@@ -33,12 +33,15 @@ jobs:
     - name: 'Build packages'
       run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-    - name: 'Get Version'
+    - name: version-from-tag-action
       id: version
-      uses: CarterChen247/version-retriever@v1
+      uses: Im-Fran/version-from-tag-action@v1.0.3
+      with:
+        remove-first-character: 'v'
+        version-variable-name: 'VERSION'
 
     - name: 'Pack Project'
-      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ steps.version.output.version-without-v }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
 
     - name: 'Push Package'
       run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -s ${{ env.NUGET_SOURCE_URL}} -k ${{ secrets.XPERIENCECOMMUNITYBASELINENUGETKEY }}
