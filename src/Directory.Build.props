@@ -17,6 +17,12 @@
 		<PackageTags>Kentico, KX13, XbyK, Xperience, Baseline, site template</PackageTags>
 	</PropertyGroup>
 	<ItemGroup>
+		<None Include="..\..\_files\icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
 		<SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(SourceLinkVersion)">
 			<PrivateAssets>all</PrivateAssets>
