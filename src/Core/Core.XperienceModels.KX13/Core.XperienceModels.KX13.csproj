@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.94" />
+		<PackageReference Include="Kentico.Xperience.Libraries" Version="$(KXVersion)" />
 	</ItemGroup>
 
 </Project>
