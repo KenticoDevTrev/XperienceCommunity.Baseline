@@ -4,7 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>TabbedPages</RootNamespace>
+    <RootNamespace>TabbedPages.KX13</RootNamespace>
+    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

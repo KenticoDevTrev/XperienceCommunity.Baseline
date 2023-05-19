@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RootNamespace>Account</RootNamespace>
+    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

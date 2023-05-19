@@ -4,8 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Core.KX13</RootNamespace>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

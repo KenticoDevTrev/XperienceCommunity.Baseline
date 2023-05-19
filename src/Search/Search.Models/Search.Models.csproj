@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Search</RootNamespace>
+    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

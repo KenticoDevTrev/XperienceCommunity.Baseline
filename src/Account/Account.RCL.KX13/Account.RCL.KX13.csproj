@@ -4,8 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Account</RootNamespace>
+    <RootNamespace>Account.KX13</RootNamespace>
 	  <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+	  <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
