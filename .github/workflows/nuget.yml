@@ -1,0 +1,35 @@
+name: "Deploy to Nuget"
+on:
+  push:
+    branches:
+      - 'releases/**'
+
+env:
+  PROJECT_PATH: "./src/XperienceCommunity.Baseline.sln"
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}\output
+  NUGET_SOURCE_URL: "https://api.nuget.org/v3/index.json"
+
+jobs:
+  deploy:
+    name: "Deploy"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: "Install dotnet"
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: "6.0.x"
+
+    - name: "Restore packages"
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: "Build packages"
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release -no-restore
+
+    - name: "Pack Project"
+      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols --output
+
+    - name: "Push Package"
+      run: dotnet nuget push ${{ PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -s ${{ env.NUGET_SOURCE_URL}} -k ${{ secrets.XPERIENCECOMMUNITYBASELINENUGETKEY }}
