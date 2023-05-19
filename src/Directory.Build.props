@@ -11,6 +11,7 @@
 		<PackageProjectUrl>https://github.com/KenticoDevTrev/XperienceCommunity.Baseline</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/KenticoDevTrev/XperienceCommunity.Baseline</RepositoryUrl>
 		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<Authors>Trevor Fayas</Authors>
 		<Company>Hbs.Net and Movement Mortgage</Company>
 		<Description>The Baseline a set of Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico</Description>
@@ -27,6 +28,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\_files\icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\readme.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
