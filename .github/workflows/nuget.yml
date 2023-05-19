@@ -2,7 +2,7 @@
 # to deploy on a version, do git tag v1.0.3-alpha (or anything with v______)
 # then this will trigger on it and use the batilla7's action to set version
 
-name: "Deploy to Nuget"
+name: "Deploy to Nuget.org"
 on:
   push:
     tags:
