@@ -1,8 +1,12 @@
+# https://www.youtube.com/watch?v=cUrrdAVmo4I
+# to deploy on a version, do git tag v1.0.3-alpha (or anything with v______)
+# then this will trigger on it and use the batilla7's action to set version
+
 name: "Deploy to Nuget"
 on:
   push:
-    branches:
-      - 'releases/**'
+    tags:
+      - 'v*'
 
 env:
   PROJECT_PATH: "./src/XperienceCommunity.Baseline.sln"
@@ -28,8 +32,12 @@ jobs:
     - name: "Build packages"
       run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release -no-restore
 
+    - name: "Get Version"
+      id: version
+      uses: battila7/get-version-action@v2
+
     - name: "Pack Project"
-      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols --output
+      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ steps.version.output.version-without-v }} --output
 
     - name: "Push Package"
       run: dotnet nuget push ${{ PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -s ${{ env.NUGET_SOURCE_URL}} -k ${{ secrets.XPERIENCECOMMUNITYBASELINENUGETKEY }}
