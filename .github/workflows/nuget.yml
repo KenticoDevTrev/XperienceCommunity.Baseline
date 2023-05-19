@@ -41,7 +41,7 @@ jobs:
         version-variable-name: 'VERSION'
 
     - name: 'Pack Project'
-      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+      run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:SymbolPackageFormat=snupkg -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
 
     - name: 'Push Package'
       run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg -s ${{ env.NUGET_SOURCE_URL}} -k ${{ secrets.XPERIENCECOMMUNITYBASELINENUGETKEY }}
