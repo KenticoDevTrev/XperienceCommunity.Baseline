@@ -1,4 +1,5 @@
 ﻿<Project>
+	<!-- Thanks to: https://lurumad.github.io/using-source-link-in-net-projects-and-how-to-configure-visual-studio-to-use-it -->
 	<PropertyGroup>
 		<NetCoreTargetVersion>net6.0</NetCoreTargetVersion>
 		<KXVersion>13.0.94</KXVersion>
