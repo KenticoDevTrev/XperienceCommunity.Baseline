@@ -35,7 +35,7 @@ jobs:
 
     - name: 'Get Version'
       id: version
-      uses: battila7/get-version-action@v2
+      uses: CarterChen247/version-retriever@v1
 
     - name: 'Pack Project'
       run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ steps.version.output.version-without-v }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
