@@ -1,13 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>Core.KX13</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Core.KX13</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.94" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.94" />
+	</ItemGroup>
 
 </Project>

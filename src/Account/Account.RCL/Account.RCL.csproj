@@ -1,32 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>Account</RootNamespace>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RootNamespace>Account</RootNamespace>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="6.0.14" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.14" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.14" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.14" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="6.0.14" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(SourceLinkVersion)" PrivateAssets="All"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Core.Library\Core.Library.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
-    <ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
-    <ProjectReference Include="..\Account.Library\Account.Library.csproj" />
-    <ProjectReference Include="..\Account.Models\Account.Models.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Core.Library\Core.Library.csproj" />
+		<ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
+		<ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
+		<ProjectReference Include="..\Account.Library\Account.Library.csproj" />
+		<ProjectReference Include="..\Account.Models\Account.Models.csproj" />
+	</ItemGroup>
 
 
 
