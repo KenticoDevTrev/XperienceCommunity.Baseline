@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Localization</RootNamespace>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<RootNamespace>Localization</RootNamespace>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
+	</ItemGroup>
+	
 </Project>

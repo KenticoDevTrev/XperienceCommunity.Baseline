@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Account.KX13</RootNamespace>
-	  <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-	  <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<RootNamespace>Account.KX13</RootNamespace>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Account.Library.KX13\Account.Library.KX13.csproj" />
-    <ProjectReference Include="..\Account.RCL\Account.RCL.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Account.Library.KX13\Account.Library.KX13.csproj" />
+		<ProjectReference Include="..\Account.RCL\Account.RCL.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,19 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>TabbedPages.KX13</RootNamespace>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<RootNamespace>TabbedPages.KX13</RootNamespace>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Core.Library.KX13\Core.Library.KX13.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Library\Core.Library.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
-    <ProjectReference Include="..\TabbedPages.Models\TabbedPages.Models.csproj" />
-    <ProjectReference Include="..\TabbedPages.XperienceModels.KX13\TabbedPages.XperienceModels.KX13.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Core.Library.KX13\Core.Library.KX13.csproj" />
+		<ProjectReference Include="..\..\Core\Core.Library\Core.Library.csproj" />
+		<ProjectReference Include="..\..\Core\Core.Models\Core.Models.csproj" />
+		<ProjectReference Include="..\TabbedPages.Models\TabbedPages.Models.csproj" />
+		<ProjectReference Include="..\TabbedPages.XperienceModels.KX13\TabbedPages.XperienceModels.KX13.csproj" />
+	</ItemGroup>
 
 </Project>

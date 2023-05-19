@@ -1,0 +1,50 @@
+﻿<Project>
+	<!-- Thanks to: https://lurumad.github.io/using-source-link-in-net-projects-and-how-to-configure-visual-studio-to-use-it -->
+	<PropertyGroup>
+		<NetCoreTargetVersion>net6.0</NetCoreTargetVersion>
+		<KXVersion>13.0.94</KXVersion>
+		<XByKVersion>0.0.0</XByKVersion>
+		<SourceLinkVersion>1.1.1</SourceLinkVersion>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Title>Kentico Xperience Baseline</Title>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/KenticoDevTrev/XperienceCommunity.Baseline</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/KenticoDevTrev/XperienceCommunity.Baseline</RepositoryUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+		<Authors>Trevor Fayas</Authors>
+		<Company>Hbs.Net and Movement Mortgage</Company>
+		<Description>The Baseline a set of Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico</Description>
+		<PackageTags>Kentico, KX13, XbyK, Xperience, Baseline, site template</PackageTags>
+		<PackageReleaseNotes>Working on getting the nuget packages built correctly</PackageReleaseNotes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<!-- Embed source files that are not tracked by the source control manager in the PDB -->
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\_files\icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\readme.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(SourceLinkVersion)">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+</Project>

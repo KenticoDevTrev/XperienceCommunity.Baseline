@@ -1,28 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>Navigation.KX13</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Navigation.KX13</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="PartialWidgetPage.Kentico.MVC.Core" Version="13.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="PartialWidgetPage.Kentico.MVC.Core" Version="13.1.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
-    <ProjectReference Include="..\Navigation.Library.KX13\Navigation.Library.KX13.csproj" />
-    <ProjectReference Include="..\Navigation.RCL\Navigation.RCL.csproj" />
-  </ItemGroup>
-
-
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
+		<ProjectReference Include="..\Navigation.Library.KX13\Navigation.Library.KX13.csproj" />
+		<ProjectReference Include="..\Navigation.RCL\Navigation.RCL.csproj" />
+	</ItemGroup>
 
 </Project>
