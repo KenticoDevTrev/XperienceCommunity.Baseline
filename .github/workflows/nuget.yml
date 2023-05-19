@@ -9,35 +9,35 @@ on:
       - 'v*'
 
 env:
-  PROJECT_PATH: "./src/XperienceCommunity.Baseline.sln"
+  PROJECT_PATH: './src/XperienceCommunity.Baseline.sln'
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}\output
-  NUGET_SOURCE_URL: "https://api.nuget.org/v3/index.json"
+  NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
 
 jobs:
   deploy:
-    name: "Deploy"
-    runs-on: ubuntu-latest
+    name: 'Deploy'
+    runs-on: 'ubuntu-latest'
     steps:
-    - name: "Checkout"
+    - name: 'Checkout'
       uses: actions/checkout@v2
 
-    - name: "Install dotnet"
+    - name: 'Install dotnet'
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: "6.0.x"
+        dotnet-version: '6.0.x'
 
-    - name: "Restore packages"
+    - name: 'Restore packages'
       run: dotnet restore ${{ env.PROJECT_PATH }}
 
-    - name: "Build packages"
+    - name: 'Build packages'
       run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release -no-restore
 
-    - name: "Get Version"
+    - name: 'Get Version'
       id: version
       uses: battila7/get-version-action@v2
 
-    - name: "Pack Project"
+    - name: 'Pack Project'
       run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ steps.version.output.version-without-v }} --output
 
-    - name: "Push Package"
+    - name: 'Push Package'
       run: dotnet nuget push ${{ PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -s ${{ env.NUGET_SOURCE_URL}} -k ${{ secrets.XPERIENCECOMMUNITYBASELINENUGETKEY }}
