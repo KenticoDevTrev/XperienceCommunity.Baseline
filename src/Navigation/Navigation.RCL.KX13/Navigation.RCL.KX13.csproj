@@ -4,8 +4,6 @@
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
 		<RootNamespace>Navigation.KX13</RootNamespace>

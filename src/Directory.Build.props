@@ -15,6 +15,15 @@
 		<Company>Hbs.Net and Movement Mortgage</Company>
 		<Description>The Baseline a set of Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico</Description>
 		<PackageTags>Kentico, KX13, XbyK, Xperience, Baseline, site template</PackageTags>
+		<PackageReleaseNotes>Working on getting the nuget packages built correctly</PackageReleaseNotes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<!-- Embed source files that are not tracked by the source control manager in the PDB -->
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\_files\icon.png">

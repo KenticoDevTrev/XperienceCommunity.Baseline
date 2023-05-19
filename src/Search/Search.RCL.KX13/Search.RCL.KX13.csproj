@@ -4,8 +4,6 @@
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RootNamespace>Search.KX13</RootNamespace>

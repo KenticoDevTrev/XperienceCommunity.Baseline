@@ -4,8 +4,6 @@
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RootNamespace>Account</RootNamespace>
@@ -21,7 +19,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.14" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.14" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="6.0.14" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(SourceLinkVersion)" PrivateAssets="All"/>
 	</ItemGroup>
 
 	<ItemGroup>
