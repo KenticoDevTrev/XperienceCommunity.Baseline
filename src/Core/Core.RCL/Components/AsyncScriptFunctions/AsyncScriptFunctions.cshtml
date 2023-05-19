@@ -1,0 +1,29 @@
+﻿<script>
+    @* All javascript that depends on any library should use window.OnScriptsLoaded(function() { }) so it will run after the javascript is loaded *@
+    @* Add an optional string identifier if you wish to make sure something is only ran once *@
+        window.OnScriptsLoaded = function(fn, identifier) {
+            window.PreloadIdentifiers = window.PreloadIdentifiers || [];
+            var addScript = true;
+            if (typeof identifier !== "undefined" && identifier != null) {
+                if (window.PreloadIdentifiers.indexOf(identifier) == -1) {
+                    window.PreloadIdentifiers.push(identifier);
+                } else {
+                    // this script by this identifier is already added
+                    addScript = false;
+                }
+            }
+            if (addScript) {
+                if (window.ScriptsLoaded) {
+                    fn();
+                } else {
+                    window.PreloadQueue = window.PreloadQueue || [];
+                    window.PreloadQueue.push(fn);
+                }
+            }
+        };
+    @* Loading javascript, should be {src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool} *@
+    window.LoadScript = function (scriptObj) {
+        window.scriptsToLoad = window.scriptsToLoad || [];
+        window.scriptsToLoad.push(scriptObj);
+    }
+</script>

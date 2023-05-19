@@ -1,0 +1,61 @@
+﻿@model Core.Components.AsyncScriptLoader.AsyncScriptLoaderViewModel
+
+<script>
+    @* This will run last after all scripts loaded, and will run the Preload methods
+        Content should be:
+
+        window.ScriptsLoaded = !0;
+        for (var queuedScripts = window.PreloadQueue || [], i = 0; i < queuedScripts.length; i++)
+        queuedScripts[i]();
+
+        *@
+        LoadScript({ src: "@(Model.ScriptRunnerPath)", appendAtEnd: true });
+
+    @* This runs after all scripts are loaded (defered as well), and runs any queued items *@
+        window.addEventListener("load", function () {
+    @* This timeout is so this run asyncly *@
+                setTimeout(function () {
+                    var loadedScripts = [];
+                    // Get all that aren't "appendAtEnd" first, then run others after
+                    for (var i = 0; i < window.scriptsToLoad.length; i++) {
+                        var options = window.scriptsToLoad[i];
+                        if (loadedScripts.indexOf(options.src) == -1) {
+                            if (typeof options.appendAtEnd === "undefined" || options.appendAtEnd == null || options.appendAtEnd == false) {
+                                loadedScripts.push(options.src);
+                                var scrpt = document.createElement("script");
+                                scrpt.async = false;
+                                scrpt.src = options.src;
+
+                                scrpt.crossOrigin = options.crossorigin;
+                                if (options.head) {
+                                    document.head.appendChild(scrpt);
+                                }
+                                else {
+                                    document.body.appendChild(scrpt);
+                                }
+                            }
+                        }
+                    }
+                    // Now re-run those append at end
+                    for (var i = 0; i < window.scriptsToLoad.length; i++) {
+                        var options = window.scriptsToLoad[i];
+                        if (loadedScripts.indexOf(options.src) == -1) {
+                            if (options.appendAtEnd == true) {
+                                loadedScripts.push(options.src);
+                                var scrpt = document.createElement("script");
+                                scrpt.async = false;
+                                scrpt.src = options.src;
+
+                                scrpt.crossOrigin = options.crossorigin;
+                                if (options.head) {
+                                    document.head.appendChild(scrpt);
+                                }
+                                else {
+                                    document.body.appendChild(scrpt);
+                                }
+                            }
+                        }
+                    }
+                }, 1);
+        });
+</script>
