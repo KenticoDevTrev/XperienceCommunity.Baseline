@@ -3,6 +3,7 @@
 # then this will trigger on it and use the batilla7's action to set version
 
 name: "Deploy to Nuget.org"
+
 on:
   push:
     tags:
