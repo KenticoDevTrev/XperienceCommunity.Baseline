@@ -83,9 +83,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Search.RCL.KX13", "Search\S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoNotes", "RepoNotes", "{CA588846-ED19-4936-959C-D6BA7B9C05F8}"
 	ProjectSection(SolutionItems) = preProject
-		RepoNotes\GlobalUsing.cs = RepoNotes\GlobalUsing.cs
 		..\README.md = ..\README.md
-		RepoNotes\_ViewImports.cshtml = RepoNotes\_ViewImports.cshtml
+		RepoNotes\GlobalUsing.KX13.cs = RepoNotes\GlobalUsing.KX13.cs
+		RepoNotes\_ViewImports.KX13.cshtml = RepoNotes\_ViewImports.KX13.cshtml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3CA7213C-A93C-499F-A05F-332274B7169C}"
