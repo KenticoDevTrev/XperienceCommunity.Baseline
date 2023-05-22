@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.EMMA;
-
-namespace Core.Components.PageMetaData
+﻿namespace Core.Components.PageMetaData
 {
     [ViewComponent]
     public class PageMetaDataViewComponent : ViewComponent

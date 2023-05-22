@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>TabbedPages</RootNamespace>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>TabbedPages</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

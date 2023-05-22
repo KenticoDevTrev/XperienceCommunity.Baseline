@@ -2,7 +2,6 @@
 using CMS.Membership;
 using Microsoft.AspNetCore.Http;
 using MVCCaching;
-using MVCCaching.Base.Core.Interfaces;
 
 namespace Core.Repositories.Implementation
 {

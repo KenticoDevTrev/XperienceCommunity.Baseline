@@ -1,17 +1,13 @@
-﻿using Kentico.Membership;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
-namespace Account.Features.Account.LogOut
+﻿namespace Account.Features.Account.LogOut
 {
     public class LogOutController : Controller
     {
         public const string _routeUrl = "Account/LogOut";
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ISignInManagerService _signInManagerService;
 
-        public LogOutController(SignInManager<ApplicationUser> signInManager)
+        public LogOutController(ISignInManagerService signInManagerService)
         {
-            _signInManager = signInManager;
+            _signInManagerService = signInManagerService;
         }
 
         [HttpGet]
@@ -29,7 +25,7 @@ namespace Account.Features.Account.LogOut
         public async Task<ActionResult> LogOut(LogOutViewModel model)
         {
             // Signs out the current user
-            await _signInManager.SignOutAsync();
+            await _signInManagerService.SignOutAsync();
 
             // Redirects to site root
             return Redirect("/");

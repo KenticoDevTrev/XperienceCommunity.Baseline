@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <WarningsAsErrors>Nullable</WarningsAsErrors>
+	  <AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Core" Version="$(XByKVersion)" />
+  </ItemGroup>
+
+</Project>

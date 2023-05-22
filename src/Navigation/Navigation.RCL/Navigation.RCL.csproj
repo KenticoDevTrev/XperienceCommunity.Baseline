@@ -2,12 +2,12 @@
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RootNamespace>Navigation</RootNamespace>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Navigation</RootNamespace>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	</PropertyGroup>
 
 	<ItemGroup>

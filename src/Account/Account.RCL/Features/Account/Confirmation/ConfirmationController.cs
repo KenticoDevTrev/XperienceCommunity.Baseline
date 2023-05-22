@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Account.Features.Account.Confirmation
+﻿namespace Account.Features.Account.Confirmation
 {
     public class ConfirmationController : Controller
     {

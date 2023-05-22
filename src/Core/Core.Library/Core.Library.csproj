@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core</RootNamespace>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Core</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

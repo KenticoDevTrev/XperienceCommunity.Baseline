@@ -6,14 +6,16 @@
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-		<RootNamespace>Core</RootNamespace>
+		<RootNamespace>Core.Xperience</RootNamespace>
 	</PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
+    <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
+  </ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="FluentValidation" Version="11.5.1" />
-		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
-		<PackageReference Include="MVCCaching.Base.Core" Version="4.0.0" />
+		<PackageReference Include="Kentico.Xperience.WebApp" Version="$(XByKVersion)" />
 	</ItemGroup>
 
 </Project>

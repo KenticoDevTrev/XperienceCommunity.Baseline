@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Localization.KX13</RootNamespace>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Localization.KX13</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

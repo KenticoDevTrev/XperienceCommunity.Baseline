@@ -1,5 +1,4 @@
 ﻿using Account.Features.Account.MyAccount;
-using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,37 +15,37 @@ namespace Account.Features.Account.LogIn
         private readonly IAccountSettingsRepository _accountSettingsRepository;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRoleService _roleService;
         private readonly ISiteRepository _siteRepository;
         private readonly IModelStateService _modelStateService;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthenticationConfigurations _authenticationConfigurations;
+        private readonly ISignInManagerService _signInManagerService;
+        private readonly IUserManagerService _userManagerService;
 
         public LogInController(IUserRepository userRepository,
             IAccountSettingsRepository accountSettingsRepository,
             IUserService userService,
             ILogger logger,
-            SignInManager<ApplicationUser> signInManager,
             IHttpContextAccessor httpContextAccessor,
             IRoleService roleService,
             ISiteRepository siteRepository,
             IModelStateService modelStateService,
-            UserManager<ApplicationUser> userManager,
-            IAuthenticationConfigurations authenticationConfigurations)
+            IAuthenticationConfigurations authenticationConfigurations,
+            ISignInManagerService signInManagerService,
+            IUserManagerService userManagerService)
         {
             _userRepository = userRepository;
             _accountSettingsRepository = accountSettingsRepository;
             _userService = userService;
             _logger = logger;
-            _signInManager = signInManager;
             _httpContextAccessor = httpContextAccessor;
             _roleService = roleService;
             _siteRepository = siteRepository;
             _modelStateService = modelStateService;
-            _userManager = userManager;
             _authenticationConfigurations = authenticationConfigurations;
+            _signInManagerService = signInManagerService;
+            _userManagerService = userManagerService;
         }
 
         /// <summary>
@@ -95,24 +94,22 @@ namespace Account.Features.Account.LogIn
                     return Redirect("/" + _twoFormAuthenticationUrl);
                 }
                 var actualUser = actualUserResult.Value;
-                var applicationUser = await _userManager.FindByNameAsync(actualUser.UserName);
 
-
-                var passwordValid = await _userManager.CheckPasswordAsync(applicationUser, model.Password);
+                var passwordValid = await _userManagerService.CheckPasswordByNameAsync(actualUser.UserName, model.Password);
 
                 if (passwordValid && _authenticationConfigurations.UseTwoFormAuthentication())
                 {
-                    if (await _signInManager.IsTwoFactorClientRememberedAsync(applicationUser))
+                    if (await _signInManagerService.IsTwoFactorClientRememberedByNameAsync(actualUser.UserName))
                     {
                         // Sign in and proceed.
-                        await _signInManager.SignInAsync(applicationUser, model.StayLogedIn);
+                        await _signInManagerService.SignInByNameAsync(actualUser.UserName, model.StayLogedIn);
                         return await LoggedInRedirect(model.RedirectUrl);
                     }
                     else
                     {
                         // Send email
-                        var token = await _userManager.GenerateTwoFactorTokenAsync(applicationUser, "Email");
-                        await _userService.SendVerificationCodeEmailAsync(actualUser, token);
+                        var token = await _userManagerService.GenerateTwoFactorTokenByNameAsync(actualUser.UserName, "Email");
+                        await _userService.SendVerificationCodeEmailAsync(actualUser, "Email");
 
                         // Redirect to Two form auth page
                         var twoFormAuthViewModel = new TwoFormAuthenticationViewModel()
@@ -132,7 +129,7 @@ namespace Account.Features.Account.LogIn
                 }
 
                 // Normal sign in
-                model.Result = await _signInManager.PasswordSignInAsync(actualUser.UserName, model.Password, model.StayLogedIn, false);
+                model.Result = await _signInManagerService.PasswordSignInByNameAsync(actualUser.UserName, model.Password, model.StayLogedIn, false);
             }
             catch (Exception ex)
             {
@@ -162,8 +159,8 @@ namespace Account.Features.Account.LogIn
             // Handle no user found
             if (model.UserName.AsNullOrWhitespaceMaybe().TryGetValue(out var userName))
             {
-                var user = await _userManager.FindByNameAsync(userName);
-                if (user == null)
+                var userExists = await _userManagerService.UserExistsByNameAsync(userName);
+                if (!userExists)
                 {
                     string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
                     return Redirect(loginUrl);
@@ -179,19 +176,18 @@ namespace Account.Features.Account.LogIn
             if (ModelState.IsValid)
             {
                 // This always returns failed, can't figure out why.
-                //var result = await  _signInManager.TwoFactorAuthenticatorSignInAsync(model.TwoFormCode, false, false);// model.StayLoggedIn, model.RememberComputer);
 
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                if (user == null)
+                var userExists = await _userManagerService.UserExistsByNameAsync(model.UserName);
+                if (!userExists)
                 {
                     return Redirect($"/{_routeUrl}");
                 }
 
                 // Verify token is correct
-                var tokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, "Email", model.TwoFormCode);
+                var tokenValid = await _userManagerService.VerifyTwoFactorTokenByNameAsync(model.UserName, "Email", model.TwoFormCode);
                 if (tokenValid)
                 {
-                    await _signInManager.SignInAsync(user, model.StayLoggedIn);
+                    await _signInManagerService.SignInByNameAsync(model.UserName, model.StayLoggedIn);
                     // Redirectig away from Login, clear TempData so if they return to login it doesn't persist
                     _modelStateService.ClearViewModel<TwoFormAuthenticationViewModel>(TempData);
                     ModelState.Clear();
@@ -212,18 +208,18 @@ namespace Account.Features.Account.LogIn
         public IActionResult ExternalLogin(string provider, string returnUrl = "")
         {
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            var properties = _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl ?? "/");
             properties.SetParameter("AuthType", "reauthorize");
             return Challenge(properties, provider);
         }
 
         [HttpGet]
         [Route("Account/ExternalLoginCallback")]
-        public async Task<IActionResult> ExternalLoginCallback(LogInViewModel model, string returnUrl = "")
+        public async Task<IActionResult> ExternalLoginCallback(LogInViewModel model)
         {
             string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
 
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            var info = await _signInManagerService.GetExternalLoginInfoAsync();
 
             if (info == null)
             {
@@ -237,31 +233,10 @@ namespace Account.Features.Account.LogIn
                 return Redirect(loginUrl);
             }
 
-            var applicationUser = await _userManager.FindByEmailAsync(email);
-            if (applicationUser != null)
+            var applicationUserExists = await _userManagerService.UserExistsByEmailAsync(email);
+            if (applicationUserExists)
             {
-                bool updateUser = false;
-                // If user started account through email, but then didn't confirm and 
-                // then authenticated 3rd party, their email is now 'confirmed' so will enable
-                // and set that to true.  This way you can STILL disable an existing account
-                if (!applicationUser.Enabled && !applicationUser.EmailConfirmed)
-                {
-                    applicationUser.Enabled = true;
-                    applicationUser.EmailConfirmed = true;
-                    updateUser = true;
-                }
-
-                // Depending on setting, convert to external only
-                if (!applicationUser.IsExternal && _authenticationConfigurations.GetExistingInternalUserBehavior() != ExistingInternalUserBehavior.LeaveAsIs)
-                {
-                    applicationUser.IsExternal = true;
-                    updateUser = true;
-                }
-
-                if (updateUser)
-                {
-                    await _userManager.UpdateAsync(applicationUser);
-                }
+                _ = await _userManagerService.EnableUserByEmailAsync(email, _authenticationConfigurations.GetExistingInternalUserBehavior() != ExistingInternalUserBehavior.LeaveAsIs);
             }
             else
             {
@@ -278,11 +253,10 @@ namespace Account.Features.Account.LogIn
                     isExternal: true,
                     isPublic: false
                     ));
-                applicationUser = await _userManager.FindByEmailAsync(email);
             }
 
             // Sign in
-            await _signInManager.SignInAsync(applicationUser, model.StayLogedIn);
+            await _signInManagerService.SignInByEmailAsync(email, model.StayLogedIn);
 
             var externalUserRoles = _authenticationConfigurations.AllExternalUserRoles().ToList();
 
@@ -304,10 +278,11 @@ namespace Account.Features.Account.LogIn
                     break;
             }
 
+            int userId = await _userManagerService.GetUserIDByEmailAsync(email);
             foreach (string role in externalUserRoles)
             {
                 await _roleService.CreateRoleIfNotExisting(role, _siteRepository.CurrentSiteName());
-                await _roleService.SetUserRole(applicationUser.Id, role, _siteRepository.CurrentSiteName(), true);
+                await _roleService.SetUserRole(userId, role, _siteRepository.CurrentSiteName(), true);
             }
             model.Result = SignInResult.Success;
 

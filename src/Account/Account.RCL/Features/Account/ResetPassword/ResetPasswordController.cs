@@ -1,5 +1,5 @@
-﻿using System.Security.Principal;
-using XperienceCommunity.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Principal;
 
 namespace Account.Features.Account.ResetPassword
 {
@@ -29,7 +29,7 @@ namespace Account.Features.Account.ResetPassword
         /// Password Reset, must be authenticated to reset password this way.
         /// </summary>        
         [HttpGet]
-        [ControllerActionAuthorization(userAuthenticationRequired: true)]
+        [Authorize]
         [Route(_routeUrl)]
         public ActionResult ResetPassword()
         {
@@ -41,7 +41,7 @@ namespace Account.Features.Account.ResetPassword
         /// </summary>
         [HttpPost]
         [Route(_routeUrl)]
-        [ControllerActionAuthorization(userAuthenticationRequired: true)]
+        [Authorize]
         [ExportModelState]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
@@ -88,5 +88,7 @@ namespace Account.Features.Account.ResetPassword
         {
             return "/" + _routeUrl;
         }
+
     }
+
 }

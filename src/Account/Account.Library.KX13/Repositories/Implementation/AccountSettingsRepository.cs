@@ -1,7 +1,6 @@
 ﻿using CMS.DataEngine;
 using Core.Services;
 using MVCCaching;
-using MVCCaching.Base.Core.Interfaces;
 
 namespace Account.Repositories.Implementation
 {

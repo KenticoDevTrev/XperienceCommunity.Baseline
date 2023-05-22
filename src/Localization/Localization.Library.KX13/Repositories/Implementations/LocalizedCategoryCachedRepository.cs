@@ -3,7 +3,6 @@ using CMS.Helpers;
 using CMS.Localization;
 using CMS.Taxonomy;
 using MVCCaching;
-using MVCCaching.Base.Core.Interfaces;
 using System.Data;
 
 namespace Localization.Repositories.Implementations

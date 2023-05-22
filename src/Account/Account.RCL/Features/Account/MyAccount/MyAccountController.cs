@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using XperienceCommunity.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
 namespace Account.Features.Account.MyAccount
 {
     public class MyAccountController : Controller
     {
         // If Adjusted, also adjust LogInController.cs as well
-        public const string _routeUrl = "Account/MyAccount";
 
         public MyAccountController()
         {
@@ -17,7 +15,7 @@ namespace Account.Features.Account.MyAccount
         /// </summary>
         [HttpGet]
         [Route(MyAccountControllerPath._routeUrl)]
-        [ControllerActionAuthorization(userAuthenticationRequired: true)]
+        [Authorize]
         public ActionResult MyAccount()
         {
             return View("/Features/Account/MyAccount/MyAccountManual.cshtml");

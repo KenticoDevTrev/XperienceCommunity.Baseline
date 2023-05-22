@@ -1,7 +1,6 @@
 ﻿using Account.Features.Account.ForgotPassword;
 using Account.Features.Account.MyAccount;
 using Account.Features.Account.Registration;
-using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 
@@ -13,19 +12,19 @@ namespace Account.Features.Account.LogIn
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAccountSettingsRepository _accountSettingsRepository;
         private readonly IPageContextRepository _pageContextRepository;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ISignInManagerService _signInManagerService;
         private readonly IModelStateService _modelStateService;
 
         public LogInViewComponent(IHttpContextAccessor httpContextAccessor,
             IAccountSettingsRepository accountSettingsRepository,
             IPageContextRepository pageContextRepository,
-            SignInManager<ApplicationUser> signInManager,
+            ISignInManagerService signInManagerService,
             IModelStateService modelStateService)
         {
             _httpContextAccessor = httpContextAccessor;
             _accountSettingsRepository = accountSettingsRepository;
             _pageContextRepository = pageContextRepository;
-            _signInManager = signInManager;
+            _signInManagerService = signInManagerService;
             _modelStateService = modelStateService;
         }
 
@@ -57,7 +56,7 @@ namespace Account.Features.Account.LogIn
                 MyAccountUrl = await _accountSettingsRepository.GetAccountMyAccountUrlAsync(MyAccountControllerPath.GetUrl()),
                 RegistrationUrl = await _accountSettingsRepository.GetAccountRegistrationUrlAsync(RegistrationController.GetUrl()),
                 ForgotPassword = await _accountSettingsRepository.GetAccountForgotPasswordUrlAsync(ForgotPasswordController.GetUrl()),
-                ExternalLoginProviders = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList(),
+                ExternalLoginProviders = (await _signInManagerService.GetExternalAuthenticationSchemesAsync()).ToList(),
             };
 
             // Set this value fresh

@@ -6,23 +6,13 @@
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
-		<RootNamespace>Core.KX13</RootNamespace>
+		<RootNamespace>Core.Xperience</RootNamespace>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Core.Library.KX13\Core.Library.KX13.csproj" />
+		<ProjectReference Include="..\Core.Library.Xperience\Core.Library.Xperience.csproj" />
 		<ProjectReference Include="..\Core.RCL\Core.RCL.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="13.0.94" />
-		<PackageReference Include="XperienceCommunity.PageTemplateUtilities" Version="1.0.0" />
-	</ItemGroup>
-
 
 </Project>
