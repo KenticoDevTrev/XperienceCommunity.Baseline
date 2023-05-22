@@ -20,6 +20,7 @@
 		<PackageReleaseNotes>Working on getting the nuget packages built correctly</PackageReleaseNotes>
 	</PropertyGroup>
 	<PropertyGroup>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->

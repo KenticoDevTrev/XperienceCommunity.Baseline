@@ -6,7 +6,6 @@
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<RootNamespace>Account</RootNamespace>
-		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
