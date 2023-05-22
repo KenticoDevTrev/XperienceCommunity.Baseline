@@ -2,18 +2,18 @@
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Core</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="11.5.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
-		<PackageReference Include="MVCCaching.Base.Core" Version="3.0.2" />
+		<PackageReference Include="MVCCaching.Base.Core" Version="4.0.0" />
 	</ItemGroup>
 
 </Project>

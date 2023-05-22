@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<NetCoreTargetVersion>net6.0</NetCoreTargetVersion>
 		<KXVersion>13.0.94</KXVersion>
-		<XByKVersion>0.0.0</XByKVersion>
+		<XByKVersion>26.2.0</XByKVersion>
 		<SourceLinkVersion>1.1.1</SourceLinkVersion>
 	</PropertyGroup>
 	<PropertyGroup>

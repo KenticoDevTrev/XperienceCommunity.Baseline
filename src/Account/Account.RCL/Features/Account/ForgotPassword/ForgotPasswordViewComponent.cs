@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Account.Features.Account.ForgotPassword
+﻿namespace Account.Features.Account.ForgotPassword
 {
     [ViewComponent]
     public class ForgotPasswordViewComponent : ViewComponent

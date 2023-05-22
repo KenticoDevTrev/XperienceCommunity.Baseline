@@ -6,7 +6,6 @@ using Core.Enums;
 using Core.Models;
 using Kentico.Content.Web.Mvc;
 using Microsoft.SqlServer.Dac.Model;
-using MVCCaching.Base.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

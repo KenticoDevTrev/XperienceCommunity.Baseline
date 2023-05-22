@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Core.Xperience</RootNamespace>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
+    <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Kentico.Xperience.WebApp" Version="$(XByKVersion)" />
+	</ItemGroup>
+
+</Project>

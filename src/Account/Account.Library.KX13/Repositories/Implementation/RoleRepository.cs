@@ -1,7 +1,6 @@
 ﻿using CMS.Helpers;
 using CMS.Membership;
 using CMS.Modules;
-using MVCCaching.Base.Core.Interfaces;
 using MVCCaching;
 using Core;
 

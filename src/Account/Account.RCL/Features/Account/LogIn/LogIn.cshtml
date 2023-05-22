@@ -23,13 +23,7 @@ else
     <form asp-controller="LogIn" asp-action="LogIn" method="POST" asp-antiforgery="true">
 
         <div class="container">
-            <page-data-context initialized="false">
-                <h1 class="text-center pt-4 pb-2">Log in to your account</h1>
-            </page-data-context>
-            <page-data-context initialized="true">
-                <page-data />
-                <editable-area area-identifier="main" />
-            </page-data-context>
+            <h1 class="text-center pt-4 pb-2">Log in to your account</h1>
             <div asp-validation-summary="All" class="alert alert-danger text-danger col-12" role="alert"></div>
 
             <input type="hidden" asp-for=RedirectUrl />

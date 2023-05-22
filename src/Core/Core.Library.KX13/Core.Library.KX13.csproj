@@ -2,17 +2,17 @@
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core.KX13</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Core.KX13</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="13.0.94" />
-		<PackageReference Include="RelationshipsExtended.Base" Version="13.0.3" />
-		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.5.3" />
+		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="$(KXVersion)" />
+		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.5.4" />
+		<PackageReference Include="RelationshipsExtended.Base" Version="13.0.7" />
 		<PackageReference Include="XperienceCommunity.PageBuilderTagHelpers" Version="1.1.0" />
 		<PackageReference Include="XperienceCommunity.PageBuilderUtilities" Version="1.1.0" />
 		<PackageReference Include="XperienceCommunity.PageTemplateUtilities" Version="1.0.0" />

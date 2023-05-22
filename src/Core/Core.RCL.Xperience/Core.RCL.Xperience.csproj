@@ -7,15 +7,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyName>$(SolutionName).$(MSBuildProjectName)</AssemblyName>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RootNamespace>Core</RootNamespace>
+		<RootNamespace>Core.Xperience</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<ProjectReference Include="..\Core.Library.Xperience\Core.Library.Xperience.csproj" />
+		<ProjectReference Include="..\Core.RCL\Core.RCL.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Core.Library\Core.Library.csproj" />
-		<ProjectReference Include="..\Core.Models\Core.Models.csproj" />
-	</ItemGroup>
 </Project>
