@@ -5,15 +5,9 @@
     <RootNamespace>XperienceModels</RootNamespace>
   </PropertyGroup>
 <PropertyGroup>
-  <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-  <RestoreLockedMode>true</RestoreLockedMode>
   <NoWarn>NU1603</NoWarn>
   <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 </PropertyGroup>
-<ItemGroup>
-    <Content Remove="packages.lock.json" />
-	<None Remove="packages.lock.json" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.94" />
   </ItemGroup>

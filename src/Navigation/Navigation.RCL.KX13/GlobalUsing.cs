@@ -24,3 +24,5 @@ global using Kentico.PageBuilder.Web.Mvc;
 global using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 // Feature
+global using Navigation.Repositories;
+global using Navigation.Models;
