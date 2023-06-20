@@ -57,6 +57,7 @@ namespace Core.Repositories.Implementation
                 var allCategoryItems = _categoryInfoProvider.Get()
                 .Columns(nameof(CategoryInfo.CategoryID),
                 nameof(CategoryInfo.CategoryName),
+                nameof(CategoryInfo.CategoryDisplayName),
                 nameof(CategoryInfo.CategoryGUID),
                 nameof(CategoryInfo.CategoryParentID),
                 nameof(CategoryInfo.CategoryDescription))

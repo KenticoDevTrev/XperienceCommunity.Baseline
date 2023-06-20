@@ -1,4 +1,4 @@
-﻿namespace Core
+﻿namespace System
 {
     public static class ToDocumentNodeIdentityHelper
     {

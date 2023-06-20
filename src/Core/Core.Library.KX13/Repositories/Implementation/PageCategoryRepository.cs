@@ -1,7 +1,7 @@
 ﻿using CMS;
 using CMS.DataEngine;
 using CMS.Taxonomy;
-using Core.Comparers;
+using Core;
 
 namespace Generic.Repositories.Implementation
 {

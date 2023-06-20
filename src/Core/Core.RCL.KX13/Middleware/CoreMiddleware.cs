@@ -18,6 +18,7 @@ namespace Core
             services.AddScoped<IBaselinePageBuilderContext, BaselinePageBuilderContext>()
                 .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
                 .AddScoped<IMediaRepository, MediaRepository>()
+                .AddScoped<IMetaDataRepository, MetaDataRepository>()
                 .AddScoped<IPageCategoryRepository, PageCategoryRepository>()
                 .AddScoped<IPageContextRepository, PageContextRepository>()
                 .AddScoped<ISiteRepository, SiteRepository>()

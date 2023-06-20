@@ -73,7 +73,7 @@ namespace Core.Repositories.Implementation
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
                 return await _mediaFileInfoProvider.GetAsync(fileGuid, await _siteRepository.GetSiteIDAsync());
-            }, new CacheSettings(15, "GetMediaItemAsync", fileGuid));
+            }, new CacheSettings(CacheMinuteTypes.Short.ToDouble(), "GetMediaItemAsync", fileGuid));
             if (result != null)
             {
                 return Result.Success(MediaFileInfoToMediaItem(result));
@@ -116,9 +116,7 @@ namespace Core.Repositories.Implementation
                 query => query
                     .WhereEquals(nameof(TreeNode.DocumentID), docId),
                 cacheSettings => cacheSettings
-                    .Dependencies((items, csbuilder) => builder.ApplyDependenciesTo(key => csbuilder.Custom(key)))
-                    .Key($"GetPageAttachmentsAsync|{docId}")
-                    .Expiration(TimeSpan.FromMinutes(15))
+                .Configure(builder, CacheMinuteTypes.Short.ToDouble(), "GetPageAttachmentsAsync", docId)
                 );
 
             if (results.Any())

@@ -1,7 +1,6 @@
-﻿using Core.Models;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Core.Comparers
+namespace Core
 {
     public class ObjectIdentityEqualityComparer : IEqualityComparer<ObjectIdentity>
     {

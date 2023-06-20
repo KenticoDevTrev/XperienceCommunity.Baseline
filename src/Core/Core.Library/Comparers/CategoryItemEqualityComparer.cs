@@ -1,6 +1,4 @@
-﻿using Core.Models;
-
-namespace Core.Comparers
+﻿namespace Core
 {
     public class CategoryItemEqualityComparer : IEqualityComparer<CategoryItem>
     {

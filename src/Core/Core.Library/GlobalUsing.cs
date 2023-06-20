@@ -10,6 +10,5 @@ global using Core.Services;
 global using Core.Models;
 global using Core.Extensions;
 global using Core.Enums;
-global using Core.Comparers;
 global using Core.Interfaces;
 global using MVCCaching;
