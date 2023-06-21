@@ -4,7 +4,7 @@
 
 @if (Model.Title.TryGetValue(out var title))
 {
-    ViewBag.Title = title; ;
+    ViewBag.Title = title;
     <title>@title</title>
     <meta property="og:title" content="@title" />
 }
@@ -19,7 +19,7 @@
 }
 @if (Model.Thumbnail.TryGetValue(out var thumbnail))
 {
-    <meta property="og:image" content="@UrlHelper.Content(thumbnail)" />
+    <meta property="og:image" content="@UrlResolver.GetAbsoluteUrl(UrlHelper.Content(thumbnail))" />
 }
 @if(Model.CanonicalUrl.TryGetValue(out var canonicalUrl)) {
     <link rel="canonical" href="@UrlResolver.GetAbsoluteUrl(canonicalUrl)" />
