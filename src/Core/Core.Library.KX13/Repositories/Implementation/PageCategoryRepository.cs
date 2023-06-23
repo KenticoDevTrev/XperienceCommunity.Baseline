@@ -2,6 +2,7 @@
 using CMS.DataEngine;
 using CMS.Taxonomy;
 using Core;
+using System.Data;
 
 namespace Generic.Repositories.Implementation
 {
@@ -76,19 +77,18 @@ namespace Generic.Repositories.Implementation
                 };
 
                 // no need to cache this call as caching entire thing
-                var query = new ObjectQuery<TreeCategoryInfo>()
-                    .Source(x => x.InnerJoin(new QuerySourceTable("CMS_Tree"), $"CMS_Tree.{nameof(TreeNode.NodeID)}", $"{TreeCategoryInfo.OBJECT_TYPE.Replace(".", "_")}.{nameof(TreeCategoryInfo.NodeID)}"))
-                    .Source(x => x.InnerJoin<CategoryInfo>($"{TreeCategoryInfo.OBJECT_TYPE.Replace(".", "_")}.{nameof(TreeCategoryInfo.CategoryID)}", $"{CategoryInfo.OBJECT_TYPE.Replace(".", "_")}.{nameof(CategoryInfo.CategoryID)}"))
-                    .Columns(new string[] {
-                        $"CMS_Tree.{nameof(TreeNode.NodeID)}",
-                        $"CMS_Tree.{nameof(TreeNode.NodeAliasPath)}",
-                        $"{CategoryInfo.OBJECT_TYPE.Replace(".", "_")}.{nameof(CategoryInfo.CategoryID)}"
-                        });
-                var retriever = await query.GetEnumerableResultAsync(System.Data.CommandBehavior.Default);
+                var query = @"
+select T.NodeID, T.NodeAliasPath, C.CategoryID
+from CMS_Tree T
+inner join CMS_TreeCategory TC on TC.NodeID = T.NodeID
+inner join CMS_Category C on C.CategoryID = TC.CategoryID
+";
+
+                var retriever = await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
 
                 // Group into two dictionaries
                 var categoriesById = _categoryCachedRepository.GetCategoryCachedById();
-                var items = retriever.Where(x => categoriesById.ContainsKey((int)x[nameof(CategoryInfo.CategoryID)])).Select(x => new PageCategoryItem(
+                var items = retriever.Tables[0].Rows.Cast<DataRow>().Where(x => categoriesById.ContainsKey((int)x[nameof(CategoryInfo.CategoryID)])).Select(x => new PageCategoryItem(
                     nodeID: (int)x[nameof(TreeNode.NodeID)],
                     path: (string)x[nameof(TreeNode.NodeAliasPath)],
                     categoryItem: categoriesById[(int)x[nameof(CategoryInfo.CategoryID)]]
