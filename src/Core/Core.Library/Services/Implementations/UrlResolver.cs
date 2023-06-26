@@ -16,6 +16,10 @@ namespace Core.Services.Implementations
 
         public string GetAbsoluteUrl(string relativeUrl)
         {
+            if(relativeUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase) || relativeUrl.StartsWith("//"))
+            {
+                return relativeUrl;
+            }
             return GetUri(ResolveUrl(relativeUrl)).AbsoluteUri;
         }
 
