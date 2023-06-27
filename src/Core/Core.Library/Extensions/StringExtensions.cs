@@ -23,11 +23,30 @@ public static class StringExtensions
         value.Length > 0 && value[0] == '~'
         ? value.Substring(1) : value;
 
-    public static string MaxLength(this string value, int maxLength, string elipses = "...")
+    public static string MaxLength(this string value, int maxLength, string elipses = "...", bool keepWholeWord = false)
     {
         if (value.Length > maxLength)
         {
-            return string.Concat(value.AsSpan(0, maxLength), elipses);
+            if (keepWholeWord)
+            {
+                var newWord = String.Empty;
+                foreach (var word in value.Split(' '))
+                {
+                    if ((newWord + " " + word).Length <= maxLength)
+                    {
+                        newWord += " " + word;
+                    }
+                    else
+                    {
+                        return $"{newWord}{elipses}";
+                    }
+                }
+                return $"{newWord}{elipses}";
+            }
+            else
+            {
+                return string.Concat(value.AsSpan(0, maxLength), elipses);
+            }
         }
         return value;
     }
