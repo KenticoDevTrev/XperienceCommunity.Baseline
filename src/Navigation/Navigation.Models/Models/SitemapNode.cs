@@ -11,6 +11,10 @@
         public Maybe<DateTime> LastModificationDate { get; set; }
         public Maybe<ChangeFrequency> ChangeFrequency { get; set; }
         public Maybe<decimal> Priority { get; set; }
+
+        /// <summary>
+        /// Other Language ISO code name(ex: es-ES) to the Url, do not include the main Url in this.
+        /// </summary>
         public Maybe<Dictionary<string, string>> OtherLanguageCodeToUrl { get; set; }
 
         /// <summary>

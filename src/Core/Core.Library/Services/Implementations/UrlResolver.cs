@@ -16,6 +16,10 @@ namespace Core.Services.Implementations
 
         public string GetAbsoluteUrl(string relativeUrl)
         {
+            if(string.IsNullOrWhiteSpace(relativeUrl))
+            {
+                relativeUrl = string.Empty;
+            }
             if(relativeUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase) || relativeUrl.StartsWith("//"))
             {
                 return relativeUrl;
@@ -27,7 +31,7 @@ namespace Core.Services.Implementations
         {
             if (string.IsNullOrWhiteSpace(url))
             {
-                return url;
+                return string.Empty;
             }
             if (url.StartsWith("~/"))
             {
