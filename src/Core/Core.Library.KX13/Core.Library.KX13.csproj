@@ -10,7 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="$(KXVersion)" />
-		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.16.2" />
+		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.16.3" />
 		<PackageReference Include="RelationshipsExtended.Base" Version="13.0.10" />
 		<PackageReference Include="XperienceCommunity.PageBuilderTagHelpers" Version="1.1.0" />
 		<PackageReference Include="XperienceCommunity.PageBuilderUtilities" Version="1.1.0" />

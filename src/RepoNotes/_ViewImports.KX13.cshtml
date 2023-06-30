@@ -6,14 +6,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject IUrlHelper Url
 
-@*  Kentico *@
-@using Kentico.Web.Mvc
-@using Kentico.Content.Web.Mvc
-@using Kentico.PageBuilder.Web.Mvc
-@addTagHelper *, Kentico.Web.Mvc
-@addTagHelper *, Kentico.Content.Web.Mvc
-
-@* Baseline Core *@
+@* Baseline Core - Agnostic *@
 @using Core
 @using Core.Models
 @using Core.Repositories
@@ -23,16 +16,24 @@
 @inject ICacheDependenciesScope CacheScope
 @inject ICacheRepositoryContext CacheContext
 @inject IPageContextRepository PageContextRepository
-@inject IHtmlLocalizer<SharedResources>
-    HtmlLocalizer
-    @addTagHelper *, Core.RCL
-    @addTagHelper *, Core.RCL.KX13
-    @addTagHelper *, XperienceCommunity.PageBuilderTagHelpers
+@inject IHtmlLocalizer<SharedResources> HtmlLocalizer
+@addTagHelper *, Core.RCL
+@addTagHelper *, MVCCaching.Base.Core.Components
 
-    @* Common Tools *@
-    @addTagHelper *, PageBuilderContainers.Kentico.MVC.Core
-    @addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
-    @addTagHelper *, XperienceCommunity.WidgetFilter
-    @addTagHelper *, XperienceCommunity.MVCCaching
+@* KX13 *@
+@using Kentico.Web.Mvc
+@using Kentico.Content.Web.Mvc
+@using Kentico.PageBuilder.Web.Mvc
+@addTagHelper *, Kentico.Web.Mvc
+@addTagHelper *, Kentico.Content.Web.Mvc
 
-    @* Various other RCLs*@
+@* Baseline Core - KX13 *@
+@addTagHelper *, Core.RCL.KX13
+@addTagHelper *, XperienceCommunity.PageBuilderTagHelpers
+
+@* Common Tools - KX13 *@
+@addTagHelper *, PageBuilderContainers.Kentico.MVC.Core
+@addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
+@addTagHelper *, XperienceCommunity.WidgetFilter   
+
+@* Various other RCLs*@
