@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ColorPickerInlineEditor", "ColorPickerInlineEditor", "{A8FFC665-D2D0-4AB4-B462-6C0884F9C1F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileContentType", "FileContentType", "{E267EE27-8FC2-4361-A558-C268CAFF9E68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StructuredContent", "StructuredContent", "{4F0B7182-7224-4FA0-B11D-0BF76E34E063}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredContent.Components", "StructuredContent.Components\StructuredContent.Components.csproj", "{7913F149-DE27-4581-87F9-D2A04F53275D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7913F149-DE27-4581-87F9-D2A04F53275D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7913F149-DE27-4581-87F9-D2A04F53275D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7913F149-DE27-4581-87F9-D2A04F53275D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7913F149-DE27-4581-87F9-D2A04F53275D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7913F149-DE27-4581-87F9-D2A04F53275D} = {4F0B7182-7224-4FA0-B11D-0BF76E34E063}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {672E1AA3-7E00-4239-8F1F-2C1DA6B2FEE9}
+	EndGlobalSection
+EndGlobal

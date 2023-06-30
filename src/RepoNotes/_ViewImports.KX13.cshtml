@@ -23,14 +23,16 @@
 @inject ICacheDependenciesScope CacheScope
 @inject ICacheRepositoryContext CacheContext
 @inject IPageContextRepository PageContextRepository
-@inject IHtmlLocalizer<SharedResources> HtmlLocalizer
-@addTagHelper *, Core.RCL
-@addTagHelper *, Core.RCL.KX13
-@addTagHelper *, XperienceCommunity.PageBuilderTagHelpers
+@inject IHtmlLocalizer<SharedResources>
+    HtmlLocalizer
+    @addTagHelper *, Core.RCL
+    @addTagHelper *, Core.RCL.KX13
+    @addTagHelper *, XperienceCommunity.PageBuilderTagHelpers
 
-@* Common Tools *@
-@addTagHelper *, PageBuilderContainers.Kentico.MVC.Core
-@addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
-@addTagHelper *, XperienceCommunity.WidgetFilter
+    @* Common Tools *@
+    @addTagHelper *, PageBuilderContainers.Kentico.MVC.Core
+    @addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
+    @addTagHelper *, XperienceCommunity.WidgetFilter
+    @addTagHelper *, XperienceCommunity.MVCCaching
 
-@* Various other RCLs*@
+    @* Various other RCLs*@

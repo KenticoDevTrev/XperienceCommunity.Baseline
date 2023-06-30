@@ -1,6 +1,6 @@
 ﻿@model Navigation.Components.Navigation.NavigationViewModel
 
-<cache expires-after="@TimeSpan.FromMinutes(60)" vary-by="@($"{Model.NavWrapperClass}{Model.StartingPath}")" enabled="@CacheContext.CacheEnabled()">
+<cache expires-after="@TimeSpan.FromMinutes(60)" vary-by="@($"{Model.NavWrapperClass}{Model.StartingPath}")" >
     <div data-ktc-search-exclude>
         <!-- Use this if you want to display a sort of "Sibling" navigation, where the current page is part of a section of the site, so you want to navigate to sibling pages as well
         Some examples are http://ecasd.us/District/Board-of-Education/Board-Member-Email (the "Parent" is the Board of Education)
