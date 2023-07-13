@@ -4,41 +4,31 @@ const webpack = require('webpack');
 const path = require('path');
 const { getEnvironmentConfigs, removeExtension } = require('./gulpTaskHelpers');
 
-
 function typescript() {
     var tsConfigs = configs.typescript;
     var envConfigs = getEnvironmentConfigs(tsConfigs);
-    return webpackResolve(envConfigs);
+    return Promise.all(envConfigs.map(tsConfig => webpackResolve(tsConfig)));
 }
 
 function react() {
     var reactConfigs = configs.react;
     var envConfigs = getEnvironmentConfigs(reactConfigs);
-    return webpackResolve(envConfigs);
+    return Promise.all(envConfigs.map(tsConfig => webpackResolve(tsConfig)));
 }
 
 // Could not get webpack to work as a readable stream for merge, so have to send an array of configs
-function webpackResolve(envConfigs){
-    return new Promise((resolve, reject) => {
-        // Loop through configs and webpack.
-        for(var i=0; i<envConfigs.length ; i++) {
-            // Get or build webpackConfig
-            var config = getWebpackConfig(envConfigs[i]);
-            
-            //log.info("Running webpack: "+config.entry+" => "+config.output.path+"\\"+config.output.filename);
-            //log.info(config);
-            webpack(config, (err, stats) => {
-                if (err) {
-                    return reject(err)
-                }
-                if (stats.hasErrors()) {
-                    return reject(new Error(stats.compilation.errors.join('\n')))
-                }
-            });
-        }
-        // Resolve finished
-        resolve()
-
+function webpackResolve(tsConfig){
+    return new Promise(function(resolve, reject) {
+        let config = getWebpackConfig(tsConfig);    
+        webpack(config, (err, stats) => {
+            if (err) {
+                return reject(err);
+            }
+            if (stats.hasErrors()) {
+                return reject(new Error(stats.compilation.errors.join('\n')))
+            }
+            resolve();
+        });
     });
 }
 
