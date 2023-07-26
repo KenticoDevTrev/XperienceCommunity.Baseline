@@ -106,7 +106,7 @@ namespace Core.Repositories.Implementation
                 return await _progressiveCache.LoadAsync(async cs =>
                 {
                     var result = await DocumentHelper.GetDocuments()
-                    .WhereEquals(nameof(TreeNode.NodeGUID), nodeGuid)
+                    .Path(nodeAliasPathAndSiteId.Item1, PathTypeEnum.Single)
                     .If(nodeAliasPathAndSiteId.Item2.TryGetValue(out var nodeSiteID), query => query.OnSite(nodeSiteID, false))
                     .WithCulturePreviewModeContext(_cacheRepositoryContext)
                     .IncludePageIdentityColumns()
@@ -115,7 +115,7 @@ namespace Core.Repositories.Implementation
                     .CombineWithAnyCulture()
                     .GetEnumerableTypedResultAsync();
 
-                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeGuid {nodeGuid}");
+                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeAliasPath {nodeAliasPathAndSiteId.Item1}");
 
                 }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByNodePath", nodeAliasPathAndSiteId.Item1, nodeAliasPathAndSiteId.Item2.GetValueOrDefault(0)));
             }
@@ -200,7 +200,7 @@ namespace Core.Repositories.Implementation
                     }
 
                     var result = await DocumentHelper.GetDocuments()
-                    .Path(nodeAliasPathAndMaybeCultureAndSiteId.Item1, PathTypeEnum.Explicit)
+                    .Path(nodeAliasPathAndMaybeCultureAndSiteId.Item1, PathTypeEnum.Single)
                     .If(nodeAliasPathAndMaybeCultureAndSiteId.Item2.TryGetValue(out var culture), query => query.Culture(culture))
                     .If(nodeAliasPathAndMaybeCultureAndSiteId.Item3.TryGetValue(out var nodeSiteID), query => query.OnSite(nodeSiteID, false))
                     .WithCulturePreviewModeContext(_cacheRepositoryContext)
