@@ -80,8 +80,8 @@ namespace MVC
             // Kentico authorization
             // services.AddKenticoAuthorization();
 
-            // Fluent Validator
-            services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new Assembly[] { typeof(Startup).Assembly }));
+            // Fluent Validator, careful not to register to assemblies as this can cause double validation on kentico form components (which kills ones like ReCaptcha)
+            services.AddFluentValidation();
 
             // Widget Filters
             services.AddWidgetFilter();
