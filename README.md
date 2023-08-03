@@ -9,12 +9,10 @@ Also special thanks to my current employer [Movement Mortgage](https://www.movem
 This Baseline's goal is to provide a framework and structure to build Kentico Xperience 13 websites in such a way that they will be easily migrated to Xperience by Kentico, as well as leveraging SOLID coding principles, Internet/SEO/Accessability best practices, and other site optimizing principles.  It also serves as a "Recipe Bin" for widgets, code samples, and other things people may want to contribute to help others as a community.  
 
 ## Status
-as of May 19th, 2023 when i am writing this, the Baseline is still getting configured and is not ready yet for usage, but should be slowly more and more usable as time goes on.  Here's my timeline:
+August 3rd, 2023, the Baseline is ready for general usage.  There is still a couple things left to do as listed below, but it's being used on my current project
 
-1. Get the baseline building and publishing to nuget packages automatically
-3. Add Installation steps for the Core, Navigation, Search, and Localization Modules
-4. Get "Starting Site" fully working and bugs worked out.
-5. Add Customization points for Core, Navigation, Search, and Localization Modules
+1. Add Installation steps for the Core, Navigation, Search, and Localization Modules
+2. Add Customization points for Navigation, Search, and Localization Modules
 6. Add Installation steps for Account, Ecommerce, and Tabbed Pages Modules
 7. Add Customization points for Account, Ecommerce, and Tabbed Pages Modules
 
