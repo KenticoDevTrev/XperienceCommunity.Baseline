@@ -50,11 +50,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
     <ProjectReference Include="..\Site.Components\Site.Components.csproj" />
     <ProjectReference Include="..\Site.Library.KX13\Site.Library.KX13.csproj" />
-    <ProjectReference Include="..\Site.Library\Site.Library.csproj" />
-    <ProjectReference Include="..\Site.Models\Site.Models.csproj" />
   </ItemGroup>
 
 	<!-- If Solution Name is MVC.XbyK, it will use the XbyK Libraries and references, otherwise it will default to the KX13-->

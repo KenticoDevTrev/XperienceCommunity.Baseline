@@ -1,10 +1,22 @@
-﻿# Main Project
+﻿# MVC
+This should contain:
+* Main MVC Site Initalization / Service and App Configuration
+* Kentico Page Template, Widgets, or any component/feature/controller that leverages Kentico technology (such as Widget Zones)
+* Other Modules / packages that you wish to leverage (See `XperienceCommunity` prefixed nuget packages, also [Github.com/KenticoDevTrev](https://www.github.com/kenticodevtrev))
+
+This library should reference:
+* `XperienceCommunity.Baseline.Core.RCL.KX13` Package (along with any other `XperienceCommmunity.Baseline._____.RCL.KX13`)
+* `Site.Components` Project (Agnostic items)
+* `Site.Library.KX13` Project (Kentico items)
+
+
+# Main Project
 This is the main .Net Core project.
 
 In the revised baseline, there's some systems and explenations on how this was put together.
 
 # Inheritance
-This project should inherit all your libraries (MVC.Libraries, MVC.Models, and Xperience.Models), however the references should almost exclusively come from the MVC.Models class library.
+This project should inherit all your libraries (primary through Site.Components and Site.Library.KX13), however the references should almost exclusively come from the MVC.Models class library.
 
 # Workflow
 This is the general flow:
