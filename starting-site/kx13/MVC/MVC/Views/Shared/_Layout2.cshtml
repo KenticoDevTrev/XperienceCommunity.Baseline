@@ -1,5 +1,6 @@
 ﻿@{
     Layout = null;
+    // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
 }
 
 <!DOCTYPE html>
@@ -7,36 +8,12 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-   
-    <script>
-        @* All javascript that depends on any library should use window.OnScriptsLoaded(function() { }) so it will run after the javascript is loaded *@
-        @* Add an optional string identifier if you wish to make sure something is only ran once *@
-            window.OnScriptsLoaded = function(fn, identifier) {
-                window.PreloadIdentifiers = window.PreloadIdentifiers || [];
-                var addScript = true;
-                if (typeof identifier !== "undefined" && identifier != null) {
-                    if (window.PreloadIdentifiers.indexOf(identifier) == -1) {
-                        window.PreloadIdentifiers.push(identifier);
-                    } else {
-                        // this script by this identifier is already added
-                        addScript = false;
-                    }
-                }
-                if (addScript) {
-                    if (window.ScriptsLoaded) {
-                        fn();
-                    } else {
-                        window.PreloadQueue = window.PreloadQueue || [];
-                        window.PreloadQueue.push(fn);
-                    }
-                }
-            };
-        // Loading javascript, should be {src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool}
-        window.LoadScript = function (scriptObj) {
-            window.scriptsToLoad = window.scriptsToLoad || [];
-            window.scriptsToLoad.push(scriptObj);
-        }
-    </script>
+
+    @* window.OnScriptsLoaded = All javascript that depends on any library should use window.OnScriptsLoaded(function() { }, identifier) so it will run after the javascript is loaded, identifier is optional to ensure only ran once *@
+    @* window.LoadScript = Loading javascript, should be window.LoadScript({src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool}) *@
+    <cache enabled=true expires-after="@CacheMinuteTypes.VeryLong.ToTimeSpan()">
+        <vc:async-script-functions />
+    </cache>
 
     <environment exclude="Development">
         @* Defined in gulpfile.js headerCss *@
@@ -53,14 +30,6 @@
         <!--<link href="@(Html.AddFileVersionToPath("/js/shared/bundles/bundleJSFooter.min.js.gz"))" rel="preload" as="script" />-->
     </environment>
 
-    <environment include="Development">
-        <!-- This section is bundled -->
-        <!--<link rel="stylesheet" href="/css/shared/generated/themes.css" type="text/css" />-->
-        
-        <!-- This section is bundled -->
-    </environment>
-
-    
 
     @RenderSection("head", required: false)
     @* added after so if there is any manual meta data that below won't trigger even if there is a matching page on the content tree *@
@@ -73,15 +42,13 @@
     </page-builder-mode>
 
     <vc:breadcrumbs-json include-default-breadcrumb="true" nodeid="-1" />
-
-
 </head>
 <body>
     <cache expires-after="CacheMinuteTypes.VeryLong.ToTimeSpan()">
         @{
             CacheScope.Begin();
         }
-        <vc:ada-quick-nav />
+        <!--<vc:ada-quick-nav />-->
         <cache-dependency cache-keys="@CacheScope.End()" />
     </cache>
 
@@ -136,64 +103,26 @@
 
     <script>
         OnScriptsLoaded(function () {
+            @*
+                These are to initialize various functionality pieces
             GlobalMethods.InitializeOtherTools();
             GlobalMethods.InitializeAccessability();
             GlobalMethods.InitializeCanvas();
             GlobalMethods.InitializeRedirectTabs();
+                *@
         });
     </script>
 
-    <script>
-        @* This will run last after all scripts loaded, and will run the Preload methods *@
-            LoadScript({ src: "@(Html.AddFileVersionToPath("/js/shared/run-queued-scripts.min.js.gz"))", appendAtEnd: true });
+    <cache enabled=true expires-after="@CacheMinuteTypes.VeryLong.ToTimeSpan()">
+        @* This will run last after all scripts loaded, and will run the Preload methods
+        Content should be:
 
-        @* This runs after all scripts are loaded (defered as well), and runs any queued items *@
-            window.addEventListener("load", function () {
-        @* This timeout is so this run asyncly *@
-                    setTimeout(function () {
-                        var loadedScripts = [];
-                        // Get all that aren't "appendAtEnd" first, then run others after
-                        for (var i = 0; i < window.scriptsToLoad.length; i++) {
-                            var options = window.scriptsToLoad[i];
-                            if (loadedScripts.indexOf(options.src) == -1) {
-                                if (typeof options.appendAtEnd === "undefined" || options.appendAtEnd == null || options.appendAtEnd == false) {
-                                    loadedScripts.push(options.src);
-                                    var scrpt = document.createElement("script");
-                                    scrpt.async = false;
-                                    scrpt.src = options.src;
+        window.ScriptsLoaded = true;
+        for (var queuedScripts = window.PreloadQueue || [], i = 0; i < queuedScripts.length; i++)
+        queuedScripts[i]();
 
-                                    scrpt.crossOrigin = options.crossorigin;
-                                    if (options.head) {
-                                        document.head.appendChild(scrpt);
-                                    }
-                                    else {
-                                        document.body.appendChild(scrpt);
-                                    }
-                                }
-                            }
-                        }
-                        // Now re-run those append at end
-                        for (var i = 0; i < window.scriptsToLoad.length; i++) {
-                            var options = window.scriptsToLoad[i];
-                            if (loadedScripts.indexOf(options.src) == -1) {
-                                if (options.appendAtEnd == true) {
-                                    loadedScripts.push(options.src);
-                                    var scrpt = document.createElement("script");
-                                    scrpt.async = false;
-                                    scrpt.src = options.src;
-
-                                    scrpt.crossOrigin = options.crossorigin;
-                                    if (options.head) {
-                                        document.head.appendChild(scrpt);
-                                    }
-                                    else {
-                                        document.body.appendChild(scrpt);
-                                    }
-                                }
-                            }
-                        }
-                    }, 1);
-            });
-    </script>
+        *@
+        <vc:async-script-loader x-script-runner-path="@(Html.AddFileVersionToPath("/js/individual/scripts/run-queued-scripts.min.js.gz"))" />
+    </cache>
 </body>
 </html>

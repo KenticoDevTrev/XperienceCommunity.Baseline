@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Site</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Models" Version="1.0.0" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Models" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
+  </ItemGroup>
+
+</Project>

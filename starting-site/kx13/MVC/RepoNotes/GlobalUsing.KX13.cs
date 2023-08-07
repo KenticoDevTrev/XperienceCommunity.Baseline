@@ -1,10 +1,9 @@
-﻿// System
+// System
 global using System;
 global using System.Linq;
 global using System.Threading;
 global using System.Collections.Generic;
 global using CSharpFunctionalExtensions;
-global using System.Threading.Tasks;
 
 // Core
 global using Core.Repositories;
@@ -34,10 +33,3 @@ global using XperienceCommunity.QueryExtensions.Collections;
 
 // Feature
 // Feature global usings here
-/*
-global using Site.Models;
-global using Site.Library;
-global using Site.Repositories;
-global using Site.Services;
-global using Site.Enums;
-*/

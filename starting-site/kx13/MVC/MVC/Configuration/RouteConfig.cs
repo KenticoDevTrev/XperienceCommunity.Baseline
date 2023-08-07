@@ -21,7 +21,7 @@ namespace MVC
                    defaults: new { controller = "HttpErrors", action = "Error" }
                 );
 
-                //Site map
+                /*
                 endpoints.MapControllerRoute(
                     name: "MySiteMap",
                     pattern: "sitemap.xml",
@@ -33,6 +33,7 @@ namespace MVC
                     pattern: "googlesitemap.xml",
                     defaults: new { controller = "Sitemap", action = "Index" }
                 );
+                */
 
                 endpoints.MapControllerRoute(
                     name: "default",

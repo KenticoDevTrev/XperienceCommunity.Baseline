@@ -10,24 +10,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RelationshipsExtended.Interfaces;
-using BootstrapLayoutTool;
-using PageBuilderContainers;
-using PageBuilderContainers.Base;
-using PartialWidgetPage;
-using Kentico.Membership;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using CMS.Helpers;
 using System.Reflection;
-using XperienceCommunity.Authorization;
 using XperienceCommunity.Localizer;
 using XperienceCommunity.PageBuilderUtilities;
 using FluentValidation.AspNetCore;
 using XperienceCommunity.WidgetFilter;
 using Core.Middleware;
+using Kentico.Forms.Web.Mvc;
 using Core;
-using CMS.Core;
+using RelationshipsExtended;
 
 namespace MVC
 {
@@ -38,7 +31,14 @@ namespace MVC
         {
             // MVC Caching
             services.AddMVCCaching();
-            services.AddMVCCachingAutoDependencyInjectionByAttribute(AssemblyDiscoverableHelper.GetAssemblies(false));
+            services.AddMVCCachingAutoDependencyInjectionByAttribute(new Assembly[]
+            {
+                typeof(StartupConfig).Assembly,
+                typeof(Site.Models.AssemblyInfo).Assembly,
+                typeof(Site.Library.KX13.AssemblyInfo).Assembly,
+                typeof(Site.Library.AssemblyInfo).Assembly,
+                typeof(Site.Components.AssemblyInfo).Assembly,
+            });
 
             // Set paths for the jquery bundles
             services.Configure<FormBuilderBundlesOptions>(options =>
@@ -53,12 +53,6 @@ namespace MVC
             // Relationships Extended
             services.AddSingleton<IRelationshipExtendedHelper, RelationshipsExtendedHelper>();
 
-            // Page Builder Container
-            // services.AddSingleton<IPageBuilderContainerHelper, PageBuilderContainerHelper>();
-
-            // Partial Widget Page
-            // services.AddSingleton<IPartialWidgetPageHelper, PartialWidgetPageHelper>();
-
             // Admin redirect filter
             services.AddSingleton<IStartupFilter>(new AdminRedirectStartupFilter(Configuration));
 
@@ -70,8 +64,14 @@ namespace MVC
             services.AddScoped(x =>
             {
                 var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+                if (actionContext == null)
+                {
+                    // Should never really occur
+                    return new UrlHelper(new ActionContext());
+                }
                 var factory = x.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
+
             });
 
             // Page template filters
@@ -81,7 +81,7 @@ namespace MVC
             // services.AddKenticoAuthorization();
 
             // Fluent Validator, careful not to register to assemblies as this can cause double validation on kentico form components (which kills ones like ReCaptcha)
-            services.AddFluentValidation();
+            services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new Assembly[] { typeof(Startup).Assembly }));
 
             // Widget Filters
             services.AddWidgetFilter();
@@ -92,19 +92,21 @@ namespace MVC
             // Enable desired Kentico Xperience features
             var kenticoServiceCollection = services.AddKentico(features =>
             {
-                features.UsePageBuilder(new PageBuilderOptions()
+
+                // If you install BootstrapLayoutTool.PageBuilderContainered.Kentico.MVC.Core package on MVC, you can use below for bootstrap layout tool
+                /*features.UsePageBuilder(new PageBuilderOptions()
                 {
                     // Specifies a default section for the page builder feature
                     DefaultSectionIdentifier = Bootstrap4LayoutToolProperties.IDENTITY,
                     // Disables the system's built-in 'Default' section
                     RegisterDefaultSection = true
-                });
+                });*/
 
                 features.UsePageRouting(new PageRoutingOptions()
                 {
                     EnableAlternativeUrls = true,
                     EnableRouting = true,
-                    //CultureCodeRouteValuesKey = "culture"
+                    CultureCodeRouteValuesKey = "culture"
                 });
 
                 // Data annotationslocationation?
@@ -155,7 +157,8 @@ namespace MVC
         public static void AddAuthentication(IServiceCollection services, IConfiguration configuration, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
         {
             // Adds Basic Kentico Authentication, needed for user context and some tools
-            services.AddCoreBaselineKenticoAuthentication(configuration, AUTHENTICATION_COOKIE_NAME);
+            services.AddCoreBaselineKenticoAuthentication(configuration, AUTHENTICATION_COOKIE_NAME)
+                .AddAuthentication();
         }
         internal static void RegisterGzipFileHandling(IServiceCollection services, IWebHostEnvironment environment, IConfiguration Configuration)
         {
@@ -234,6 +237,8 @@ namespace MVC
             */
             app.UseStaticFiles();
 
+            // app.UseUrlRedirection();
+
             app.UseKentico();
 
             app.UseCookiePolicy();
@@ -244,6 +249,7 @@ namespace MVC
 
             app.UseAuthorization();
 
+            // Adds the Site and Culture to the httpContext, can use by calling CustomVaryByHeaders._____() for <cache> tag vary-by-header
             app.UseCustomVaryByHeaders();
 
         }
