@@ -164,11 +164,11 @@ namespace Core.Repositories.Implementation
 
             PageMetaData metaData = new PageMetaData()
             {
-                Title = title,
-                Keywords = keywords.AsNullOrWhitespaceMaybe().GetValueOrDefault(string.Empty),
-                Description = description.AsNullOrWhitespaceMaybe().GetValueOrDefault(string.Empty),
-                Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : string.Empty,
-                ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : string.Empty,
+                Title = title.AsNullOrWhitespaceMaybe(),
+                Keywords = keywords.AsNullOrWhitespaceMaybe(),
+                Description = description.AsNullOrWhitespaceMaybe(),
+                Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
+                ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
                 NoIndex = noIndex
             };
 
