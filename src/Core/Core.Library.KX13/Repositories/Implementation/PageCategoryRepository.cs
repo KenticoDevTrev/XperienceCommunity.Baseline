@@ -63,7 +63,7 @@ namespace Generic.Repositories.Implementation
         /// Helper function that gets ALL node/path categories in one query, used by others to quickly retrieve data.
         /// </summary>
         /// <returns></returns>
-        private async Task<Tuple<Dictionary<int, IEnumerable<CategoryItem>>, Dictionary<string, IEnumerable<CategoryItem>>>> GetCategoriesByIdentifiersAsync()
+        private async Task<Tuple<IReadOnlyDictionary<int, IEnumerable<CategoryItem>>, IReadOnlyDictionary<string, IEnumerable<CategoryItem>>>> GetCategoriesByIdentifiersAsync()
         {
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.ObjectType(TreeCategoryInfo.OBJECT_TYPE)
@@ -96,23 +96,25 @@ inner join CMS_Category C on C.CategoryID = TC.CategoryID
 
                 var dictionaryByNodeID = items.GroupBy(x => x.NodeID).ToDictionary(key => key.Key, value => value.Select(x => x.CategoryItem));
                 var dictionaryByPath = items.GroupBy(x => x.Path).ToDictionary(key => key.Key, value => value.Select(x => x.CategoryItem));
-                var result = new Tuple<Dictionary<int, IEnumerable<CategoryItem>>, Dictionary<string, IEnumerable<CategoryItem>>>(dictionaryByNodeID, dictionaryByPath);
+                var result = new Tuple<IReadOnlyDictionary<int, IEnumerable<CategoryItem>>, IReadOnlyDictionary<string, IEnumerable<CategoryItem>>>(dictionaryByNodeID, dictionaryByPath);
                 return result;
             }, new CacheSettings(60, $"GetCategoriesByIdentifiersAsync"));
         }
-    }
 
-    internal record PageCategoryItem
-    {
-        public PageCategoryItem(int nodeID, string path, CategoryItem categoryItem)
+        private record PageCategoryItem
         {
-            NodeID = nodeID;
-            Path = path;
-            CategoryItem = categoryItem;
-        }
+            public PageCategoryItem(int nodeID, string path, CategoryItem categoryItem)
+            {
+                NodeID = nodeID;
+                Path = path;
+                CategoryItem = categoryItem;
+            }
 
-        public int NodeID { get; set; }
-        public string Path { get; set; }
-        public CategoryItem CategoryItem { get; set; }
+            public int NodeID { get; init; }
+            public string Path { get; init; }
+            public CategoryItem CategoryItem { get; init; }
+        }
     }
+
+    
 }

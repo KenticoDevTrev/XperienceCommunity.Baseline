@@ -1,6 +1,6 @@
 ﻿namespace Core.Models
 {
-    public class User : IObjectIdentifiable
+    public record User : IObjectIdentifiable
     {
         public User(string userName, string firstName, string lastName, string email, bool enabled, bool isExternal, bool isPublic)
         {
@@ -27,18 +27,18 @@
         }
 
 
-        public Maybe<int> UserID { get; set; }
-        public string UserName { get; set; }
-        public Maybe<Guid> UserGUID { get; set; }
+        public Maybe<int> UserID { get; init; }
+        public string UserName { get; init; }
+        public Maybe<Guid> UserGUID { get; init; }
 
-        public string Email { get; set; }
+        public string Email { get; init; }
 
-        public string FirstName { get; set; }
-        public Maybe<string> MiddleName { get; set; }
-        public string LastName { get; set; }
-        public bool Enabled { get; set; }
-        public bool IsExternal { get; set; }
-        public bool IsPublic { get; set; }
+        public string FirstName { get; init; }
+        public Maybe<string> MiddleName { get; init; }
+        public string LastName { get; init; }
+        public bool Enabled { get; init; }
+        public bool IsExternal { get; init; }
+        public bool IsPublic { get; init; }
 
         public ObjectIdentity ToObjectIdentity()
         {

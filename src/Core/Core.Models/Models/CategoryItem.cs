@@ -1,6 +1,6 @@
 ﻿namespace Core.Models
 {
-    public class CategoryItem : IObjectIdentifiable
+    public record CategoryItem : IObjectIdentifiable
     {
         public CategoryItem(int categoryID, Guid categoryGuid, string categoryName, int categoryParentID, string categoryDisplayName)
         {
@@ -11,13 +11,13 @@
             CategoryDisplayName = categoryDisplayName;
         }
 
-        public int CategoryID { get; set; }
-        public int CategoryParentID { get; set; }
-        public Guid CategoryGuid { get; set; }
-        public string CategoryName { get; set; }
+        public int CategoryID { get; init; }
+        public int CategoryParentID { get; init; }
+        public Guid CategoryGuid { get; init; }
+        public string CategoryName { get; init; }
 
-        public string CategoryDisplayName { get; set; }
-        public Maybe<string> CategoryDescription { get; set; }
+        public string CategoryDisplayName { get; init; }
+        public Maybe<string> CategoryDescription { get; init; }
       
         public static CategoryItem UnfoundCategoryItem()
         {

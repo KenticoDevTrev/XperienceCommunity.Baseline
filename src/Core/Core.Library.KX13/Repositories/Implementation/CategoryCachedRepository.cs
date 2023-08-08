@@ -85,9 +85,9 @@ namespace Core.Repositories.Implementation
                 ByGuid = byGuid;
             }
 
-            public Dictionary<int, CategoryItem> ByID { get; set; }
-            public Dictionary<string, CategoryItem> ByCodeName { get; set; }
-            public Dictionary<Guid, CategoryItem> ByGuid { get; set; }
+            public Dictionary<int, CategoryItem> ByID { get; internal set; }
+            public Dictionary<string, CategoryItem> ByCodeName { get; internal set; }
+            public Dictionary<Guid, CategoryItem> ByGuid { get; internal set; }
         }
     }
 

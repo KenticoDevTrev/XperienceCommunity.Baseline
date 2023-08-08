@@ -27,7 +27,7 @@ namespace Core.Components.AsyncScriptLoader
     }
     public record AsyncScriptLoaderViewModel
     {
-        public string ScriptRunnerPath { get; set; }
+        public string ScriptRunnerPath { get; init; }
 
         public AsyncScriptLoaderViewModel(string scriptRunnerPath)
         {

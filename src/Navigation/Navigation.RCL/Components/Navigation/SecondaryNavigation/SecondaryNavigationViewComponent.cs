@@ -31,14 +31,14 @@ namespace Navigation.Components.Navigation.SecondaryNavigation
                 var page = await _pageContextRepository.GetCurrentPageAsync();
                 if (page.TryGetValue(out var pageItem))
                 {
-                    navigationProperties.Path = pageItem.Path;
+                    navigationProperties = navigationProperties with { Path = pageItem.Path };
                 }
             }
 
             // If include secondary navigation, need a css class
             if (navigationProperties.IncludeSecondaryNavSelector && !string.IsNullOrWhiteSpace(navigationProperties.CssClass))
             {
-                navigationProperties.CssClass = "secondary-navigation";
+                navigationProperties = navigationProperties with { CssClass = "secondary-navigation" };
             }
 
             var ancestorPath = await _navigationRepository.GetAncestorPathAsync(navigationProperties.Path.GetValueOrDefault("/"), navigationProperties.Level, navigationProperties.LevelIsRelative, navigationProperties.MinimumAbsoluteLevel);

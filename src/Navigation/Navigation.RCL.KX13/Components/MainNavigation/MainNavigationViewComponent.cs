@@ -32,9 +32,9 @@ namespace Navigation.Components.Navigation.MainNavigation
                 IncludeScreenReaderNavigation = includeScreenReaderNavigation;
             }
 
-            public IEnumerable<NavigationItem> NavItems { get; set; } = Array.Empty<NavigationItem>();
-            public string NavWrapperClass { get; set; }
-            public bool IncludeScreenReaderNavigation { get; set; }
+            public IEnumerable<NavigationItem> NavItems { get; init; } = Array.Empty<NavigationItem>();
+            public string NavWrapperClass { get; init; }
+            public bool IncludeScreenReaderNavigation { get; init; }
         }
     }
 }

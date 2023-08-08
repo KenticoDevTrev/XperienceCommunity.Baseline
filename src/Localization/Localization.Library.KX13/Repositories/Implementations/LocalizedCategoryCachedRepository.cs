@@ -1,4 +1,5 @@
-﻿using CMS.DataEngine;
+﻿using Amazon.Runtime.Internal.Transform;
+using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Localization;
 using CMS.Taxonomy;
@@ -92,17 +93,14 @@ namespace Localization.Repositories.Implementations
                     }
                 }).FirstOrMaybe();
 
-                if (properKey.TryGetValue(out var displayNameKey))
-                {
-                    localizedCategoryItem.CategoryDisplayName = localizationValues.DisplayNames[displayNameKey];
-                }
-                if (properDescriptionKey.TryGetValue(out var descriptionKey))
-                {
-                    localizedCategoryItem.CategoryDescription = localizationValues.Descriptions[descriptionKey];
-                }
+                // Clone record with new values if they are overwritten
+                localizedCategoryItem = localizedCategoryItem with {
+                    CategoryDisplayName = properKey.TryGetValue(out var displayNameKey) ? localizationValues.DisplayNames[displayNameKey] : localizedCategoryItem.CategoryDisplayName,
+                    CategoryDescription = properDescriptionKey.TryGetValue(out var descriptionKey) ? localizationValues.Descriptions[descriptionKey] : localizedCategoryItem.CategoryDescription
+                };
             }
-            return localizedCategoryItem;
 
+            return localizedCategoryItem;
         }
 
        
@@ -115,7 +113,7 @@ namespace Localization.Repositories.Implementations
 
             return _progressiveCache.Load(cs =>
             {
-                var values = new Dictionary<int, LocalizedCategoryValues>();
+                var values = new Dictionary<int, InternalLocalizedCategoryValues>();
                 if (cs.Cached)
                 {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
@@ -156,7 +154,7 @@ where C.CategoryDescription not like '{$%$}'";
                     {
                         if (!values.ContainsKey(categoryID))
                         {
-                            values.Add(categoryID, new LocalizedCategoryValues());
+                            values.Add(categoryID, new InternalLocalizedCategoryValues());
                         }
                         var value = values[categoryID];
                         value.DisplayNames.Add(cultureCodeVal.ToLower(), categoryDisplayName);
@@ -172,21 +170,40 @@ where C.CategoryDescription not like '{$%$}'";
                     {
                         if (!values.ContainsKey(categoryID))
                         {
-                            values.Add(categoryID, new LocalizedCategoryValues());
+                            values.Add(categoryID, new InternalLocalizedCategoryValues());
                         }
                         var value = values[categoryID];
                         value.Descriptions.Add(cultureCodeVal.ToLower(), categoryDescription);
                     }
                 }
-                return values;
+                // return as read only version
+                return values.ToDictionary(key => key.Key, value => new LocalizedCategoryValues(
+                    displayNames: value.Value.DisplayNames,
+                    descriptions: value.Value.Descriptions
+                ));
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetCategoryLocalizedDictionary"));
+        }
+
+        /// <summary>
+        /// Temporary record used to build the dictionaries before converting to readonly
+        /// </summary>
+        private record InternalLocalizedCategoryValues
+        {
+            public Dictionary<string, string> DisplayNames { get; set; } = new Dictionary<string, string>();
+            public Dictionary<string, Maybe<string>> Descriptions { get; set; } = new Dictionary<string, Maybe<string>>();
         }
     }
 
     public record LocalizedCategoryValues
     {
-        public Dictionary<string, string> DisplayNames { get; set; } = new Dictionary<string, string>();
-        public Dictionary<string, Maybe<string>> Descriptions { get; set; } = new Dictionary<string, Maybe<string>>();
+        public LocalizedCategoryValues(IReadOnlyDictionary<string, string> displayNames, IReadOnlyDictionary<string, Maybe<string>> descriptions)
+        {
+            DisplayNames = displayNames;
+            Descriptions = descriptions;
+        }
+
+        public IReadOnlyDictionary<string, string> DisplayNames { get; init; }
+        public IReadOnlyDictionary<string, Maybe<string>> Descriptions { get; init; }
     }
 
     public static class CategoryItemExtensions

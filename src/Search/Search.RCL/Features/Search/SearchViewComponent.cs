@@ -1,5 +1,4 @@
-﻿using Core.Repositories;
-using Microsoft.Extensions.Primitives;
+﻿using Microsoft.Extensions.Primitives;
 using Search.Repositories;
 namespace Search.Features.Search
 {
@@ -9,15 +8,12 @@ namespace Search.Features.Search
     {
         private readonly ISearchRepository _searchRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ISiteRepository _siteRepository;
 
         public SearchViewComponent(ISearchRepository searchRepository,
-            IHttpContextAccessor httpContextAccessor,
-            ISiteRepository siteRepository)
+            IHttpContextAccessor httpContextAccessor)
         {
             _searchRepository = searchRepository;
             _httpContextAccessor = httpContextAccessor;
-            _siteRepository = siteRepository;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -42,19 +38,23 @@ namespace Search.Features.Search
                 }
             }
 
-            var model = new SearchViewModel(
-                searchValue: searchValue.GetValueOrDefault(string.Empty),
-                currentPage: page,
-                pageSize: pageSize
-            );
-
+            
+            Maybe<SearchResponse> results = Maybe.None;
             if (searchValue.TryGetValue(out var searchVal))
             {
                 var indexes = new string[] { "SearchIndexName" };
 
                 // Perform search
-                model.SearchResults = await _searchRepository.Search(searchVal, indexes, page, pageSize);
+                results = await _searchRepository.Search(searchVal, indexes, page, pageSize);
             }
+            var model = new SearchViewModel(
+                searchValue: searchValue.GetValueOrDefault(string.Empty),
+                currentPage: page,
+                pageSize: pageSize
+            )
+            {
+                SearchResults = results
+            };
             return View("/Features/Search/Search.cshtml", model);
         }
     }
@@ -68,9 +68,9 @@ namespace Search.Features.Search
             PageSize = pageSize;
         }
 
-        public string SearchValue { get; set; }
-        public Maybe<SearchResponse> SearchResults { get; set; }
-        public int CurrentPage { get; set; } = 1;
-        public int PageSize { get; set; } = 100;
+        public string SearchValue { get; init; }
+        public Maybe<SearchResponse> SearchResults { get; init; }
+        public int CurrentPage { get; init; } = 1;
+        public int PageSize { get; init; } = 100;
     }
 }

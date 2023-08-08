@@ -153,6 +153,19 @@ namespace CSharpFunctionalExtensions
         }
 
         /// <summary>
+        /// Returns a Maybe of the dictionary value, Maybe.None if the key doesn't exist.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key">The lookup key</param>
+        /// <returns>Maybe.None if the key doesn't exist, or the value if it does.</returns>
+        public static Maybe<TValue> GetValueOrMaybe<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
+        {
+            return key != null && dictionary.ContainsKey(key) ? dictionary[key] : Maybe.None;
+        }
+
+        /// <summary>
         /// Helper for when you need a sub-value of a Maybe object.
         /// </summary>
         /// <typeparam name="T"></typeparam>

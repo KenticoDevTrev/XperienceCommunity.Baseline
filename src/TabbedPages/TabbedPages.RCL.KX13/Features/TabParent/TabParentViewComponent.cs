@@ -32,7 +32,7 @@ namespace TabbedPages.Features.TabParent
             Name = name;
         }
 
-        public IEnumerable<TabItem> Tabs { get; set; }
-        public string Name { get; set; }
+        public IEnumerable<TabItem> Tabs { get; init; }
+        public string Name { get; init; }
     }
 }

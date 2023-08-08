@@ -23,7 +23,9 @@
             // If none set as current page, set the last one to it.
             if(!breadcrumbList.Where(x => x.IsCurrentPage).Any() && breadcrumbList.Any())
             {
-                breadcrumbList.Last().IsCurrentPage = true;
+                var lastBreadcrumb = breadcrumbList.Last() with { IsCurrentPage = true };
+                breadcrumbList.RemoveAt(breadcrumbList.Count - 1);
+                breadcrumbList.Add(lastBreadcrumb);
             }
 
             if(includeDefaultBreadcrumb)

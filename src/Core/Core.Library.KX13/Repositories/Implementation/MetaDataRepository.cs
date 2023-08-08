@@ -162,6 +162,19 @@ namespace Core.Repositories.Implementation
                 noIndex = customDataVal != null ? ValidationHelper.GetBoolean(customDataVal, false) : Maybe.None;
             }
 
+            string canonicalUrlValue = string.Empty;
+
+            // Handle canonical url
+            if (GetCanonicalUrl(node).TryGetValue(out var canonicalUrl))
+            {
+                canonicalUrlValue = canonicalUrl;
+            }
+            else if (_urlHelper.Kentico().PageCanonicalUrl().AsNullOrWhitespaceMaybe().TryGetValue(out var canonicalUrlFromUrl))
+            {
+                // Try to get from url
+                canonicalUrlValue = canonicalUrlFromUrl;
+            }
+
             PageMetaData metaData = new PageMetaData()
             {
                 Title = title.AsNullOrWhitespaceMaybe(),
@@ -169,19 +182,9 @@ namespace Core.Repositories.Implementation
                 Description = description.AsNullOrWhitespaceMaybe(),
                 Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
                 ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
-                NoIndex = noIndex
+                NoIndex = noIndex,
+                CanonicalUrl = canonicalUrlValue.AsNullOrWhitespaceMaybe()
             };
-
-            // Handle canonical url
-            if (GetCanonicalUrl(node).TryGetValue(out var canonicalUrl))
-            {
-                metaData.CanonicalUrl = canonicalUrl;
-            }
-            else if (_urlHelper.Kentico().PageCanonicalUrl().AsNullOrWhitespaceMaybe().TryGetValue(out var canonicalUrlFromUrl))
-            {
-                // Try to get from url
-                metaData.CanonicalUrl = canonicalUrlFromUrl;
-            }
 
             return Task.FromResult(metaData);
         }

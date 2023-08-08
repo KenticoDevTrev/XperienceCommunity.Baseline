@@ -4,9 +4,9 @@ namespace Core.Models
 {
     public record DocumentIdentity : ICacheKey
     {
-        public Maybe<int> DocumentId { get; set; }
-        public Maybe<Tuple<string, Maybe<string>, Maybe<int>>> NodeAliasPathAndMaybeCultureAndSiteId { get; set; }
-        public Maybe<Guid> DocumentGuid { get; set; }
+        public Maybe<int> DocumentId { get; init; }
+        public Maybe<Tuple<string, Maybe<string>, Maybe<int>>> NodeAliasPathAndMaybeCultureAndSiteId { get; init; }
+        public Maybe<Guid> DocumentGuid { get; init; }
 
         public string GetCacheKey()
         {

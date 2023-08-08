@@ -4,9 +4,9 @@ namespace Core.Models
 {
     public record ObjectIdentity : ICacheKey
     {
-        public Maybe<int> Id { get; set; }
-        public Maybe<string> CodeName { get; set; }
-        public Maybe<Guid> Guid { get; set; }
+        public Maybe<int> Id { get; init; }
+        public Maybe<string> CodeName { get; init; }
+        public Maybe<Guid> Guid { get; init; }
 
         public string GetCacheKey()
         {

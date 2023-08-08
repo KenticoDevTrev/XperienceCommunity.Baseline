@@ -46,14 +46,13 @@ namespace Navigation.Repositories.Implementations
 
         public async Task<IEnumerable<NavigationItem>> GetNavItemsAsync(Maybe<string> navPath, IEnumerable<string>? navTypes = null)
         {
-
             var navigationItems = await GetNavigationItemsAsync(navPath, navTypes ?? Array.Empty<string>());
 
             // Convert to a Hierarchy listing
             var hierarchyItems = await NodeListToHierarchyTreeNodesAsync(navigationItems);
 
             // Convert to Model
-            var items = new List<NavigationItem>();
+            var items = new List<NavigationItemBuilder>();
             foreach (var hierarchyNavTreeNode in hierarchyItems)
             {
                 // Call the check to set the Ancestor is current
@@ -64,7 +63,7 @@ namespace Navigation.Repositories.Implementations
                 }
 
             }
-            return await Task.FromResult(items);
+            return await Task.FromResult(items.Select(x => x.ToNavigationItem()));
         }
 
         public async Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly, IEnumerable<string>? pageTypes = null, string? orderBy = null, string? whereCondition = null, int? maxLevel = -1, int? topNumber = -1)
@@ -125,7 +124,7 @@ namespace Navigation.Repositories.Implementations
             }
 
             // Convert to Model
-            var items = new List<NavigationItem>();
+            var items = new List<NavigationItemBuilder>();
             foreach (var hierarchyNavTreeNode in hierarchyNodes)
             {
                 // Call the check to set the Ancestor is current
@@ -135,7 +134,7 @@ namespace Navigation.Repositories.Implementations
                     items.Add(item.Value);
                 }
             }
-            return await Task.FromResult(items);
+            return await Task.FromResult(items.Select(x => x.ToNavigationItem()));
         }
 
         public Task<string> GetAncestorPathAsync(string path, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
@@ -196,10 +195,10 @@ namespace Navigation.Repositories.Implementations
             return await GetAncestorPathAsync(result.FirstOrDefault()?.NodeAliasPath ?? "/", levels, levelIsRelative);
         }
 
-        private async Task<Result<NavigationItem>> GetTreeNodeToNavigationItemAsync(HierarchyTreeNode hierarchyNavTreeNode)
+        private async Task<Result<NavigationItemBuilder>> GetTreeNodeToNavigationItemAsync(HierarchyTreeNode hierarchyNavTreeNode)
         {
             var nodeGuidToClass = await NodeGuidToClassNameAsync();
-            var navItem = new NavigationItem(hierarchyNavTreeNode.Page.DocumentName);
+            var navItem = new NavigationItemBuilder(hierarchyNavTreeNode.Page.DocumentName);
 
             if (hierarchyNavTreeNode.Page is NavigationPageType navTreeNode)
             {
@@ -208,18 +207,17 @@ namespace Navigation.Repositories.Implementations
                     case NavigationTypeEnum.Automatic:
                         if (navTreeNode.NavigationPageNodeGuid != Guid.Empty && nodeGuidToClass.GetValueOrMaybe(navTreeNode.NavigationPageNodeGuid).TryGetValue(out var className))
                         {
-
                             var tempNavItem = await GetNavigationFromNodeInfo(navTreeNode.NavigationPageNodeGuid, className);
                             if (tempNavItem.TryGetValue(out var tempNavItemVal))
                             {
                                 // Convert to a new navigation item so it's not linked to the cached memory object, specifically the Children List
-                                navItem = CloneNavItem(tempNavItemVal);
+                                navItem = CloneNavItemBuilder(tempNavItemVal);
                             }
                             else
                             {
                                 // could not find document
                                 _logger.LogInformation("NavigationRepository", "Nav Item Reference not found", $"Could not find page with guid {navTreeNode.NavigationPageNodeGuid} on Navigation item {navTreeNode.NodeAliasPath}");
-                                return Result.Failure<NavigationItem>($"Could not find page with guid {navTreeNode.NavigationPageNodeGuid} on Navigation item {navTreeNode.NodeAliasPath}");
+                                return Result.Failure<NavigationItemBuilder>($"Could not find page with guid {navTreeNode.NavigationPageNodeGuid} on Navigation item {navTreeNode.NodeAliasPath}");
                             }
                         }
                         else
@@ -264,13 +262,13 @@ namespace Navigation.Repositories.Implementations
                 if (tempNavItem.TryGetValue(out var tempNavItemVal))
                 {
                     // Convert to a new navigation item so it's not linked to the cached memory object, specifically the Children List
-                    navItem = CloneNavItem(tempNavItemVal);
+                    navItem = CloneNavItemBuilder(tempNavItemVal);
                 }
                 else
                 {
                     // could not find document
                     _logger.LogInformation("NavigationRepository", "Non Nav Item not found", $"Could not find page with guid {page.NodeGUID}: {tempNavItem.Error}");
-                    return Result.Failure<NavigationItem>($"Could not find page with guid {page.NodeGUID}");
+                    return Result.Failure<NavigationItemBuilder>($"Could not find page with guid {page.NodeGUID}");
                 }
             }
 
@@ -288,12 +286,12 @@ namespace Navigation.Repositories.Implementations
             return navItem;
         }
 
-        private NavigationItem CloneNavItem(NavigationItem navItem)
+        private NavigationItemBuilder CloneNavItemBuilder(NavigationItemBuilder navItem)
         {
-            return new NavigationItem(navItem.LinkText)
+            return new NavigationItemBuilder(navItem.LinkText)
             {
                 NavLevel = navItem.NavLevel,
-                Children = new List<NavigationItem>(),
+                Children = new List<NavigationItemBuilder>(),
                 LinkCSSClass = navItem.LinkCSSClass,
                 LinkHref = navItem.LinkHref,
                 LinkTarget = navItem.LinkTarget,
@@ -308,7 +306,7 @@ namespace Navigation.Repositories.Implementations
         }
 
 
-        private async Task<Dictionary<Guid, string>> NodeGuidToClassNameAsync()
+        private async Task<IReadOnlyDictionary<Guid, string>> NodeGuidToClassNameAsync()
         {
             return await _progressiveCache.LoadAsync(async cs =>
             {
@@ -328,7 +326,7 @@ namespace Navigation.Repositories.Implementations
         /// <param name="nodeGuid"></param>
         /// <param name="className"></param>
         /// <returns></returns>
-        private async Task<Result<NavigationItem>> GetNavigationFromNodeInfo(Guid nodeGuid, string className)
+        private async Task<Result<NavigationItemBuilder>> GetNavigationFromNodeInfo(Guid nodeGuid, string className)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
                .Node(nodeGuid);
@@ -355,7 +353,7 @@ namespace Navigation.Repositories.Implementations
                 var prioritizeLocalizedValue = treeDoc.DocumentCulture.Equals("en-US", StringComparison.OrdinalIgnoreCase);
 
                 // Normal Tree node to Navigation
-                var navItem = new NavigationItem(treeDoc.DocumentName)
+                var navItem = new NavigationItemBuilder(treeDoc.DocumentName)
                 {
                     LinkHref = DocumentURLProvider.GetUrl(treeDoc).RemoveTildeFromFirstSpot(),
                     LinkPagePath = treeDoc.NodeAliasPath,
@@ -367,7 +365,7 @@ namespace Navigation.Repositories.Implementations
 
                 return navItem;
             }
-            return Result.Failure<NavigationItem>($"Could not retrieve page {nodeGuid}");
+            return Result.Failure<NavigationItemBuilder>($"Could not retrieve page {nodeGuid}");
 
         }
 

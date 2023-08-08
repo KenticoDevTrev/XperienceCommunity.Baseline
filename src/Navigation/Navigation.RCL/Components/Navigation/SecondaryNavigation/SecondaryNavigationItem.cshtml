@@ -1,5 +1,5 @@
 ﻿@model NavigationItem
-@if (Model.Children.Count == 0)
+@if (Model.Children.Count() == 0)
 {
     <li navitem-class navitem-references navigation-item="Model" class="nav-item">
         <a class="nav-link" navitem-link navigation-item="Model">@Html.Raw(Model.LinkText)</a>

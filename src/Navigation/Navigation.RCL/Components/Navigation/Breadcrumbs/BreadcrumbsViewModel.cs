@@ -2,6 +2,6 @@
 {
     public record BreadcrumbsViewModel
     {
-        public IEnumerable<Breadcrumb> Breadcrumbs { get; set; } = Array.Empty<Breadcrumb>();
+        public IEnumerable<Breadcrumb> Breadcrumbs { get; init; } = Array.Empty<Breadcrumb>();
     }
 }

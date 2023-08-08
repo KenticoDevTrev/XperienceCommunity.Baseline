@@ -75,7 +75,7 @@ namespace Core.Models
         /// </summary>
         public int NodeSiteID { get; init; }
 
-        public string Culture { get; set; }
+        public string Culture { get; init; }
 
         public DocumentIdentity DocumentIdentity
         {
@@ -141,6 +141,6 @@ namespace Core.Models
         /// <summary>
         /// Typed page data
         /// </summary>
-        public T Data { get; set; }
+        public T Data { get; init; }
     }
 }

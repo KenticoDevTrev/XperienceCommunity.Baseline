@@ -1,20 +1,20 @@
 ﻿namespace Navigation.Models
 {
-    public class NavigationItem
+    /// <summary>
+    /// Used to build a NavigationItem, should convert to the NavigationItem once built.
+    /// </summary>
+    public class NavigationItemBuilder
     {
-        public NavigationItem(string linkText)
+        public NavigationItemBuilder(string linkText)
         {
             LinkText = linkText;
         }
 
         public string LinkText { get; set; }
         public int NavLevel { get; set; } = 0;
-        public List<NavigationItem> Children { get; set; } = new List<NavigationItem>();
-
+        public List<NavigationItemBuilder> Children { get; set; } = new List<NavigationItemBuilder>();
         public Maybe<string> LinkCSSClass { get; set; }
-
         public Maybe<string> LinkHref { get; set; }
-
         public Maybe<string> LinkTarget { get; set; }
         public Maybe<string> LinkOnClick { get; set; }
         public Maybe<string> LinkAlt { get; set; }
@@ -36,6 +36,55 @@
                 child.InitializeNavLevels();
             });
         }
+
+        public NavigationItem ToNavigationItem()
+        {
+            return new NavigationItem(LinkText)
+            {
+                LinkText = LinkText,
+                NavLevel = NavLevel,
+                Children = Children.Select(x => x.ToNavigationItem()),
+                LinkCSSClass = LinkCSSClass,
+                LinkHref = LinkHref,
+                LinkTarget = LinkTarget,
+                LinkOnClick = LinkOnClick,
+                LinkAlt = LinkAlt,
+                LinkPagePath = LinkPagePath,
+                LinkPageGUID = LinkPageGUID,
+                LinkDocumentGUID = LinkDocumentGUID,
+                LinkPageID = LinkPageID,
+                LinkDocumentID = LinkDocumentID,
+                IsMegaMenu = IsMegaMenu
+            };
+        }
+    }
+
+    public record NavigationItem
+    {
+        public NavigationItem(string linkText)
+        {
+            LinkText = linkText;
+        }
+
+        public string LinkText { get; init; }
+        public int NavLevel { get; init; } = 0;
+        public IEnumerable<NavigationItem> Children { get; init; } = Array.Empty<NavigationItem>();
+
+        public Maybe<string> LinkCSSClass { get; init; }
+
+        public Maybe<string> LinkHref { get; init; }
+
+        public Maybe<string> LinkTarget { get; init; }
+        public Maybe<string> LinkOnClick { get; init; }
+        public Maybe<string> LinkAlt { get; init; }
+        public Maybe<string> LinkPagePath { get; init; }
+        public Maybe<Guid> LinkPageGUID { get; init; }
+        public Maybe<Guid> LinkDocumentGUID { get; init; }
+        public Maybe<int> LinkPageID { get; init; }
+        public Maybe<int> LinkDocumentID { get; init; }
+        public bool IsMegaMenu { get; init; } = false;
+
+
 
         /// <summary>
         /// Checks if the current page or descendent is current page

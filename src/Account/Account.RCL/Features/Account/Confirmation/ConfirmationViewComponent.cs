@@ -69,15 +69,15 @@ namespace Account.Features.Account.Confirmation
                     throw new InvalidOperationException(userResult.Error);
                 }
                 // Verifies the confirmation parameters and enables the user account if successful
+                var results = await _userService.ConfirmRegistrationConfirmationTokenAsync(userResult.Value, token.GetValueOrDefault(string.Empty));
                 model = new ConfirmationViewModel(
-                    result: await _userService.ConfirmRegistrationConfirmationTokenAsync(userResult.Value, token.GetValueOrDefault(string.Empty)),
+                    result: results,
                     isEditMode: isEditMode
-                );
-
-                if (model.Result.Succeeded)
+                    )
                 {
-                    model.LoginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl());
-                }
+                    LoginUrl = results.Succeeded ? await _accountSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl()) : Maybe.None
+                };
+                
             }
             catch (InvalidOperationException ex)
             {

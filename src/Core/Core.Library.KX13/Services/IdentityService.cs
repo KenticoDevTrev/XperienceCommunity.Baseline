@@ -248,19 +248,28 @@ namespace Core.Services.Implementations
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var objRow))
                 {
-                    var newIdentity = new ObjectIdentity();
+                    Maybe<int> idMaybe = Maybe.None;
+                    Maybe<Guid> guidMaybe = Maybe.None;
+                    Maybe<string> codeNameMaybe = Maybe.None;
                     if (idColumnMaybe.TryGetValue(out var idColumnVal))
                     {
-                        newIdentity.Id = ValidationHelper.GetInteger(objRow[idColumnVal], 0).WithMatchAsNone(0);
+                        idMaybe = ValidationHelper.GetInteger(objRow[idColumnVal], 0).WithMatchAsNone(0);
                     }
                     if (guidColumnMaybe.TryGetValue(out var guidColumnVal))
                     {
-                        newIdentity.Guid = ValidationHelper.GetGuid(objRow[guidColumnVal], Guid.Empty).WithMatchAsNone(Guid.Empty);
+                        guidMaybe = ValidationHelper.GetGuid(objRow[guidColumnVal], Guid.Empty).WithMatchAsNone(Guid.Empty);
                     }
                     if (codeNameColumnMaybe.TryGetValue(out var codeNameColumnVal))
                     {
-                        newIdentity.CodeName = ValidationHelper.GetString(objRow[codeNameColumnVal], string.Empty).WithMatchAsNone(string.Empty);
+                        codeNameMaybe = ValidationHelper.GetString(objRow[codeNameColumnVal], string.Empty).WithMatchAsNone(string.Empty);
                     }
+
+                    var newIdentity = new ObjectIdentity()
+                    {
+                        Id = idMaybe,
+                        Guid = guidMaybe,
+                        CodeName = codeNameMaybe
+                    };
                     return newIdentity;
                 }
                 else
@@ -298,18 +307,23 @@ namespace Core.Services.Implementations
                 foreach (DataRow item in allItems)
                 {
                     // Create
-                    var objectIdentity = new ObjectIdentity()
-                    {
-                        Id = (int)item[baseClassObj.TypeInfo.IDColumn]
-                    };
+                    Maybe<Guid> guidMaybe = Maybe.None;
+                    Maybe<string> codeNameMaybe = Maybe.None;
                     if (baseClassObj.TypeInfo.GUIDColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var guidColumn))
                     {
-                        objectIdentity.Guid = ValidationHelper.GetGuid(item[guidColumn], Guid.Empty).WithMatchAsNone(Guid.Empty);
+                        guidMaybe = ValidationHelper.GetGuid(item[guidColumn], Guid.Empty).WithMatchAsNone(Guid.Empty);
                     }
                     if (baseClassObj.TypeInfo.CodeNameColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var codeNameColumn))
                     {
-                        objectIdentity.CodeName = ValidationHelper.GetString(item[codeNameColumn], string.Empty).WithMatchAsNone(string.Empty);
+                        codeNameMaybe = ValidationHelper.GetString(item[codeNameColumn], string.Empty).WithMatchAsNone(string.Empty);
                     }
+
+                    var objectIdentity = new ObjectIdentity()
+                    {
+                        Id = (int)item[baseClassObj.TypeInfo.IDColumn],
+                        Guid = guidMaybe,
+                        CodeName = codeNameMaybe
+                    };
 
                     // Add
                     if (objectIdentity.Id.TryGetValue(out var idVal))
@@ -404,40 +418,42 @@ namespace Core.Services.Implementations
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetAllNodeDocumentIdenties"));
 
         }
-    }
 
-    public class NodeDocumentIdentityHolder
-    {
-        public NodeDocumentIdentityHolder(DocumentIdentityDictionaries document, NodeIdentityDictionaries node)
+        private class NodeDocumentIdentityHolder
         {
-            Document = document;
-            Node = node;
+            public NodeDocumentIdentityHolder(DocumentIdentityDictionaries document, NodeIdentityDictionaries node)
+            {
+                Document = document;
+                Node = node;
+            }
+
+            public DocumentIdentityDictionaries Document { get; set; }
+            public NodeIdentityDictionaries Node { get; set; }
         }
 
-        public DocumentIdentityDictionaries Document { get; set; }
-        public NodeIdentityDictionaries Node { get; set; }
+        private class DocumentIdentityDictionaries
+        {
+            public Dictionary<int, DocumentIdentity> ById { get; set; } = new Dictionary<int, DocumentIdentity>();
+            public Dictionary<string, DocumentIdentity> ByNodeAliasPathCultureSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
+            public Dictionary<string, DocumentIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
+
+            public Dictionary<Guid, DocumentIdentity> ByGuid { get; set; } = new Dictionary<Guid, DocumentIdentity>();
+        }
+
+        private class NodeIdentityDictionaries
+        {
+            public Dictionary<int, NodeIdentity> ById { get; set; } = new Dictionary<int, NodeIdentity>();
+            public Dictionary<string, NodeIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, NodeIdentity>();
+            public Dictionary<Guid, NodeIdentity> ByGuid { get; set; } = new Dictionary<Guid, NodeIdentity>();
+        }
+
+        private class ObjectIdentityDictionaries
+        {
+            public Dictionary<int, ObjectIdentity> ById { get; set; } = new Dictionary<int, ObjectIdentity>();
+            public Dictionary<string, ObjectIdentity> ByCodeName { get; set; } = new Dictionary<string, ObjectIdentity>();
+            public Dictionary<Guid, ObjectIdentity> ByGuid { get; set; } = new Dictionary<Guid, ObjectIdentity>();
+        }
     }
 
-    public class DocumentIdentityDictionaries
-    {
-        public Dictionary<int, DocumentIdentity> ById { get; set; } = new Dictionary<int, DocumentIdentity>();
-        public Dictionary<string, DocumentIdentity> ByNodeAliasPathCultureSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
-        public Dictionary<string, DocumentIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
-
-        public Dictionary<Guid, DocumentIdentity> ByGuid { get; set; } = new Dictionary<Guid, DocumentIdentity>();
-    }
-
-    public class NodeIdentityDictionaries
-    {
-        public Dictionary<int, NodeIdentity> ById { get; set; } = new Dictionary<int, NodeIdentity>();
-        public Dictionary<string, NodeIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, NodeIdentity>();
-        public Dictionary<Guid, NodeIdentity> ByGuid { get; set; } = new Dictionary<Guid, NodeIdentity>();
-    }
-
-    public class ObjectIdentityDictionaries
-    {
-        public Dictionary<int, ObjectIdentity> ById { get; set; } = new Dictionary<int, ObjectIdentity>();
-        public Dictionary<string, ObjectIdentity> ByCodeName { get; set; } = new Dictionary<string, ObjectIdentity>();
-        public Dictionary<Guid, ObjectIdentity> ByGuid { get; set; } = new Dictionary<Guid, ObjectIdentity>();
-    }
+    
 }

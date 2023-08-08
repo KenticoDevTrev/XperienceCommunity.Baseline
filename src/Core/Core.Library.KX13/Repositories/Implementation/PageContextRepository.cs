@@ -192,7 +192,7 @@ namespace Core.Repositories.Implementation
                     return currentPage;
                 }
                 builder.PagePath(nodeAliasPathAndMaybeCultureAndSiteId.Item1);
-                var test =  await _progressiveCache.LoadAsync(async cs =>
+                return await _progressiveCache.LoadAsync(async cs =>
                 {
                     if(cs.Cached)
                     {

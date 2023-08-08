@@ -2,7 +2,7 @@
 
 namespace Navigation.Models
 {
-    public class BreadcrumbJsonLD
+    public record BreadcrumbJsonLD
     {
         public BreadcrumbJsonLD(List<ItemListElementJsonLD> itemListElement)
         {
@@ -10,12 +10,10 @@ namespace Navigation.Models
         }
 
         [JsonPropertyName("@context")]
-        public string Context { get; set; } = "https://schema.org";
+        public string Context { get; } = "https://schema.org";
         [JsonPropertyName("@type")]
-        public string ContentType { get; set; } = "BreadcrumbList";
+        public string ContentType { get; } = "BreadcrumbList";
         [JsonPropertyName("itemListElement")]
-        public List<ItemListElementJsonLD> ItemListElement { get; set; }
-
-    
+        public IEnumerable<ItemListElementJsonLD> ItemListElement { get; set; }
     }
 }

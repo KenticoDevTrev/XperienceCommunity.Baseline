@@ -16,7 +16,7 @@
             Id = id;
         }
 
-        public IEnumerable<NavigationItem> NavigationItems { get; set; }
-        public string Id { get; set; }
+        public IEnumerable<NavigationItem> NavigationItems { get; init; }
+        public string Id { get; init; }
     }
 }
