@@ -107,7 +107,7 @@ namespace Core.Repositories.Implementation
             string keywords = string.Empty;
             string description = string.Empty;
             string title = string.Empty;
-
+            Maybe<bool> noIndex = Maybe.None;
             // Try to get these values first
             /*if (node is SomePageType menuPage)
             {
@@ -156,6 +156,11 @@ namespace Core.Repositories.Implementation
                 var customDataVal = node.DocumentCustomData.GetValue("MetaData_Title");
                 title = customDataVal != null && customDataVal is string titleVal ? titleVal : node.DocumentPageTitle.AsNullOrWhitespaceMaybe().GetValueOrDefault(node.DocumentName);
             }
+            if(noIndex.HasNoValue)
+            {
+                var customDataVal = node.DocumentCustomData.GetValue("MetaData_NoIndex");
+                noIndex = customDataVal != null ? ValidationHelper.GetBoolean(customDataVal, false) : Maybe.None;
+            }
 
             PageMetaData metaData = new PageMetaData()
             {
@@ -164,6 +169,7 @@ namespace Core.Repositories.Implementation
                 Description = description.AsNullOrWhitespaceMaybe().GetValueOrDefault(string.Empty),
                 Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : string.Empty,
                 ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : string.Empty,
+                NoIndex = noIndex
             };
 
             // Handle canonical url

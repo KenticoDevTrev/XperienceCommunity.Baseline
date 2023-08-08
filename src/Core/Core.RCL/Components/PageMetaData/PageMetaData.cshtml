@@ -1,26 +1,31 @@
 ﻿@model Core.Components.PageMetaData.PageMetaDataViewModel
 @inject IUrlHelper UrlHelper
-@inject IUrlResolver UrlResolver 
+@inject IUrlResolver UrlResolver
 
-@if (Model.Title.TryGetValue(out var title))
+@if (Model.Title.TryGetValue(out var title) && !string.IsNullOrWhiteSpace(title))
 {
     ViewBag.Title = title;
     <title>@title</title>
     <meta property="og:title" content="@title" />
 }
-@if (Model.Description.TryGetValue(out var description))
+@if (Model.Description.TryGetValue(out var description) && !string.IsNullOrWhiteSpace(description))
 {
     <meta name="description" content="@description">
     <meta property="og:description" content="@description" />
 }
-@if (Model.Keywords.TryGetValue(out var keywords))
+@if (Model.Keywords.TryGetValue(out var keywords) && !string.IsNullOrWhiteSpace(keywords))
 {
     <meta name="keywords" content="@keywords">
 }
-@if (Model.Thumbnail.TryGetValue(out var thumbnail))
+@if (Model.Thumbnail.TryGetValue(out var thumbnail) && !string.IsNullOrWhiteSpace(thumbnail))
 {
     <meta property="og:image" content="@UrlResolver.GetAbsoluteUrl(thumbnail)" />
 }
-@if(Model.CanonicalUrl.TryGetValue(out var canonicalUrl)) {
+@if (Model.CanonicalUrl.TryGetValue(out var canonicalUrl) && !string.IsNullOrWhiteSpace(canonicalUrl))
+{
     <link rel="canonical" href="@UrlResolver.GetAbsoluteUrl(canonicalUrl)" />
+}
+@if (Model.NoIndex.TryGetValue(out var noIndex) && noIndex)
+{
+    <meta name="robots" content="noindex">
 }

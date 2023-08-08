@@ -8,5 +8,6 @@
         public Maybe<string> Thumbnail { get; set; }
         public Maybe<string> ThumbnailLarge { get; set; }
         public Maybe<string> CanonicalUrl { get; set; }
+        public Maybe<bool> NoIndex { get; set; }
     }
 }
