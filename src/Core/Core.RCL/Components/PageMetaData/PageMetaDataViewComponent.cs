@@ -35,7 +35,8 @@
                     Keywords = metaDataVal.Keywords,
                     Description = metaDataVal.Description,
                     Thumbnail = metaDataVal.Thumbnail,
-                    CanonicalUrl = metaDataVal.CanonicalUrl
+                    CanonicalUrl = metaDataVal.CanonicalUrl,
+                    NoIndex = metaDataVal.NoIndex
                 };
                 return View("/Components/PageMetaData/PageMetaData.cshtml", model);
             }
