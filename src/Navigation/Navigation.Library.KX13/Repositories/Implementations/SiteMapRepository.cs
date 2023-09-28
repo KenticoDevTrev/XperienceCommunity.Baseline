@@ -56,12 +56,12 @@ namespace Navigation.Repositories.Implementations
                 {
                     if (options.UrlColumnName.TryGetValue(out var urlColumnName))
                     {
-                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
+                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
+                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
                     }
                     else
                     {
-                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
-                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
+                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
                     }
                 }
             }
@@ -107,6 +107,7 @@ namespace Navigation.Repositories.Implementations
             {
                 var relativeUrl = page.GetStringValue(urlColumnName, _pageUrlRetriever.Retrieve(page).RelativePath);
 
+                // TODO: do a massive lookup by URL and alt url instead and look for a match vs. individual, this is highly unoptimized
                 // Try to find page by NodeAliasPath
 
                 var actualPage = await _pageRetriever.RetrieveAsync<TreeNode>(
