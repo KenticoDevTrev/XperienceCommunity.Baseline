@@ -43,27 +43,27 @@
             var parentUl = parentLi.parentElement;
             switch (event.key) {
                 case 'ArrowLeft':
-                    let prevLink = parentLi.previousSibling;
+                    let prevLink = parentLi.previousElementSibling;
                     if (prevLink) {
-                        prevLink.querySelector("> a").focus();
+                        prevLink.querySelector("a").focus();
                     }
                     break;
                 case 'ArrowUp':
-                    let parentLink = parentUl.previousSibling();
+                    let parentLink = parentUl.previousElementSibling;
                     if (parentLink) {
                         $(parentLink).focus();
                     }
                     break;
                 case 'ArrowRight':
-                    let nextLink = parentLi.nextSibling();
+                    let nextLink = parentLi.nextElementSibling;
                     if (nextLink) {
-                        nextLink.querySelector("> a").focus();
+                        nextLink.querySelector("a").focus();
                     }
                     break;
                 case 'ArrowDown':
-                    let childLink = link.nextSibling();
+                    let childLink = link.nextElementSibling;
                     if (childLink) {
-                        childLink.querySelectorAll("> li:first-child > a").focus();
+                        childLink.querySelector("li:first-child > a").focus();
                     }
                     break;
                 case 'Enter':
