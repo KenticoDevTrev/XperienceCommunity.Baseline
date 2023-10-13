@@ -14,5 +14,12 @@
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetAsync();
+
+        /// <summary>
+        /// Gets the SiteMapUrlSet given the SiteMapOptionsPageBuidlerOnly, this method is quicker and more accurate than the GetSiteMapUrlSet but can't handle "UrlColumn" items.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetPageBuilderAsync(SiteMapOptionsPageBuilderOnly options);
     }
 }

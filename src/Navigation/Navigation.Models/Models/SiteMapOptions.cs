@@ -59,4 +59,45 @@ namespace Navigation.Models
             return CacheItemName.GetValueOrDefault($"{Path}|{string.Join(",", ClassNames)}|{CombineWithDefaultCulture.GetValueOrDefault(false)}|{CultureCode.GetValueOrDefault(string.Empty)}|{MaxRelativeLevel}|{SelectOnlyPublished}|{WhereCondition.GetValueOrDefault(string.Empty)}|{CheckDocumentPermissions.GetValueOrDefault(false)}");
         }
     }
+
+
+    /// <summary>
+    /// This will use a different 'mode' of Sitemap options, that uses the UrlPath Table, and has advanced logic to also detect 'changes' for any sub element (specified by the PageElementHolderClass).
+    /// 
+    /// This does NOT support the UrlColumnName, as those won't be accurate in the UrlPath table
+    /// </summary>
+    public class SiteMapOptionsPageBuilderOnly : SiteMapOptions, ICacheKey
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="languageGroupingMode">The language grouping mode.</param>
+        /// <param name="pageElementHolderClass">If you have a sub class that 'holds' page elements, such as a Sections folder or similar, you can pass this and it will scan child elements up to 3 levels deep and use the latest item touched there for the last modified date of the page</param>
+        public SiteMapOptionsPageBuilderOnly(PageBuilderLanguageGroupingMode languageGroupingMode, string? pageElementHolderClass = null, int? siteID = null)
+        {
+            LanguageGroupingMode = languageGroupingMode;
+            PageElementHolderClass = pageElementHolderClass.AsMaybe();
+            SiteID = siteID.AsMaybe();
+        }
+
+        public PageBuilderLanguageGroupingMode LanguageGroupingMode { get; set; }
+        public Maybe<string> PageElementHolderClass { get; set; }
+        public Maybe<int> SiteID { get; set; }
+    }
+
+    public enum PageBuilderLanguageGroupingMode
+    {
+        /// <summary>
+        /// Returns all culture variants, even if that page isn't translated to the culture (would fall back to the default language)
+        /// </summary>
+        AllCultures,
+        /// <summary>
+        /// Returns all culture variants only if the page actually exists in that language.
+        /// </summary>
+        AllCultures_OnlyIfExists,
+        /// <summary>
+        /// Returns only the specified culture
+        /// </summary>
+        OnlySpecifiedCulture
+    }
 }

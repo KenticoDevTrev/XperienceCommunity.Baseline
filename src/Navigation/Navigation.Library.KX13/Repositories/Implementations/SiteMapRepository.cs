@@ -1,4 +1,5 @@
-﻿using CMS.DocumentEngine.Routing;
+﻿using CMS.DataEngine;
+using CMS.DocumentEngine.Routing;
 using Kentico.Content.Web.Mvc;
 
 namespace Navigation.Repositories.Implementations
@@ -45,6 +46,12 @@ namespace Navigation.Repositories.Implementations
 
         public async Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetAsync(SiteMapOptions options)
         {
+            // Switch on the type
+            if (options is SiteMapOptionsPageBuilderOnly pageBuilderOnlySitemapOptions)
+            {
+                return await GetSiteMapUrlSetPageBuilderAsync(pageBuilderOnlySitemapOptions);
+            }
+
             // Clean up
             options.Path = DataHelper.GetNotEmpty(options.Path, "/").Replace("%", "");
 
@@ -255,6 +262,92 @@ namespace Navigation.Repositories.Implementations
             return levelResult.FirstOrDefault()?.NodeLevel ?? 0;
         }
 
+        public Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetPageBuilderAsync(SiteMapOptionsPageBuilderOnly options)
+        {
+            options.Path = DataHelper.GetNotEmpty(options.Path, "/").Replace("%", "");
 
+            // Build out the query
+            /*declare @siteID int = 1
+            declare @contentHolderPageType nvarchar(100) = 'mmweb.sectionfolder' -- If null, won't check sub areas
+            declare @cultureCode nvarchar(5) = 'en-US'*/
+            var queryParams = new QueryDataParameters();
+            if (options.SiteID.TryGetValue(out var siteID))
+            {
+                queryParams.Add("@SiteID", siteID);
+            }
+            if (options.CultureCode.TryGetValue(out var culture))
+            {
+                queryParams.Add("@DocumentCulture", culture);
+            }
+
+            Maybe<int> maxLevel = options.MaxRelativeLevel < 0 ? Maybe.None : options.Path.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Length + options.MaxRelativeLevel;
+
+            string viewCultureJoin = (options.LanguageGroupingMode == PageBuilderLanguageGroupingMode.AllCultures || options.LanguageGroupingMode == PageBuilderLanguageGroupingMode.OnlySpecifiedCulture)
+           ? " inner join View_CMS_Tree_Joined on NodeID = PageUrlPathNodeID and (case when HasDocMatch = 1 then DocumentCulture else PageUrlPathCulture end = PageUrlPathCulture)"
+           : " inner join View_CMS_Tree_Joined on NodeID = PageUrlPathNodeID and PageUrlPathCulture = DocumentCulture";
+
+            var query = $@"
+select 
+    *,
+        case when DaysSinceModified > 365 then 'yearly' else
+            case when DaysSinceModified > 30 then 'monthly' else
+                case when DaysSinceModified > 7 then 'weekly' else 'daily' end
+            end
+        end as ChangeFrequency
+from 
+(
+    Select 
+        '/'+PageUrlPathUrlPath as [Url],
+        LatestModified, 
+        NodeID, 
+        NodeLevel, 
+        NodeOrder, 
+        NodeParentID,
+        PageUrlPathCulture, 
+        DATEDIFF(day, LatestModified, GETDATE()) as DaysSinceModified 
+    from 
+    (
+        select 
+            CMS_PageUrlPath.*, 
+            case when DocumentID is null then 0 else 1 end as HasDocMatch 
+        from CMS_PageUrlPath
+        left join View_CMS_Tree_Joined on NodeID = PageUrlPathNodeID and DocumentCulture = PageUrlPathCulture
+    ) PageUrlPathWithHasCultureMatch
+    {viewCultureJoin}
+    inner join 
+    (
+        select 
+            ParentDocumentID, 
+            MAX(LargestDate) as LatestModified
+        from (
+            select 
+                L0.DocumentID as ParentDocumentID, 
+                (select MAX(v) from (VALUES (l0.DocumentModifiedWhen), (L1.DocumentModifiedWhen), (L2.DocumentModifiedWhen), (L3.DocumentModifiedWhen), (L4.DocumentModifiedWhen)) as value(v)) as LargestDate 
+            from View_CMS_Tree_Joined L0
+            left outer join View_CMS_Tree_Joined L1 on L0.NodeID = L1.NodeParentID and L1.ClassName = @contentHolderPageType
+            left outer join View_CMS_Tree_Joined L2 on L1.NodeID = L2.NodeParentID
+            left outer join View_CMS_Tree_Joined L3 on L2.NodeID = L3.NodeParentID
+            left outer join View_CMS_Tree_Joined L4 on L3.NodeID = L4.NodeParentID
+        where 
+            {(options.ClassNames.Any() ? $"LO.ClassName in ('{string.Join("','", options.ClassNames.Select(x => SqlHelper.EscapeQuotes(x)))}')" : "")}
+    ) DocumentsWithLargestDate
+    group by 
+        ParentDocumentID
+) DocumentIDToLastModified on ParentDocumentID = DocumentID
+where 
+    NodeAliasPath like '{options.Path}%'
+    {(options.SiteID.HasValue ? "and NodeSiteID = @SiteID" : "")}
+    {(options.LanguageGroupingMode == PageBuilderLanguageGroupingMode.OnlySpecifiedCulture && options.CultureCode.HasValue ? "and DocumentCulture = @CultureCode" : "")}
+    {(options.WhereCondition.TryGetValue(out var whereCondition) ? $"and ({whereCondition})" : "")}
+) DataWithDays
+    where 
+        1=1
+        {(maxLevel.TryGetValue(out var maxLevelVal) ? $"and NodeLevel <= {maxLevelVal}" : "")}
+    order by
+        NodeID,
+        PageUrlPathCulture
+";
+
+        }
     }
 }
