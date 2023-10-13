@@ -10,40 +10,65 @@
     </ul>
 </nav>
 <script>
+    @if(Model.NavShortcutSelector.TryGetValue(out var navShortcutId))
+    {
+    <text>
+    var navShortcuts = document.querySelectorAll('@(navShortcutId)');
+    if (navShortcuts) {
+        navShortcuts.forEach(function (navShortcut) {
+            navShortcut.addEventListener('keydown', function (e) {
+                switch (e.key) {
+                    case 'Enter':
+                    case ' ':
+                    case 'Space':
+                        var firstNavItem = document.querySelector('#@(Model.Id) > li:first-child > a');
+                        if (firstNavItem) {
+                            firstNavItem.focus();
+                        }
+                        e.preventDefault();
+                        break;
+                }
+            });
+        });
+    }
+    </text>
+    }
+
     // enable left/right/up/down navigation
-    var navLinks = document.querySelectorAll("#@(Model.Id) a");
+    var navLinks = document.querySelectorAll("#@(Model.Id.TrimStart('#')) a");
     for(var n = 0; n< navLinks.length; n++){
-        navLinks[n].addEventListener("keydown", function(event) {
+        navLinks[n].addEventListener('keydown', function(event) {
             var link = this;
             var parentLi = link.parentElement;
             var parentUl = parentLi.parentElement;
-            switch (event.keyCode) {
-                case 37: // left arrow
-                    let prevLink = $(parentLi).prev("li");
+            switch (event.key) {
+                case 'ArrowLeft':
+                    let prevLink = parentLi.previousSibling;
                     if (prevLink) {
-                        $("> a", prevLink).focus();
+                        prevLink.querySelector("> a").focus();
                     }
                     break;
-                case 38: // up arrow
-                    let parentLink = $(parentUl).siblings("a");
+                case 'ArrowUp':
+                    let parentLink = parentUl.previousSibling();
                     if (parentLink) {
                         $(parentLink).focus();
                     }
                     break;
-                case 39: // right arrow
-                    let nextLink = $(parentLi).next("li");
+                case 'ArrowRight':
+                    let nextLink = parentLi.nextSibling();
                     if (nextLink) {
-                        $("> a", nextLink).focus();
+                        nextLink.querySelector("> a").focus();
                     }
                     break;
-                case 40: // down arrow
-                    let childLink = $(link).siblings("ul");
+                case 'ArrowDown':
+                    let childLink = link.nextSibling();
                     if (childLink) {
-                        $("> li:first-child > a", childLink).focus();
+                        childLink.querySelectorAll("> li:first-child > a").focus();
                     }
                     break;
-                case 13: // enter
-                case 32: // space
+                case 'Enter':
+                case ' ':
+                case 'Space':
                     event.preventDefault();
 
             }
