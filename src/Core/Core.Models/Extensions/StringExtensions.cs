@@ -1,5 +1,4 @@
-﻿
-public static class StringExtensions
+﻿public static class StringExtensions
 {
 
     public static Maybe<string> AsNullOrWhitespaceMaybe(this string? value)
