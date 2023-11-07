@@ -1,7 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using System.Linq;
-
-namespace System.Collections.Generic
+﻿namespace System.Collections.Generic
 {
     public static class IEnumerableExtensions
     {
