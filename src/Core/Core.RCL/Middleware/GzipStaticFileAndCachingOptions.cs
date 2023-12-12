@@ -50,7 +50,7 @@ namespace Core.Middleware
                 }
 
                 // If it has the v= key, then the build # is appended so safe to cache for a year, also images can be cached fully
-                if (((context.Context.Request.Query?.ContainsKey("v") ?? false) || ((context.File?.PhysicalPath?.IndexOf("wwwroot\\images") ?? -1) > -1) || ((context.File?.PhysicalPath?.IndexOf("\\fonts\\") ?? -1) > -1)))
+                if (((context.Context.Request.Query?.ContainsKey("v") ?? false) || ((context.File?.PhysicalPath?.IndexOf($"wwwroot{Path.DirectorySeparatorChar}images") ?? -1) > -1) || ((context.File?.PhysicalPath?.IndexOf($"{Path.DirectorySeparatorChar}fonts{Path.DirectorySeparatorChar}") ?? -1) > -1)))
                 {
                     const int durationInSeconds = 60 * 60 * 24 * 365; // 1 year
                     context.Context.Response.Headers[HeaderNames.CacheControl] =
