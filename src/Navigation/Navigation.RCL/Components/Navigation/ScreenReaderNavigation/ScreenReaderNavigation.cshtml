@@ -1,7 +1,7 @@
 ﻿@using Navigation.Components.Navigation.ScreenReaderNavigation
 @model ScreenReaderNavigationViewModel
 <nav class="visually-hidden ada-main-navigation" role="navigation" aria-label="Screen Reader Navigation">
-    <ul id="@Model.Id">
+    <ul id="@Model.Id" name="@Model.Id">
         @foreach (var navItem in Model.NavigationItems)
         {
             <partial name="/Components/Navigation/ScreenReaderNavigation/ScreenReaderNavigationList.cshtml" model="new ScreenReaderNavigationListViewModel(navItem, 1)" />
