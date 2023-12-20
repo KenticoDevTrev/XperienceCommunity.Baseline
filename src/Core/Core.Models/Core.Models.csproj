@@ -12,7 +12,7 @@
 		<PackageReference Include="FluentValidation" Version="11.5.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.39.2" />
-		<PackageReference Include="MVCCaching.Base.Core" Version="4.2.0" />
+		<PackageReference Include="MVCCaching.Base.Core" Version="4.4.0" />
 	</ItemGroup>
 
 </Project>

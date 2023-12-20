@@ -9,6 +9,7 @@ using CMS.DocumentEngine.Types;
 using MVCCaching;
 using NavigationPageType = CMS.DocumentEngine.Types.Generic.Navigation;
 using RelationshipsExtended;
+using CMS;
 
 namespace Navigation.Repositories.Implementations
 {
@@ -372,6 +373,15 @@ namespace Navigation.Repositories.Implementations
         private async Task<IEnumerable<NavigationPageType>> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
+
+            if(navPath.TryGetValue(out var pathForBuilder))
+            {
+                builder.PagePath(pathForBuilder.Trim('%'), PathTypeEnum.Section);
+            }
+            if(navTypes.Any())
+            {
+                builder.ObjectType(TreeCategoryInfo.OBJECT_TYPE);
+            }
 
             var results = await _pageRetriever.RetrieveAsync<NavigationPageType>(query => query
                     .OrderBy(new string[] { nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeOrder) })

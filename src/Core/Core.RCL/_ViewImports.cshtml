@@ -5,7 +5,6 @@
 @using Microsoft.Extensions.Localization
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject IUrlHelper Url
-
 @* Baseline Core *@
 @using Core
 @using Core.Models
@@ -18,7 +17,7 @@
 @inject ICacheRepositoryContext CacheContext
 @inject IPageContextRepository PageContextRepository
 @inject IHtmlLocalizer<SharedResources> HtmlLocalizer
-@addTagHelper *, Core.RCL
-
+@addTagHelper *, XperienceCommunity.Baseline.Core.RCL
+@addTagHelper *, MVCCaching.Base.Core.Components
 
 @* Various other RCLs*@

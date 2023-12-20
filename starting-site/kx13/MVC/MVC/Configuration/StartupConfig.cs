@@ -211,9 +211,6 @@ namespace MVC
             //////// ERROR HANDLING //////
             //////////////////////////////
 
-
-            app.UseStaticFiles();
-
             // While IIS and IIS Express automatically handle StaticFiles from the root, default Kestrel doesn't, so safer to 
             // add this for any Site Media Libraries if you ever plan on linking directly to the file.  /getmedia linkes are not
             // impacted. 

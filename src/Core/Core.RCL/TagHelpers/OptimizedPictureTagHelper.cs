@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Web;
 
 namespace Core.TagHelpers
 {
@@ -8,6 +9,8 @@ namespace Core.TagHelpers
     {
         private string[] OptimizedImageExtensions = new string[] { "jpg", "jpeg", "png" };
         private string[] WebpImageExtensions = new string[] { "jpg", "jpeg" };
+
+        public override int Order => 50;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -28,14 +31,18 @@ namespace Core.TagHelpers
                         {
                             output.PreElement.AppendHtml("<picture>");
 
+                            var altString = output.Attributes.ContainsName("alt") ? $"alt=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["alt"].Value.ToString() ?? "")}\"" : "";
+                            var heightString = output.Attributes.ContainsName("height") ? $"height=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["width"].Value.ToString() ?? "")}\"" : "";
+                            var widthString = output.Attributes.ContainsName("width") ? $"width=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["height"].Value.ToString() ?? "")}\"" : "";
+
                             // use WebP
                             if (hasWebp)
                             {
-                                output.PreElement.AppendHtml($"<source srcset=\"{imgSrc.Replace("/source/", "/webp/", StringComparison.OrdinalIgnoreCase).Replace(imageExtension, "webp", StringComparison.OrdinalIgnoreCase)}\" type=\"image/webp\"/>");
+                                output.PreElement.AppendHtml($"<source srcset=\"{imgSrc.Replace("/source/", "/webp/", StringComparison.OrdinalIgnoreCase).Replace(imageExtension, "webp", StringComparison.OrdinalIgnoreCase)}\" type=\"image/webp\" {altString} {heightString} {widthString} />");
                             }
                             if (hasOptimized)
                             {
-                                output.PreElement.AppendHtml($"<source srcset=\"{imgSrc.Replace("/source/", "/optimized/", StringComparison.OrdinalIgnoreCase)}\" type=\"image/{imageExtension.Replace("jpg", "jpeg", StringComparison.OrdinalIgnoreCase)}\"/>");
+                                output.PreElement.AppendHtml($"<source srcset=\"{imgSrc.Replace("/source/", "/optimized/", StringComparison.OrdinalIgnoreCase)}\" type=\"image/{imageExtension.Replace("jpg", "jpeg", StringComparison.OrdinalIgnoreCase)}\" {altString} {heightString} {widthString} />");
                             }
                             // normal image tag will appear here
 

@@ -1,6 +1,6 @@
 ﻿namespace Search.Models
 {
-    public class SearchItem
+    public record SearchItem
     {
         public SearchItem(string documentExtensions, string image, string content, DateTime created, string title, string index, float maxScore, int position, double score, string type, string id, float absScore)
         {
@@ -32,5 +32,20 @@
         public float AbsScore { get; set; }
         public bool IsPage { get; set; } = false;
         public Maybe<string> PageUrl { get; set; }
+    }
+
+    public record SearchItem<T> : SearchItem
+    {
+        public SearchItem(string documentExtensions, string image, string content, DateTime created, string title, string index, float maxScore, int position, double score, string type, string id, float absScore, T data) : base(documentExtensions, image, content, created, title, index, maxScore, position, score, type, id, absScore)
+        {
+            Data = data;
+        }
+
+        public SearchItem(T data, SearchItem searchItem) : base(searchItem)
+        {
+            Data = data;
+        }
+
+        public T Data { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace CSharpFunctionalExtensions
+﻿namespace CSharpFunctionalExtensions
 {
     public static class MaybeExtensions
     {

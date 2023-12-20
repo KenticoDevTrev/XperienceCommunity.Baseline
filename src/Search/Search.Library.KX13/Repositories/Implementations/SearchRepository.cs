@@ -1,4 +1,5 @@
-﻿using CMS.DocumentEngine;
+﻿using CMS.DataEngine;
+using CMS.DocumentEngine;
 using CMS.Membership;
 using CMS.Search;
 using CMS.WebAnalytics;
@@ -55,11 +56,24 @@ namespace Search.Repositories.Implementations
                             id: x.Id,
                             absScore: x.AbsScore
                             );
+
+                        var customUrlMaybe = ValidationHelper.GetString(x.GetSearchValue(SearchFieldsConstants.CUSTOM_URL), "").AsNullOrWhitespaceMaybe();
                         if (x.Data is TreeNode page)
                         {
                             resultItem.IsPage = true;
-                            resultItem.PageUrl = page.ToPageIdentity().RelativeUrl;
+                            resultItem.PageUrl = customUrlMaybe.GetValueOrDefault(page.ToPageIdentity().RelativeUrl).TrimStart('~');
+                        } else
+                        {
+                            resultItem.IsPage = false;
+                            resultItem.PageUrl = customUrlMaybe;
                         }
+                        /* Can customize, then do type casting later to see if it's the right type
+                        if (isCustom)
+                        {
+                            resultItem = new SearchItem<CategoryItem>(CategoryItem.UnfoundCategoryItem(), resultItem);
+                        }
+                        */
+
                         return resultItem;
                     }),
                     TotalPossible = Search.TotalNumberOfResults,
