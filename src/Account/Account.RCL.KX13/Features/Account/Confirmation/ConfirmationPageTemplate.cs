@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.Confirmation;
+﻿using Account.Features.Account.Confirmation;
 
 [assembly: RegisterPageTemplate(
     "Generic.Account_Confirmation",

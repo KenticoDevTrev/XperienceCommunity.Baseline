@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.ForgottenPasswordReset;
+﻿using Account.Features.Account.ForgottenPasswordReset;
 
 [assembly: RegisterPageTemplate(
     "Generic.Account_ForgottenPasswordReset",

@@ -2,7 +2,6 @@
 using Search.Repositories;
 namespace Search.Features.Search
 {
-    
     [ViewComponent]
     public class SearchViewComponent : ViewComponent
     {

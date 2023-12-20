@@ -1,8 +1,5 @@
-﻿using CMS.Helpers;
-using CMS.Membership;
+﻿using CMS.Membership;
 using CMS.Modules;
-using MVCCaching;
-using Core;
 
 namespace Account.Repositories.Implementations
 {

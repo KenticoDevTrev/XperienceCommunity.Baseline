@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.MyAccount;
+﻿using Account.Features.Account.MyAccount;
 using XperienceCommunity.Authorization;
 
 [assembly: RegisterPageTemplate(

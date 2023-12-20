@@ -1,5 +1,4 @@
 ﻿using CMS.Membership;
-using MVCCaching;
 
 namespace Account.Services.Implementation
 {

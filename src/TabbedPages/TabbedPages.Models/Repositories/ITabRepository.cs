@@ -1,6 +1,4 @@
-﻿using Core.Models;
-
-namespace TabbedPages.Repositories
+﻿namespace TabbedPages.Repositories
 {
     public interface ITabRepository
     {

@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using TabbedPages.Features.Tab;
+﻿using TabbedPages.Features.Tab;
 
 [assembly: RegisterPageTemplate(
     "Generic.Tab_Default",

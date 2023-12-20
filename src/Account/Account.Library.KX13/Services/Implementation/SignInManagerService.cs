@@ -2,11 +2,6 @@
 using Kentico.Membership;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Account.KX13.Services.Implementation
 {
@@ -21,8 +16,6 @@ namespace Account.KX13.Services.Implementation
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
- 
 
         public async Task<bool> IsTwoFactorClientRememberedByNameAsync(string userName) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByNameAsync(userName));
         public async Task<bool> IsTwoFactorClientRememberedByEmailAsync(string email) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByEmailAsync(email));

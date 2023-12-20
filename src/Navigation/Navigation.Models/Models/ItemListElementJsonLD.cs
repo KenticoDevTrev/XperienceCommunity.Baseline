@@ -12,7 +12,7 @@ namespace Navigation.Models
         }
 
         [JsonPropertyName("@type")]
-        public string ContentType { get;  } = "ListItem";
+        public string ContentType { get; } = "ListItem";
         [JsonPropertyName("position")]
         public int Position { get; init; }
         [JsonPropertyName("name")]

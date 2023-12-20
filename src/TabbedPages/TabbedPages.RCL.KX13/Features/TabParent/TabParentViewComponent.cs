@@ -1,5 +1,4 @@
-﻿using Core.Models;
-using TabbedPages.Models;
+﻿using TabbedPages.Models;
 using TabbedPages.Repositories;
 
 namespace TabbedPages.Features.TabParent

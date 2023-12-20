@@ -46,7 +46,7 @@ namespace Navigation.Repositories.Implementations
         public async Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetAsync(SiteMapOptions options)
         {
             // Clean up
-            options.Path = DataHelper.GetNotEmpty(options.Path, "/").Replace("%", "");
+            options = options with { Path = DataHelper.GetNotEmpty(options.Path, "/").Replace("%", "") };
 
             var nodes = new List<SitemapNode>();
 
@@ -85,11 +85,10 @@ namespace Navigation.Repositories.Implementations
         private SitemapNode ConvertToSiteMapUrl(string relativeURL, DateTime? modifiedLast)
         {
             string url = URLHelper.GetAbsoluteUrl(relativeURL, RequestContext.CurrentDomain);
-            var siteMapItem = new SitemapNode(url);
-            if (modifiedLast.HasValue)
+            var siteMapItem = new SitemapNode(url)
             {
-                siteMapItem.LastModificationDate = modifiedLast.Value;
-            }
+                LastModificationDate = modifiedLast.HasValue ? modifiedLast.Value : Maybe<DateTime>.None
+            };
             return siteMapItem;
         }
 

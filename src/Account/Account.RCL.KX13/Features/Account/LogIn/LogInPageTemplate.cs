@@ -1,6 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.LogIn;
-
+﻿using Account.Features.Account.LogIn;
 
 [assembly: RegisterPageTemplate(
     "Generic.Account_LogIn",

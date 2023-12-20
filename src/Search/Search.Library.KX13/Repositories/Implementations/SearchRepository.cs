@@ -1,11 +1,8 @@
 ﻿using CMS.DataEngine;
-using CMS.DocumentEngine;
 using CMS.Membership;
 using CMS.Search;
 using CMS.WebAnalytics;
-using Core.Extensions;
 using Microsoft.AspNetCore.Http;
-using MVCCaching;
 
 namespace Search.Repositories.Implementations
 {

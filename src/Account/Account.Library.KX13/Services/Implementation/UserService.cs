@@ -1,10 +1,7 @@
-﻿using Account.Services;
-using CMS.Base;
-using CMS.Helpers;
+﻿using CMS.Base;
 using CMS.Membership;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
-using MVCCaching;
 using System.Web;
 
 namespace Account.Services.Implementation

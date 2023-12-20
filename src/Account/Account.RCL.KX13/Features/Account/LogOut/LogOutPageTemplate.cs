@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.LogOut;
+﻿using Account.Features.Account.LogOut;
 using XperienceCommunity.Authorization;
 
 [assembly: RegisterPageTemplate(

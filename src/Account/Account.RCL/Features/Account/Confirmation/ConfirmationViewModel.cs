@@ -2,7 +2,7 @@
 
 namespace Account.Features.Account.Confirmation
 {
-    public class ConfirmationViewModel
+    public record ConfirmationViewModel
     {
         public ConfirmationViewModel(IdentityResult result, bool isEditMode)
         {
@@ -10,8 +10,8 @@ namespace Account.Features.Account.Confirmation
             IsEditMode = isEditMode;
         }
 
-        public Maybe<string> LoginUrl { get; set; }
-        public IdentityResult Result { get; set; }
-        public bool IsEditMode { get; set; }
+        public Maybe<string> LoginUrl { get; init; }
+        public IdentityResult Result { get; init; }
+        public bool IsEditMode { get; init; }
     }
 }

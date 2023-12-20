@@ -1,18 +1,4 @@
 ﻿using CMS.Base;
-using CMS.DocumentEngine;
-using CMS.DocumentEngine.Types.Generic;
-using CMS.Helpers;
-using Core.Enums;
-using Core.Models;
-using Kentico.Content.Web.Mvc;
-using Microsoft.SqlServer.Dac.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TabbedPages.Models;
-using XperienceCommunity.QueryExtensions.Documents;
 
 namespace TabbedPages.Repositories.Implementations
 {

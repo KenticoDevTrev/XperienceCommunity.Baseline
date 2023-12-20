@@ -1,13 +1,13 @@
 ﻿namespace Navigation.Components.Navigation.ScreenReaderNavigation
 {
-    public class ScreenReaderNavigationListViewModel
+    public record ScreenReaderNavigationListViewModel
     {
         public ScreenReaderNavigationListViewModel(NavigationItem navItem, int level)
         {
             NavItem = navItem;
             Level = level;
         }
-        public NavigationItem NavItem { get; set; }
-        public int Level { get; set; }
+        public NavigationItem NavItem { get; init; }
+        public int Level { get; init; }
     }
 }

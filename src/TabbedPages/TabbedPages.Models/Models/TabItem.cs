@@ -1,6 +1,6 @@
 ﻿namespace TabbedPages.Models
 {
-    public class TabItem
+    public record TabItem
     {
         public TabItem(string name, int documentID)
         {
@@ -8,7 +8,7 @@
             DocumentID = documentID;
         }
 
-        public string Name { get; set; }
-        public int DocumentID { get; set; }
+        public string Name { get; init; }
+        public int DocumentID { get; init; }
     }
 }

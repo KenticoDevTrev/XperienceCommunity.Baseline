@@ -1,6 +1,4 @@
-﻿using MVCCaching;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
     public record ObjectIdentity : ICacheKey
     {

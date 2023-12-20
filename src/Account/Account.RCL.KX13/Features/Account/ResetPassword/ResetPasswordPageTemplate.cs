@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Account.Features.Account.ResetPassword;
+﻿using Account.Features.Account.ResetPassword;
 using XperienceCommunity.Authorization;
 
 [assembly: RegisterPageTemplate(

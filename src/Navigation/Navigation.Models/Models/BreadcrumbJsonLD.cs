@@ -14,6 +14,6 @@ namespace Navigation.Models
         [JsonPropertyName("@type")]
         public string ContentType { get; } = "BreadcrumbList";
         [JsonPropertyName("itemListElement")]
-        public IEnumerable<ItemListElementJsonLD> ItemListElement { get; set; }
+        public IEnumerable<ItemListElementJsonLD> ItemListElement { get; init; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Kentico.PageBuilder.Web.Mvc.PageTemplates;
-using Search.Features.Search;
+﻿using Search.Features.Search;
 
 [assembly: RegisterPageTemplate(
     "Generic.Search_Default",
