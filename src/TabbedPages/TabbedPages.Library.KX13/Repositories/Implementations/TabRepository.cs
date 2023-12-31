@@ -26,12 +26,12 @@ namespace TabbedPages.Repositories.Implementations
             _siteRepository = siteRepository;
         }
 
-        public async Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity)
+        public async Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity)
         {
             // This implementation uses the NodeAliasPath, so if it's missing then we need to get it.
-            if(parentIdentity.NodeAliasPathAndSiteId.HasNoValue)
+            if(parentIdentity.PathAndChannelId.HasNoValue)
             {
-                var identityResult = await _identityService.HydrateNodeIdentity(parentIdentity);
+                var identityResult = await _identityService.HydrateTreeIdentity(parentIdentity);
                 if(identityResult.IsFailure)
                 {
                     return Array.Empty<TabItem>();
@@ -39,13 +39,13 @@ namespace TabbedPages.Repositories.Implementations
             }
 
             // Should never be Maybe.None but just in case...
-            if(!parentIdentity.NodeAliasPathAndSiteId.TryGetValue(out var nodeAliasPathAndSiteID))
+            if(!parentIdentity.PathAndChannelId.TryGetValue(out var pathAndAndChannelId))
             {
                 return Array.Empty<TabItem>();
             }
 
-            string path = nodeAliasPathAndSiteID.Item1;
-            string siteName = _siteRepository.SiteNameById(nodeAliasPathAndSiteID.Item2.GetValueOrDefault(_siteService.CurrentSite.SiteID));
+            string path = pathAndAndChannelId.Item1;
+            string siteName = _siteRepository.SiteNameById(pathAndAndChannelId.Item2.GetValueOrDefault(_siteService.CurrentSite.SiteID));
 
             var builder = _cacheDependencyBuilderFactory.Create(siteName)
                 .PagePath(path, PathTypeEnum.Children);
@@ -74,6 +74,9 @@ namespace TabbedPages.Repositories.Implementations
 
             return nodes.Select(x => x.ToTabItem());
         }
+
+        [Obsolete("Use GetTabsAsync(TreeIdentity parentIdentity)")]
+        public Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity) => GetTabsAsync(parentIdentity.ToTreeIdentity());
     }
 }
 namespace CMS.DocumentEngine.Types.Generic

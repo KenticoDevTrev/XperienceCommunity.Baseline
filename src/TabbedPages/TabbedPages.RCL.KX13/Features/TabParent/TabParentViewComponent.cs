@@ -17,8 +17,8 @@ namespace TabbedPages.Features.TabParent
         {
             var model = new TabParentViewModel(
                 name: page.Name,
-                tabs: await _tabRepository.GetTabsAsync(page.NodeIdentity)
-                );
+                tabs: await _tabRepository.GetTabsAsync(page.TreeIdentity)
+            );
             return View("/Features/TabParent/TabParent.cshtml", model);
         }
     }
