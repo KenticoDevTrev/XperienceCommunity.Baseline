@@ -1,14 +1,11 @@
-﻿using CMS.DocumentEngine;
-using CMS.Helpers;
-
-namespace MVCCaching
+﻿namespace MVCCaching
 {
     /// <summary>
     /// Helper Method that allows you to store cache dependencies easily, and also be able to apply them to the IPageRetriever, should NOT inject this but instead declare it since otherwise the cacheKeys will be the same each time.
     /// </summary>
     public static class ICacheDependencyBuilderExtensions
     {
-        public static ICacheDependencyBuilder Pages(this ICacheDependencyBuilder builder, IEnumerable<PageIdentity> pages) => builder.Pages(pages.Select(x => x.DocumentID));
+        public static ICacheDependencyBuilder Pages(this ICacheDependencyBuilder builder, IEnumerable<PageIdentity> pages) => builder.WebPages(pages.Select(x => x.PageID));
 
         public static ICacheDependencyBuilder Attachment(this ICacheDependencyBuilder builder, IEnumerable<MediaItem> attachments)
         {
@@ -74,18 +71,25 @@ namespace MVCCaching
             return (DateTime.Now - lastTouched > forThisTime);
         }
 
-        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<PageIdentity> pages) => Nodes(builder, pages.Select(x => x.NodeID));
+        public static ICacheDependencyBuilder WebPages(this ICacheDependencyBuilder builder, IEnumerable<TreeNode> pages) => WebPages(builder, pages.Select(x => x.NodeID));
 
-        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<TreeNode> pages) => Nodes(builder, pages.Select(x => x.NodeID));
-
-        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<int> nodeIds)
+        public static ICacheDependencyBuilder WebPages(this ICacheDependencyBuilder builder, IEnumerable<int> webPageItemIds)
         {
-            foreach (var nodeID in nodeIds)
+            foreach (var webPageItemId in webPageItemIds)
             {
-                builder.AddKey($"nodeid|{nodeID}");
+                // Xperience by Kentico: builder.AddKey($"webpageitem|byid|{webPageItemId}");
+                builder.AddKey($"nodeid|{webPageItemId}");
             }
             return builder;
         }
 
+        [Obsolete("Use WebPages method")]
+        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<PageIdentity> pages) => WebPages(builder, pages.Select(x => x.NodeID));
+
+        [Obsolete("Use WebPages method, possibly using PageIdentity instead of TreeNode if this is not in a KX13 specific implementation")]
+        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<TreeNode> pages) => WebPages(builder, pages.Select(x => x.NodeID));
+
+        [Obsolete("Use WebPages method, passing the WebPageId (nodeid)")]
+        public static ICacheDependencyBuilder Nodes(this ICacheDependencyBuilder builder, IEnumerable<int> nodeIds) => builder.WebPages(nodeIds);
     }
 }

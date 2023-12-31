@@ -144,7 +144,7 @@
                 {
                     ContentID = ContentID,
                     ContentGuid = ContentGuid,
-                    PathAndAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
                 };
             }
         }
@@ -162,7 +162,33 @@
             }
         }
 
-        [Obsolete("Use ContentIdentity")]
+        public TreeIdentity TreeIdentity
+        {
+            get
+            {
+                return new TreeIdentity()
+                {
+                    PageID = PageID,
+                    PageGuid = PageGuid,
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                };
+            }
+        }
+
+        public TreeCultureIdentity TreeCultureIdentity
+        {
+            get
+            {
+                return new TreeCultureIdentity(Culture)
+                {
+                    PageID = PageID,
+                    PageGuid = PageGuid,
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                };
+            }
+        }
+
+        [Obsolete("Use ContentIdentity or TreeIdentity")]
         public NodeIdentity NodeIdentity
         {
             get
@@ -191,7 +217,6 @@
         }
 
 
-
         public string GetCacheKey()
         {
             return $"contentculture-{ContentCultureGuid}";
@@ -218,10 +243,17 @@
 
     public record PageIdentity<T> : PageIdentity
     {
+        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID, T data) : base(name, alias, pageID, pageGuid, contentID, contentName, contentGuid, contentCultureID, contentCultureGuid, path, culture, relativeUrl, absoluteUrl, level, channelID)
+        {
+            Data = data;
+        }
+
+        [Obsolete("Use primary constructor, passing NodeID as both PageID and ContentID, and NodeGuid as both PageGuid and ContentGuid, NodeAlias as both Alias and ContentName, DocumentID/Guid as ContentCultureID/Guid, and SiteID as ChannelID")]
         public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID, T data) : base(name, alias, nodeID, nodeGUID, documentID, documentGUID, path, culture, relativeUrl, absoluteUrl, nodeLevel, nodeSiteID)
         {
             Data = data;
         }
+
         public PageIdentity(T data, PageIdentity pageIdentity) : base(pageIdentity)
         {
             Data = data;
