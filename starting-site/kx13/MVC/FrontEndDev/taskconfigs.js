@@ -23,7 +23,7 @@ const configs = {
         //    minify: false,
 		//	  watchPaths: ['./typescript/Helpers/**/*.ts',
 		//	  './react/SampleReact/**/*.ts']
-        }
+        // }
     ],
     jsbundles: [
         {
