@@ -13,11 +13,11 @@ namespace TabbedPages.Features.TabParent
             _tabRepository = tabRepository;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(PageIdentity page)
+        public async Task<IViewComponentResult> InvokeAsync(PageIdentity xPage)
         {
             var model = new TabParentViewModel(
-                name: page.Name,
-                tabs: await _tabRepository.GetTabsAsync(page.TreeIdentity)
+                name: xPage.Name,
+                tabs: await _tabRepository.GetTabsAsync(xPage.TreeIdentity)
             );
             return View("/Features/TabParent/TabParent.cshtml", model);
         }

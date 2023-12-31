@@ -18,7 +18,7 @@
         /// Uses the current page context to render meta data
         /// </summary>
         /// <returns></returns>
-        public async Task<IViewComponentResult> InvokeAsync(int documentId = -1)
+        public async Task<IViewComponentResult> InvokeAsync(int xContentCultureId = -1)
         {
             if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext) && httpContext.Items.TryGetValue("ManualMetaDataAdded", out var manualAdded))
             {
@@ -26,7 +26,7 @@
                 return Content(string.Empty);
             }
 
-            var metaData = documentId > 0 ? await _metaDataRepository.GetMetaDataAsync(documentId) : await _metaDataRepository.GetMetaDataAsync();
+            var metaData = xContentCultureId > 0 ? await _metaDataRepository.GetMetaDataAsync(xContentCultureId) : await _metaDataRepository.GetMetaDataAsync();
             if (metaData.TryGetValue(out var metaDataVal))
             {
                 var model = new PageMetaDataViewModel()

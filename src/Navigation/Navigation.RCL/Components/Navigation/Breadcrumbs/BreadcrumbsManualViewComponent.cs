@@ -11,14 +11,14 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Breadcrumb> breadcrumbs, bool includeDefaultBreadcrumb = true)
+        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Breadcrumb> xBreadcrumbs, bool xIncludeDefaultBreadcrumb = true)
         {
 
             if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))
             {
                 httpContext.Items.TryAdd("BreadcrumbsManuallyDone", true);
             }
-            var breadcrumbList = breadcrumbs.ToList();
+            var breadcrumbList = xBreadcrumbs.ToList();
 
             // If none set as current page, set the last one to it.
             if(!breadcrumbList.Where(x => x.IsCurrentPage).Any() && breadcrumbList.Any())
@@ -28,7 +28,7 @@
                 breadcrumbList.Add(lastBreadcrumb);
             }
 
-            if(includeDefaultBreadcrumb)
+            if(xIncludeDefaultBreadcrumb)
             {
                 breadcrumbList.Insert(0, await _breadcrumbRepository.GetDefaultBreadcrumbAsync());
             }

@@ -41,18 +41,18 @@ namespace Core.Repositories.Implementation
         }
 
 
-        public async Task<Result<PageMetaData>> GetMetaDataAsync(int documentId, string? thumbnail = null)
+        public async Task<Result<PageMetaData>> GetMetaDataAsync(int contentCultureId, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
-                .Page(documentId);
+                .Page(contentCultureId);
 
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
-                    .WhereEquals(nameof(TreeNode.DocumentID), documentId)
+                    .WhereEquals(nameof(TreeNode.DocumentID), contentCultureId)
                     .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
-                .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", documentId)
+                .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", contentCultureId)
             ) ;
             if (page.Any())
             {
@@ -64,18 +64,18 @@ namespace Core.Repositories.Implementation
             }
         }
 
-        public async Task<Result<PageMetaData>> GetMetaDataAsync(Guid documentGuid, string? thumbnail = null)
+        public async Task<Result<PageMetaData>> GetMetaDataAsync(Guid contentCultureGuid, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
-            builder.Page(documentGuid);
+            builder.Page(contentCultureGuid);
 
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
-                    .WhereEquals(nameof(TreeNode.DocumentGUID), documentGuid)
+                    .WhereEquals(nameof(TreeNode.DocumentGUID), contentCultureGuid)
                     .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
-                    .Configure(builder, CacheMinuteTypes.VeryLong.ToDouble(), "GetMetaDataAsync", documentGuid)
+                    .Configure(builder, CacheMinuteTypes.VeryLong.ToDouble(), "GetMetaDataAsync", contentCultureGuid)
             );
             if (page.Any())
             {

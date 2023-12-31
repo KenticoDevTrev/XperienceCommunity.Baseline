@@ -19,7 +19,7 @@ namespace Navigation.Components.Navigation.BreadcrumbsJson
         }
 
 
-        public async Task<IViewComponentResult> InvokeAsync(bool IncludeDefaultBreadcrumb = true, int Nodeid = -1)
+        public async Task<IViewComponentResult> InvokeAsync(bool xIncludeDefaultBreadcrumb = true, int xPageId = -1)
         {
             if(_httpContext.HttpContext.AsMaybe().TryGetValue(out var httpContext)
                 && httpContext.Items.ContainsKey("BreadcrumbJsonLDManuallyDone"))
@@ -27,21 +27,21 @@ namespace Navigation.Components.Navigation.BreadcrumbsJson
                 return Content(String.Empty);
             }
             // Use current page if not provided
-            if(Nodeid <= 0)
+            if(xPageId <= 0)
             {
                 var currentPage = await _pageContextRepository.GetCurrentPageAsync();
                 if (currentPage.TryGetValue(out var curPage))
                 {
-                    Nodeid = curPage.NodeID;
+                    xPageId = curPage.PageID;
                 }
             }
 
-            if(Nodeid <= 0)
+            if(xPageId <= 0)
             {
                 return Content(string.Empty);
             }
-            var breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(Nodeid, IncludeDefaultBreadcrumb);
-            var breadcrumbsJson = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(breadcrumbs, !IncludeDefaultBreadcrumb);
+            var breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId, xIncludeDefaultBreadcrumb);
+            var breadcrumbsJson = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(breadcrumbs, !xIncludeDefaultBreadcrumb);
             // Serialize into the raw JSON data
             var model = new BreadcrumbsJsonViewModel(
                 serializedBreadcrumbJsonLD: JsonSerializer.Serialize(breadcrumbsJson)
