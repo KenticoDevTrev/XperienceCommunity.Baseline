@@ -1,31 +1,18 @@
 ﻿using CMS.Membership;
-using MVCCaching;
 
 namespace Account.Services.Implementation
 {
     [AutoDependencyInjection]
-    public class RoleService : IRoleService
+    public class RoleService(
+        IRoleRepository _roleRepository,
+        IRoleInfoProvider _roleInfoProvider,
+        ISiteRepository _siteRepository,
+        IUserRoleInfoProvider _userRoleInfoProvider) : IRoleService
     {
-        readonly IRoleRepository _roleRepository;
-        private readonly IRoleInfoProvider _roleInfoProvider;
-        private readonly ISiteRepository _siteRepository;
-        private readonly IUserRoleInfoProvider _userRoleInfoProvider;
-
-        public RoleService(IRoleRepository roleRepository,
-            IRoleInfoProvider roleInfoProvider,
-            ISiteRepository siteRepository,
-            IUserRoleInfoProvider userRoleInfoProvider)
-        {
-            _roleRepository = roleRepository;
-            _roleInfoProvider = roleInfoProvider;
-            _siteRepository = siteRepository;
-            _userRoleInfoProvider = userRoleInfoProvider;
-        }
-
         public async Task CreateRoleIfNotExisting(string roleName, string siteName)
         {
             var roleResult = await _roleRepository.GetRoleAsync(roleName, siteName);
-            if (roleResult.TryGetValue(out var role))
+            if (roleResult.IsFailure)
             {
                 var newRole = new RoleInfo()
                 {

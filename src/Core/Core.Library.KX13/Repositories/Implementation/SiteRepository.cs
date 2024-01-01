@@ -4,20 +4,11 @@ using CMS.SiteProvider;
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class SiteRepository : ISiteRepository
+    public class SiteRepository(
+        ISiteService _siteService,
+        ISiteInfoProvider _siteInfoProvider,
+        IProgressiveCache _progressiveCache) : ISiteRepository
     {
-        private readonly ISiteInfoProvider _siteInfoProvider;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ISiteService _siteService;
-
-        public SiteRepository(ISiteService siteService,
-            ISiteInfoProvider siteInfoProvider,
-            IProgressiveCache progressiveCache)
-        {
-            _siteInfoProvider = siteInfoProvider;
-            _progressiveCache = progressiveCache;
-            _siteService = siteService;
-        }
         public string CurrentSiteName()
         {
             return _siteService.CurrentSite.SiteName;

@@ -3,20 +3,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Account.Repositories.Implementation
 {
-
     public class AuthenticationConfiguration : IAuthenticationConfigurations
     {
-        public AuthenticationConfiguration()
-        {
-
-        }
         public ExistingInternalUserBehavior ExistingInternalUserBehavior { get; set; } = ExistingInternalUserBehavior.LeaveAsIs;
-        public List<string> InternalUserRoles { get; set; } = new List<string>();
-        public List<string> AllExternalUserRoles { get; set; } = new List<string>();
-        public List<string> FacebookUserRoles { get; set; } = new List<string>();
-        public List<string> GoogleUserRoles { get; set; } = new List<string>();
-        public List<string> MicrosoftUserRoles { get; set; } = new List<string>();
-        public List<string> TwitterUserRoles { get; set; } = new List<string>();
+        public List<string> InternalUserRoles { get; set; } = [];
+        public List<string> AllExternalUserRoles { get; set; } = [];
+        public List<string> FacebookUserRoles { get; set; } = [];
+        public List<string> GoogleUserRoles { get; set; } = [];
+        public List<string> MicrosoftUserRoles { get; set; } = [];
+        public List<string> TwitterUserRoles { get; set; } = [];
         public bool UseTwoFormAuthentication { get; set; } = false;
 
         public ExistingInternalUserBehavior GetExistingInternalUserBehavior() => ExistingInternalUserBehavior;
@@ -43,7 +38,7 @@ namespace Account.Repositories.Implementation
             var defaultObj = new AuthenticationConfiguration()
             {
                 // default here
-                AllExternalUserRoles = new List<string>() { "external-user" }
+                AllExternalUserRoles = ["external-user"]
             };
             configuration.Invoke(defaultObj);
             builder.Services.AddSingleton<IAuthenticationConfigurations>(defaultObj);

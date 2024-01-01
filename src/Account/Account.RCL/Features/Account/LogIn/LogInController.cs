@@ -1,52 +1,22 @@
-﻿using Account.Features.Account.MyAccount;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Account.Features.Account.LogIn
 {
-    public class LogInController : Controller
+    public class LogInController(
+        IUserRepository _userRepository,
+        IAccountSettingsRepository _accountSettingsRepository,
+        IUserService _userService,
+        ILogger _logger,
+        IRoleService _roleService,
+        ISiteRepository _siteRepository,
+        IModelStateService _modelStateService,
+        IAuthenticationConfigurations _authenticationConfigurations,
+        ISignInManagerService _signInManagerService,
+        IUserManagerService _userManagerService) : Controller
     {
         public const string _routeUrl = "Account/LogIn";
         public const string _twoFormAuthenticationUrl = "Account/TwoFormAuthentication";
-        private readonly IUserRepository _userRepository;
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IUserService _userService;
-        private readonly ILogger _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRoleService _roleService;
-        private readonly ISiteRepository _siteRepository;
-        private readonly IModelStateService _modelStateService;
-        private readonly IAuthenticationConfigurations _authenticationConfigurations;
-        private readonly ISignInManagerService _signInManagerService;
-        private readonly IUserManagerService _userManagerService;
-
-        public LogInController(IUserRepository userRepository,
-            IAccountSettingsRepository accountSettingsRepository,
-            IUserService userService,
-            ILogger logger,
-            IHttpContextAccessor httpContextAccessor,
-            IRoleService roleService,
-            ISiteRepository siteRepository,
-            IModelStateService modelStateService,
-            IAuthenticationConfigurations authenticationConfigurations,
-            ISignInManagerService signInManagerService,
-            IUserManagerService userManagerService)
-        {
-            _userRepository = userRepository;
-            _accountSettingsRepository = accountSettingsRepository;
-            _userService = userService;
-            _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
-            _roleService = roleService;
-            _siteRepository = siteRepository;
-            _modelStateService = modelStateService;
-            _authenticationConfigurations = authenticationConfigurations;
-            _signInManagerService = signInManagerService;
-            _userManagerService = userManagerService;
-        }
 
         /// <summary>
         /// Fall back if not using Page Templates
@@ -219,9 +189,9 @@ namespace Account.Features.Account.LogIn
         {
             string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
 
-            var info = await _signInManagerService.GetExternalLoginInfoAsync();
+            var infoResult = await _signInManagerService.GetExternalLoginInfoAsync();
 
-            if (info == null)
+            if (!infoResult.TryGetValue(out var info))
             {
                 return Redirect(loginUrl);
             }
@@ -248,8 +218,8 @@ namespace Account.Features.Account.LogIn
                     email: email,
                     userName: email,
                     enabled: true,
-                    firstName: firstName,
-                    lastName: lastName,
+                    firstName: firstName ?? string.Empty,
+                    lastName: lastName ?? string.Empty,
                     isExternal: true,
                     isPublic: false
                     ));

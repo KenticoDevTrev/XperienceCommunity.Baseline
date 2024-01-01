@@ -1,7 +1,7 @@
 ﻿@model Navigation.Models.NavigationItem
-@if (Model.IsMegaMenu && Model.LinkDocumentID.TryGetValue(out var linkDocId))
+@if (Model.IsMegaMenu && Model.LinkContentCultureID.TryGetValue(out var linkDocId))
 {
-    <li navitem-class navitem-references navigation-item="Model" class="nav-item dropdown mega-menu">
+    <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item dropdown mega-menu">
         <a href="#" class="nav-link dropdown-toggle" title="@Model.LinkAlt" onclick="@Model.LinkOnClick" data-toggle="dropdown">
             @Html.Raw(Model.LinkText)
         </a>
@@ -12,15 +12,15 @@
         </div>
     </li>
 }
-else if (Model.Children.Count == 0)
+else if (Model.Children.Count() == 0)
 {
-    <li navitem-class navitem-references navigation-item="Model">
-        <a class="nav-link" navitem-link navigation-item="Model">@Html.Raw(Model.LinkText)</a>
+    <li bl-navitem-class bl-navitem-references bl-navigation-item="Model">
+        <a class="nav-link" bl-navitem-link bl-navigation-item="Model">@Html.Raw(Model.LinkText)</a>
     </li>
 }
 else
 {
-    <li navitem-class navitem-references navigation-item="Model" class="nav-item dropdown">
+    <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item dropdown">
         <a class="nav-link  dropdown-toggle" title="@Model.LinkAlt" href="#" onclick="@Model.LinkOnClick" data-toggle="dropdown">
             @Html.Raw(Model.LinkText)
         </a>

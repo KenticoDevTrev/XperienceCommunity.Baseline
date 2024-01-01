@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Navigation.Features.PartialNavigation
+﻿namespace Navigation.Features.PartialNavigation
 {
     [ViewComponent]
     public class PartialNavigationViewComponent : ViewComponent
     {
-        public PartialNavigationViewComponent()
-        {
-        }
-
-
         public IViewComponentResult Invoke()
         {
             var model = new PartialNavigationViewModel()

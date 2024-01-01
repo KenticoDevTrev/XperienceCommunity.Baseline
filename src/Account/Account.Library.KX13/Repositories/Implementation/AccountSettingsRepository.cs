@@ -1,25 +1,12 @@
 ﻿using CMS.DataEngine;
-using Core.Services;
-using MVCCaching;
 
 namespace Account.Repositories.Implementation
 {
-    internal class AccountSettingsRepository : IAccountSettingsRepository
+    public class AccountSettingsRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ISiteRepository _siteRepository,
+        IUrlResolver _urlResolver) : IAccountSettingsRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ISiteRepository _siteRepository;
-        private readonly IUrlResolver _urlResolver;
-
-        public AccountSettingsRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ISiteRepository siteRepository,
-            IUrlResolver urlResolver)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _siteRepository = siteRepository;
-            _urlResolver = urlResolver;
-        }
-
-
         public Task<string> GetAccountConfirmationUrlAsync(string fallBackUrl)
         {
             _ = _cacheDependencyBuilderFactory.Create()

@@ -1,6 +1,6 @@
 ﻿namespace Account.Models
 {
-    public class PasswordPolicySettings
+    public record PasswordPolicySettings
     {
         public PasswordPolicySettings(bool usePasswordPolicy, int minLength, int numNonAlphanumericChars, string regex, string violationMessage)
         {
@@ -11,10 +11,10 @@
             ViolationMessage = violationMessage;
         }
 
-        public bool UsePasswordPolicy { get; set; }
-        public int MinLength { get; set; }
-        public int NumNonAlphanumericChars { get; set; }
-        public string Regex { get; set; }
-        public string ViolationMessage { get; set; }
+        public bool UsePasswordPolicy { get; init; }
+        public int MinLength { get; init; }
+        public int NumNonAlphanumericChars { get; init; }
+        public string Regex { get; init; }
+        public string ViolationMessage { get; init; }
     }
 }

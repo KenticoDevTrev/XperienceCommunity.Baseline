@@ -1,30 +1,16 @@
 ﻿using Account.Features.Account.LogIn;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Account.Features.Account.ForgottenPasswordReset
 {
-    public class ForgottenPasswordResetController : Controller
+    public class ForgottenPasswordResetController(
+        IUserRepository _userRepository,
+        IAccountSettingsRepository _accountSettingsRepository,
+        IUserService _userService,
+        ILogger _logger,
+        IModelStateService _modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ForgottenPasswordReset";
-        private readonly IUserRepository _userRepository;
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IUserService _userService;
-        private readonly ILogger _logger;
-        private readonly IModelStateService _modelStateService;
-
-        public ForgottenPasswordResetController(IUserRepository userRepository,
-            IAccountSettingsRepository accountSettingsRepository,
-            IUserService userService,
-            ILogger logger,
-            IModelStateService modelStateService)
-        {
-            _userRepository = userRepository;
-            _accountSettingsRepository = accountSettingsRepository;
-            _userService = userService;
-            _logger = logger;
-            _modelStateService = modelStateService;
-        }
 
         /// <summary>
         /// Retrieves the UserGUID and the Token and presents the password reset.

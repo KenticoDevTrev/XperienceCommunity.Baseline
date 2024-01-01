@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Core" Version="$(XByKVersion)" />
+    <PackageReference Include="Kentico.Xperience.Core" Version="28.0.0" />
   </ItemGroup>
 
 </Project>

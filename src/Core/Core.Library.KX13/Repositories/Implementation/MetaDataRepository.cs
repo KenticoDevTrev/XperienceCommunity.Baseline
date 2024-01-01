@@ -1,58 +1,31 @@
 ﻿using CMS.Base;
 using CMS.DocumentEngine.Internal;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Kentico.Web.Mvc;
 
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class MetaDataRepository : IMetaDataRepository
+    public class MetaDataRepository(
+        IPageRetriever _pageRetriever,
+        IPageDataContextRetriever _pageDataContextRetriever,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IUrlResolver _urlResolver,
+        IPageUrlRetriever _pageUrlRetriever,
+        IUrlHelper _urlHelper) : IMetaDataRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        public readonly IPageRetriever _pageRetriever;
-        public readonly IPageDataContextRetriever _pageDataContextRetriever;
-        public readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUrlResolver _urlResolver;
-        private readonly IMediaRepository _mediaRepository;
-        private readonly ISiteService _siteService;
-        private readonly IPageUrlRetriever _pageUrlRetriever;
-        private readonly IUrlHelper _urlHelper;
-
-        public MetaDataRepository(IPageRetriever pageRetriever,
-            IPageDataContextRetriever pageDataContextRetriever,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IHttpContextAccessor httpContextAccessor,
-            IUrlResolver urlResolver,
-            IMediaRepository mediaRepository,
-            ISiteService siteService,
-            IPageUrlRetriever pageUrlRetriever,
-            IUrlHelper urlHelper)
-        {
-            _pageRetriever = pageRetriever;
-            _pageDataContextRetriever = pageDataContextRetriever;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _httpContextAccessor = httpContextAccessor;
-            _urlResolver = urlResolver;
-            _mediaRepository = mediaRepository;
-            _siteService = siteService;
-            _pageUrlRetriever = pageUrlRetriever;
-            _urlHelper = urlHelper;
-        }
-
-
-        public async Task<Result<PageMetaData>> GetMetaDataAsync(int documentId, string? thumbnail = null)
+        public async Task<Result<PageMetaData>> GetMetaDataAsync(int contentCultureId, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
-                .Page(documentId);
+                .Page(contentCultureId);
 
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
-                    .WhereEquals(nameof(TreeNode.DocumentID), documentId)
+                    .WhereEquals(nameof(TreeNode.DocumentID), contentCultureId)
                     .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
-                .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", documentId)
+                .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", contentCultureId)
             ) ;
             if (page.Any())
             {
@@ -64,18 +37,18 @@ namespace Core.Repositories.Implementation
             }
         }
 
-        public async Task<Result<PageMetaData>> GetMetaDataAsync(Guid documentGuid, string? thumbnail = null)
+        public async Task<Result<PageMetaData>> GetMetaDataAsync(Guid contentCultureGuid, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
-            builder.Page(documentGuid);
+            builder.Page(contentCultureGuid);
 
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
-                    .WhereEquals(nameof(TreeNode.DocumentGUID), documentGuid)
+                    .WhereEquals(nameof(TreeNode.DocumentGUID), contentCultureGuid)
                     .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
-                    .Configure(builder, CacheMinuteTypes.VeryLong.ToDouble(), "GetMetaDataAsync", documentGuid)
+                    .Configure(builder, CacheMinuteTypes.VeryLong.ToDouble(), "GetMetaDataAsync", contentCultureGuid)
             );
             if (page.Any())
             {
@@ -162,26 +135,29 @@ namespace Core.Repositories.Implementation
                 noIndex = customDataVal != null ? ValidationHelper.GetBoolean(customDataVal, false) : Maybe.None;
             }
 
-            PageMetaData metaData = new PageMetaData()
+            string canonicalUrlValue = string.Empty;
+
+            // Handle canonical url
+            if (GetCanonicalUrl(node).TryGetValue(out var canonicalUrl))
+            {
+                canonicalUrlValue = canonicalUrl;
+            }
+            else if (_urlHelper.Kentico().PageCanonicalUrl().AsNullOrWhitespaceMaybe().TryGetValue(out var canonicalUrlFromUrl))
+            {
+                // Try to get from url
+                canonicalUrlValue = canonicalUrlFromUrl;
+            }
+
+            var metaData = new PageMetaData()
             {
                 Title = title.AsNullOrWhitespaceMaybe(),
                 Keywords = keywords.AsNullOrWhitespaceMaybe(),
                 Description = description.AsNullOrWhitespaceMaybe(),
                 Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
                 ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
-                NoIndex = noIndex
+                NoIndex = noIndex,
+                CanonicalUrl = canonicalUrlValue.AsNullOrWhitespaceMaybe()
             };
-
-            // Handle canonical url
-            if (GetCanonicalUrl(node).TryGetValue(out var canonicalUrl))
-            {
-                metaData.CanonicalUrl = canonicalUrl;
-            }
-            else if (_urlHelper.Kentico().PageCanonicalUrl().AsNullOrWhitespaceMaybe().TryGetValue(out var canonicalUrlFromUrl))
-            {
-                // Try to get from url
-                metaData.CanonicalUrl = canonicalUrlFromUrl;
-            }
 
             return Task.FromResult(metaData);
         }

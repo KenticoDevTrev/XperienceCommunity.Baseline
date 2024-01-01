@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace Core.Repositories
+﻿namespace Core.Repositories
 {
     /// <summary>
     /// These classes are specifically not-async, becuase often taxonomy operations are leveraged heavily,

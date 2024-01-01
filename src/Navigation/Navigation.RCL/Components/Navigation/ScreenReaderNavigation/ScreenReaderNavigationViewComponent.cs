@@ -2,9 +2,9 @@
 {
     public class ScreenReaderNavigationViewComponent : ViewComponent
     {
-        public IViewComponentResult Invoke(IEnumerable<NavigationItem> navigationItems, string navigationId, string? navShortcutSelector = null)
+        public IViewComponentResult Invoke(IEnumerable<NavigationItem> xNavigationItems, string xNavigationId, string? xNavShortcutSelector = null)
         {
-            return View("/Components/Navigation/ScreenReaderNavigation/ScreenReaderNavigation.cshtml", new ScreenReaderNavigationViewModel(navigationItems, navigationId, navShortcutSelector));
+            return View("/Components/Navigation/ScreenReaderNavigation/ScreenReaderNavigation.cshtml", new ScreenReaderNavigationViewModel(xNavigationItems, xNavigationId, xNavShortcutSelector));
         }
     }
 
@@ -17,8 +17,9 @@
             NavShortcutSelector = navShortcutSelector.AsMaybe();
         }
 
-        public IEnumerable<NavigationItem> NavigationItems { get; set; }
-        public string Id { get; set; }
-        public Maybe<string> NavShortcutSelector { get; set; }
+        public IEnumerable<NavigationItem> NavigationItems { get; init; }
+        public string Id { get; init; }
+        public Maybe<string> NavShortcutSelector { get; init; }
+
     }
 }

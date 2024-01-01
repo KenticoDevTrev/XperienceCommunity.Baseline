@@ -1,8 +1,6 @@
 ﻿using CMS;
 using CMS.DataEngine;
-using Navigation.Library;
 using NavigationPageType = CMS.DocumentEngine.Types.Generic.Navigation;
-[assembly: RegisterModule(typeof(NavigationLoaderModule))]
 
 namespace Navigation.Library
 {

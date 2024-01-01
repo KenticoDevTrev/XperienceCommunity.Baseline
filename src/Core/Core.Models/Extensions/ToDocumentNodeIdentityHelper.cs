@@ -1,5 +1,6 @@
 ﻿namespace System
 {
+    [Obsolete("Should use ToContentIdentity or ToContentCultureIdentity methods")]
     public static class ToDocumentNodeIdentityHelper
     {
         public static DocumentIdentity ToDocumentIdentity(this int value)

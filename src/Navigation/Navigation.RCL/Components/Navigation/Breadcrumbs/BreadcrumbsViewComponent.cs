@@ -1,23 +1,12 @@
 ﻿namespace Navigation.Components.Navigation.Breadcrumbs
 {
     [ViewComponent(Name = "Breadcrumbs")]
-    public class BreadcrumbsViewComponent : ViewComponent
+    public class BreadcrumbsViewComponent(
+        IPageContextRepository _pageContextRepository,
+        IBreadcrumbRepository _breadcrumbRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IPageContextRepository _pageContextRepository;
-        private readonly IBreadcrumbRepository _breadcrumbRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public BreadcrumbsViewComponent(IPageContextRepository pageContextRepository,
-            IBreadcrumbRepository breadcrumbRepository,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _pageContextRepository = pageContextRepository;
-            _breadcrumbRepository = breadcrumbRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-
-        public async Task<IViewComponentResult> InvokeAsync(bool includeDefaultBreadcrumb = true, int nodeid = -1)
+        public async Task<IViewComponentResult> InvokeAsync(bool xIncludeDefaultBreadcrumb = true, int xPageId = -1)
         {
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext)
                 && (
@@ -32,7 +21,7 @@
 
 
             // Use current page if not provided
-            if (nodeid <= 0)
+            if (xPageId <= 0)
             {
                 var curPage = await _pageContextRepository.GetCurrentPageAsync();
                 if (curPage.TryGetValue(out var curPageItem))
@@ -42,17 +31,17 @@
                         return Content(string.Empty);
                     }
 
-                    nodeid = curPageItem.NodeID;
+                    xPageId = curPageItem.PageID;
                 }
             }
 
-            if (nodeid <= 0)
+            if (xPageId <= 0)
             {
                 return Content(string.Empty);
             }
             var model = new BreadcrumbsViewModel()
             {
-                Breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(nodeid, includeDefaultBreadcrumb)
+                Breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId, xIncludeDefaultBreadcrumb)
             };
             return View("/Components/Navigation/Breadcrumbs/Breadcrumbs.cshtml", model);
         }

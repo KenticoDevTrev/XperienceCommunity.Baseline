@@ -11,7 +11,7 @@
                 @for (int T = 0; T < tabCount; T++)
                 {
                     var Element = Model.Tabs.ElementAt(T);
-                    <a class="nav-item nav-link" id="nav-home-tab @(T == 0 ? "active" : "")" data-toggle="tab" href="#Tab-@Element.DocumentID" role="tab" aria-controls="Tab-@Element.DocumentID" aria-selected="@(T == 0 ? "true" : "false")">@Element.Name</a>
+                    <a class="nav-item nav-link" id="nav-home-tab @(T == 0 ? "active" : "")" data-toggle="tab" href="#Tab-@Element.PageCultureID" role="tab" aria-controls="Tab-@Element.PageCultureID" aria-selected="@(T == 0 ? "true" : "false")">@Element.Name</a>
                 }
             </div>
         </nav>
@@ -19,8 +19,8 @@
             @for (int T = 0; T < tabCount; T++)
             {
                 var Element = Model.Tabs.ElementAt(T);
-                <inlinewidgetpage documentid="@Element.DocumentID">
-                    <div class="tab-pane fade @(T == 0 ? "show active" : "")" id="Tab-@Element.DocumentID" role="tabpanel" aria-labelledby="Tab-@Element.DocumentID">
+                <inlinewidgetpage documentid="@Element.PageCultureID">
+                    <div class="tab-pane fade @(T == 0 ? "show active" : "")" id="Tab-@Element.PageCultureID" role="tabpanel" aria-labelledby="Tab-@Element.PageCultureID">
                         <vc:tab />
                     </div>
                 </inlinewidgetpage>

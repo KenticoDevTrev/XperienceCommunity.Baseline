@@ -1,6 +1,4 @@
-﻿using Core.Services;
-
-namespace Generic.Components.ImportModelState
+﻿namespace Core.Components.ImportModelState
 {
     /// <summary>
     /// If using PageTemplate View Component with a POST action, the Controller's POST should have the [ExportModelState] Attribute
@@ -8,15 +6,8 @@ namespace Generic.Components.ImportModelState
     /// This View component will then hydrate the ModelState from the TempData
     /// </summary>
     [ViewComponent]
-    public class ImportModelStateViewComponent : ViewComponent
+    public class ImportModelStateViewComponent(IModelStateService _modelStateService) : ViewComponent
     {
-        private readonly IModelStateService _modelStateService;
-
-        public ImportModelStateViewComponent(IModelStateService modelStateService)
-        {
-            _modelStateService = modelStateService;
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

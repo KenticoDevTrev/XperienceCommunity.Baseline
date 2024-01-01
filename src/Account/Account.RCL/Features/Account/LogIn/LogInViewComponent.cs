@@ -1,33 +1,18 @@
 ﻿using Account.Features.Account.ForgotPassword;
 using Account.Features.Account.MyAccount;
 using Account.Features.Account.Registration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 
 namespace Account.Features.Account.LogIn
 {
     [ViewComponent]
-    public class LogInViewComponent : ViewComponent
+    public class LogInViewComponent(
+        IHttpContextAccessor _httpContextAccessor,
+        IAccountSettingsRepository _accountSettingsRepository,
+        IPageContextRepository _pageContextRepository,
+        ISignInManagerService _signInManagerService,
+        IModelStateService _modelStateService) : ViewComponent
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IPageContextRepository _pageContextRepository;
-        private readonly ISignInManagerService _signInManagerService;
-        private readonly IModelStateService _modelStateService;
-
-        public LogInViewComponent(IHttpContextAccessor httpContextAccessor,
-            IAccountSettingsRepository accountSettingsRepository,
-            IPageContextRepository pageContextRepository,
-            ISignInManagerService signInManagerService,
-            IModelStateService modelStateService)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _accountSettingsRepository = accountSettingsRepository;
-            _pageContextRepository = pageContextRepository;
-            _signInManagerService = signInManagerService;
-            _modelStateService = modelStateService;
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>
@@ -42,9 +27,10 @@ namespace Account.Features.Account.LogIn
             // Try to get returnUrl from query
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))
             {
-                if (httpContext.Request.Query.TryGetValue("returnUrl", out StringValues queryReturnUrl) && queryReturnUrl.Any())
+                if (httpContext.Request.Query.TryGetValue("returnUrl", out StringValues queryReturnUrl) 
+                    && queryReturnUrl.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var queryReturnUrlVal))
                 {
-                    redirectUrl = queryReturnUrl.First();
+                    redirectUrl = queryReturnUrlVal;
                 }
             }
             // Check google configuration

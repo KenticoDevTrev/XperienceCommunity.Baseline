@@ -1,6 +1,6 @@
 ﻿namespace Navigation.Models
 {
-    public class Breadcrumb
+    public record Breadcrumb
     {
         public Breadcrumb(string linkText, string linkUrl)
         {
@@ -14,10 +14,9 @@
             IsCurrentPage = isCurrentPage;
         }
 
-        public string LinkText { get; set; }
-        public string LinkUrl { get; set; }
-        public bool IsCurrentPage { get; set; } = false;
+        public string LinkText { get; init; }
+        public string LinkUrl { get; init; }
+        public bool IsCurrentPage { get; init; } = false;
 
-        
     }
 }

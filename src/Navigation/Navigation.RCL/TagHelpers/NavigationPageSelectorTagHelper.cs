@@ -2,21 +2,17 @@
 
 namespace Navigation.TagHelpers
 {
-    [HtmlTargetElement("navigation-page-selector")]
-    public class NavigationPageSelectorTagHelper : TagHelper
+    [HtmlTargetElement("bl:navigation-page-selector")]
+    public class NavigationPageSelectorTagHelper(
+        IPageContextRepository _pageContextRepository,
+        IUrlResolver _urlResolver) : TagHelper
     {
-        private readonly IPageContextRepository _pageContextRepository;
-        private readonly IUrlResolver _urlResolver;
-
+        [HtmlAttributeName("x-parent-class")]
         public string ParentClass { get; set; } = string.Empty;
+
+        [HtmlAttributeName("x-current-page-path")]
         public string CurrentPagePath { get; set; } = string.Empty;
 
-        public NavigationPageSelectorTagHelper(IPageContextRepository pageContextRepository,
-            IUrlResolver urlResolver)
-        {
-            _pageContextRepository = pageContextRepository;
-            _urlResolver = urlResolver;
-        }
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (CurrentPagePath.AsNullOrWhitespaceMaybe().TryGetValue(out var currentPagePath))

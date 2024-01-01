@@ -1,8 +1,4 @@
-﻿using Core.RCL.KX13.Models.FormComponents.DecimalInput;
-using Kentico.Forms.Web.Mvc;
-
-// Registers a form component for use in the form builder
-[assembly: RegisterFormComponent(DecimalInputComponent.IDENTIFIER, typeof(DecimalInputComponent), "Decimal Value", Description = "Receives a Decimal typed value.", IconClass = "icon-octothorpe")]
+﻿using Kentico.Forms.Web.Mvc;
 
 namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
 {
@@ -40,7 +36,7 @@ namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
                     if(NewVal >= Convert.ToDecimal(Math.Pow(10, Size)))
                     {
                         string[] DecimalParts = NewVal.ToString().Split('.');
-                        NewVal = Convert.ToDecimal(string.Join(".", new string[] { DecimalParts[0].Substring(DecimalParts[0].Length - Size), (DecimalParts.Length > 1 ? DecimalParts[1] : "0") }));
+                        NewVal = Convert.ToDecimal(string.Join(".", new string[] { DecimalParts[0][^Size..], (DecimalParts.Length > 1 ? DecimalParts[1] : "0") }));
                     }
                 }
 

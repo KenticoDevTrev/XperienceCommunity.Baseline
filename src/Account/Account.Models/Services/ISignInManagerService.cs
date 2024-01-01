@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Account.Services
 {
@@ -35,7 +30,7 @@ namespace Account.Services
         /// <returns>A configured <see cref="AuthenticationProperties"/>.</returns>
         AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl);
         
-        Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
+        Task<Result<ExternalLoginInfo>> GetExternalLoginInfoAsync();
         Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
     }
 }

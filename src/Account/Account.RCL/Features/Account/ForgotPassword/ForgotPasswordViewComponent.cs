@@ -1,15 +1,8 @@
 ﻿namespace Account.Features.Account.ForgotPassword
 {
     [ViewComponent]
-    public class ForgotPasswordViewComponent : ViewComponent
+    public class ForgotPasswordViewComponent(IModelStateService _modelStateService) : ViewComponent
     {
-        private readonly IModelStateService _modelStateService;
-
-        public ForgotPasswordViewComponent(IModelStateService modelStateService)
-        {
-            _modelStateService = modelStateService;
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

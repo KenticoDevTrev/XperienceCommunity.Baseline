@@ -2,30 +2,14 @@
 
 namespace Account.Features.Account.Registration
 {
-    public class RegistrationController : Controller
+    public class RegistrationController(
+        IAccountSettingsRepository _accountSettingsRepository,
+        IUserService _userService,
+        ILogger _logger,
+        IUrlResolver _urlResolver,
+        IModelStateService _modelStateService) : Controller
     {
         public const string _routeUrl = "Account/Registration";
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IUserService _userService;
-        private readonly ILogger _logger;
-        private readonly IUrlResolver _urlResolver;
-        private readonly IModelStateService _modelStateService;
-
-        public RegistrationController(IAccountSettingsRepository accountSettingsRepository,
-            IUserService userService,
-            ILogger logger,
-            IUrlResolver urlResolver,
-            IModelStateService modelStateService
-            )
-        {
-            _accountSettingsRepository = accountSettingsRepository;
-            _userService = userService;
-            _logger = logger;
-            _urlResolver = urlResolver;
-            _modelStateService = modelStateService;
-        }
-
-        
 
         /// <summary>
         /// Fall back, should use Account Page Templates instead

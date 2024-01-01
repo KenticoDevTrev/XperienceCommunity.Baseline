@@ -4,7 +4,6 @@ namespace Account.Extensions
 {
     public static class PasswordValidationExtension
     {
-
         public static IRuleBuilderOptions<T, string> ValidPassword<T>(this IRuleBuilder<T, string> ruleBuilder, PasswordPolicySettings settings)
         {
             string message = !string.IsNullOrWhiteSpace(settings.ViolationMessage) ? settings.ViolationMessage : "Invalid Password";

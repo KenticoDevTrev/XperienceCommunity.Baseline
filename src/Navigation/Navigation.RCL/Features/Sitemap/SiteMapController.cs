@@ -2,22 +2,11 @@
 
 namespace Navigation.Features.Sitemap
 {
-    public class SiteMapController : Controller
+    public class SiteMapController(
+        ISiteMapRepository _siteMapRepository,
+        SitemapConfiguration _sitemapConfiguration,
+        ISiteRepository _siteRepository) : Controller
     {
-
-        private readonly ISiteMapRepository _siteMapRepository;
-        private readonly SitemapConfiguration _sitemapConfiguration;
-        private readonly ISiteRepository _siteRepository;
-
-        public SiteMapController(ISiteMapRepository siteMapRepository,
-            SitemapConfiguration sitemapConfiguration,
-            ISiteRepository siteRepository)
-        {
-            _siteMapRepository = siteMapRepository;
-            _sitemapConfiguration = sitemapConfiguration;
-            _siteRepository = siteRepository;
-        }
-
         // GET: SiteMap
         [HttpGet]
         public async Task<ActionResult> IndexAsync()

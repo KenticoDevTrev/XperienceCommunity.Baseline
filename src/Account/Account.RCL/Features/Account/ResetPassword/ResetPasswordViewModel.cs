@@ -1,5 +1,4 @@
-﻿using Account.Extensions;
-using FluentValidation;
+﻿using FluentValidation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 

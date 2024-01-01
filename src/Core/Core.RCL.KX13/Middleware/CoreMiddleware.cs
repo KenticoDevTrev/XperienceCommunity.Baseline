@@ -1,11 +1,7 @@
-﻿using Core.Repositories;
-using Core.Repositories.Implementation;
-using Core.Services;
+﻿using Core.Repositories.Implementation;
 using Core.Services.Implementations;
-using Generic.Repositories.Implementation;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Logger = Core.Services.Implementation.Logger;
 
@@ -31,7 +27,7 @@ namespace Core
 
         }
 
-        public static IServiceCollection AddCoreBaselineKenticoAuthentication(this IServiceCollection services, IConfiguration configuration, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
+        public static IServiceCollection AddCoreBaselineKenticoAuthentication(this IServiceCollection services)
         {
             // Required for authentication
             services.AddScoped<IPasswordHasher<ApplicationUser>, Kentico.Membership.PasswordHasher<ApplicationUser>>();

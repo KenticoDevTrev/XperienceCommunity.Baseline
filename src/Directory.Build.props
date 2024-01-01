@@ -1,10 +1,10 @@
 ﻿<Project>
 	<!-- Thanks to: https://lurumad.github.io/using-source-link-in-net-projects-and-how-to-configure-visual-studio-to-use-it -->
 	<PropertyGroup>
-		<NetCoreTargetVersion>net6.0</NetCoreTargetVersion>
-		<KXVersion>13.0.94</KXVersion>
+		<NetCoreTargetVersion>net8.0</NetCoreTargetVersion>
+		<KXVersion>13.0.130</KXVersion>
 		<XByKVersion>26.2.0</XByKVersion>
-		<SourceLinkVersion>1.1.1</SourceLinkVersion>
+		<SourceLinkVersion>8.0.0</SourceLinkVersion>
 	</PropertyGroup>
 	<PropertyGroup>
 		<Title>Kentico Xperience Baseline</Title>
@@ -40,10 +40,12 @@
 	</ItemGroup>
 	<ItemGroup>
 		<SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
+		<!-- Says no longer needed for .net 8, we'll see!
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(SourceLinkVersion)">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
+		-->
 	</ItemGroup>
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

@@ -1,0 +1,5 @@
+Imported baseline types, set the page type -> Site to the current site, and after setting connection string and hash resigned.
+
+Added home page and set Setting -> Url and SEO Home page to /Home
+
+built the front end dev folder

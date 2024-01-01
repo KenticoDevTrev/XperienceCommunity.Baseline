@@ -1,13 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Search.Features.Search
+﻿namespace Search.Features.Search
 {
     public class SearchController : Controller
-    {
-        public SearchController()
-        {
-        }
-        
+    {   
         /// <summary>
         /// Fall back, should really use page templates
         /// </summary>

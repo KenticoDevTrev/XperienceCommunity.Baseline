@@ -1,12 +1,12 @@
 ﻿namespace Localization.Models
 {
-    public class LocalizationConfiguration
+    public record LocalizationConfiguration
     {
         public LocalizationConfiguration(string defaultCulture)
         {
             DefaultCulture = defaultCulture;
         }
 
-        public string DefaultCulture { get; set; }
+        public string DefaultCulture { get; init; }
     }
 }

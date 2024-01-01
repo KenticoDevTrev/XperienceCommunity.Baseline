@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Twitter;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using XperienceCommunity.Authorization;
 
 namespace Account
@@ -69,8 +66,8 @@ namespace Account
             {
                 authBuilder.AddGoogle("Google", opt =>
                 {
-                    opt.ClientId = googleAuth["ClientId"];
-                    opt.ClientSecret = googleAuth["ClientSecret"];
+                    opt.ClientId = googleAuth["ClientId"] ?? string.Empty;
+                    opt.ClientSecret = googleAuth["ClientSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                 });
@@ -80,8 +77,8 @@ namespace Account
             {
                 authBuilder.AddFacebook("Facebook", opt =>
                  {
-                     opt.AppId = facebookAuth["AppId"];
-                     opt.AppSecret = facebookAuth["AppSecret"];
+                     opt.AppId = facebookAuth["AppId"] ?? string.Empty;
+                     opt.AppSecret = facebookAuth["AppSecret"] ?? string.Empty;
                      opt.SignInScheme = IdentityConstants.ExternalScheme;
                      opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
                  });
@@ -103,8 +100,8 @@ namespace Account
                 authBuilder.AddMicrosoftAccount(opt =>
                  {
 
-                     opt.ClientId = microsoftAuth["ClientId"];
-                     opt.ClientSecret = microsoftAuth["ClientSecret"];
+                     opt.ClientId = microsoftAuth["ClientId"] ?? string.Empty;
+                     opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
                      opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                  });
             }
@@ -145,14 +142,9 @@ namespace Account
         }
     }
 
-    public class SiteSettingsCookieAuthenticationEvents : CookieAuthenticationEvents
+    public class SiteSettingsCookieAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : CookieAuthenticationEvents
     {
-        private readonly IAccountSettingsRepository _accountSiteSettingsRepository;
 
-        public SiteSettingsCookieAuthenticationEvents(IAccountSettingsRepository accountSiteSettingsRepository)
-        {
-            _accountSiteSettingsRepository = accountSiteSettingsRepository;
-        }
         public override async Task RedirectToLogin(RedirectContext<CookieAuthenticationOptions> context)
         {
             string url = await _accountSiteSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl());
@@ -182,14 +174,8 @@ namespace Account
         }
     }
 
-    public class SiteSettingsFacebookOauthAuthenticationEvents : OAuthEvents
+    public class SiteSettingsFacebookOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : OAuthEvents
     {
-        private readonly IAccountSettingsRepository _accountSiteSettingsRepository;
-
-        public SiteSettingsFacebookOauthAuthenticationEvents(IAccountSettingsRepository accountSiteSettingsRepository)
-        {
-            _accountSiteSettingsRepository = accountSiteSettingsRepository;
-        }
 
         public override async Task AccessDenied(AccessDeniedContext context)
         {
@@ -207,15 +193,8 @@ namespace Account
         }
     }
 
-    public class SiteSettingsOauthAuthenticationEvents : OAuthEvents
+    public class SiteSettingsOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : OAuthEvents
     {
-        private readonly IAccountSettingsRepository _accountSiteSettingsRepository;
-
-        public SiteSettingsOauthAuthenticationEvents(IAccountSettingsRepository accountSiteSettingsRepository)
-        {
-            _accountSiteSettingsRepository = accountSiteSettingsRepository;
-        }
-
         public override async Task AccessDenied(AccessDeniedContext context)
         {
             context.ReturnUrl = await _accountSiteSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl());
@@ -224,15 +203,8 @@ namespace Account
 
     }
 
-    public class SiteSettingsTwitterOauthAuthenticationEvents : TwitterEvents
+    public class SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : TwitterEvents
     {
-        private readonly IAccountSettingsRepository _accountSiteSettingsRepository;
-
-        public SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository accountSiteSettingsRepository)
-        {
-            _accountSiteSettingsRepository = accountSiteSettingsRepository;
-        }
-
         public override async Task AccessDenied(AccessDeniedContext context)
         {
             context.AccessDeniedPath = await _accountSiteSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl());

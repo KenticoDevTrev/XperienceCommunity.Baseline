@@ -1,25 +1,17 @@
-﻿using Core.Models;
-using TabbedPages.Models;
+﻿using TabbedPages.Models;
 using TabbedPages.Repositories;
 
 namespace TabbedPages.Features.TabParent
 {
     [ViewComponent]
-    public class TabParentViewComponent : ViewComponent
+    public class TabParentViewComponent(ITabRepository _tabRepository) : ViewComponent
     {
-        private readonly ITabRepository _tabRepository;
-
-        public TabParentViewComponent(ITabRepository tabRepository)
-        {
-            _tabRepository = tabRepository;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync(PageIdentity page)
+        public async Task<IViewComponentResult> InvokeAsync(PageIdentity xPage)
         {
             var model = new TabParentViewModel(
-                name: page.Name,
-                tabs: await _tabRepository.GetTabsAsync(page.NodeIdentity)
-                );
+                name: xPage.Name,
+                tabs: await _tabRepository.GetTabsAsync(xPage.TreeIdentity)
+            );
             return View("/Features/TabParent/TabParent.cshtml", model);
         }
     }
@@ -32,7 +24,7 @@ namespace TabbedPages.Features.TabParent
             Name = name;
         }
 
-        public IEnumerable<TabItem> Tabs { get; set; }
-        public string Name { get; set; }
+        public IEnumerable<TabItem> Tabs { get; init; }
+        public string Name { get; init; }
     }
 }

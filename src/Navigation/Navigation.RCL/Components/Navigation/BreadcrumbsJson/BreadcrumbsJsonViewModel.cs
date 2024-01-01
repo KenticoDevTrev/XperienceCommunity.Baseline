@@ -7,6 +7,6 @@
             SerializedBreadcrumbJsonLD = serializedBreadcrumbJsonLD;
         }
 
-        public string SerializedBreadcrumbJsonLD { get; set; }
+        public string SerializedBreadcrumbJsonLD { get; init; }
     }
 }

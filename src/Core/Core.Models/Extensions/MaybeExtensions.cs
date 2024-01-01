@@ -64,7 +64,7 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static T? AsNullableValue<T>(this Maybe<T> value) => value.HasValue ? (T?)value.Value : default(T);
+        public static T? AsNullableValue<T>(this Maybe<T> value) => value.HasValue ? (T?)value.Value : default;
         public static int? AsNullableIntValue(this Maybe<int> value) => value.HasValue ? (int?)value.Value : null;
         public static double? AsNullableDoubleValue(this Maybe<double> value) => value.HasValue ? (double?)value.Value : null;
         public static decimal? AsNullableDecimalValue(this Maybe<decimal> value) => value.HasValue ? (decimal?)value.Value : null;
@@ -146,6 +146,19 @@
         /// <param name="key">The lookup key</param>
         /// <returns>Maybe.None if the key doesn't exist, or the value if it does.</returns>
         public static Maybe<TValue> GetValueOrMaybe<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
+        {
+            return key != null && dictionary.TryGetValue(key, out var value) ? value : Maybe.None;
+        }
+
+        /// <summary>
+        /// Returns a Maybe of the dictionary value, Maybe.None if the key doesn't exist.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key">The lookup key</param>
+        /// <returns>Maybe.None if the key doesn't exist, or the value if it does.</returns>
+        public static Maybe<TValue> GetValueOrMaybe<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
         {
             return key != null && dictionary.ContainsKey(key) ? dictionary[key] : Maybe.None;
         }

@@ -1,14 +1,14 @@
 ﻿@model NavigationItem
-@if (Model.Children.Count == 0)
+@if (Model.Children.Count() == 0)
 {
-    <li navitem-class navitem-references navigation-item="Model" class="nav-item">
-        <a class="nav-link" navitem-link navigation-item="Model">@Html.Raw(Model.LinkText)</a>
+    <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item">
+        <a class="nav-link" bl-navitem-link bl-navigation-item="Model">@Html.Raw(Model.LinkText)</a>
     </li>
 }
 else
 {
-    <li navitem-class navitem-references navigation-item="Model" class="nav-item dropdown">
-        <a class="nav-link" navitem-link navigation-item="Model" data-toggle="dropdown">
+    <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item dropdown">
+        <a class="nav-link" bl-navitem-link bl-navigation-item="Model" data-toggle="dropdown">
             @Html.Raw(Model.LinkText)
         </a>
         <ul class="dropdown-menu">

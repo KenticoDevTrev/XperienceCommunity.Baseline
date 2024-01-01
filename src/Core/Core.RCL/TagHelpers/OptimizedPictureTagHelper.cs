@@ -7,8 +7,8 @@ namespace Core.TagHelpers
     [HtmlTargetElement("img", Attributes = "bl-optimize")]
     public class OptimizedPictureTagHelper : TagHelper
     {
-        private string[] OptimizedImageExtensions = new string[] { "jpg", "jpeg", "png" };
-        private string[] WebpImageExtensions = new string[] { "jpg", "jpeg" };
+        private readonly string[] _optimizedImageExtensions = ["jpg", "jpeg", "png"];
+        private readonly string[] _webpImageExtensions = ["jpg", "jpeg"];
 
         public override int Order => 50;
 
@@ -24,8 +24,8 @@ namespace Core.TagHelpers
                     if (imgSrc.StartsWith("/images/source", StringComparison.OrdinalIgnoreCase))
                     {
                         string imageExtension = System.IO.Path.GetExtension(imgSrc).Trim('.');
-                        bool hasOptimized = OptimizedImageExtensions.Contains(imageExtension, StringComparer.OrdinalIgnoreCase);
-                        bool hasWebp = WebpImageExtensions.Contains(imageExtension, StringComparer.OrdinalIgnoreCase);
+                        bool hasOptimized = _optimizedImageExtensions.Contains(imageExtension, StringComparer.OrdinalIgnoreCase);
+                        bool hasWebp = _webpImageExtensions.Contains(imageExtension, StringComparer.OrdinalIgnoreCase);
 
                         if (hasOptimized || hasWebp)
                         {

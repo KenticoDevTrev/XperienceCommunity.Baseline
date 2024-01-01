@@ -1,38 +1,19 @@
 ﻿using CMS.DataEngine;
 using CMS.Localization;
-using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.Localization;
 
 namespace Navigation.Repositories.Implementations
 {
     [AutoDependencyInjection]
-    public class BreadcrumbRepository : IBreadcrumbRepository
+    public class BreadcrumbRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ISiteRepository _siteRepository,
+        IUrlResolver _urlResolver,
+        IPageRetriever _pageRetriever,
+        IProgressiveCache _progressiveCache,
+        ICacheRepositoryContext _repoContext,
+        IStringLocalizer<SharedResources> _stringLocalizer) : IBreadcrumbRepository
     {
-        private readonly ISiteRepository _siteRepository;
-        private readonly IUrlResolver _urlResolver;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IPageRetriever _pageRetriever;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICacheRepositoryContext _repoContext;
-        private readonly IStringLocalizer<SharedResources> _stringLocalizer;
-
-        public BreadcrumbRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ISiteRepository siteRepository,
-            IUrlResolver urlResolver,
-            IPageRetriever pageRetriever,
-            IProgressiveCache progressiveCache,
-            ICacheRepositoryContext repoContext,
-            IStringLocalizer<SharedResources> stringLocalizer)
-        {
-            _siteRepository = siteRepository;
-            _urlResolver = urlResolver;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _pageRetriever = pageRetriever;
-            _progressiveCache = progressiveCache;
-            _repoContext = repoContext;
-            _stringLocalizer = stringLocalizer;
-        }
-
         public Task<BreadcrumbJsonLD> BreadcrumbsToJsonLDAsync(IEnumerable<Breadcrumb> breadcrumbs, bool excludeFirst = true)
         {
             var itemListElement = new List<ItemListElementJsonLD>();
@@ -58,7 +39,7 @@ namespace Navigation.Repositories.Implementations
             var breadcrumbsDictionary = await GetNodeToBreadcrumbAndParent();
 
             bool isCurrentPage = true;
-            List<Breadcrumb> breadcrumbs = new List<Breadcrumb>();
+            List<Breadcrumb> breadcrumbs = [];
             int nextNodeID = nodeID;
             while (breadcrumbsDictionary.ContainsKey(nextNodeID))
             {
@@ -118,7 +99,7 @@ namespace Navigation.Repositories.Implementations
                 query => query
                     .IncludePageIdentityColumns()
                     .Columns(nameof(TreeNode.NodeParentID), nameof(TreeNode.DocumentName))
-                    .If(validClassNames.Any(), query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", validClassNames.Select(x => SqlHelper.EscapeQuotes(x)))}'))")),
+                    .If(validClassNames.Length != 0, query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", validClassNames.Select(x => SqlHelper.EscapeQuotes(x)))}'))")),
                 cacheSettings => cacheSettings
                     .Dependencies((items, csbuilder) => csbuilder.PagePath("/", PathTypeEnum.Section))
                     .Key($"GetNodeToBreadcrumbAndParent") // Since Page Retriever, already has context of culture and site and published

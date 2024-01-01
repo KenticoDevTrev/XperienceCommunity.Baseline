@@ -1,5 +1,4 @@
-﻿using Core.Repositories;
-using FluentValidation;
+﻿using FluentValidation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,24 +1,16 @@
-﻿
-
-namespace Navigation.Components.Navigation.MainNavigation
+﻿namespace Navigation.Components.Navigation.MainNavigation
 {
     [ViewComponent(Name = "MainNavigation")]
-    public class MainNavigationViewComponent : ViewComponent
+    public class MainNavigationViewComponent(INavigationRepository _navigationRepository) : ViewComponent
     {
-        private readonly INavigationRepository _navigationRepository;
-
-        public MainNavigationViewComponent(INavigationRepository navigationRepository)
+        public async Task<IViewComponentResult> InvokeAsync(string xNavigationParentPath, string xCssClass = "MainNav", bool xIncludeScreenReaderNav = true)
         {
-            _navigationRepository = navigationRepository;
-        }
-        public async Task<IViewComponentResult> InvokeAsync(string NavigationParentPath, string CssClass = "MainNav", bool includeScreenReaderNav = true)
-        {
-            NavigationParentPath = !string.IsNullOrWhiteSpace(NavigationParentPath) ? NavigationParentPath : "/MasterPage/Navigation";
-            var NavItems = await _navigationRepository.GetNavItemsAsync(NavigationParentPath);
+            xNavigationParentPath = !string.IsNullOrWhiteSpace(xNavigationParentPath) ? xNavigationParentPath : "/MasterPage/Navigation";
+            var NavItems = await _navigationRepository.GetNavItemsAsync(xNavigationParentPath);
             var model = new MainNavigationViewModel(
                 navItems: NavItems.ToList(),
-                navWrapperClass: CssClass,
-                includeScreenReaderNavigation: includeScreenReaderNav
+                navWrapperClass: xCssClass,
+                includeScreenReaderNavigation: xIncludeScreenReaderNav
             );
 
             return View("/Components/Navigation/MainNavigation/MainNavigation.cshtml", model);
@@ -32,9 +24,9 @@ namespace Navigation.Components.Navigation.MainNavigation
                 IncludeScreenReaderNavigation = includeScreenReaderNavigation;
             }
 
-            public IEnumerable<NavigationItem> NavItems { get; set; } = Array.Empty<NavigationItem>();
-            public string NavWrapperClass { get; set; }
-            public bool IncludeScreenReaderNavigation { get; set; }
+            public IEnumerable<NavigationItem> NavItems { get; init; } = Array.Empty<NavigationItem>();
+            public string NavWrapperClass { get; init; }
+            public bool IncludeScreenReaderNavigation { get; init; }
         }
     }
 }

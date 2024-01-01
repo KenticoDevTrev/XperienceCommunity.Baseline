@@ -3,18 +3,10 @@
 namespace Account.Features.Account.ForgottenPasswordReset
 {
     [ViewComponent]
-    public class ForgottenPasswordResetViewComponent : ViewComponent
+    public class ForgottenPasswordResetViewComponent(
+        IHttpContextAccessor _httpContextAccessor,
+        IModelStateService _modelStateService) : ViewComponent
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IModelStateService _modelStateService;
-
-        public ForgottenPasswordResetViewComponent(IHttpContextAccessor httpContextAccessor,
-            IModelStateService modelStateService)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _modelStateService = modelStateService;
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>
@@ -29,16 +21,18 @@ namespace Account.Features.Account.ForgottenPasswordReset
             Maybe<string> token = Maybe.None;
             if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))
             {
-                if (httpContext.Request.Query.TryGetValue("userId", out StringValues queryUserID) && queryUserID.Any())
+                if (httpContext.Request.Query.TryGetValue("userId", out StringValues queryUserID) 
+                    && queryUserID.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var userIdValue))
                 {
-                    if (Guid.TryParse(queryUserID, out Guid userIdTemp))
+                    if (Guid.TryParse(userIdValue, out Guid userIdTemp))
                     {
                         userId = userIdTemp;
                     }
                 }
-                if (httpContext.Request.Query.TryGetValue("token", out StringValues queryToken) && queryToken.Any())
+                if (httpContext.Request.Query.TryGetValue("token", out StringValues queryToken) 
+                    && queryToken.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var queryTokenVal))
                 {
-                    token = queryToken.First();
+                    token = queryTokenVal;
                 }
             }
 

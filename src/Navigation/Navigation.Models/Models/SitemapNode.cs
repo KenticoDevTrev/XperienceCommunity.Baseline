@@ -1,21 +1,21 @@
 ﻿namespace Navigation.Models
 {
-    public class SitemapNode
+    public record SitemapNode
     {
         public SitemapNode(string url)
         {
             Url = url;
         }
 
-        public string Url { get; set; }
-        public Maybe<DateTime> LastModificationDate { get; set; }
-        public Maybe<ChangeFrequency> ChangeFrequency { get; set; }
-        public Maybe<decimal> Priority { get; set; }
+        public string Url { get; init; }
+        public Maybe<DateTime> LastModificationDate { get; init; }
+        public Maybe<ChangeFrequency> ChangeFrequency { get; init; }
+        public Maybe<decimal> Priority { get; init; }
 
         /// <summary>
         /// Other Language ISO code name(ex: es-ES) to the Url, do not include the main Url in this.
         /// </summary>
-        public Maybe<Dictionary<string, string>> OtherLanguageCodeToUrl { get; set; }
+        public Maybe<Dictionary<string, string>> OtherLanguageCodeToUrl { get; init; }
 
         /// <summary>
         /// Helper to get an array of Sitemap Nodes to a valid sitemap xml
@@ -24,35 +24,35 @@
         /// <returns></returns>
         public static string GetSitemap(IEnumerable<SitemapNode> sitemapNodes)
         {
-            return $"<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">{string.Join("\n", sitemapNodes.Select(x => x.SitemapNodeToXmlString()))}</urlset>";
+            return $"<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"https://sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\r\n{string.Join("\n", sitemapNodes.Select(x => x.SitemapNodeToXmlString()))}</urlset>";
         }
 
         public string SitemapNodeToXmlString()
         {
             string changeFreq = string.Empty;
-            if (this.ChangeFrequency.HasValue)
+            if (ChangeFrequency.HasValue)
             {
-                switch (this.ChangeFrequency.Value)
+                switch (ChangeFrequency.Value)
                 {
-                    case Navigation.Models.ChangeFrequency.Always:
+                    case Models.ChangeFrequency.Always:
                         changeFreq = "always";
                         break;
-                    case Navigation.Models.ChangeFrequency.Daily:
+                    case Models.ChangeFrequency.Daily:
                         changeFreq = "daily";
                         break;
-                    case Navigation.Models.ChangeFrequency.Hourly:
+                    case Models.ChangeFrequency.Hourly:
                         changeFreq = "hourly";
                         break;
-                    case Navigation.Models.ChangeFrequency.Monthly:
+                    case Models.ChangeFrequency.Monthly:
                         changeFreq = "monthly";
                         break;
-                    case Navigation.Models.ChangeFrequency.Never:
+                    case Models.ChangeFrequency.Never:
                         changeFreq = "never";
                         break;
-                    case Navigation.Models.ChangeFrequency.Weekly:
+                    case Models.ChangeFrequency.Weekly:
                         changeFreq = "weekly";
                         break;
-                    case Navigation.Models.ChangeFrequency.Yearly:
+                    case Models.ChangeFrequency.Yearly:
                         changeFreq = "yearly";
                         break;
                 }
@@ -60,7 +60,7 @@
 
             return string.Format("<url>{0}{1}{2}{3}{4}</url>",
                 $"<loc>{Url}</loc>",
-            LastModificationDate.HasValue ? $"<lastmod>{LastModificationDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz")}</lastmod>" : "",
+            LastModificationDate.HasValue ? $"<lastmod>{LastModificationDate.Value:yyyy-MM-ddTHH:mm:sszzz}</lastmod>" : "",
             !string.IsNullOrWhiteSpace(changeFreq) ? $"<changefreq>{changeFreq}</changefreq>" : "",
             Priority.HasValue ? $"<priority>{Priority.Value}</priority>" : "",
             OtherLanguageCodeToUrl.TryGetValue(out var otherLanguageCodeToUrl) ? string.Join("", otherLanguageCodeToUrl.Keys.Select(langCode => $"<xhtml:link rel=\"alternate\" hreflang=\"{langCode}\" href=\"{otherLanguageCodeToUrl[langCode]}\"/>")) : string.Empty

@@ -1,6 +1,6 @@
 ﻿namespace Account.Features.Account.MyAccount
 {
-    public class MyAccountViewModel
+    public record MyAccountViewModel
     {
 
     }

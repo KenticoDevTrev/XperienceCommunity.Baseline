@@ -17,8 +17,8 @@ namespace Core.Features.PageBuilderError
             }
             NeedsAttention = isError;
         }
-        public string Message { get; set; }
-        public ConfigurationHelperMode Mode { get; set; }
-        public bool NeedsAttention { get; }
+        public string Message { get; init; }
+        public ConfigurationHelperMode Mode { get; init; }
+        public bool NeedsAttention { get; init; }
     }
 }

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.Components.AsyncScriptLoader
+﻿namespace Core.Components.AsyncScriptLoader
 {
     public class AsyncScriptLoaderViewComponent : ViewComponent
     {
-        public AsyncScriptLoaderViewComponent() { }
-
         /// <summary>
         /// Placed at the end of the page, this places the code to loop through all the scripts, and calls the ScriptRunnerPath at the end.
         /// </summary>
@@ -27,7 +19,7 @@ namespace Core.Components.AsyncScriptLoader
     }
     public record AsyncScriptLoaderViewModel
     {
-        public string ScriptRunnerPath { get; set; }
+        public string ScriptRunnerPath { get; init; }
 
         public AsyncScriptLoaderViewModel(string scriptRunnerPath)
         {

@@ -1,9 +1,6 @@
-﻿using Core.Attributes;
-using Core.Helpers;
-using Core.Services;
+﻿using Core.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using MVCCaching;
 using System.Text.Json;
 
 namespace Core.Services.Implementations
@@ -14,9 +11,7 @@ namespace Core.Services.Implementations
         public void MergeModelState(ModelStateDictionary modelState, ITempDataDictionary tempData)
         {
             string key = typeof(ModelStateTransfer).FullName ?? typeof(ModelStateTransfer).Name;
-            var serialisedModelState = tempData[key] as string;
-
-            if (serialisedModelState != null)
+            if (tempData[key] is string serialisedModelState)
             {
                 var retrievedModelState = ModelStateHelpers.DeserialiseModelState(serialisedModelState);
                 // Merge

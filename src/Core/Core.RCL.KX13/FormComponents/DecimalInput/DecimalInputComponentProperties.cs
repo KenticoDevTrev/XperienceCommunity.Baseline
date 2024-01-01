@@ -12,7 +12,7 @@ namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
 
         bool DecimalPrecisionWasSet { get; set; } = false;
         bool DecimalSizeWasSet { get; set; } = false;
-        [EditingComponentProperty("DecimalPrecision", 38)]
+        [EditingComponentProperty(nameof(DecimalPrecision), 38)]
         public int DecimalPrecision
         {
             get {
@@ -24,7 +24,7 @@ namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
             }
         }
 
-        [EditingComponentProperty("DecimalSize", 38)]
+        [EditingComponentProperty(nameof(DecimalSize), 38)]
         public int DecimalSize
         {
             get

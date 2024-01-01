@@ -1,0 +1,100 @@
+BreadcrumbsJsonViewComponent
+Changed nodeId to xPageId
+Changed IncludeDefaultBreadcrumb to xIncludeDefaultBreadcrumb
+
+BreadcrumbsViewComponent:
+Changed nodeId to xPageId
+Changed IncludeDefaultBreadcrumb to xIncludeDefaultBreadcrumb
+
+BreadcrumbsManualViewComponent
+Changed breadcrumbs to xBreadcrumbs
+Changed includeDefaultBreadcrumb to xIncludeDefaultBreadcrumb
+
+BreadcrumbsJsonManualViewComponent
+Changed breadcrumbs to xBreadcrumbs
+Changed includeDefaultBreadcrumb to xIncludeDefaultBreadcrumb
+
+SecondaryNavigationViewComponent
+Changed navigationProperties to xNavigationProperties
+
+TabParentViewComponent
+Changed page to xPage
+
+PageMetaDataViewComponent
+change documentId to xContentCultureId
+
+ManualPageMetaDataViewComponent
+changed metaData to xMetaData
+
+MainNavigationViewComponent
+changed NavigationParentPath to xNavigationParentPath
+changed CssClass to xCssClass
+changed includeScreenReaderNav to xIncludeScreenReaderNav
+
+ScreenReaderNavigationViewModel
+changed navigationItems to xNavigationItems
+changed navigationId to xNavigationId,
+changed navShortcutSelector to xNavShortcutSelector
+
+BreadcrumbsManualViewComponent
+changed breadcrumbs to xBreadcrumbs
+changed includeDefaultBreadcrumbs to xIncludeDefaultBreadcrumbs
+
+ConfigurationHelperViewComponent
+changed instructions to xInstructions
+changed needsAttention to xNeedsAttention
+changed mode to xMode
+changed visible to xVisible
+
+
+IMetaDataRepository
+Changed documentId to contentCultureId
+Changed documentGuid to contentCultureGuid
+
+NavigationItem && NavigationItemBuilder
+Changed LinkPageGUID to LinkPageGuid
+Changed LinkDocumentGUID to LinkContentCultureGuid
+changed LinkDocumentID to LinkContentCultureID
+
+
+IPageContextRepository.GetPageAsync(TreeCultureIdentity identity) replaces IPageContextRepository.GetPageAsync(DocumentIdentity), however the logic is different and may require refactoring to transition.
+
+Identities have been adjusted to be geared towards the Xperience by Kentico implelmentation.  Many of these identities are simply name changes, and can be used as follows:
+
+
+
+
+
+NodeIdentity => TreeIdentity
+	-NodeId => PageID
+	-NodeGuid => PageGuid
+	-NodeAliasPathAndSiteId => PathAndChannelId
+
+NodeIdentity => ContentIdentity
+	-NodeId => ContentID
+	-NodeGuid => ContentGuid
+	-NodeAliasPathAndSiteId => PathAndAndChannelId*
+*in Xperience by Kentico, will find the WebPageItem and then look up the Content Item correlated to it
+
+
+DocumentIdentity => ContentCultureIdentity
+	-DocumentId => ContentCultureID
+	-DocumentGuid => ContentCultureGuid
+	-NodeAliasPathAndMaybeCultureAndSiteId => PathAndMaybeCultureAndChannelId
+	-[] => MaybeContentIDAndMaybeCulture**
+**in Xperience by Kentico, There is a Culture version of a Content Item, so this field allows to be found by this.  In Kentico Xperience 13, the "ContentID" is the NodeID, and the Culture is the language code
+
+
+*** IMPORTANT: REFACTORING REQUIRED ***
+For switching between DocumentIdentity to TreeCultureIdentity, in Xperience by Kentico there isn't a direct link between a culture version of a content item and a Web Page Item, while in Kentico Xperience 13 every Cultured Item (Document) has a Web Page (Node).
+
+For this reason, the TreeCultureIdentity (saying it must be a Web Page/Node) leverages the WebPage Identifiers and a required Culture that is part of the constructor.  This means you will need to refactor KX13 implementations that previous used DocumentIdentity and now use TreeCultureIdentity so it will look up by the NodeID/NodeGuid/NodeAliasPath and culture, instead of the DocumentID and DocumentGuid.
+
+DocumentIdentity => TreeCultureIdentity(CultureCode)
+	-DocumentId => PageID *** (NodeID)
+	-DocumentGuid => PageGuid (NodeGuid)
+	-NodeAliasPathAndMaybeCultureAndSiteId => PathAndChannelId (NodeAliasPath and SiteID)
+
+
+ObjectQueryExtensions
+Changed to namespace Core.Extensions

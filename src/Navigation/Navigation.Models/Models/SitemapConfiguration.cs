@@ -2,12 +2,7 @@
 {
     public class SitemapConfiguration
     {
-        public SitemapConfiguration()
-        {
-
-        }
-
-        public Dictionary<string, IEnumerable<SiteMapOptions>> SiteNameToConfigurations { get; set; } = new Dictionary<string, IEnumerable<SiteMapOptions>>();
+        public Dictionary<string, IEnumerable<SiteMapOptions>> SiteNameToConfigurations { get; set; } = [];
 
         public void AddSitemapConfiguration(string sitename, IEnumerable<SiteMapOptions> options)
         {

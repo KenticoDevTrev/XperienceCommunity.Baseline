@@ -1,57 +1,62 @@
-﻿using MVCCaching;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
     public record PageIdentity : ICacheKey
     {
+        /// <summary>
+        /// Primary Constructor
+        /// </summary>
+        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID)
+        {
+            Name = name;
+            Alias = alias;
+            PageID = pageID;
+            ContentID = contentID;
+            PageGuid = pageGuid;
+            ContentGuid = contentGuid;
+            ContentName = contentName;
+            ContentCultureID = contentCultureID;
+            ContentCultureGuid = contentCultureGuid;
+            Path = path;
+            RelativeUrl = relativeUrl;
+            AbsoluteUrl = absoluteUrl;
+            PageLevel = level;
+            ChannelID = channelID;
+            Culture = culture;
+        }
+
+        [Obsolete("Use primary constructor, passing NodeID as both PageID and ContentID, and NodeGuid as both PageGuid and ContentGuid, NodeAlias as both Alias and ContentName, DocumentID/Guid as ContentCultureID/Guid, and SiteID as ChannelID")]
         public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID)
         {
             Name = name;
             Alias = alias;
-            NodeID = nodeID;
-            NodeGUID = nodeGUID;
-            DocumentID = documentID;
-            DocumentGUID = documentGUID;
+            PageID = nodeID;
+            ContentID = nodeID;
+            PageGuid = nodeGUID;
+            ContentGuid = nodeGUID;
+            ContentName = alias;
+            ContentCultureID = documentID;
+            ContentCultureGuid = documentGUID;
             Path = path;
             RelativeUrl = relativeUrl;
             AbsoluteUrl = absoluteUrl;
-            NodeLevel = nodeLevel;
-            NodeSiteID = nodeSiteID;
+            PageLevel = nodeLevel;
+            ChannelID = nodeSiteID;
             Culture = culture;
         }
 
+        
         /// <summary>
-        /// The Name of the page
+        /// The Name of the page (tree)
         /// </summary>
         public string Name { get; init; }
 
         /// <summary>
-        /// The Code Name of the page
+        /// The Code Name of the page (tree)
         /// </summary>
         public string Alias { get; init; }
 
         /// <summary>
-        /// The Page's int identity (culture agnostic)
-        /// </summary>
-        public int NodeID { get; init; }
-
-        /// <summary>
-        /// The Page's guid identity (culture agnostic)
-        /// </summary>
-        public Guid NodeGUID { get; init; }
-
-        /// <summary>
-        /// The Page's int identity (culture specific)
-        /// </summary>
-        public int DocumentID { get; init; }
-
-        /// <summary>
-        /// The Page's guid identity (culture specific)
-        /// </summary>
-        public Guid DocumentGUID { get; init; }
-
-        /// <summary>
-        /// The content path of the page
+        /// The path of the page (tree)
         /// </summary>
         public string Path { get; init; }
 
@@ -66,46 +71,155 @@ namespace Core.Models
         public string AbsoluteUrl { get; init; }
 
         /// <summary>
-        /// Nesting level of the page.
+        /// The Channel this page identity belongs to.
         /// </summary>
-        public int NodeLevel { get; init; }
+        public int ChannelID { get; init; }
 
         /// <summary>
-        /// The Site ID of the page
+        /// Nesting level of the page (tree)
         /// </summary>
-        public int NodeSiteID { get; init; }
+        public int PageLevel { get; init; }
 
-        public string Culture { get; set; }
+        /// <summary>
+        /// Page's identity (tree)
+        /// </summary>
+        public int PageID { get; init; }
 
-        public DocumentIdentity DocumentIdentity
+        /// <summary>
+        /// The Page's guid identity (tree)
+        /// </summary>
+        public Guid PageGuid { get; init; }
+
+        /// <summary>
+        /// The Content's identity (data, culture agnostic)
+        /// </summary>
+        public int ContentID { get; init; }
+
+        /// <summary>
+        /// The Content's Code Name (data, culture agnostic)
+        /// </summary>
+        public string ContentName { get; init; }
+
+        /// <summary>
+        /// The Content's guid identity (data, culture agnostic)
+        /// </summary>
+        public Guid ContentGuid { get; init; }
+
+        /// <summary>
+        /// The Content's identity (data, culture specific)
+        /// </summary>
+        public int ContentCultureID { get; init; }
+
+        /// <summary>
+        /// The Content's guid identity (data, culture specific)
+        /// </summary>
+        public Guid ContentCultureGuid { get; init; }
+
+
+        [Obsolete("Use PageLevel")]
+        public int NodeLevel => PageLevel;
+
+        [Obsolete("Use ChannelID")]
+        public int NodeSiteID => ChannelID;
+
+        [Obsolete("Use ContentID for data lookups, PageID for tree structure related lookups")]
+        public int NodeID => ContentID;
+
+        [Obsolete("Use ContentGuid for data lookups, PageGuid for tree structure related lookups")]
+        public Guid NodeGUID => ContentGuid;
+
+        [Obsolete("Use ContentCultureID")]
+        public int DocumentID => ContentCultureID;
+
+        [Obsolete("Use ContentCultureGuid")]
+        public Guid DocumentGUID => ContentCultureGuid;
+
+        public string Culture { get; init; }
+
+        public ContentIdentity ContentIdentity
         {
             get
             {
-                return new DocumentIdentity()
+                return new ContentIdentity()
                 {
-                    DocumentId = DocumentID,
-                    DocumentGuid = DocumentGUID,
-                    NodeAliasPathAndMaybeCultureAndSiteId = new Tuple<string, Maybe<string>, Maybe<int>>(Path, Culture, NodeSiteID)
+                    ContentID = ContentID,
+                    ContentGuid = ContentGuid,
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
                 };
             }
         }
 
+        public ContentCultureIdentity ContentCultureIdentity
+        {
+            get
+            {
+                return new ContentCultureIdentity()
+                {
+                    ContentCultureID = ContentCultureID,
+                    ContentCultureGuid = ContentCultureGuid,
+                    PathAndMaybeCultureAndChannelId = new Tuple<string, Maybe<string>, Maybe<int>>(Path, Culture, ChannelID)
+                };
+            }
+        }
+
+        public TreeIdentity TreeIdentity
+        {
+            get
+            {
+                return new TreeIdentity()
+                {
+                    PageID = PageID,
+                    PageGuid = PageGuid,
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                };
+            }
+        }
+
+        public TreeCultureIdentity TreeCultureIdentity
+        {
+            get
+            {
+                return new TreeCultureIdentity(Culture)
+                {
+                    PageID = PageID,
+                    PageGuid = PageGuid,
+                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                };
+            }
+        }
+
+        [Obsolete("Use ContentIdentity or TreeIdentity")]
         public NodeIdentity NodeIdentity
         {
             get
             {
                 return new NodeIdentity()
                 {
-                    NodeId = NodeID,
-                    NodeGuid = NodeGUID,
-                    NodeAliasPathAndSiteId = new Tuple<string, Maybe<int>>(Path, NodeSiteID)
+                    NodeId = ContentID,
+                    NodeGuid = ContentGuid,
+                    NodeAliasPathAndSiteId = new Tuple<string, Maybe<int>>(Path, ChannelID)
                 };
             }
         }
 
+        [Obsolete("Use ContentCultureIdentity")]
+        public DocumentIdentity DocumentIdentity
+        {
+            get
+            {
+                return new DocumentIdentity()
+                {
+                    DocumentId = ContentCultureID,
+                    DocumentGuid = ContentCultureGuid,
+                    NodeAliasPathAndMaybeCultureAndSiteId = new Tuple<string, Maybe<string>, Maybe<int>>(Path, Culture, ChannelID)
+                };
+            }
+        }
+
+
         public string GetCacheKey()
         {
-            return $"doc-{DocumentGUID}";
+            return $"contentculture-{ContentCultureGuid}";
         }
 
         /// <summary>
@@ -114,25 +228,32 @@ namespace Core.Models
         /// <returns></returns>
         public static PageIdentity Empty()
         {
-            return new PageIdentity("", "", 0, Guid.Empty, 0, Guid.Empty, "/", "en-US", "/", "/", 0, 0);
+            return new PageIdentity("", "", 0, Guid.Empty, 0, "", Guid.Empty, 0, Guid.Empty, "/", "en-US", "/", "/", 0, 0);
         }
 
         /// <summary>
-        /// Returns a page Identity with random Document/Node Guids
+        /// Returns a page Identity with random Content/Content Culture/Web Page Guids
         /// </summary>
         /// <returns></returns>
         public static PageIdentity Random()
         {
-            return new PageIdentity("", "", 0, Guid.NewGuid(), 0, Guid.NewGuid(), "/", "en-US", "/", "/", 0, 0);
+            return new PageIdentity("", "", 0, Guid.NewGuid(), 0, "", Guid.NewGuid(), 0, Guid.NewGuid(), "/", "en-US", "/", "/", 0, 0);
         }
     }
 
     public record PageIdentity<T> : PageIdentity
     {
+        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID, T data) : base(name, alias, pageID, pageGuid, contentID, contentName, contentGuid, contentCultureID, contentCultureGuid, path, culture, relativeUrl, absoluteUrl, level, channelID)
+        {
+            Data = data;
+        }
+
+        [Obsolete("Use primary constructor, passing NodeID as both PageID and ContentID, and NodeGuid as both PageGuid and ContentGuid, NodeAlias as both Alias and ContentName, DocumentID/Guid as ContentCultureID/Guid, and SiteID as ChannelID")]
         public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID, T data) : base(name, alias, nodeID, nodeGUID, documentID, documentGUID, path, culture, relativeUrl, absoluteUrl, nodeLevel, nodeSiteID)
         {
             Data = data;
         }
+
         public PageIdentity(T data, PageIdentity pageIdentity) : base(pageIdentity)
         {
             Data = data;
@@ -141,6 +262,6 @@ namespace Core.Models
         /// <summary>
         /// Typed page data
         /// </summary>
-        public T Data { get; set; }
+        public T Data { get; init; }
     }
 }

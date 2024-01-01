@@ -1,51 +1,21 @@
 ﻿using CMS.Base;
-using CMS.DocumentEngine;
-using CMS.DocumentEngine.Types.Generic;
-using CMS.Helpers;
-using Core.Enums;
-using Core.Models;
-using Kentico.Content.Web.Mvc;
-using Microsoft.SqlServer.Dac.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TabbedPages.Models;
-using XperienceCommunity.QueryExtensions.Documents;
 
 namespace TabbedPages.Repositories.Implementations
 {
-    public class TabRepository : ITabRepository
+    public class TabRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ICacheRepositoryContext _cacheRepositoryContext,
+        IProgressiveCache _progressiveCache,
+        IIdentityService _identityService,
+        ISiteService _siteService,
+        ISiteRepository _siteRepository) : ITabRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly IIdentityService _identityService;
-        private readonly ISiteService _siteService;
-        private readonly ISiteRepository _siteRepository;
-
-        public TabRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ICacheRepositoryContext cacheRepositoryContext,
-            IProgressiveCache progressiveCache,
-            IIdentityService identityService,
-            ISiteService siteService,
-            ISiteRepository siteRepository)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _cacheRepositoryContext = cacheRepositoryContext;
-            _progressiveCache = progressiveCache;
-            _identityService = identityService;
-            _siteService = siteService;
-            _siteRepository = siteRepository;
-        }
-
-        public async Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity)
+        public async Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity)
         {
             // This implementation uses the NodeAliasPath, so if it's missing then we need to get it.
-            if(parentIdentity.NodeAliasPathAndSiteId.HasNoValue)
+            if(parentIdentity.PathAndChannelId.HasNoValue)
             {
-                var identityResult = await _identityService.HydrateNodeIdentity(parentIdentity);
+                var identityResult = await _identityService.HydrateTreeIdentity(parentIdentity);
                 if(identityResult.IsFailure)
                 {
                     return Array.Empty<TabItem>();
@@ -53,13 +23,13 @@ namespace TabbedPages.Repositories.Implementations
             }
 
             // Should never be Maybe.None but just in case...
-            if(!parentIdentity.NodeAliasPathAndSiteId.TryGetValue(out var nodeAliasPathAndSiteID))
+            if(!parentIdentity.PathAndChannelId.TryGetValue(out var pathAndAndChannelId))
             {
                 return Array.Empty<TabItem>();
             }
 
-            string path = nodeAliasPathAndSiteID.Item1;
-            string siteName = _siteRepository.SiteNameById(nodeAliasPathAndSiteID.Item2.GetValueOrDefault(_siteService.CurrentSite.SiteID));
+            string path = pathAndAndChannelId.Item1;
+            string siteName = _siteRepository.SiteNameById(pathAndAndChannelId.Item2.GetValueOrDefault(_siteService.CurrentSite.SiteID));
 
             var builder = _cacheDependencyBuilderFactory.Create(siteName)
                 .PagePath(path, PathTypeEnum.Children);
@@ -88,6 +58,9 @@ namespace TabbedPages.Repositories.Implementations
 
             return nodes.Select(x => x.ToTabItem());
         }
+
+        [Obsolete("Use GetTabsAsync(TreeIdentity parentIdentity)")]
+        public Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity) => GetTabsAsync(parentIdentity.ToTreeIdentity());
     }
 }
 namespace CMS.DocumentEngine.Types.Generic
@@ -99,7 +72,7 @@ namespace CMS.DocumentEngine.Types.Generic
 
             return new TabItem(
                 name: value.TabName,
-                documentID: value.DocumentID);
+                pageCultureID: value.DocumentID);
         }
     }
 }

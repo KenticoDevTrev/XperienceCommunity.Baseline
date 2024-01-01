@@ -2,11 +2,11 @@
 
 namespace Search.Models
 {
-    public class SearchResponse
+    public record SearchResponse
     {
-        public IEnumerable<SearchItem> Items { get; set; } = Array.Empty<SearchItem>();
-        public int TotalPossible { get; set; } = 0;
-        public IEnumerable<string> HighlightedWords { get; set; } = Array.Empty<string>();
-        public Maybe<Regex> HighlightRegex { get; set; }
+        public IEnumerable<SearchItem> Items { get; init; } = [];
+        public int TotalPossible { get; init; } = 0;
+        public IEnumerable<string> HighlightedWords { get; init; } = [];
+        public Maybe<Regex> HighlightRegex { get; init; }
     }
 }

@@ -1,32 +1,27 @@
 ﻿namespace Navigation.Components.Navigation.Breadcrumbs
 {
-    public class BreadcrumbsManualViewComponent : ViewComponent
+    public class BreadcrumbsManualViewComponent(
+        IBreadcrumbRepository _breadcrumbRepository, 
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IBreadcrumbRepository _breadcrumbRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public BreadcrumbsManualViewComponent(IBreadcrumbRepository breadcrumbRepository, IHttpContextAccessor httpContextAccessor)
-        {
-            _breadcrumbRepository = breadcrumbRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Breadcrumb> breadcrumbs, bool includeDefaultBreadcrumb = true)
+        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Breadcrumb> xBreadcrumbs, bool xIncludeDefaultBreadcrumb = true)
         {
 
             if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))
             {
                 httpContext.Items.TryAdd("BreadcrumbsManuallyDone", true);
             }
-            var breadcrumbList = breadcrumbs.ToList();
+            var breadcrumbList = xBreadcrumbs.ToList();
 
             // If none set as current page, set the last one to it.
-            if(!breadcrumbList.Where(x => x.IsCurrentPage).Any() && breadcrumbList.Any())
+            if(!breadcrumbList.Where(x => x.IsCurrentPage).Any() && breadcrumbList.Count != 0)
             {
-                breadcrumbList.Last().IsCurrentPage = true;
+                var lastBreadcrumb = breadcrumbList.Last() with { IsCurrentPage = true };
+                breadcrumbList.RemoveAt(breadcrumbList.Count - 1);
+                breadcrumbList.Add(lastBreadcrumb);
             }
 
-            if(includeDefaultBreadcrumb)
+            if(xIncludeDefaultBreadcrumb)
             {
                 breadcrumbList.Insert(0, await _breadcrumbRepository.GetDefaultBreadcrumbAsync());
             }

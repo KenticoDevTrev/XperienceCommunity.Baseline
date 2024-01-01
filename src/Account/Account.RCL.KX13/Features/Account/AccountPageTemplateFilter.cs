@@ -1,6 +1,4 @@
-﻿
-
-namespace Account.Features.Account
+﻿namespace Account.Features.Account
 {
     public class ConfirmationPageTemplateFilter : PageTypePageTemplateFilter
     {

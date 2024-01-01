@@ -2,7 +2,7 @@
 
 namespace Navigation.Models
 {
-    public class ItemListElementJsonLD
+    public record ItemListElementJsonLD
     {
         public ItemListElementJsonLD(int position, string name, string item)
         {
@@ -12,14 +12,12 @@ namespace Navigation.Models
         }
 
         [JsonPropertyName("@type")]
-        public string ContentType { get; set; } = "ListItem";
+        public string ContentType { get; } = "ListItem";
         [JsonPropertyName("position")]
-        public int Position { get; set; }
+        public int Position { get; init; }
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; init; }
         [JsonPropertyName("item")]
-        public string Item { get; set; }
-
-     
+        public string Item { get; init; }
     }
 }

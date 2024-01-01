@@ -1,6 +1,4 @@
-﻿using Core.Models;
-
-namespace TabbedPages.Repositories
+﻿namespace TabbedPages.Repositories
 {
     public interface ITabRepository
     {
@@ -9,6 +7,9 @@ namespace TabbedPages.Repositories
         /// </summary>
         /// <param name="parentIdentity">The parent that the tabs reside under.</param>
         /// <returns>The Tabs</returns>
+        Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity);
+
+        [Obsolete("Use GetTabsAsync(TreeIdentity)")]
         Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity);
     }
 }

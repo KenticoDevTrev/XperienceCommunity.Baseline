@@ -18,8 +18,6 @@ using CMS.DataEngine;
 using CMS.DocumentEngine;
 using CMS.DocumentEngine.Types.Generic;
 
-[assembly: RegisterDocumentType(Account.CLASS_NAME, typeof(Account))]
-
 namespace CMS.DocumentEngine.Types.Generic
 {
 	/// <summary>

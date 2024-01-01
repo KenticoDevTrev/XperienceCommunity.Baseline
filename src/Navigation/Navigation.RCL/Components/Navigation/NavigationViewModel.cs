@@ -1,6 +1,6 @@
 ﻿namespace Navigation.Components.Navigation
 {
-    public class NavigationViewModel
+    public record NavigationViewModel
     {
         public NavigationViewModel(List<NavigationItem> navItems, string navWrapperClass, string startingPath, string currentPagePath, bool includeCurrentPageSelector, bool includeScreenReaderNavigation)
         {

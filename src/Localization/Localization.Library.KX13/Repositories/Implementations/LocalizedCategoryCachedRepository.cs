@@ -1,27 +1,15 @@
 ﻿using CMS.DataEngine;
-using CMS.Helpers;
 using CMS.Localization;
 using CMS.Taxonomy;
-using MVCCaching;
 using System.Data;
 
 namespace Localization.Repositories.Implementations
 {
-    public class LocalizedCategoryCachedRepository : ILocalizedCategoryCachedRepository
+    public class LocalizedCategoryCachedRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IProgressiveCache _progressiveCache,
+        LocalizationConfiguration _configuration) : ILocalizedCategoryCachedRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly LocalizationConfiguration _configuration;
-
-        public LocalizedCategoryCachedRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IProgressiveCache progressiveCache,
-            LocalizationConfiguration configuration)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _progressiveCache = progressiveCache;
-            _configuration = configuration;
-        }
-
         public LocalizedCategoryItem LocalizeCategoryItem(CategoryItem categoryItem, string cultureCode)
         {
             var localizationDictionary = GetLocalizedItemsCached();
@@ -92,17 +80,14 @@ namespace Localization.Repositories.Implementations
                     }
                 }).FirstOrMaybe();
 
-                if (properKey.TryGetValue(out var displayNameKey))
-                {
-                    localizedCategoryItem.CategoryDisplayName = localizationValues.DisplayNames[displayNameKey];
-                }
-                if (properDescriptionKey.TryGetValue(out var descriptionKey))
-                {
-                    localizedCategoryItem.CategoryDescription = localizationValues.Descriptions[descriptionKey];
-                }
+                // Clone record with new values if they are overwritten
+                localizedCategoryItem = localizedCategoryItem with {
+                    CategoryDisplayName = properKey.TryGetValue(out var displayNameKey) ? localizationValues.DisplayNames[displayNameKey] : localizedCategoryItem.CategoryDisplayName,
+                    CategoryDescription = properDescriptionKey.TryGetValue(out var descriptionKey) ? localizationValues.Descriptions[descriptionKey] : localizedCategoryItem.CategoryDescription
+                };
             }
-            return localizedCategoryItem;
 
+            return localizedCategoryItem;
         }
 
        
@@ -115,7 +100,7 @@ namespace Localization.Repositories.Implementations
 
             return _progressiveCache.Load(cs =>
             {
-                var values = new Dictionary<int, LocalizedCategoryValues>();
+                var values = new Dictionary<int, InternalLocalizedCategoryValues>();
                 if (cs.Cached)
                 {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
@@ -143,8 +128,8 @@ union all
 select C.CategoryID, C.CategoryparentID,C.CategoryDescription
 from CMS_Category C  
 where C.CategoryDescription not like '{$%$}'";
-                var resultsName = ConnectionHelper.ExecuteQuery(queryName, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
-                var resultsDescription = ConnectionHelper.ExecuteQuery(queryDescriptions, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
+                var resultsName = ConnectionHelper.ExecuteQuery(queryName, [], QueryTypeEnum.SQLQuery);
+                var resultsDescription = ConnectionHelper.ExecuteQuery(queryDescriptions, [], QueryTypeEnum.SQLQuery);
 
                 foreach (DataRow dr in resultsName.Tables[0].Rows)
                 {
@@ -154,12 +139,12 @@ where C.CategoryDescription not like '{$%$}'";
 
                     if (cultureCode.TryGetValue(out var cultureCodeVal))
                     {
-                        if (!values.ContainsKey(categoryID))
+                        if (!values.TryGetValue(categoryID, out var categoryValue))
                         {
-                            values.Add(categoryID, new LocalizedCategoryValues());
+                            categoryValue = new InternalLocalizedCategoryValues();
+                            values.Add(categoryID, categoryValue);
                         }
-                        var value = values[categoryID];
-                        value.DisplayNames.Add(cultureCodeVal.ToLower(), categoryDisplayName);
+                        categoryValue.DisplayNames.Add(cultureCodeVal.ToLower(), categoryDisplayName);
                     }
                 }
                 foreach (DataRow dr in resultsDescription.Tables[0].Rows)
@@ -170,23 +155,42 @@ where C.CategoryDescription not like '{$%$}'";
 
                     if (cultureCode.TryGetValue(out var cultureCodeVal))
                     {
-                        if (!values.ContainsKey(categoryID))
+                        if (!values.TryGetValue(categoryID, out var value))
                         {
-                            values.Add(categoryID, new LocalizedCategoryValues());
+                            value = new InternalLocalizedCategoryValues();
+                            values.Add(categoryID, value);
                         }
-                        var value = values[categoryID];
                         value.Descriptions.Add(cultureCodeVal.ToLower(), categoryDescription);
                     }
                 }
-                return values;
+                // return as read only version
+                return values.ToDictionary(key => key.Key, value => new LocalizedCategoryValues(
+                    displayNames: value.Value.DisplayNames,
+                    descriptions: value.Value.Descriptions
+                ));
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetCategoryLocalizedDictionary"));
+        }
+
+        /// <summary>
+        /// Temporary record used to build the dictionaries before converting to readonly
+        /// </summary>
+        private record InternalLocalizedCategoryValues
+        {
+            public Dictionary<string, string> DisplayNames { get; set; } = [];
+            public Dictionary<string, Maybe<string>> Descriptions { get; set; } = [];
         }
     }
 
     public record LocalizedCategoryValues
     {
-        public Dictionary<string, string> DisplayNames { get; set; } = new Dictionary<string, string>();
-        public Dictionary<string, Maybe<string>> Descriptions { get; set; } = new Dictionary<string, Maybe<string>>();
+        public LocalizedCategoryValues(IReadOnlyDictionary<string, string> displayNames, IReadOnlyDictionary<string, Maybe<string>> descriptions)
+        {
+            DisplayNames = displayNames;
+            Descriptions = descriptions;
+        }
+
+        public IReadOnlyDictionary<string, string> DisplayNames { get; init; }
+        public IReadOnlyDictionary<string, Maybe<string>> Descriptions { get; init; }
     }
 
     public static class CategoryItemExtensions
