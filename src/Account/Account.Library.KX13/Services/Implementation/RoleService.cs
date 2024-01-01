@@ -25,7 +25,7 @@ namespace Account.Services.Implementation
         public async Task CreateRoleIfNotExisting(string roleName, string siteName)
         {
             var roleResult = await _roleRepository.GetRoleAsync(roleName, siteName);
-            if (roleResult.TryGetValue(out var role))
+            if (roleResult.IsFailure)
             {
                 var newRole = new RoleInfo()
                 {

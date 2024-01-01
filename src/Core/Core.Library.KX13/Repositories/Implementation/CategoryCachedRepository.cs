@@ -18,7 +18,13 @@ namespace Core.Repositories.Implementation
         }
         public IEnumerable<ObjectIdentity> CategoryNamesToCategoryIdentity(IEnumerable<string> categoryNames)
         {
-            throw new NotImplementedException();
+            List<ObjectIdentity> results = [];
+            var categoriesByName = GetCachedHolder().ByCodeName;
+            foreach (var key in categoriesByName.Keys.Intersect(categoryNames.Select(x => x.ToLower())))
+            {
+                results.Add(categoriesByName[key].ToObjectIdentity());
+            }
+            return results;
         }
 
         public Dictionary<Guid, CategoryItem> GetCategoryCachedByGuid() => GetCachedHolder().ByGuid;
