@@ -5,7 +5,6 @@ namespace Account.Features.Account.MyAccount
     public class MyAccountController : Controller
     {
         // If Adjusted, also adjust LogInController.cs as well
-
         public MyAccountController()
         {
         }

@@ -3,19 +3,10 @@
 namespace Navigation.Components.Navigation.BreadcrumbsJson
 {
     [ViewComponent]
-    public class BreadcrumbsJsonManualViewComponent : ViewComponent
+    public class BreadcrumbsJsonManualViewComponent(
+        IBreadcrumbRepository _breadcrumbRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IBreadcrumbRepository _breadcrumbRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public BreadcrumbsJsonManualViewComponent(IBreadcrumbRepository breadcrumbRepository,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _breadcrumbRepository = breadcrumbRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-
         public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Breadcrumb> xBreadcrumbs, bool xIncludeDefaultBreadcrumb = true)
         {
             if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))

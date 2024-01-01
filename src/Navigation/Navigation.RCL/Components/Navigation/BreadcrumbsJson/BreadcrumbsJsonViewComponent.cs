@@ -3,25 +3,14 @@
 namespace Navigation.Components.Navigation.BreadcrumbsJson
 {
     [ViewComponent(Name = "BreadcrumbsJson")]
-    public class BreadcrumbsJsonViewComponent : ViewComponent
+    public class BreadcrumbsJsonViewComponent(
+        IPageContextRepository _pageContextRepository,
+        IBreadcrumbRepository _breadcrumbRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IPageContextRepository _pageContextRepository;
-        private readonly IBreadcrumbRepository _breadcrumbRepository;
-        private readonly IHttpContextAccessor _httpContext;
-
-        public BreadcrumbsJsonViewComponent(IPageContextRepository pageContextRepository,
-            IBreadcrumbRepository breadcrumbRepository,
-            IHttpContextAccessor httpContext)
-        {
-            _pageContextRepository = pageContextRepository;
-            _breadcrumbRepository = breadcrumbRepository;
-            _httpContext = httpContext;
-        }
-
-
         public async Task<IViewComponentResult> InvokeAsync(bool xIncludeDefaultBreadcrumb = true, int xPageId = -1)
         {
-            if(_httpContext.HttpContext.AsMaybe().TryGetValue(out var httpContext)
+            if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext)
                 && httpContext.Items.ContainsKey("BreadcrumbJsonLDManuallyDone"))
             {
                 return Content(String.Empty);

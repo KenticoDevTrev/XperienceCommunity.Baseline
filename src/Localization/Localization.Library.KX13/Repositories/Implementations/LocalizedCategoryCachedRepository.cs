@@ -1,28 +1,15 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using CMS.DataEngine;
-using CMS.Helpers;
+﻿using CMS.DataEngine;
 using CMS.Localization;
 using CMS.Taxonomy;
-using MVCCaching;
 using System.Data;
 
 namespace Localization.Repositories.Implementations
 {
-    public class LocalizedCategoryCachedRepository : ILocalizedCategoryCachedRepository
+    public class LocalizedCategoryCachedRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IProgressiveCache _progressiveCache,
+        LocalizationConfiguration _configuration) : ILocalizedCategoryCachedRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly LocalizationConfiguration _configuration;
-
-        public LocalizedCategoryCachedRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IProgressiveCache progressiveCache,
-            LocalizationConfiguration configuration)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _progressiveCache = progressiveCache;
-            _configuration = configuration;
-        }
-
         public LocalizedCategoryItem LocalizeCategoryItem(CategoryItem categoryItem, string cultureCode)
         {
             var localizationDictionary = GetLocalizedItemsCached();
@@ -141,8 +128,8 @@ union all
 select C.CategoryID, C.CategoryparentID,C.CategoryDescription
 from CMS_Category C  
 where C.CategoryDescription not like '{$%$}'";
-                var resultsName = ConnectionHelper.ExecuteQuery(queryName, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
-                var resultsDescription = ConnectionHelper.ExecuteQuery(queryDescriptions, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
+                var resultsName = ConnectionHelper.ExecuteQuery(queryName, [], QueryTypeEnum.SQLQuery);
+                var resultsDescription = ConnectionHelper.ExecuteQuery(queryDescriptions, [], QueryTypeEnum.SQLQuery);
 
                 foreach (DataRow dr in resultsName.Tables[0].Rows)
                 {
@@ -152,12 +139,12 @@ where C.CategoryDescription not like '{$%$}'";
 
                     if (cultureCode.TryGetValue(out var cultureCodeVal))
                     {
-                        if (!values.ContainsKey(categoryID))
+                        if (!values.TryGetValue(categoryID, out var categoryValue))
                         {
-                            values.Add(categoryID, new InternalLocalizedCategoryValues());
+                            categoryValue = new InternalLocalizedCategoryValues();
+                            values.Add(categoryID, categoryValue);
                         }
-                        var value = values[categoryID];
-                        value.DisplayNames.Add(cultureCodeVal.ToLower(), categoryDisplayName);
+                        categoryValue.DisplayNames.Add(cultureCodeVal.ToLower(), categoryDisplayName);
                     }
                 }
                 foreach (DataRow dr in resultsDescription.Tables[0].Rows)
@@ -168,11 +155,11 @@ where C.CategoryDescription not like '{$%$}'";
 
                     if (cultureCode.TryGetValue(out var cultureCodeVal))
                     {
-                        if (!values.ContainsKey(categoryID))
+                        if (!values.TryGetValue(categoryID, out var value))
                         {
-                            values.Add(categoryID, new InternalLocalizedCategoryValues());
+                            value = new InternalLocalizedCategoryValues();
+                            values.Add(categoryID, value);
                         }
-                        var value = values[categoryID];
                         value.Descriptions.Add(cultureCodeVal.ToLower(), categoryDescription);
                     }
                 }
@@ -189,8 +176,8 @@ where C.CategoryDescription not like '{$%$}'";
         /// </summary>
         private record InternalLocalizedCategoryValues
         {
-            public Dictionary<string, string> DisplayNames { get; set; } = new Dictionary<string, string>();
-            public Dictionary<string, Maybe<string>> Descriptions { get; set; } = new Dictionary<string, Maybe<string>>();
+            public Dictionary<string, string> DisplayNames { get; set; } = [];
+            public Dictionary<string, Maybe<string>> Descriptions { get; set; } = [];
         }
     }
 

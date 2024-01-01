@@ -3,11 +3,6 @@
     [ViewComponent]
     public class PartialNavigationViewComponent : ViewComponent
     {
-        public PartialNavigationViewComponent()
-        {
-        }
-
-
         public IViewComponentResult Invoke()
         {
             var model = new PartialNavigationViewModel()

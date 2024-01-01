@@ -2,15 +2,8 @@
 
 namespace Core.Repositories.Implementation
 {
-    public class BaselinePageBuilderContext : IBaselinePageBuilderContext
+    public class BaselinePageBuilderContext(IPageBuilderContext _pageBuilderContext) : IBaselinePageBuilderContext
     {
-        private readonly IPageBuilderContext _pageBuilderContext;
-
-        public BaselinePageBuilderContext(IPageBuilderContext pageBuilderContext)
-        {
-            _pageBuilderContext = pageBuilderContext;
-        }
-
         public bool IsPreviewMode => _pageBuilderContext.IsPreviewMode;
 
         public bool IsLiveMode => _pageBuilderContext.IsLiveMode;

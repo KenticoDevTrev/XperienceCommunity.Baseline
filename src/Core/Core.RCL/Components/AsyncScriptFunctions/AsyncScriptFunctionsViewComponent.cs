@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.Components.AsyncScriptFunctions
+﻿namespace Core.Components.AsyncScriptFunctions
 {
     /// <summary>
     /// Adds the window.LoadScript and window.OnScriptsLoaded methods to the page.  
@@ -23,8 +17,6 @@ namespace Core.Components.AsyncScriptFunctions
     /// </summary>
     public class AsyncScriptFunctionsViewComponent : ViewComponent
     {
-        public AsyncScriptFunctionsViewComponent() { }
-
         public IViewComponentResult Invoke()
         {
             return View("/Components/AsyncScriptFunctions/AsyncScriptFunctions.cshtml");

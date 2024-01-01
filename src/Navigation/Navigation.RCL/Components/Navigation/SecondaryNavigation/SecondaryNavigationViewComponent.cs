@@ -1,23 +1,11 @@
-﻿using MVCCaching;
-
-namespace Navigation.Components.Navigation.SecondaryNavigation
+﻿namespace Navigation.Components.Navigation.SecondaryNavigation
 {
     [ViewComponent(Name = "SecondaryNavigation")]
-    public class SecondaryNavigationViewComponent : ViewComponent
+    public class SecondaryNavigationViewComponent(
+        INavigationRepository _navigationRepository,
+        ICacheDependenciesScope _cacheDependenciesScope,
+        IPageContextRepository _pageContextRepository) : ViewComponent
     {
-        private readonly INavigationRepository _navigationRepository;
-        private readonly ICacheDependenciesScope _cacheDependenciesScope;
-        private readonly IPageContextRepository _pageContextRepository;
-
-        public SecondaryNavigationViewComponent(INavigationRepository navigationRepository,
-            ICacheDependenciesScope cacheDependenciesScope,
-            IPageContextRepository pageContextRepository)
-        {
-            _navigationRepository = navigationRepository;
-            _cacheDependenciesScope = cacheDependenciesScope;
-            _pageContextRepository = pageContextRepository;
-        }
-
         public async Task<IViewComponentResult> InvokeAsync(SecondaryNavigationProperties xNavigationProperties)
         {
             // Begin Cache Scope, this is 'ended' in the view

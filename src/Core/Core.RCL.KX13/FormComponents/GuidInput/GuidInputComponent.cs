@@ -1,7 +1,5 @@
 ﻿using Core.RCL.KX13.Models.FormComponents.GuidInput;
 using Kentico.Forms.Web.Mvc;
-using System;
-
 
 // Registers a form component for use in the form builder
 [assembly: RegisterFormComponent(GuidInputComponent.IDENTIFIER, typeof(GuidInputComponent), "Guid Value", Description = "Receives a Guid typed value.", IconClass = "icon-octothorpe")]
@@ -17,7 +15,7 @@ namespace Core.RCL.KX13.Models.FormComponents.GuidInput
         [BindableProperty]
         public string Value { 
             get {
-                return GuidValue != default(Guid) ? GuidValue.ToString() : "";
+                return GuidValue != default ? GuidValue.ToString() : "";
             } set {
                 if(!string.IsNullOrWhiteSpace(value))
                 {

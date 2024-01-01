@@ -1,15 +1,8 @@
 ﻿namespace Core.Components.PageMetaData
 {
     [ViewComponent]
-    public class ManualPageMetaDataViewComponent : ViewComponent
+    public class ManualPageMetaDataViewComponent(IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public ManualPageMetaDataViewComponent(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         /// <summary>
         /// Render Page meta data with a custom meta data item
         /// </summary>

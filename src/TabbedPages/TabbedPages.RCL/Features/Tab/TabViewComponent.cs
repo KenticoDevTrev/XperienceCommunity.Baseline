@@ -3,10 +3,6 @@
     [ViewComponent]
     public class TabViewComponent : ViewComponent
     {
-        public TabViewComponent()
-        {
-        }
-
         public IViewComponentResult Invoke()
         {
             var model = new TabViewModel()

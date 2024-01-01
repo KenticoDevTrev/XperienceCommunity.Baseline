@@ -1,11 +1,5 @@
-﻿using Localization.Repositories;
-using Localization.Repositories.Implementations;
+﻿using Localization.Repositories.Implementations;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XperienceCommunity.Localizer;
 
 namespace Localization

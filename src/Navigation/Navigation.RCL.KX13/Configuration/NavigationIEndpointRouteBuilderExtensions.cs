@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Navigation.RCL.Configuration
 {
-    public static class NavigationIEndpointRouteBuilderExtensions
+    public static partial class NavigationIEndpointRouteBuilderExtensions
     {
         public static IEndpointRouteBuilder UseSitemapRoute(this IEndpointRouteBuilder endpoints, IEnumerable<string>? sitemapPatterns = null)
         {
@@ -14,7 +14,7 @@ namespace Navigation.RCL.Configuration
             foreach (string pattern in urlPatterns)
             {
                 endpoints.MapControllerRoute(
-                    name: $"Sitemap_{Regex.Replace(pattern, "[A-Za-z]", "")}",
+                    name: $"Sitemap_{AlphaOnlyRegex().Replace(pattern, "")}",
                     pattern: pattern,
                     defaults: new { controller = "Sitemap", action = "Index" }
                 );
@@ -22,5 +22,8 @@ namespace Navigation.RCL.Configuration
 
             return endpoints;
         }
+
+        [GeneratedRegex("[A-Za-z]")]
+        private static partial Regex AlphaOnlyRegex();
     }
 }

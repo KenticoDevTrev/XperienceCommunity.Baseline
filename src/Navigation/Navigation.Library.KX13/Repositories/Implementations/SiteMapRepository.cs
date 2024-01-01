@@ -1,27 +1,15 @@
 ﻿using CMS.DocumentEngine.Routing;
-using Kentico.Content.Web.Mvc;
 
 namespace Navigation.Repositories.Implementations
 {
     [AutoDependencyInjection]
-    public class SiteMapRepository : ISiteMapRepository
+    public class SiteMapRepository(
+        IPageUrlRetriever _pageUrlRetriever,
+        IPageRetriever _pageRetriever,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ICacheRepositoryContext _repoContext
+        ) : ISiteMapRepository
     {
-        private readonly IPageUrlRetriever _pageUrlRetriever;
-        private readonly IPageRetriever _pageRetriever;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ICacheRepositoryContext _repoContext;
-
-        public SiteMapRepository(IPageUrlRetriever pageUrlRetriever,
-            IPageRetriever pageRetriever,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ICacheRepositoryContext repoContext)
-        {
-            _pageUrlRetriever = pageUrlRetriever;
-            _pageRetriever = pageRetriever;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _repoContext = repoContext;
-        }
-
         public async Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetAsync()
         {
             var builder = _cacheDependencyBuilderFactory.Create();
@@ -56,12 +44,12 @@ namespace Navigation.Repositories.Implementations
                 {
                     if (options.UrlColumnName.TryGetValue(out var urlColumnName))
                     {
-                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
+                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
+                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
                     }
                     else
                     {
-                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
-                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
+                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
                     }
                 }
             }
@@ -82,12 +70,12 @@ namespace Navigation.Repositories.Implementations
         /// <param name="RelativeURL">The Relative Url</param>
         /// <param name="ModifiedLast">The last modified date</param>
         /// <returns>The SitemapNode</returns>
-        private SitemapNode ConvertToSiteMapUrl(string relativeURL, DateTime? modifiedLast)
+        private static SitemapNode ConvertToSiteMapUrl(string relativeURL, DateTime? modifiedLast)
         {
             string url = URLHelper.GetAbsoluteUrl(relativeURL, RequestContext.CurrentDomain);
             var siteMapItem = new SitemapNode(url)
             {
-                LastModificationDate = modifiedLast.HasValue ? modifiedLast.Value : Maybe<DateTime>.None
+                LastModificationDate = modifiedLast ?? Maybe<DateTime>.None
             };
             return siteMapItem;
         }
@@ -136,7 +124,7 @@ namespace Navigation.Repositories.Implementations
             return (await GetSiteMapUrlSetBaseAsync(path, options)).Select(x => TreeNodeToSitemapNode(x));
         }
 
-        private SitemapNode TreeNodeToSitemapNode(TreeNode node)
+        private static SitemapNode TreeNodeToSitemapNode(TreeNode node)
         {
             return new SitemapNode(node.ToPageIdentity().AbsoluteUrl)
             {

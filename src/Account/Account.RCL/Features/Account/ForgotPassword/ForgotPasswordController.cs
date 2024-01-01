@@ -1,29 +1,15 @@
 ﻿using Account.Features.Account.ForgottenPasswordReset;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Account.Features.Account.ForgotPassword
 {
-    public class ForgotPasswordController : Controller
+    public class ForgotPasswordController(
+        IUserRepository _userRepository,
+        IAccountSettingsRepository _accountSettingsRepository,
+        IUserService _userService,
+        IUrlResolver _urlResolver,
+        IModelStateService _modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ForgotPassword";
-        private readonly IUserRepository _userRepository;
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IUserService _userService;
-        private readonly IUrlResolver _urlResolver;
-        private readonly IModelStateService _modelStateService;
-
-        public ForgotPasswordController(IUserRepository userRepository,
-            IAccountSettingsRepository accountSettingsRepository,
-            IUserService userService,
-            IUrlResolver urlResolver,
-            IModelStateService modelStateService)
-        {
-            _userRepository = userRepository;
-            _accountSettingsRepository = accountSettingsRepository;
-            _userService = userService;
-            _urlResolver = urlResolver;
-            _modelStateService = modelStateService;
-        }
 
         /// <summary>
         /// Fallback if not using Page Templates

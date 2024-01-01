@@ -1,5 +1,4 @@
 ﻿using Core.Helpers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Core.Attributes
@@ -20,13 +19,12 @@ namespace Core.Attributes
                     || filterContext.Result is RedirectToRouteResult
                     || filterContext.Result is RedirectToActionResult)
                 {
-                    var controller = filterContext.Controller as Controller;
-                    if (controller != null && filterContext.ModelState != null)
-                    {
-                        var modelState = ModelStateHelpers.SerialiseModelState(filterContext.ModelState);
-                        controller.TempData[Key] = modelState;
-                    }
+                if (filterContext.Controller is Controller controller && filterContext.ModelState != null)
+                {
+                    var modelState = ModelStateHelpers.SerialiseModelState(filterContext.ModelState);
+                    controller.TempData[Key] = modelState;
                 }
+            }
             //}
 
             base.OnActionExecuted(filterContext);

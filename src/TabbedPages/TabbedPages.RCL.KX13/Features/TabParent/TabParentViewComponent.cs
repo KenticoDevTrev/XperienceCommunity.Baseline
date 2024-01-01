@@ -4,15 +4,8 @@ using TabbedPages.Repositories;
 namespace TabbedPages.Features.TabParent
 {
     [ViewComponent]
-    public class TabParentViewComponent : ViewComponent
+    public class TabParentViewComponent(ITabRepository _tabRepository) : ViewComponent
     {
-        private readonly ITabRepository _tabRepository;
-
-        public TabParentViewComponent(ITabRepository tabRepository)
-        {
-            _tabRepository = tabRepository;
-        }
-
         public async Task<IViewComponentResult> InvokeAsync(PageIdentity xPage)
         {
             var model = new TabParentViewModel(

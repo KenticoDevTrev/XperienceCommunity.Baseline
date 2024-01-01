@@ -1,16 +1,8 @@
-﻿
-
-namespace Navigation.Components.Navigation.MainNavigation
+﻿namespace Navigation.Components.Navigation.MainNavigation
 {
     [ViewComponent(Name = "MainNavigation")]
-    public class MainNavigationViewComponent : ViewComponent
+    public class MainNavigationViewComponent(INavigationRepository _navigationRepository) : ViewComponent
     {
-        private readonly INavigationRepository _navigationRepository;
-
-        public MainNavigationViewComponent(INavigationRepository navigationRepository)
-        {
-            _navigationRepository = navigationRepository;
-        }
         public async Task<IViewComponentResult> InvokeAsync(string xNavigationParentPath, string xCssClass = "MainNav", bool xIncludeScreenReaderNav = true)
         {
             xNavigationParentPath = !string.IsNullOrWhiteSpace(xNavigationParentPath) ? xNavigationParentPath : "/MasterPage/Navigation";

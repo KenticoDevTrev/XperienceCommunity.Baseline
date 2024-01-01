@@ -1,22 +1,11 @@
 ﻿namespace Navigation.Components.Navigation.Breadcrumbs
 {
     [ViewComponent(Name = "Breadcrumbs")]
-    public class BreadcrumbsViewComponent : ViewComponent
+    public class BreadcrumbsViewComponent(
+        IPageContextRepository _pageContextRepository,
+        IBreadcrumbRepository _breadcrumbRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IPageContextRepository _pageContextRepository;
-        private readonly IBreadcrumbRepository _breadcrumbRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public BreadcrumbsViewComponent(IPageContextRepository pageContextRepository,
-            IBreadcrumbRepository breadcrumbRepository,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _pageContextRepository = pageContextRepository;
-            _breadcrumbRepository = breadcrumbRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-
         public async Task<IViewComponentResult> InvokeAsync(bool xIncludeDefaultBreadcrumb = true, int xPageId = -1)
         {
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext)

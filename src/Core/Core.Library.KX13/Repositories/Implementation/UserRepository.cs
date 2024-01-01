@@ -1,29 +1,16 @@
 ﻿using CMS.Helpers;
 using CMS.Membership;
 using Microsoft.AspNetCore.Http;
-using MVCCaching;
 
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class UserRepository : IUserRepository
+    public class UserRepository(
+        IUserInfoProvider _userInfoProvider,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IProgressiveCache _progressiveCache,
+        IHttpContextAccessor _httpContextAccessor) : IUserRepository
     {
-        private readonly IUserInfoProvider _userInfoProvider;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public UserRepository(IUserInfoProvider userInfoProvider,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IProgressiveCache progressiveCache,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _userInfoProvider = userInfoProvider;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _progressiveCache = progressiveCache;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         public async Task<User> GetCurrentUserAsync()
         {
             var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "public";

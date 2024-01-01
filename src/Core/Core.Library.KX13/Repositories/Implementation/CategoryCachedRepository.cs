@@ -2,23 +2,20 @@
 
 namespace Core.Repositories.Implementation
 {
-    public class CategoryCachedRepository : ICategoryCachedRepository
+    public class CategoryCachedRepository(
+        ICategoryInfoProvider _categoryInfoProvider,
+        IProgressiveCache _progressiveCache,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory) : ICategoryCachedRepository
     {
-        private readonly ICategoryInfoProvider _categoryInfoProvider;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-
-        public CategoryCachedRepository(ICategoryInfoProvider categoryInfoProvider,
-            IProgressiveCache progressiveCache,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory)
-        {
-            _categoryInfoProvider = categoryInfoProvider;
-            _progressiveCache = progressiveCache;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-        }
         public IEnumerable<ObjectIdentity> CategoryNamesToCategoryIdentity(IEnumerable<string> categoryNames)
         {
-            throw new NotImplementedException();
+            List<ObjectIdentity> results = [];
+            var categoriesByName = GetCachedHolder().ByCodeName;
+            foreach (var key in categoriesByName.Keys.Intersect(categoryNames.Select(x => x.ToLower())))
+            {
+                results.Add(categoriesByName[key].ToObjectIdentity());
+            }
+            return results;
         }
 
         public Dictionary<Guid, CategoryItem> GetCategoryCachedByGuid() => GetCachedHolder().ByGuid;

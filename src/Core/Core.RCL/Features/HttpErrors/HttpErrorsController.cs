@@ -1,20 +1,16 @@
-﻿
-namespace Core.Features.HttpErrors
+﻿namespace Core.Features.HttpErrors
 {
     public class HttpErrorsController : Controller
     {
         public ActionResult Error(int code)
         {
-            switch(code)
+            return code switch
             {
-                case 404:
-                    return Error404();
-                case 500:
-                    return Error500();
-                case 403:
-                    return AccessDenied();
-            }
-            return View(code);
+                404 => Error404(),
+                500 => Error500(),
+                403 => AccessDenied(),
+                _ => View(code),
+            };
         }
 
         public ActionResult Error404()

@@ -3,27 +3,13 @@ using CMS.Modules;
 
 namespace Account.Repositories.Implementations
 {
-    public class RoleRepository : IRoleRepository
+    public class RoleRepository(
+        IRoleInfoProvider _roleInfoProvider,
+        ISiteRepository _siteRepository,
+        IProgressiveCache _progressiveCache,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IUserInfoProvider _userInfoProvider) : IRoleRepository
     {
-        private readonly IRoleInfoProvider _roleInfoProvider;
-        private readonly ISiteRepository _siteRepository;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IUserInfoProvider _userInfoProvider;
-
-        public RoleRepository(IRoleInfoProvider roleInfoProvider,
-            ISiteRepository siteRepository,
-            IProgressiveCache progressiveCache,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IUserInfoProvider userInfoProvider)
-        {
-            _roleInfoProvider = roleInfoProvider;
-            _siteRepository = siteRepository;
-            _progressiveCache = progressiveCache;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _userInfoProvider = userInfoProvider;
-        }
-
         public async Task<Result<RoleItem>> GetRoleAsync(string roleName, string siteName)
         {
             var builder = _cacheDependencyBuilderFactory.Create();

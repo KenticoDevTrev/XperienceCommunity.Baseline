@@ -1,45 +1,21 @@
-﻿
-using CMS.DataEngine;
+﻿using CMS.DataEngine;
 using CMS.MediaLibrary;
 using System.Data;
 
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class MediaRepository : IMediaRepository
+    public class MediaRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ISiteRepository _siteRepository,
+        IPageRetriever _pageRetriever,
+        IProgressiveCache _progressiveCache,
+        IAttachmentInfoProvider _attachmentInfoProvider,
+        IMediaFileInfoProvider _mediaFileInfoProvider,
+        IPageDataContextRetriever _pageDataContextRetriever,
+        IMediaFileUrlRetriever _mediaFileUrlRetriever,
+        IPageAttachmentUrlRetriever _pageAttachmentUrlRetriever) : IMediaRepository
     {
-
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ISiteRepository _siteRepository;
-        private readonly IPageRetriever _pageRetriever;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly IAttachmentInfoProvider _attachmentInfoProvider;
-        private readonly IMediaFileInfoProvider _mediaFileInfoProvider;
-        private readonly IPageDataContextRetriever _pageDataContextRetriever;
-        private readonly IMediaFileUrlRetriever _mediaFileUrlRetriever;
-        private readonly IPageAttachmentUrlRetriever _pageAttachmentUrlRetriever;
-
-        public MediaRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ISiteRepository siteRepository,
-            IPageRetriever pageRetriever,
-            IProgressiveCache progressiveCache,
-            IAttachmentInfoProvider attachmentInfoProvider,
-            IMediaFileInfoProvider mediaFileInfoProvider,
-            IPageDataContextRetriever pageDataContextRetriever,
-            IMediaFileUrlRetriever mediaFileUrlRetriever,
-            IPageAttachmentUrlRetriever pageAttachmentUrlRetriever)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _siteRepository = siteRepository;
-            _pageRetriever = pageRetriever;
-            _progressiveCache = progressiveCache;
-            _attachmentInfoProvider = attachmentInfoProvider;
-            _mediaFileInfoProvider = mediaFileInfoProvider;
-            _pageDataContextRetriever = pageDataContextRetriever;
-            _mediaFileUrlRetriever = mediaFileUrlRetriever;
-            _pageAttachmentUrlRetriever = pageAttachmentUrlRetriever;
-        }
-
         [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         public async Task<Result<MediaItem>> GetAttachmentItemAsync(Guid attachmentGuid)
         {
@@ -207,7 +183,7 @@ namespace Core.Repositories.Implementation
                 var data = await XperienceCommunityConnectionHelper.ExecuteQueryAsync(
                     @"select FileGuid as [Guid], FileSiteID as [SiteId] from Media_File
                         union all
-                    Select AttachmentGUID as [Guid], AttachmentSiteID as [SiteId] from CMS_Attachment", new QueryDataParameters(), QueryTypeEnum.SQLQuery);
+                    Select AttachmentGUID as [Guid], AttachmentSiteID as [SiteId] from CMS_Attachment", [], QueryTypeEnum.SQLQuery);
 
                 if (cs.Cached)
                 {

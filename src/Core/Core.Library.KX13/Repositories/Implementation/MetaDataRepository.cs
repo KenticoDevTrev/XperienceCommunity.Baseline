@@ -1,40 +1,19 @@
 ﻿using CMS.Base;
 using CMS.DocumentEngine.Internal;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Kentico.Web.Mvc;
 
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class MetaDataRepository : IMetaDataRepository
+    public class MetaDataRepository(
+        IPageRetriever _pageRetriever,
+        IPageDataContextRetriever _pageDataContextRetriever,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IUrlResolver _urlResolver,
+        IPageUrlRetriever _pageUrlRetriever,
+        IUrlHelper _urlHelper) : IMetaDataRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        public readonly IPageRetriever _pageRetriever;
-        public readonly IPageDataContextRetriever _pageDataContextRetriever;
-        public readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUrlResolver _urlResolver;
-        private readonly IPageUrlRetriever _pageUrlRetriever;
-        private readonly IUrlHelper _urlHelper;
-
-        public MetaDataRepository(IPageRetriever pageRetriever,
-            IPageDataContextRetriever pageDataContextRetriever,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IHttpContextAccessor httpContextAccessor,
-            IUrlResolver urlResolver,
-            IPageUrlRetriever pageUrlRetriever,
-            IUrlHelper urlHelper)
-        {
-            _pageRetriever = pageRetriever;
-            _pageDataContextRetriever = pageDataContextRetriever;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _httpContextAccessor = httpContextAccessor;
-            _urlResolver = urlResolver;
-            _pageUrlRetriever = pageUrlRetriever;
-            _urlHelper = urlHelper;
-        }
-
-
         public async Task<Result<PageMetaData>> GetMetaDataAsync(int contentCultureId, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create()

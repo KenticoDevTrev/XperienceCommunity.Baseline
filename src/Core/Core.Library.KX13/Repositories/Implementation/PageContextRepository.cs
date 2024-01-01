@@ -6,28 +6,14 @@ using Kentico.PageBuilder.Web.Mvc;
 namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class PageContextRepository : IPageContextRepository
+    public class PageContextRepository(
+        IPageDataContextRetriever _pageDataContextRetriever,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IHttpContextAccessor _httpContextAccessor,
+        IProgressiveCache _progressiveCache,
+        ICacheRepositoryContext _cacheRepositoryContext
+            ) : IPageContextRepository
     {
-        private readonly IPageDataContextRetriever _pageDataContextRetriever;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext;
-
-        public PageContextRepository(IPageDataContextRetriever pageDataContextRetriever,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IHttpContextAccessor httpContextAccessor,
-            IProgressiveCache progressiveCache,
-            ICacheRepositoryContext cacheRepositoryContext
-            )
-        {
-            _pageDataContextRetriever = pageDataContextRetriever;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _httpContextAccessor = httpContextAccessor;
-            _progressiveCache = progressiveCache;
-            _cacheRepositoryContext = cacheRepositoryContext;
-        }
-
         public Task<Result<PageIdentity>> GetCurrentPageAsync()
         {
             var builder = _cacheDependencyBuilderFactory.Create();

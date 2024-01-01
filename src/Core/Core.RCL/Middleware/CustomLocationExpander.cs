@@ -15,15 +15,15 @@ namespace Core.Middleware
         }
     }
 
-    public class CustomLocationExpander : IViewLocationExpander
+    public partial class CustomLocationExpander : IViewLocationExpander
     {
-        private const string _CustomViewPath = "CustomViewPath";
-        private const string _CustomController = "CustomController";
+        private const string _customViewPath = "CustomViewPath";
+        private const string _customController = "CustomController";
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-            Regex DefaultKenticoViewDetector = new Regex(@"^((?:[Ww]idgets|[Ss]ections|[Pp]age[Tt]emplates))+\/_+((.+)+_+(.+))");
-            Regex DefaultKenticoPageTypeDetector = new Regex(@"^((?:[Pp]age[Tt]ypes))+\/+((.+)+_+(.+))");
-            Regex DefaultComponentDetector = new Regex(@"^((?:[Cc]omponents))+\/+([\w\.]+)\/+(.*)");
+            var DefaultKenticoViewDetector = ViewDetectorRegex();
+            var DefaultKenticoPageTypeDetector = PageTypeRegex();
+            var DefaultComponentDetector = ComponentRegex();
 
             /* If successful
              * Group 0 = FullMatch (ex "Widgets/_My_CustomWidget")
@@ -48,19 +48,19 @@ namespace Core.Middleware
             if (DefaultKenticoViewsMatch.Success)
             {
                 // I'm going to store Widgets, Sections, and Page Templates as the Widgets|Sections|PageTemplates/WidgetCodeName/Default
-                context.Values.Add(_CustomViewPath, string.Format("{0}/{1}/Default", DefaultKenticoViewsMatch.Groups[1].Value, DefaultKenticoViewsMatch.Groups[2].Value.Replace("_", "")));
-                context.Values.Add(_CustomController, DefaultKenticoViewsMatch.Groups[1].Value);
+                context.Values.Add(_customViewPath, string.Format("{0}/{1}/Default", DefaultKenticoViewsMatch.Groups[1].Value, DefaultKenticoViewsMatch.Groups[2].Value.Replace("_", "")));
+                context.Values.Add(_customController, DefaultKenticoViewsMatch.Groups[1].Value);
             }
             else if (DefaultKenticoPageTypeMatch.Success)
             {
-                context.Values.Add(_CustomViewPath, string.Format("{0}/{1}/Default", DefaultKenticoPageTypeMatch.Groups[1].Value, DefaultKenticoPageTypeMatch.Groups[2].Value.Replace("_", "")));
-                context.Values.Add(_CustomController, DefaultKenticoPageTypeMatch.Groups[1].Value);
+                context.Values.Add(_customViewPath, string.Format("{0}/{1}/Default", DefaultKenticoPageTypeMatch.Groups[1].Value, DefaultKenticoPageTypeMatch.Groups[2].Value.Replace("_", "")));
+                context.Values.Add(_customController, DefaultKenticoPageTypeMatch.Groups[1].Value);
             }
             else if (DefaultComponentMatch.Success)
             {
                 // Stripping "Component" out so widget, section, page template View components can go under the main root
-                context.Values.Add(_CustomViewPath, string.Format("{0}/{1}", DefaultComponentMatch.Groups[2].Value, DefaultComponentMatch.Groups[3].Value));
-                context.Values.Add(_CustomController, context.ControllerName);
+                context.Values.Add(_customViewPath, string.Format("{0}/{1}", DefaultComponentMatch.Groups[2].Value, DefaultComponentMatch.Groups[3].Value));
+                context.Values.Add(_customController, context.ControllerName);
             }
 
         }
@@ -72,7 +72,7 @@ namespace Core.Middleware
              * {1} - Controller Name
              * {0} - View Name
              */
-            List<string> Paths = new List<string> { 
+            List<string> Paths = [ 
                 // Default View Locations to support imported / legacy paths
                 "/Views/{1}/{0}.cshtml",
                 "/Views/Shared/{0}.cshtml",
@@ -95,12 +95,12 @@ namespace Core.Middleware
                 "/{0}.cshtml", 
                 // Adds /Components/{ComponentName}/{ComponentViewName}.cshtml
                 "/Components/{0}.cshtml",
-                };
+                ];
 
             // Add "Hard Coded" custom view paths to checks, along with the normal default view paths for backward compatability
-            if (context.Values.ContainsKey(_CustomViewPath))
+            if (context.Values.TryGetValue(_customViewPath, out var customPath))
             {
-                var CombinedPaths = new List<string>(Paths.Select(x => string.Format(x, context.Values[_CustomViewPath], context.Values[_CustomController], "")));
+                var CombinedPaths = new List<string>(Paths.Select(x => string.Format(x, customPath, context.Values[_customController], "")));
                 CombinedPaths.AddRange(Paths);
                 return CombinedPaths;
             }
@@ -108,5 +108,14 @@ namespace Core.Middleware
             // Returns the normal view paths
             return Paths;
         }
+
+        [GeneratedRegex(@"^((?:[Ww]idgets|[Ss]ections|[Pp]age[Tt]emplates))+\/_+((.+)+_+(.+))")]
+        private static partial Regex ViewDetectorRegex();
+        
+        [GeneratedRegex(@"^((?:[Pp]age[Tt]ypes))+\/+((.+)+_+(.+))")]
+        private static partial Regex PageTypeRegex();
+
+        [GeneratedRegex(@"^((?:[Cc]omponents))+\/+([\w\.]+)\/+(.*)")]
+        private static partial Regex ComponentRegex();
     }
 }

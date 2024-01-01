@@ -7,21 +7,11 @@ using Microsoft.AspNetCore.Http;
 namespace Search.Repositories.Implementations
 {
     [AutoDependencyInjection]
-    public class SearchRepository : ISearchRepository
+    public class SearchRepository(
+        IHttpContextAccessor _httpContextAccessor,
+        IUserInfoProvider _userInfoProvider,
+        IPagesActivityLogger _pagesActivityLogger) : ISearchRepository
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUserInfoProvider _userInfoProvider;
-        private readonly IPagesActivityLogger _pagesActivityLogger;
-
-        public SearchRepository(IHttpContextAccessor httpContextAccessor,
-            IUserInfoProvider userInfoProvider,
-            IPagesActivityLogger pagesActivityLogger)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _userInfoProvider = userInfoProvider;
-            _pagesActivityLogger = pagesActivityLogger;
-        }
-
         public async Task<SearchResponse> Search(string searchValue, IEnumerable<string> indexes, int page = 1, int pageSize = 100)
         {
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext)

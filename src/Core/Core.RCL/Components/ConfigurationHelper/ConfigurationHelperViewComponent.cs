@@ -1,14 +1,7 @@
 ﻿namespace Core.Components.ConfigurationHelper
 {
-    public class ConfigurationHelperViewComponent : ViewComponent
+    public class ConfigurationHelperViewComponent(IBaselinePageBuilderContext _pageBuilderContext) : ViewComponent
     {
-        private readonly IBaselinePageBuilderContext _pageBuilderContext;
-
-        public ConfigurationHelperViewComponent(IBaselinePageBuilderContext pageBuilderContext)
-        {
-            _pageBuilderContext = pageBuilderContext;
-        }
-
         public IViewComponentResult Invoke(string xInstructions, bool xNeedsAttention = true, ConfigurationHelperMode xMode = ConfigurationHelperMode.Inline, bool xVisible = true)
         {
             if(!_pageBuilderContext.IsEditMode || !xVisible)

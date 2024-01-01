@@ -3,17 +3,10 @@ using Search.Repositories;
 namespace Search.Features.Search
 {
     [ViewComponent]
-    public class SearchViewComponent : ViewComponent
+    public class SearchViewComponent(
+        ISearchRepository _searchRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly ISearchRepository _searchRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public SearchViewComponent(ISearchRepository searchRepository,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _searchRepository = searchRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
@@ -23,17 +16,20 @@ namespace Search.Features.Search
             int pageSize = 100;
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext))
             {
-                if (httpContext.Request.Query.TryGetValue("searchValue", out StringValues querySearchValue) && querySearchValue.Any())
+                if (httpContext.Request.Query.TryGetValue("searchValue", out StringValues querySearchValue) 
+                    && querySearchValue.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var querySearchVal))
                 {
-                    searchValue = querySearchValue.First();
+                    searchValue = querySearchVal;
                 }
-                if (httpContext.Request.Query.TryGetValue("page", out StringValues queryPage) && queryPage.Any())
+                if (httpContext.Request.Query.TryGetValue("page", out StringValues queryPage) 
+                    && queryPage.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var queryPageVal))
                 {
-                    _ = int.TryParse(queryPage.First(), out page);
+                    _ = int.TryParse(queryPageVal, out page);
                 }
-                if (httpContext.Request.Query.TryGetValue("pageSize", out StringValues queryPageSize) && queryPageSize.Any())
+                if (httpContext.Request.Query.TryGetValue("pageSize", out StringValues queryPageSize) 
+                    && queryPageSize.FirstOrMaybe(x => !string.IsNullOrWhiteSpace(x)).TryGetValue(out var queryPageSizeVal))
                 {
-                    _ = int.TryParse(queryPageSize.First(), out pageSize);
+                    _ = int.TryParse(queryPageSizeVal, out pageSize);
                 }
             }
 

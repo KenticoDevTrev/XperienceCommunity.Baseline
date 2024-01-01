@@ -1,33 +1,17 @@
 ﻿using CMS.Base;
 using CMS.DataEngine;
 using CMS.SiteProvider;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using System.Data;
 
 namespace Core.Services.Implementations
 {
-    public class IdentityService : IIdentityService
+    public class IdentityService(
+        IProgressiveCache _progressiveCache,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ISiteService _siteService,
+        ICacheRepositoryContext _cacheRepositoryContext,
+        ISiteInfoProvider _siteInfoProvider) : IIdentityService
     {
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ISiteService _siteService;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext;
-        private readonly ISiteInfoProvider _siteInfoProvider;
-
-        public IdentityService(IProgressiveCache progressiveCache,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ISiteService siteService,
-            ICacheRepositoryContext cacheRepositoryContext,
-            ISiteInfoProvider siteInfoProvider)
-        {
-            _progressiveCache = progressiveCache;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _siteService = siteService;
-            _cacheRepositoryContext = cacheRepositoryContext;
-            _siteInfoProvider = siteInfoProvider;
-        }
-
         public async Task<Result<TreeIdentity>> HydrateTreeIdentity(TreeIdentity identity)
         {
             // If current identity is full, then just return it.
@@ -518,11 +502,11 @@ namespace Core.Services.Implementations
                         var documentKey = $"{document.NodeAliasPath}|{document.NodeSiteID}".ToLower();
                         var documentCulturelessKey = $"{document.NodeAliasPath}|{document.NodeSiteID}".ToLower();
 
-                        treeCultureIdentityDictionaries.ById.TryAdd(document.NodeId, new List<TreeCultureIdentity>());
+                        treeCultureIdentityDictionaries.ById.TryAdd(document.NodeId, []);
                         treeCultureIdentityDictionaries.ById[document.NodeId].Add(documentIdentity);
-                        treeCultureIdentityDictionaries.ByGuid.TryAdd(document.NodeGuid, new List<TreeCultureIdentity>());
+                        treeCultureIdentityDictionaries.ByGuid.TryAdd(document.NodeGuid, []);
                         treeCultureIdentityDictionaries.ByGuid[document.NodeGuid].Add(documentIdentity);
-                        treeCultureIdentityDictionaries.ByPathChannelIDKey.TryAdd(documentKey, new List<TreeCultureIdentity>());
+                        treeCultureIdentityDictionaries.ByPathChannelIDKey.TryAdd(documentKey, []);
                         treeCultureIdentityDictionaries.ByPathChannelIDKey[documentKey].Add(documentIdentity);
                     }
                 }
@@ -612,7 +596,7 @@ namespace Core.Services.Implementations
                 {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
-                var allItems = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(GetObjectIdentitySelectStatement(classInfo, baseClassObj), new QueryDataParameters(), QueryTypeEnum.SQLQuery))
+                var allItems = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(GetObjectIdentitySelectStatement(classInfo, baseClassObj), [], QueryTypeEnum.SQLQuery))
                 .Tables[0].Rows.Cast<DataRow>();
 
                 var dictionary = new ObjectIdentityDictionaries();
@@ -690,7 +674,7 @@ namespace Core.Services.Implementations
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
                 var query = $"select SiteID, COALESCE(SiteDefaultVisitorCulture, {nameof(SettingsKeyInfo.KeyValue)}) as DefaultCulture from CMS_Site left join (select top 1 {nameof(SettingsKeyInfo.KeyValue)} from CMS_SettingsKey where KeyName = 'CMSDefaultCultureCode') a on 1=1";
-                return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, new QueryDataParameters(), QueryTypeEnum.SQLQuery))
+                return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery))
                 .Tables[0].Rows.Cast<DataRow>()
                 .Select(x => new Tuple<int, string>((int)x[nameof(SiteInfo.SiteID)], (string)x["DefaultCulture"]))
                 .GroupBy(x => x.Item1)
@@ -720,7 +704,7 @@ namespace Core.Services.Implementations
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
                 var query = $"select NodeID, NodeGUID, NodeAliasPath, NodeSiteID, DocumentCulture, DocumentID, DocumentGUID from View_CMS_Tree_Joined";
-                return Result.Success<IEnumerable<AllPagesData>>((await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, new QueryDataParameters(), QueryTypeEnum.SQLQuery))
+                return Result.Success<IEnumerable<AllPagesData>>((await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery))
                     .Tables[0].Rows.Cast<DataRow>()
                     .Select(x => new AllPagesData(NodeId: (int)x["NodeID"], NodeGuid: (Guid)x["NodeGuid"], NodeAliasPath: (string)x["NodeAliasPath"], NodeSiteID: (int)x["NodeSiteID"], DocumentCulture: (string)x["DocumentCulture"], DocumentID: (int)x["DocumentID"], DocumentGuid: (Guid)x["DocumentGUID"]))
                     );
@@ -747,57 +731,57 @@ namespace Core.Services.Implementations
         #pragma warning disable CS0618 // Type or member is obsolete, but this is used for internal implementation and KX13 support
         private class DocumentIdentityDictionaries
         {
-            public Dictionary<int, DocumentIdentity> ById { get; set; } = new Dictionary<int, DocumentIdentity>();
-            public Dictionary<string, DocumentIdentity> ByNodeAliasPathCultureSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
-            public Dictionary<string, DocumentIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, DocumentIdentity>();
+            public Dictionary<int, DocumentIdentity> ById { get; set; } = [];
+            public Dictionary<string, DocumentIdentity> ByNodeAliasPathCultureSiteIDKey { get; set; } = [];
+            public Dictionary<string, DocumentIdentity> ByNodeAliasPathSiteIDKey { get; set; } = [];
 
-            public Dictionary<Guid, DocumentIdentity> ByGuid { get; set; } = new Dictionary<Guid, DocumentIdentity>();
+            public Dictionary<Guid, DocumentIdentity> ByGuid { get; set; } = [];
         }
 
         private class NodeIdentityDictionaries
         {
-            public Dictionary<int, NodeIdentity> ById { get; set; } = new Dictionary<int, NodeIdentity>();
-            public Dictionary<string, NodeIdentity> ByNodeAliasPathSiteIDKey { get; set; } = new Dictionary<string, NodeIdentity>();
-            public Dictionary<Guid, NodeIdentity> ByGuid { get; set; } = new Dictionary<Guid, NodeIdentity>();
+            public Dictionary<int, NodeIdentity> ById { get; set; } = [];
+            public Dictionary<string, NodeIdentity> ByNodeAliasPathSiteIDKey { get; set; } = [];
+            public Dictionary<Guid, NodeIdentity> ByGuid { get; set; } = [];
         }
         #pragma warning restore CS0618 // Type or member is obsolete
 
 
         private class TreeIdentityDictionaries
         {
-            public Dictionary<int, TreeIdentity> ById { get; set; } = new Dictionary<int, TreeIdentity>();
-            public Dictionary<string, TreeIdentity> ByPathChannelIDKey { get; set; } = new Dictionary<string, TreeIdentity>();
-            public Dictionary<Guid, TreeIdentity> ByGuid { get; set; } = new Dictionary<Guid, TreeIdentity>();
+            public Dictionary<int, TreeIdentity> ById { get; set; } = [];
+            public Dictionary<string, TreeIdentity> ByPathChannelIDKey { get; set; } = [];
+            public Dictionary<Guid, TreeIdentity> ByGuid { get; set; } = [];
         }
 
         private class TreeCultureIdentityDictionaries
         {
-            public Dictionary<int, List<TreeCultureIdentity>> ById { get; set; } = new Dictionary<int, List<TreeCultureIdentity>>();
-            public Dictionary<string, List<TreeCultureIdentity>> ByPathChannelIDKey { get; set; } = new Dictionary<string, List<TreeCultureIdentity>>();
-            public Dictionary<Guid, List<TreeCultureIdentity>> ByGuid { get; set; } = new Dictionary<Guid, List<TreeCultureIdentity>>();
+            public Dictionary<int, List<TreeCultureIdentity>> ById { get; set; } = [];
+            public Dictionary<string, List<TreeCultureIdentity>> ByPathChannelIDKey { get; set; } = [];
+            public Dictionary<Guid, List<TreeCultureIdentity>> ByGuid { get; set; } = [];
         }
 
         private class ContentIdentityDictionaries
         {
-            public Dictionary<int, ContentIdentity> ById { get; set; } = new Dictionary<int, ContentIdentity>();
-            public Dictionary<string, ContentIdentity> ByPathChannelIDKey { get; set; } = new Dictionary<string, ContentIdentity>();
-            public Dictionary<Guid, ContentIdentity> ByGuid { get; set; } = new Dictionary<Guid, ContentIdentity>();
+            public Dictionary<int, ContentIdentity> ById { get; set; } = [];
+            public Dictionary<string, ContentIdentity> ByPathChannelIDKey { get; set; } = [];
+            public Dictionary<Guid, ContentIdentity> ByGuid { get; set; } = [];
         }
 
         private class ContentCultureIdentityDictionaries
         {
-            public Dictionary<int, ContentCultureIdentity> ById { get; set; } = new Dictionary<int, ContentCultureIdentity>();
-            public Dictionary<string, ContentCultureIdentity> ByContentIDAndCultureKey { get; init; } = new Dictionary<string, ContentCultureIdentity>();
-            public Dictionary<string, ContentCultureIdentity> ByPathChannelCultureIDKey { get; set; } = new Dictionary<string, ContentCultureIdentity>();
-            public Dictionary<string, ContentCultureIdentity> ByPathChannelIDKey { get; set; } = new Dictionary<string, ContentCultureIdentity>();
-            public Dictionary<Guid, ContentCultureIdentity> ByGuid { get; set; } = new Dictionary<Guid, ContentCultureIdentity>();
+            public Dictionary<int, ContentCultureIdentity> ById { get; set; } = [];
+            public Dictionary<string, ContentCultureIdentity> ByContentIDAndCultureKey { get; init; } = [];
+            public Dictionary<string, ContentCultureIdentity> ByPathChannelCultureIDKey { get; set; } = [];
+            public Dictionary<string, ContentCultureIdentity> ByPathChannelIDKey { get; set; } = [];
+            public Dictionary<Guid, ContentCultureIdentity> ByGuid { get; set; } = [];
         }
 
         private class ObjectIdentityDictionaries
         {
-            public Dictionary<int, ObjectIdentity> ById { get; set; } = new Dictionary<int, ObjectIdentity>();
-            public Dictionary<string, ObjectIdentity> ByCodeName { get; set; } = new Dictionary<string, ObjectIdentity>();
-            public Dictionary<Guid, ObjectIdentity> ByGuid { get; set; } = new Dictionary<Guid, ObjectIdentity>();
+            public Dictionary<int, ObjectIdentity> ById { get; set; } = [];
+            public Dictionary<string, ObjectIdentity> ByCodeName { get; set; } = [];
+            public Dictionary<Guid, ObjectIdentity> ByGuid { get; set; } = [];
         }
 
         #endregion

@@ -1,19 +1,10 @@
-﻿using Core.Services;
-using Microsoft.AspNetCore.Http;
-using MVCCaching;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Core.Services.Implementations
 {
     [AutoDependencyInjection]
-    public class UrlResolver : IUrlResolver
+    public class UrlResolver(IHttpContextAccessor _httpContextAccessor) : IUrlResolver
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public UrlResolver(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         public string GetAbsoluteUrl(string relativeUrl)
         {
             if(string.IsNullOrWhiteSpace(relativeUrl))

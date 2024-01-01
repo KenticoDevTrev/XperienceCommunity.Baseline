@@ -1,28 +1,16 @@
 ﻿using CMS;
 using CMS.DataEngine;
 using CMS.Taxonomy;
-using Core;
 using System.Data;
 
-namespace Generic.Repositories.Implementation
+namespace Core.Repositories.Implementation
 {
     [AutoDependencyInjection]
-    public class PageCategoryRepository : IPageCategoryRepository
+    public class PageCategoryRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        IProgressiveCache _progressiveCache,
+        ICategoryCachedRepository _categoryCachedRepository) : IPageCategoryRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly ICategoryCachedRepository _categoryCachedRepository;
-
-        public PageCategoryRepository(
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            IProgressiveCache progressiveCache,
-            ICategoryCachedRepository categoryCachedRepository)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _progressiveCache = progressiveCache;
-            _categoryCachedRepository = categoryCachedRepository;
-        }
-
         public async Task<IEnumerable<CategoryItem>> GetCategoriesByNodeAsync(int nodeID)
         {
             var dictionary = (await GetCategoriesByIdentifiersAsync()).Item1;
@@ -84,7 +72,7 @@ inner join CMS_TreeCategory TC on TC.NodeID = T.NodeID
 inner join CMS_Category C on C.CategoryID = TC.CategoryID
 ";
 
-                var retriever = await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, new QueryDataParameters(), QueryTypeEnum.SQLQuery);
+                var retriever = await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery);
 
                 // Group into two dictionaries
                 var categoriesById = _categoryCachedRepository.GetCategoryCachedById();

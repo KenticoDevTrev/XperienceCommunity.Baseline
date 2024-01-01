@@ -1,5 +1,8 @@
 ﻿namespace Core.Services
 {
+    /// <summary>
+    /// These services help fill all the "Maybe" values within the various identity objects, in case you need one value but are passed another.
+    /// </summary>
     public interface IIdentityService
     {
         Task<Result<TreeIdentity>> HydrateTreeIdentity(TreeIdentity identity);

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Navigation.Middleware
 {
-    public static class IServiceCollectionNavigationMiddleware
+    public static partial class IServiceCollectionNavigationMiddleware
     {
         /// <summary>
         /// Adds Navigation Dependency Injection and options
@@ -49,7 +49,7 @@ namespace Navigation.Middleware
             foreach (string pattern in urlPatterns)
             {
                 endpoints.MapControllerRoute(
-                    name: $"Sitemap_{Regex.Replace(pattern, "[A-Za-z]", "")}",
+                    name: $"Sitemap_{AlphaOnlyRegex().Replace(pattern, "")}",
                     pattern: pattern,
                     defaults: new { controller = "Sitemap", action = "Index" }
                 );
@@ -58,6 +58,8 @@ namespace Navigation.Middleware
             return endpoints;
         }
 
+        [GeneratedRegex("[A-Za-z]")]
+        private static partial Regex AlphaOnlyRegex();
     }
 
     public class NavigationConfigurationOptions

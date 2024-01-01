@@ -1,19 +1,10 @@
 ﻿namespace Core.Components.PageMetaData
 {
     [ViewComponent]
-    public class PageMetaDataViewComponent : ViewComponent
+    public class PageMetaDataViewComponent(
+        IMetaDataRepository _metaDataRepository,
+        IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
-        private readonly IMetaDataRepository _metaDataRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public PageMetaDataViewComponent(IMetaDataRepository metaDataRepository,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _metaDataRepository = metaDataRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

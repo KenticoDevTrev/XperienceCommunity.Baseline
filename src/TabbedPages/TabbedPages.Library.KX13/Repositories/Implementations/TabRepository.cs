@@ -2,30 +2,14 @@
 
 namespace TabbedPages.Repositories.Implementations
 {
-    public class TabRepository : ITabRepository
+    public class TabRepository(
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ICacheRepositoryContext _cacheRepositoryContext,
+        IProgressiveCache _progressiveCache,
+        IIdentityService _identityService,
+        ISiteService _siteService,
+        ISiteRepository _siteRepository) : ITabRepository
     {
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext;
-        private readonly IProgressiveCache _progressiveCache;
-        private readonly IIdentityService _identityService;
-        private readonly ISiteService _siteService;
-        private readonly ISiteRepository _siteRepository;
-
-        public TabRepository(ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ICacheRepositoryContext cacheRepositoryContext,
-            IProgressiveCache progressiveCache,
-            IIdentityService identityService,
-            ISiteService siteService,
-            ISiteRepository siteRepository)
-        {
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _cacheRepositoryContext = cacheRepositoryContext;
-            _progressiveCache = progressiveCache;
-            _identityService = identityService;
-            _siteService = siteService;
-            _siteRepository = siteRepository;
-        }
-
         public async Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity)
         {
             // This implementation uses the NodeAliasPath, so if it's missing then we need to get it.

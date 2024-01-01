@@ -1,6 +1,5 @@
 ﻿namespace Navigation.Models
 {
-
     public record SecondaryNavigationProperties()
     {
         /// <summary>

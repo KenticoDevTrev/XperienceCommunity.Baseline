@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Account.Features.Account.LogOut
+﻿namespace Account.Features.Account.LogOut
 {
     [ViewComponent]
     public class LogOutViewComponent : ViewComponent

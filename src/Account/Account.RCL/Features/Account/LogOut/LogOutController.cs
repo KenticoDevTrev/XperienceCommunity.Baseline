@@ -1,14 +1,8 @@
 ﻿namespace Account.Features.Account.LogOut
 {
-    public class LogOutController : Controller
+    public class LogOutController(ISignInManagerService _signInManagerService) : Controller
     {
         public const string _routeUrl = "Account/LogOut";
-        private readonly ISignInManagerService _signInManagerService;
-
-        public LogOutController(ISignInManagerService signInManagerService)
-        {
-            _signInManagerService = signInManagerService;
-        }
 
         [HttpGet]
         [Route(_routeUrl)]
@@ -22,6 +16,7 @@
         /// </summary>
         [HttpPost]
         [Route(_routeUrl)]
+        #pragma warning disable IDE0060 // Remove unused parameter, keeping for view model customizations
         public async Task<ActionResult> LogOut(LogOutViewModel model)
         {
             // Signs out the current user
@@ -30,6 +25,7 @@
             // Redirects to site root
             return Redirect("/");
         }
+        #pragma warning restore IDE0060 // Remove unused parameter, keeping for view model customizations
 
         public static string GetUrl()
         {

@@ -1,29 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.Security.Principal;
 
 namespace Account.Features.Account.ResetPassword
 {
-    public class ResetPasswordController : Controller
+    public class ResetPasswordController(
+        IUserRepository _userRepository,
+        IAccountSettingsRepository _accountSettingsRepository,
+        IUserService _userService,
+        ILogger _logger,
+        IModelStateService _modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ResetPassword";
-        private readonly IUserRepository _userRepository;
-        private readonly IAccountSettingsRepository _accountSettingsRepository;
-        private readonly IUserService _userService;
-        private readonly ILogger _logger;
-        private readonly IModelStateService _modelStateService;
-
-        public ResetPasswordController(IUserRepository userRepository,
-            IAccountSettingsRepository accountSettingsRepository,
-            IUserService userService,
-            ILogger logger,
-            IModelStateService modelStateService)
-        {
-            _userRepository = userRepository;
-            _accountSettingsRepository = accountSettingsRepository;
-            _userService = userService;
-            _logger = logger;
-            _modelStateService = modelStateService;
-        }
 
         /// <summary>
         /// Password Reset, must be authenticated to reset password this way.
@@ -55,7 +41,7 @@ namespace Account.Features.Account.ResetPassword
             {
                 return Redirect(resetPasswordUrl);
             }
-            if (User.Identity.AsMaybe().TryGetValue(out IIdentity identity) && identity.Name.AsNullOrWhitespaceMaybe().TryGetValue(out var name))
+            if (User.Identity.AsMaybe().TryGetValue(out var identity) && identity.Name.AsNullOrWhitespaceMaybe().TryGetValue(out var name))
             {
 
                 try

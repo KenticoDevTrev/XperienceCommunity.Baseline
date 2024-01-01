@@ -1,5 +1,4 @@
 ﻿using Core.Helpers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Core.Attributes
@@ -13,9 +12,7 @@ namespace Core.Attributes
         {
             if (filterContext.Controller is Controller controller)
             {
-                var serialisedModelState = controller.TempData[Key] as string;
-
-                if (serialisedModelState != null)
+                if (controller.TempData[Key] is string serialisedModelState)
                 {
                     //Only Import if we are viewing
                     if (filterContext.Result is ViewResult)

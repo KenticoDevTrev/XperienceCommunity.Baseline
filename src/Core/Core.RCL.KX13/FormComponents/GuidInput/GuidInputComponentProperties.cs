@@ -1,6 +1,5 @@
 ﻿using CMS.DataEngine;
 using Kentico.Forms.Web.Mvc;
-using System;
 
 namespace Core.RCL.KX13.Models.FormComponents.GuidInput
 {

@@ -1,18 +1,13 @@
 ﻿namespace Navigation.Models
 {
     /// <summary>
-    /// Used to build a NavigationItem, should convert to the NavigationItem once built.
+    /// Used to build a NavigationItem, should convert to the NavigationItem once built, properties often are modified during building so not using record
     /// </summary>
-    public class NavigationItemBuilder
+    public class NavigationItemBuilder(string linkText)
     {
-        public NavigationItemBuilder(string linkText)
-        {
-            LinkText = linkText;
-        }
-
-        public string LinkText { get; set; }
+        public string LinkText { get; set; } = linkText;
         public int NavLevel { get; set; } = 0;
-        public List<NavigationItemBuilder> Children { get; set; } = new List<NavigationItemBuilder>();
+        public List<NavigationItemBuilder> Children { get; set; } = [];
         public Maybe<string> LinkCSSClass { get; set; }
         public Maybe<string> LinkHref { get; set; }
         public Maybe<string> LinkTarget { get; set; }

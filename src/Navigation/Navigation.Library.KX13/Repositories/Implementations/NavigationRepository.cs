@@ -9,31 +9,14 @@ using CMS;
 namespace Navigation.Repositories.Implementations
 {
     [AutoDependencyInjection]
-    public class NavigationRepository : INavigationRepository
+    public class NavigationRepository(
+        IPageRetriever _pageRetriever,
+        ISiteRepository _siteRepository,
+        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
+        ILogger _logger,
+        IStringLocalizer<SharedResources> _stringLocalizer,
+        IProgressiveCache _progressiveCache) : INavigationRepository
     {
-        private readonly IPageRetriever _pageRetriever;
-        private readonly ISiteRepository _siteRepository;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
-        private readonly ILogger _logger;
-        private readonly IStringLocalizer<SharedResources> _stringLocalizer;
-        private readonly IProgressiveCache _progressiveCache;
-
-        public NavigationRepository(IPageRetriever pageRetriever,
-            ISiteRepository siteRepository,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-            ILogger logger,
-            IStringLocalizer<SharedResources> stringLocalizer,
-            IProgressiveCache progressiveCache)
-        {
-            _pageRetriever = pageRetriever;
-            _siteRepository = siteRepository;
-            _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-            _logger = logger;
-            _stringLocalizer = stringLocalizer;
-            _progressiveCache = progressiveCache;
-        }
-
-
         public async Task<IEnumerable<NavigationItem>> GetNavItemsAsync(Maybe<string> navPath, IEnumerable<string>? navTypes = null)
         {
             var navigationItems = await GetNavigationItemsAsync(navPath, navTypes ?? Array.Empty<string>());
@@ -101,15 +84,14 @@ namespace Navigation.Repositories.Implementations
             // Populate the Children of the TypedResults
             foreach (TreeNode node in newNodeList)
             {
-                // If no parent exists, add to top level
-                if (!nodeIDToHierarchyTreeNode.ContainsKey(node.NodeParentID))
+                // If parent exists, add as child, otherwise add to top level
+                if (nodeIDToHierarchyTreeNode.TryGetValue(node.NodeParentID, out HierarchyTreeNode? value))
                 {
-                    hierarchyNodes.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
+                    value.Children.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
                 }
                 else
                 {
-                    // Otherwise, add to the parent element.
-                    nodeIDToHierarchyTreeNode[node.NodeParentID].Children.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
+                    hierarchyNodes.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
                 }
             }
 
@@ -281,7 +263,7 @@ namespace Navigation.Repositories.Implementations
             return new NavigationItemBuilder(navItem.LinkText)
             {
                 NavLevel = navItem.NavLevel,
-                Children = new List<NavigationItemBuilder>(),
+                Children = [],
                 LinkCSSClass = navItem.LinkCSSClass,
                 LinkHref = navItem.LinkHref,
                 LinkTarget = navItem.LinkTarget,
@@ -302,9 +284,9 @@ namespace Navigation.Repositories.Implementations
             {
                 if (cs.Cached)
                 {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(new string[] { "cms.tree|all", "cms.node|all" });
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(["cms.tree|all", "cms.node|all" ]);
                 }
-                return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync("select NodeGuid, ClassName from CMS_Tree inner join CMS_Class on ClassID = NodeClassID", new QueryDataParameters(), QueryTypeEnum.SQLQuery))
+                return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync("select NodeGuid, ClassName from CMS_Tree inner join CMS_Class on ClassID = NodeClassID", [], QueryTypeEnum.SQLQuery))
                 .Tables[0].Rows.Cast<DataRow>().Select(x => new Tuple<Guid, string>((Guid)x["NodeGuid"], (string)x["ClassName"])).GroupBy(x => x.Item1).ToDictionary(key => key.Key, value => value.First().Item2);
             }, new CacheSettings(CacheMinuteTypes.Long.ToDouble(), "GetNodeToClassName"));
         }
@@ -434,7 +416,7 @@ namespace Navigation.Repositories.Implementations
                             }
                             query.Columns(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) });
                             var pageTypes = navItem.PageTypes.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                            if (pageTypes.Any())
+                            if (pageTypes.Length != 0)
                             {
                                 query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypes)}')");
                             }
@@ -464,15 +446,14 @@ namespace Navigation.Repositories.Implementations
             // Populate the Children of the TypedResults
             foreach (TreeNode node in newNodeList)
             {
-                // If no parent exists, add to top level
-                if (!nodeIDToHierarchyTreeNode.ContainsKey(node.NodeParentID))
+                // If parent exists, add as child, otherwise add to top level
+                if (nodeIDToHierarchyTreeNode.TryGetValue(node.NodeParentID, out HierarchyTreeNode? value))
                 {
-                    hierarchyNodes.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
+                    value.Children.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
                 }
                 else
                 {
-                    // Otherwise, add to the parent element.
-                    nodeIDToHierarchyTreeNode[node.NodeParentID].Children.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
+                    hierarchyNodes.Add(nodeIDToHierarchyTreeNode[node.NodeID]);
                 }
             }
             return hierarchyNodes;

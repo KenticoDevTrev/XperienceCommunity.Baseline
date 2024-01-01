@@ -19,7 +19,5 @@ namespace Navigation.Models
         public string Name { get; init; }
         [JsonPropertyName("item")]
         public string Item { get; init; }
-
-     
     }
 }

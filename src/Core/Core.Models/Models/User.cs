@@ -20,6 +20,7 @@
             UserGUID = userGUID;
             Email = email;
             FirstName = firstName;
+            MiddleName = middleName.AsNullOrWhitespaceMaybe();
             LastName = lastName;
             Enabled = enabled;
             IsExternal = isExternal;

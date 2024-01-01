@@ -40,7 +40,7 @@ namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
                     if(NewVal >= Convert.ToDecimal(Math.Pow(10, Size)))
                     {
                         string[] DecimalParts = NewVal.ToString().Split('.');
-                        NewVal = Convert.ToDecimal(string.Join(".", new string[] { DecimalParts[0].Substring(DecimalParts[0].Length - Size), (DecimalParts.Length > 1 ? DecimalParts[1] : "0") }));
+                        NewVal = Convert.ToDecimal(string.Join(".", new string[] { DecimalParts[0][^Size..], (DecimalParts.Length > 1 ? DecimalParts[1] : "0") }));
                     }
                 }
 

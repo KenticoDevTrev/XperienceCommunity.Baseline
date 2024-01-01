@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Account.Features.Account.MyAccount
+﻿namespace Account.Features.Account.MyAccount
 {
     [ViewComponent]
     public class MyAccountViewComponent : ViewComponent
