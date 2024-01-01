@@ -56,12 +56,12 @@ namespace Navigation.Repositories.Implementations
                 {
                     if (options.UrlColumnName.TryGetValue(out var urlColumnName))
                     {
-                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
+                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
+                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
                     }
                     else
                     {
-                        // Since it's not the specific node, but the page found at that url that we need, we will first get the urls, then cache on getting those items.
-                        nodes.AddRange(await GetSiteMapUrlSetForClassWithUrlColumnAsync(options.Path, ClassName, options, urlColumnName));
+                        nodes.AddRange(await GetSiteMapUrlSetForClassAsync(options.Path, ClassName, options));
                     }
                 }
             }
@@ -82,7 +82,7 @@ namespace Navigation.Repositories.Implementations
         /// <param name="RelativeURL">The Relative Url</param>
         /// <param name="ModifiedLast">The last modified date</param>
         /// <returns>The SitemapNode</returns>
-        private SitemapNode ConvertToSiteMapUrl(string relativeURL, DateTime? modifiedLast)
+        private static SitemapNode ConvertToSiteMapUrl(string relativeURL, DateTime? modifiedLast)
         {
             string url = URLHelper.GetAbsoluteUrl(relativeURL, RequestContext.CurrentDomain);
             var siteMapItem = new SitemapNode(url);
@@ -137,7 +137,7 @@ namespace Navigation.Repositories.Implementations
             return (await GetSiteMapUrlSetBaseAsync(path, options)).Select(x => TreeNodeToSitemapNode(x));
         }
 
-        private SitemapNode TreeNodeToSitemapNode(TreeNode node)
+        private static SitemapNode TreeNodeToSitemapNode(TreeNode node)
         {
             return new SitemapNode(node.ToPageIdentity().AbsoluteUrl)
             {

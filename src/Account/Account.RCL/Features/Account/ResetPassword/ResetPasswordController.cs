@@ -55,7 +55,7 @@ namespace Account.Features.Account.ResetPassword
             {
                 return Redirect(resetPasswordUrl);
             }
-            if (User.Identity.AsMaybe().TryGetValue(out IIdentity identity) && identity.Name.AsNullOrWhitespaceMaybe().TryGetValue(out var name))
+            if (User.Identity.AsMaybe().TryGetValue(out var identity) && identity.Name.AsNullOrWhitespaceMaybe().TryGetValue(out var name))
             {
 
                 try
