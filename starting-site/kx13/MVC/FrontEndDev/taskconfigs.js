@@ -23,7 +23,7 @@ const configs = {
         //    minify: false,
 		//	  watchPaths: ['./typescript/Helpers/**/*.ts',
 		//	  './react/SampleReact/**/*.ts']
-        }
+        // }
     ],
     jsbundles: [
         {
@@ -76,7 +76,7 @@ const configs = {
 			paths: ['./sass/01_theme/*.scss',
 				'./sass/02_custom/*.scss' ],
 			base: { base: "'./sass" },
-			dest: "../css/bundles/main-bundle/generated",
+			dest: "./css/bundles/main-bundle/generated",
 			fileName: "styles.css",
 			optimizationLevelOnProduction: 2,
 			includeMapOnProduction: true

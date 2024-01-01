@@ -146,13 +146,13 @@ namespace Core.Services.Implementations
                 var query = $"select NodeID, NodeGUID, NodeAliasPath, NodeSiteID from View_CMS_Tree_Joined where ";
                 if (identity.NodeId.TryGetValue(out var id))
                 {
-                    query += $"DocumentID = @DocumentID";
-                    queryParams.Add(new DataParameter("@DocumentID", id));
+                    query += $"NodeID = @NodeID";
+                    queryParams.Add(new DataParameter("@NodeID", id));
                 }
                 if (identity.NodeGuid.TryGetValue(out var guid))
                 {
-                    query += $"DocumentGuid = @DocumentGuid";
-                    queryParams.Add(new DataParameter("@DocumentGuid", guid));
+                    query += $"NodeGuid = @NodeGuid";
+                    queryParams.Add(new DataParameter("@NodeGuid", guid));
                 }
                 if (identity.NodeAliasPathAndSiteId.TryGetValue(out var nodePathValues))
                 {
@@ -165,8 +165,8 @@ namespace Core.Services.Implementations
                 {
                     return new NodeIdentity()
                     {
-                        NodeId = (int)docRow["DocumentID"],
-                        NodeGuid = (Guid)docRow["DocumentGuid"],
+                        NodeId = (int)docRow["NodeID"],
+                        NodeGuid = (Guid)docRow["NodeGUID"],
                         NodeAliasPathAndSiteId = new Tuple<string, Maybe<int>>((string)docRow["NodeAliasPath"], (int)docRow["NodeSiteID"])
                     };
                 }

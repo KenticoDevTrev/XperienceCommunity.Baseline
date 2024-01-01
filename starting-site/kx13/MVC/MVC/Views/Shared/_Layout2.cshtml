@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
     // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
 }
@@ -41,7 +41,6 @@
         <link href="/css/EditMode.css" rel="stylesheet" />
     </page-builder-mode>
 
-    <vc:breadcrumbs-json include-default-breadcrumb="true" nodeid="-1" />
 </head>
 <body>
     <cache expires-after="CacheMinuteTypes.VeryLong.ToTimeSpan()">
@@ -55,10 +54,10 @@
 
     <header data-ktc-search-exclude>
     </header>
-        <vc:breadcrumbs include-default-breadcrumb="true" />
-        @RenderSection("breadcrumb", false)
 
-                @RenderBody()
+    @RenderSection("breadcrumb", false)
+
+    @RenderBody()
 
     <footer data-ktc-search-exclude>
     </footer>
@@ -115,12 +114,11 @@
 
     <cache enabled=true expires-after="@CacheMinuteTypes.VeryLong.ToTimeSpan()">
         @* This will run last after all scripts loaded, and will run the Preload methods
-        Content should be:
+            Content should be:
 
-        window.ScriptsLoaded = true;
-        for (var queuedScripts = window.PreloadQueue || [], i = 0; i < queuedScripts.length; i++)
-        queuedScripts[i]();
-
+            window.ScriptsLoaded = true;
+            for (var queuedScripts = window.PreloadQueue || [], i = 0; i < queuedScripts.length; i++)
+            queuedScripts[i]();
         *@
         <vc:async-script-loader x-script-runner-path="@(Html.AddFileVersionToPath("/js/individual/scripts/run-queued-scripts.min.js.gz"))" />
     </cache>
