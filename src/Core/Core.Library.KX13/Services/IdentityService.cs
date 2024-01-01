@@ -427,7 +427,7 @@ namespace Core.Services.Implementations
             }
         }
 
-        private string GetObjectIdentitySelectStatement(DataClassInfo classInfo, BaseInfo baseClassObj)
+        private static string GetObjectIdentitySelectStatement(DataClassInfo classInfo, BaseInfo baseClassObj)
         {
             var typeInfo = baseClassObj.TypeInfo;
             return $"select {typeInfo.IDColumn} {(typeInfo.GUIDColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var guidColumn) ? $", [{guidColumn}]" : "")} {(typeInfo.CodeNameColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var codenameColumn) ? $", [{codenameColumn}]" : "")} from {classInfo.ClassTableName}";
@@ -466,67 +466,6 @@ namespace Core.Services.Implementations
         }
 
         #region "Dictionary Holder Populators"
-        
-        #pragma warning disable CS0618 // Type or member is obsolete
-        private async Task<Result<NodeDocumentIdentityHolder>> GetNodeDocumentHolderAsync()
-        {
-            var allPagesResult = await GetBaseAllPagesData();
-            if (!allPagesResult.TryGetValue(out var allPages, out var error))
-            {
-                return Result.Failure<NodeDocumentIdentityHolder>(error);
-            }
-
-            var allPagesKeys = await GetAllPagesKeys();
-
-            return _progressiveCache.Load(cs =>
-            {
-                var builder = _cacheDependencyBuilderFactory.Create(false)
-                    .AddKeys(allPagesKeys);
-
-                if (cs.Cached)
-                {
-                    cs.CacheDependency = builder
-                        .GetCMSCacheDependency();
-                }
-
-                var nodeIdentityDictionaries = new NodeIdentityDictionaries();
-                var documentIdentityDictionaries = new DocumentIdentityDictionaries();
-                foreach (var nodeGrouping in allPages.GroupBy(x => x.NodeId))
-                {
-                    var firstItem = nodeGrouping.First();
-                    var nodeIdentity = new NodeIdentity()
-                    {
-                        NodeId = firstItem.NodeId,
-                        NodeGuid = firstItem.NodeGuid,
-                        NodeAliasPathAndSiteId = new Tuple<string, Maybe<int>>(firstItem.NodeAliasPath, firstItem.NodeSiteID)
-                    };
-                    var nodeKey = $"{firstItem.NodeAliasPath}|{firstItem.NodeSiteID}".ToLower();
-                    nodeIdentityDictionaries.ById.TryAdd(firstItem.NodeId, nodeIdentity);
-                    nodeIdentityDictionaries.ByNodeAliasPathSiteIDKey.TryAdd(nodeKey, nodeIdentity);
-                    nodeIdentityDictionaries.ByGuid.TryAdd(firstItem.NodeGuid, nodeIdentity);
-
-                    foreach (var document in nodeGrouping)
-                    {
-                        var documentIdentity = new DocumentIdentity()
-                        {
-                            DocumentId = document.DocumentID,
-                            DocumentGuid = document.DocumentGuid,
-                            NodeAliasPathAndMaybeCultureAndSiteId = new Tuple<string, Maybe<string>, Maybe<int>>(document.NodeAliasPath, document.DocumentCulture, document.NodeSiteID)
-                        };
-                        var documentKey = $"{document.NodeAliasPath}|{document.DocumentCulture}|{document.NodeSiteID}".ToLower();
-                        var documentCulturelessKey = $"{document.NodeAliasPath}|{document.NodeSiteID}".ToLower();
-                        documentIdentityDictionaries.ById.TryAdd(document.DocumentID, documentIdentity);
-                        documentIdentityDictionaries.ByGuid.TryAdd(document.DocumentGuid, documentIdentity);
-                        documentIdentityDictionaries.ByNodeAliasPathCultureSiteIDKey.TryAdd(documentKey, documentIdentity);
-                        documentIdentityDictionaries.ByNodeAliasPathSiteIDKey.TryAdd(documentCulturelessKey, documentIdentity);
-                    }
-                }
-                return new NodeDocumentIdentityHolder(documentIdentityDictionaries, nodeIdentityDictionaries);
-
-            }, new CacheSettings(CacheMinuteTypes.Long.ToDouble(), "GetAllNodeDocumentIdenties"));
-
-        }
-        #pragma warning restore CS0618 // Type or member is obsolete
 
         private async Task<Result<TreeIdentityHolder>> GetTreeIdentityHolderAsync()
         {

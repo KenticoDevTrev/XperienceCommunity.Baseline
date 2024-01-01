@@ -7,6 +7,7 @@
         /// </summary>
         /// <param name="documentID">The Page's document id, if not provided will use the current page context</param>
         /// <returns></returns>
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         Task<IEnumerable<MediaItem>> GetPageAttachmentsAsync(int? documentID = null);
 
         /// <summary>
@@ -15,6 +16,7 @@
         /// <param name="attachmentGuid">The Attachment Guid</param>
         /// <param name="documentID">The page's document id, if not provided will use the current page context</param>
         /// <returns></returns>
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         Task<Result<MediaItem>> GetPageAttachmentAsync(Guid attachmentGuid, int? documentID = null);
 
         /// <summary>
@@ -22,6 +24,7 @@
         /// </summary>
         /// <param name="attachmentGuid">The Attachment Guid</param>
         /// <returns></returns>
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         Task<Result<MediaItem>> GetAttachmentItemAsync(Guid attachmentGuid);
 
         /// <summary>
@@ -29,6 +32,7 @@
         /// </summary>
         /// <param name="attachmentGuids">IEnumerable of Attachment Guids</param>
         /// <returns></returns>
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         Task<IEnumerable<MediaItem>> GetAttachmentsAsync(IEnumerable<Guid> attachmentGuids);
 
         /// <summary>

@@ -88,7 +88,7 @@ namespace CMS.DocumentEngine.Types.Generic
 
             return new TabItem(
                 name: value.TabName,
-                documentID: value.DocumentID);
+                pageCultureID: value.DocumentID);
         }
     }
 }

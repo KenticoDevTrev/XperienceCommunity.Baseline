@@ -14,8 +14,6 @@ namespace Core.Repositories.Implementation
         public readonly IPageDataContextRetriever _pageDataContextRetriever;
         public readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUrlResolver _urlResolver;
-        private readonly IMediaRepository _mediaRepository;
-        private readonly ISiteService _siteService;
         private readonly IPageUrlRetriever _pageUrlRetriever;
         private readonly IUrlHelper _urlHelper;
 
@@ -24,8 +22,6 @@ namespace Core.Repositories.Implementation
             ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
             IHttpContextAccessor httpContextAccessor,
             IUrlResolver urlResolver,
-            IMediaRepository mediaRepository,
-            ISiteService siteService,
             IPageUrlRetriever pageUrlRetriever,
             IUrlHelper urlHelper)
         {
@@ -34,8 +30,6 @@ namespace Core.Repositories.Implementation
             _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
             _httpContextAccessor = httpContextAccessor;
             _urlResolver = urlResolver;
-            _mediaRepository = mediaRepository;
-            _siteService = siteService;
             _pageUrlRetriever = pageUrlRetriever;
             _urlHelper = urlHelper;
         }
@@ -175,7 +169,7 @@ namespace Core.Repositories.Implementation
                 canonicalUrlValue = canonicalUrlFromUrl;
             }
 
-            PageMetaData metaData = new PageMetaData()
+            var metaData = new PageMetaData()
             {
                 Title = title.AsNullOrWhitespaceMaybe(),
                 Keywords = keywords.AsNullOrWhitespaceMaybe(),

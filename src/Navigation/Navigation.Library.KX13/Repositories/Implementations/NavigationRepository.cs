@@ -1,12 +1,7 @@
 ﻿using CMS.Base;
 using CMS.DataEngine;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing;
-using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Data;
-using CMS.DocumentEngine.Types;
-using MVCCaching;
 using NavigationPageType = CMS.DocumentEngine.Types.Generic.Navigation;
 using RelationshipsExtended;
 using CMS;
@@ -21,8 +16,6 @@ namespace Navigation.Repositories.Implementations
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory;
         private readonly ILogger _logger;
         private readonly IStringLocalizer<SharedResources> _stringLocalizer;
-        private readonly IMediaRepository _mediaRepository;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext;
         private readonly IProgressiveCache _progressiveCache;
 
         public NavigationRepository(IPageRetriever pageRetriever,
@@ -30,8 +23,6 @@ namespace Navigation.Repositories.Implementations
             ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
             ILogger logger,
             IStringLocalizer<SharedResources> stringLocalizer,
-            IMediaRepository mediaRepository,
-            ICacheRepositoryContext cacheRepositoryContext,
             IProgressiveCache progressiveCache)
         {
             _pageRetriever = pageRetriever;
@@ -39,8 +30,6 @@ namespace Navigation.Repositories.Implementations
             _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
             _logger = logger;
             _stringLocalizer = stringLocalizer;
-            _mediaRepository = mediaRepository;
-            _cacheRepositoryContext = cacheRepositoryContext;
             _progressiveCache = progressiveCache;
         }
 
@@ -206,9 +195,9 @@ namespace Navigation.Repositories.Implementations
                 switch ((NavigationTypeEnum)(navTreeNode.NavigationType))
                 {
                     case NavigationTypeEnum.Automatic:
-                        if (navTreeNode.NavigationPageNodeGuid != Guid.Empty && nodeGuidToClass.GetValueOrMaybe(navTreeNode.NavigationPageNodeGuid).TryGetValue(out var className))
+                        if (navTreeNode.NavigationPageNodeGuid != Guid.Empty && nodeGuidToClass.GetValueOrMaybe(navTreeNode.NavigationPageNodeGuid).TryGetValue(out _))
                         {
-                            var tempNavItem = await GetNavigationFromNodeInfo(navTreeNode.NavigationPageNodeGuid, className);
+                            var tempNavItem = await GetNavigationFromNodeInfo(navTreeNode.NavigationPageNodeGuid);
                             if (tempNavItem.TryGetValue(out var tempNavItemVal))
                             {
                                 // Convert to a new navigation item so it's not linked to the cached memory object, specifically the Children List
@@ -227,10 +216,10 @@ namespace Navigation.Repositories.Implementations
                             navItem.LinkTarget = navTreeNode.NavigationLinkTarget;
                             navItem.LinkHref = navTreeNode.NavigationLinkUrl;
                             navItem.LinkPagePath = navTreeNode.NodeAliasPath;
-                            navItem.LinkDocumentID = navTreeNode.DocumentID;
+                            navItem.LinkContentCultureID = navTreeNode.DocumentID;
                             navItem.LinkPageID = navTreeNode.NodeID;
-                            navItem.LinkPageGUID = navTreeNode.NodeGUID;
-                            navItem.LinkDocumentGUID = navTreeNode.DocumentGUID;
+                            navItem.LinkPageGuid = navTreeNode.NodeGUID;
+                            navItem.LinkContentCultureGuid = navTreeNode.DocumentGUID;
                         }
                         break;
                     case NavigationTypeEnum.Manual:
@@ -242,10 +231,10 @@ namespace Navigation.Repositories.Implementations
                             navItem.LinkTarget = navTreeNode.NavigationLinkTarget;
                         navItem.LinkHref = navTreeNode.NavigationLinkUrl;
                         navItem.LinkPagePath = navTreeNode.NodeAliasPath;
-                        navItem.LinkDocumentID = navTreeNode.DocumentID;
+                        navItem.LinkContentCultureID = navTreeNode.DocumentID;
                         navItem.LinkPageID = navTreeNode.NodeID;
-                        navItem.LinkPageGUID = navTreeNode.NodeGUID;
-                        navItem.LinkDocumentGUID = navTreeNode.DocumentGUID;
+                        navItem.LinkPageGuid = navTreeNode.NodeGUID;
+                        navItem.LinkContentCultureGuid = navTreeNode.DocumentGUID;
                         break;
                 }
                 // Add additional items
@@ -259,7 +248,7 @@ namespace Navigation.Repositories.Implementations
                 // Treat as an automatic nav type
                 var page = hierarchyNavTreeNode.Page;
 
-                var tempNavItem = await GetNavigationFromNodeInfo(page.NodeGUID, page.ClassName);
+                var tempNavItem = await GetNavigationFromNodeInfo(page.NodeGUID);
                 if (tempNavItem.TryGetValue(out var tempNavItemVal))
                 {
                     // Convert to a new navigation item so it's not linked to the cached memory object, specifically the Children List
@@ -287,7 +276,7 @@ namespace Navigation.Repositories.Implementations
             return navItem;
         }
 
-        private NavigationItemBuilder CloneNavItemBuilder(NavigationItemBuilder navItem)
+        private static NavigationItemBuilder CloneNavItemBuilder(NavigationItemBuilder navItem)
         {
             return new NavigationItemBuilder(navItem.LinkText)
             {
@@ -299,10 +288,10 @@ namespace Navigation.Repositories.Implementations
                 LinkOnClick = navItem.LinkOnClick,
                 LinkAlt = navItem.LinkAlt,
                 LinkPagePath = navItem.LinkPagePath,
-                LinkPageGUID = navItem.LinkPageGUID,
-                LinkDocumentGUID = navItem.LinkDocumentGUID,
+                LinkPageGuid = navItem.LinkPageGuid,
+                LinkContentCultureGuid = navItem.LinkContentCultureGuid,
                 LinkPageID = navItem.LinkPageID,
-                LinkDocumentID = navItem.LinkDocumentID
+                LinkContentCultureID = navItem.LinkContentCultureID
             };
         }
 
@@ -327,7 +316,7 @@ namespace Navigation.Repositories.Implementations
         /// <param name="nodeGuid"></param>
         /// <param name="className"></param>
         /// <returns></returns>
-        private async Task<Result<NavigationItemBuilder>> GetNavigationFromNodeInfo(Guid nodeGuid, string className)
+        private async Task<Result<NavigationItemBuilder>> GetNavigationFromNodeInfo(Guid nodeGuid)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
                .Node(nodeGuid);
@@ -358,10 +347,10 @@ namespace Navigation.Repositories.Implementations
                 {
                     LinkHref = DocumentURLProvider.GetUrl(treeDoc).RemoveTildeFromFirstSpot(),
                     LinkPagePath = treeDoc.NodeAliasPath,
-                    LinkPageGUID = treeDoc.NodeGUID,
+                    LinkPageGuid = treeDoc.NodeGUID,
                     LinkPageID = treeDoc.NodeID,
-                    LinkDocumentID = treeDoc.DocumentID,
-                    LinkDocumentGUID = treeDoc.DocumentGUID
+                    LinkContentCultureID = treeDoc.DocumentID,
+                    LinkContentCultureGuid = treeDoc.DocumentGUID
                 };
 
                 return navItem;
@@ -408,7 +397,7 @@ namespace Navigation.Repositories.Implementations
             var newNodeList = new List<TreeNode>();
 
             // populate ParentNodeIDToTreeNode
-            foreach (TreeNode node in nodes)
+            foreach (var node in nodes.Select(x => (TreeNode)x))
             {
                 nodeIDToHierarchyTreeNode.Add(node.NodeID, new HierarchyTreeNode(node));
                 newNodeList.Add(node);

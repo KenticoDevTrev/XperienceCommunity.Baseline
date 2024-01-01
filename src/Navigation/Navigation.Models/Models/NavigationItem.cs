@@ -19,10 +19,10 @@
         public Maybe<string> LinkOnClick { get; set; }
         public Maybe<string> LinkAlt { get; set; }
         public Maybe<string> LinkPagePath { get; set; }
-        public Maybe<Guid> LinkPageGUID { get; set; }
-        public Maybe<Guid> LinkDocumentGUID { get; set; }
+        public Maybe<Guid> LinkPageGuid { get; set; }
+        public Maybe<Guid> LinkContentCultureGuid { get; set; }
         public Maybe<int> LinkPageID { get; set; }
-        public Maybe<int> LinkDocumentID { get; set; }
+        public Maybe<int> LinkContentCultureID { get; set; }
         public bool IsMegaMenu { get; set; } = false;
 
         /// <summary>
@@ -50,10 +50,10 @@
                 LinkOnClick = LinkOnClick,
                 LinkAlt = LinkAlt,
                 LinkPagePath = LinkPagePath,
-                LinkPageGUID = LinkPageGUID,
-                LinkDocumentGUID = LinkDocumentGUID,
+                LinkPageGuid = LinkPageGuid,
+                LinkContentCultureGuid = LinkContentCultureGuid,
                 LinkPageID = LinkPageID,
-                LinkDocumentID = LinkDocumentID,
+                LinkContentCultureID = LinkContentCultureID,
                 IsMegaMenu = IsMegaMenu
             };
         }
@@ -78,10 +78,10 @@
         public Maybe<string> LinkOnClick { get; init; }
         public Maybe<string> LinkAlt { get; init; }
         public Maybe<string> LinkPagePath { get; init; }
-        public Maybe<Guid> LinkPageGUID { get; init; }
-        public Maybe<Guid> LinkDocumentGUID { get; init; }
+        public Maybe<Guid> LinkPageGuid { get; init; }
+        public Maybe<Guid> LinkContentCultureGuid { get; init; }
         public Maybe<int> LinkPageID { get; init; }
-        public Maybe<int> LinkDocumentID { get; init; }
+        public Maybe<int> LinkContentCultureID { get; init; }
         public bool IsMegaMenu { get; init; } = false;
 
 
@@ -119,13 +119,13 @@
                 case "System.Int32":
                 case "System.Int16":
                 case "System.Int":
-                    if ((LinkPageID.HasValue && LinkPageID == Convert.ToInt32(PageIdentifier)) || (LinkDocumentID.HasValue && LinkDocumentID.Equals(Convert.ToInt32(PageIdentifier))))
+                    if ((LinkPageID.HasValue && LinkPageID == Convert.ToInt32(PageIdentifier)) || (LinkContentCultureID.HasValue && LinkContentCultureID.Equals(Convert.ToInt32(PageIdentifier))))
                     {
                         return true;
                     }
                     break;
                 case "System.Guid":
-                    if (LinkPageGUID.HasValue && LinkPageGUID.Value.Equals((Guid)PageIdentifier))
+                    if (LinkPageGuid.HasValue && LinkPageGuid.Value.Equals((Guid)PageIdentifier))
                     {
                         return true;
                     }

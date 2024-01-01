@@ -109,8 +109,8 @@ namespace Core.Repositories.Implementation
             {
                 if (currentPage.TryGetValue(out var currentPageVal) &&
                     currentPageVal.Path.Equals(nodeAliasPathAndMaybeCultureAndSiteId.Item1, StringComparison.OrdinalIgnoreCase)
-                    && (nodeAliasPathAndMaybeCultureAndSiteId.Item3.TryGetValue(out var siteID) ? currentPageVal.NodeSiteID == siteID : true)
-                    && (nodeAliasPathAndMaybeCultureAndSiteId.Item2.TryGetValue(out var culture) ? currentPageVal.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase) : true)
+                    && (!nodeAliasPathAndMaybeCultureAndSiteId.Item3.TryGetValue(out var siteID) || currentPageVal.NodeSiteID == siteID)
+                    && (!nodeAliasPathAndMaybeCultureAndSiteId.Item2.TryGetValue(out var culture) || currentPageVal.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase))
                     )
                 {
                     return currentPage;
@@ -283,7 +283,7 @@ namespace Core.Repositories.Implementation
             {
                 if (currentPage.TryGetValue(out var currentPageVal) &&
                     currentPageVal.Path.Equals(pathAndAndChannelId.Item1, StringComparison.OrdinalIgnoreCase)
-                    && (pathAndAndChannelId.Item2.TryGetValue(out var siteID) ? currentPageVal.ChannelID == siteID : true)
+                    && (!pathAndAndChannelId.Item2.TryGetValue(out var siteID) || currentPageVal.ChannelID == siteID)
                     && currentPageVal.Culture.Equals(identity.Culture, StringComparison.OrdinalIgnoreCase)
                     )
                 {

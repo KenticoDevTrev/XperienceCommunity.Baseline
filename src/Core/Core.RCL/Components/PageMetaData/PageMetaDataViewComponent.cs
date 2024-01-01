@@ -20,7 +20,7 @@
         /// <returns></returns>
         public async Task<IViewComponentResult> InvokeAsync(int xContentCultureId = -1)
         {
-            if(_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext) && httpContext.Items.TryGetValue("ManualMetaDataAdded", out var manualAdded))
+            if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext) && httpContext.Items.TryGetValue("ManualMetaDataAdded", out _))
             {
                 // Manual page meta data added, so don't do automatic.
                 return Content(string.Empty);

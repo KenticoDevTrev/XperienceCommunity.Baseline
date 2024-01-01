@@ -40,6 +40,7 @@ namespace Core.Repositories.Implementation
             _pageAttachmentUrlRetriever = pageAttachmentUrlRetriever;
         }
 
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         public async Task<Result<MediaItem>> GetAttachmentItemAsync(Guid attachmentGuid)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
@@ -81,6 +82,7 @@ namespace Core.Repositories.Implementation
             return Result.Failure<MediaItem>("Could not find Media Item");
         }
 
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         public async Task<Result<MediaItem>> GetPageAttachmentAsync(Guid attachmentGuid, int? documentID = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
@@ -99,6 +101,7 @@ namespace Core.Repositories.Implementation
             return await GetAttachmentItemAsync(attachmentGuid);
         }
 
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         public async Task<IEnumerable<MediaItem>> GetPageAttachmentsAsync(int? documentID = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
@@ -177,6 +180,7 @@ namespace Core.Repositories.Implementation
             return result.Select(x => MediaFileInfoToMediaItem(x));
         }
 
+        [Obsolete("Attachments will not be supported in Xperience by Kentico, so you should consider migrating to use the media library instead.  The XperienceCommunity.MediaLibraryMigrationToolkit may help.")]
         public async Task<IEnumerable<MediaItem>> GetAttachmentsAsync(IEnumerable<Guid> attachmentGuids)
         {
             var builder = _cacheDependencyBuilderFactory.Create();

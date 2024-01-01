@@ -1,7 +1,5 @@
 ﻿using CMS.DataEngine;
-using CMS.DocumentEngine;
 using CMS.DocumentEngine.Routing;
-using CMS.Helpers;
 using CMS.SiteProvider;
 
 namespace Core.Extensions
@@ -70,6 +68,9 @@ namespace Core.Extensions
                 node.NodeAlias,
                 node.NodeID,
                 node.NodeGUID,
+                node.NodeID,
+                node.NodeName,
+                node.NodeGUID,
                 node.DocumentID,
                 node.DocumentGUID,
                 node.NodeAliasPath,
@@ -83,8 +84,6 @@ namespace Core.Extensions
             return pageIdentity;
         }
 
-
-
         /// <summary>
         /// DocumentURLProvider.GetPresentationUrl() does various uncached database calls, this caches that to minimize calls for absolute url
         /// </summary>
@@ -95,12 +94,11 @@ namespace Core.Extensions
         /// <returns></returns>
         private static string GetAbsoluteUrlOptimized(string virtualPath, SiteInfoIdentifier siteIdentifier, string cultureCode, bool ensureUrlFormat)
         {
-            Uri uri;
             if (siteIdentifier == null)
             {
-                throw new ArgumentNullException("siteIdentifier");
+                throw new InvalidOperationException("siteIdentifier is null");
             }
-            if (URLHelper.IsAbsoluteUrl(virtualPath, out uri))
+            if (URLHelper.IsAbsoluteUrl(virtualPath, out Uri uri))
             {
                 return virtualPath;
             }

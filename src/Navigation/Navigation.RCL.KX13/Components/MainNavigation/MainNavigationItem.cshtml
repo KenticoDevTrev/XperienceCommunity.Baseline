@@ -1,5 +1,5 @@
 ﻿@model Navigation.Models.NavigationItem
-@if (Model.IsMegaMenu && Model.LinkDocumentID.TryGetValue(out var linkDocId))
+@if (Model.IsMegaMenu && Model.LinkContentCultureID.TryGetValue(out var linkDocId))
 {
     <li navitem-class navitem-references navigation-item="Model" class="nav-item dropdown mega-menu">
         <a href="#" class="nav-link dropdown-toggle" title="@Model.LinkAlt" onclick="@Model.LinkOnClick" data-toggle="dropdown">
