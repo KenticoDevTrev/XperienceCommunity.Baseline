@@ -1,6 +1,0 @@
-typescript/**/*.js
-typescript/**/*.js.map
-react/**/*.js
-react/**/*.js.map
-generated
-node_modules

@@ -1,5 +1,42 @@
 ﻿//Build Paths; add or remove to this variable to configure additional paths for compilation.
 const configs = {
+    precopy: [
+        {
+            environments: ['dev', 'production'],
+            paths: [
+                './node_modules/aspnet-client-validation/dist/aspnet-validation.css'
+            ],
+            base: { base: "./node_modules/aspnet-client-validation/dist" },
+            dest: "./css/bundles/main-bundle/imported"
+        },
+		{
+            environments: ['dev', 'production'],
+            paths: [
+				'./node_modules/aspnet-client-validation/dist/aspnet-validation.min.js',
+				'./node_modules/aspnet-client-validation/dist/aspnet-validation.min.js.map'
+            ],
+            base: { base: "./node_modules/aspnet-client-validation/dist" },
+            dest: "./js/bundles/footer-bundle/imported"
+        },
+		{
+            environments: ['dev', 'production'],
+            paths: [
+				// Can replace with your own framework, or use only specific bootstrap variants
+				'./node_modules/bootstrap/dist/css/bootstrap.css'
+            ],
+            base: { base: "./node_modules/bootstrap/dist/css/" },
+            dest: "./css/bundles/main-bundle/imported"
+        },
+		{
+            environments: ['dev', 'production'],
+            paths: [
+				// using the non bundled bootstrap (doesn't include popper), but you can change this if you wish to the bundled
+				'./node_modules/bootstrap/dist/js/bootstrap.js'
+            ],
+            base: { base: "./node_modules/bootstrap/dist/js/" },
+            dest: "./js/bundles/footer-bundle/imported"
+        }
+    ],
     typescript: [
         { 
             environments: ['dev', 'production'],
@@ -30,11 +67,26 @@ const configs = {
 			environments: ['dev', 'production'],
 			paths: [
 				// can also do map files of any raw of these, which copy over only on dev
-				'./js/bundles/footer-bundle/**/*.js',
+				'./js/bundles/footer-bundle/**/*.js'
 			],
 			base: { base: "./js/bundles/footer-bundle" },
-			dest: "../MVC/wwwroot/js/bundles",
+			dest: "../MVC/wwwroot/js/bundles/footer-bundle",
 			bundleName: "footer-bundle.js",
+			bundleOnDev: true,
+			minify: true, 
+			gzip: true,
+			obfuscateOnProduction: false, 
+			includeMapOnProduction: true
+		},
+		{
+			environments: ['dev', 'production'],
+			paths: [
+				// can also do map files of any raw of these, which copy over only on dev
+				'./js/bundles/form-bundle/**/*.js'
+			],
+			base: { base: "./js/bundles/form-bundle" },
+			dest: "../MVC/wwwroot/js/bundles/form-bundle",
+			bundleName: "form-bundle.js",
 			bundleOnDev: true,
 			minify: true, 
 			gzip: true,
@@ -47,7 +99,8 @@ const configs = {
 			name: "IndividualJS",
 			environments: ['dev', 'production'],
 			paths: ['./js/individual/**/*.js',
-			'./js/individual/generated/*.js.map'],
+			'./js/individual/generated/*.js.map'
+			],
 			base: { base: "./js" },
 			dest: "../MVC/wwwroot/js",
 			minify: true,

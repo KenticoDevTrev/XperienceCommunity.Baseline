@@ -4,3 +4,5 @@ react/**/*.js
 react/**/*.js.map
 generated
 node_modules
+css/bundles/*/imported
+js/bundles/*/imported

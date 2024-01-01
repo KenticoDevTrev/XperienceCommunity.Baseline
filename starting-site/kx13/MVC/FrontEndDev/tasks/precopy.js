@@ -4,16 +4,16 @@ const { dest, src } = require('gulp');
 const merge2 = require('merge2')
 const { getEnvironmentConfigs } = require('./gulpTaskHelpers');
 
-function copy() {
-    var copyConfigs = configs.copy;
+function precopy() {
+    var copyConfigs = configs.precopy;
     var envConfigs = getEnvironmentConfigs(copyConfigs);
-    return merge2(envConfigs.map(copyConfig => copyStream(copyConfig)));
+    return merge2(envConfigs.map(copyConfig => precopyStream(copyConfig)));
 }
 
-function copyStream(copyConfig) {
+function precopyStream(copyConfig) {
     let stream = src(copyConfig.paths, copyConfig.base);
     stream.pipe(dest(copyConfig.dest));
     return stream;
 }
 
-module.exports = { copy, copyStream };
+module.exports = { precopy, precopyStream };

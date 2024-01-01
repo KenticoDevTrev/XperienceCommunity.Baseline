@@ -9,8 +9,8 @@
   <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.115" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.KX13" Version="1.0.0" />
+    <PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.131" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.KX13" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />

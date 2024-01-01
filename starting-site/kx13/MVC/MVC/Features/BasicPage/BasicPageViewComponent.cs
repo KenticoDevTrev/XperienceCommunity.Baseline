@@ -3,10 +3,6 @@
     [ViewComponent]
     public class BasicPageViewComponent : ViewComponent
     {
-        public BasicPageViewComponent()
-        {
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

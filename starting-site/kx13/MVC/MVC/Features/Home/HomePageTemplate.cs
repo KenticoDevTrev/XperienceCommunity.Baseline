@@ -1,5 +1,4 @@
 using BaselineSiteElements.Features.Home;
-using Kentico.PageBuilder.Web.Mvc.PageTemplates;
 
 [assembly: RegisterPageTemplate(
     "Generic.Home_Default",
