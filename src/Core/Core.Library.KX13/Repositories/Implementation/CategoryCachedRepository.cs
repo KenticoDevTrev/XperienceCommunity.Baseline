@@ -18,7 +18,7 @@ namespace Core.Repositories.Implementation
         }
         public IEnumerable<ObjectIdentity> CategoryNamesToCategoryIdentity(IEnumerable<string> categoryNames)
         {
-            List<ObjectIdentity> results = [];
+            var results = new List<ObjectIdentity>();
             var categoriesByName = GetCachedHolder().ByCodeName;
             foreach (var key in categoriesByName.Keys.Intersect(categoryNames.Select(x => x.ToLower())))
             {
