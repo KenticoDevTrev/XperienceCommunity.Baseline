@@ -14,6 +14,7 @@ const { typescript, react, webpackResolve} = require('./tasks/typescript');
 const { jsBundle, jsBundleStream, jsRaw, jsRawStream } = require('./tasks/javascript');
 const { images, imagesStream } = require('./tasks/images');
 const { copy, copyStream } = require('./tasks/copy');
+const { precopy, precopyStream } = require('./tasks/precopy');
 
 function clean(callback) {
     // You can modify this to clean up any files not needed, this is called before both CSS and JS runs
@@ -23,6 +24,7 @@ function clean(callback) {
 task("clean", series(clean));
 
 task("build", series(
+    series(clean, precopy),
     parallel(
         series(clean, scss, cssRaw, cssBundle),
         series(clean, typescript, react, jsRaw, jsBundle),
@@ -30,6 +32,8 @@ task("build", series(
     ),
     series(clean, copy)
 ));
+
+task("build:precopy", series(clean, precopy));
 
 task("build:css", series(clean, scss, cssRaw, cssBundle))
 task("build:scss", series(clean, scss));
@@ -46,6 +50,14 @@ task("build:images", series(clean, images));
 task("build:copy", series(clean, copy));
 
 task("watch", () => {
+    getEnvironmentConfigs(configs.precopy, true).forEach((config) => {
+        var paths = config.watchPaths ?? config.paths;
+        if(paths) {
+            var watchFunction = () => precopyStream(config);
+            watchFunction.displayName = "precopy:"+(config.name ?? config.dest);
+            watch(paths, watchFunction);
+        }
+    });
     getEnvironmentConfigs(configs.scss, true).forEach((config) => {
         var paths = config.watchPaths ?? config.paths;
         if(paths) {

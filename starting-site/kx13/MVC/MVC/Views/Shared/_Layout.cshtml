@@ -1,82 +1,121 @@
 ﻿@{
     Layout = null;
+    // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
 }
 <!DOCTYPE html>
-<html lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0])">
+<html dir="ltr" lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0])">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <environment include="Development">
-        @* Defined in gulpfile.js headerJS *@
-        <script src="~/js/scripts/jquery-3.5.1.min.js"></script>
-        <script src="~/js/scripts/HeaderCustom.js"></script>
+    @* window.OnScriptsLoaded = All javascript that depends on any library should use window.OnScriptsLoaded(function() { }, identifier) so it will run after the javascript is loaded, identifier is optional to ensure only ran once *@
+    @* window.LoadScript = Loading javascript, should be window.LoadScript({src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool}) *@
+    <cache enabled=true expires-after="@CacheMinuteTypes.VeryLong.ToTimeSpan()">
+        <vc:async-script-functions />
+    </cache>
 
-        @* Defined in gulpfile.js headerCss *@
-        <link href="~/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-        <link href="~/css/Custom.css" rel="stylesheet" />
-    </environment>
     <environment exclude="Development">
-        @* Defined in gulpfile.js headerJS *@
-        <script src="~/js/bundles/HeaderJS.min.js.gz"></script>
+        @* Defined in taskconfigs.js *@
+        <link href="/css/bundles/main-bundle/main-bundle.min.css.gz" rel="stylesheet" asp-append-version="true" />
 
-        @* Defined in gulpfile.js headerCss *@
-        <link href="~/css/bundles/HeaderStyles.min.css.gz" rel="stylesheet" />
+        @* start preloading javascript *@
+        <link href="@(Html.AddFileVersionToPath("/js/bundles/footer-bundle/footer-bundle.min.js.gz"))" rel="preload" as="script" />
+        <page-builder-mode exclude="Edit">
+            <link href="@(Html.AddFileVersionToPath("/js/bundles/form-bundle/form-bundle.min.js.gz"))" rel="preload" as="script" />
+        </page-builder-mode>
     </environment>
+    <environment include="Development">
+        @* Defined in taskconfigs.js *@
+        <link href="/css/bundles/main-bundle/imported/aspnet-validation.css" rel="stylesheet" asp-append-version="true" />
+        <link href="/css/bundles/main-bundle/imported/bootstrap.css" rel="stylesheet" asp-append-version="true" />
+        <link href="/css/bundles/main-bundle/generated/styles.css" rel="stylesheet" asp-append-version="true" />
+    </environment>
+
 
     @RenderSection("head", required: false)
+
+    @* added after so if there is any manual meta data that below won't trigger even if there is a matching page on the content tree *@
+    <vc:page-meta-data />
 
     <page-builder-mode include="Edit">
         <!-- Edit Mode -->
         <page-builder-styles />
-        <link href="~/css/EditMode.css" rel="stylesheet" />
+        <link href="/css/individual/edit-mode.css" rel="stylesheet" />
     </page-builder-mode>
-    @*Page builder styles manually added here if needed*@
 
 </head>
 <body>
-    @* Cache Header*@
+    <cache expires-after="CacheMinuteTypes.VeryLong.ToTimeSpan()">
+        @{
+            CacheScope.Begin();
+        }
+        <!--<vc:ada-quick-nav />-->
+        <cache-dependency cache-keys="@CacheScope.End()" />
+    </cache>
 
     <header data-ktc-search-exclude>
-
     </header>
+
+    @RenderSection("breadcrumb", false)
+
     @RenderBody()
 
     <footer data-ktc-search-exclude>
-        
     </footer>
-
-    <!-- Includes the jQuery Validator for MVC-->
-    <script src="~/js/bundles/jqueryval.min.js"></script>
-    <script type="text/javascript">
-        $.validator.setDefaults({ ignore: null });
-    </script>
 
     <page-builder-mode include="Edit">
         <!-- Edit mode-->
         <page-builder-scripts />
-        <script src="~/js/scripts/MyComponentsConfiguration.js"></script>
+        <script src="/js/individual/scripts/MyComponentsConfiguration.js"></script>
     </page-builder-mode>
     <page-builder-mode exclude="Edit">
-        @* Needed for some of the form stuff, at least used to be *@
-        <script src="~/js/scripts/updatableFormHelper.js"></script>
-        <script src="~/js/scripts/inputmask.js"></script>
+        @* These are needed for Forms, edit mode includes these as well so only need when not in edit mode *@
+        <script>LoadScript({ src: "@(Html.AddFileVersionToPath("/js/bundles/form-bundle/form-bundle.min.js.gz"))" })</script>
     </page-builder-mode>
 
     <!-- Javascripts File -->
-    <environment include="Development">
-        @* Defined in gulpfile.js footerJS *@
-        <script src="~/js/jquery.unobtrusive.ajax/jquery-unobtrusive-ajax.min.js"></script>
-        <script src="~/js/helpers.js"></script>
-        <script src="~/js/Custom.js"></script>
-        <script src="~/js/bootstrap/popper.min.js"></script>
-        <script src="~/js/bootstrap/bootstrap.min.js"></script>
-    </environment>
     <environment exclude="Development">
-        @* Defined in gulpfile.js footerJS *@
-        <script src="~/js/bundles/FooterJS.min.js.gz"></script>
+        @* Defined in taskconfigs.js *@
+        <script>LoadScript({ src: "@(Html.AddFileVersionToPath("/js/bundles/footer-bundle/footer-bundle.min.js.gz"))" })</script>
     </environment>
+    <environment include="Development">
+        @* Defined in taskconfigs.js *@
+        <script>LoadScript({ src: "/js/bundles/footer-bundle/generated/helpers.js" })</script>
+        <script>LoadScript({ src: "/js/bundles/footer-bundle/imported/aspnet-validation.min.js" })</script>
+        <script>LoadScript({ src: "/js/bundles/footer-bundle/imported/bootstrap.js" })</script>
+    </environment>
+    <script type="text/javascript">
+        @* aspnet validator hookup *@
+        OnScriptsLoaded(function () {
+            // Exposes window['aspnetValidation']
+            var v = new aspnetValidation.ValidationService();
+            v.bootstrap();
+        });
+    </script>
 
     @RenderSection("bottom", required: false)
+
+    <script>
+        OnScriptsLoaded(function () {
+            @*
+                These are to initialize various functionality pieces
+            GlobalMethods.InitializeOtherTools();
+            GlobalMethods.InitializeAccessability();
+            GlobalMethods.InitializeCanvas();
+            GlobalMethods.InitializeRedirectTabs();
+                *@
+        });
+    </script>
+
+    <cache enabled=true expires-after="@CacheMinuteTypes.VeryLong.ToTimeSpan()">
+        @* This will run last after all scripts loaded, and will run the Preload methods
+            Content should be:
+
+            window.ScriptsLoaded = true;
+            for (var queuedScripts = window.PreloadQueue || [], i = 0; i < queuedScripts.length; i++)
+            queuedScripts[i]();
+        *@
+        <vc:async-script-loader x-script-runner-path="@(Html.AddFileVersionToPath("/js/individual/scripts/run-queued-scripts.min.js.gz"))" />
+    </cache>
 </body>
 </html>

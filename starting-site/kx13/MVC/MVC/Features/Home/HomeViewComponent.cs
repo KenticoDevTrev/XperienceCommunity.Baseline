@@ -4,12 +4,6 @@ namespace BaselineSiteElements.Features.Home
     [ViewComponent]
     public class HomeViewComponent : ViewComponent
     {
-
-        public HomeViewComponent()
-        {
-            
-        }
-
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

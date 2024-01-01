@@ -21,12 +21,13 @@ using Core.Middleware;
 using Kentico.Forms.Web.Mvc;
 using Core;
 using RelationshipsExtended;
+using FluentValidation;
 
 namespace MVC
 {
     public static class StartupConfig
     {
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         public static void RegisterInterfaces(IServiceCollection services, IWebHostEnvironment Environment, IConfiguration Configuration)
         {
             // MVC Caching
@@ -40,13 +41,6 @@ namespace MVC
                 typeof(Site.Components.AssemblyInfo).Assembly,
             });
 
-            // Set paths for the jquery bundles
-            services.Configure<FormBuilderBundlesOptions>(options =>
-            {
-                options.JQueryCustomBundleWebRootPath = "js/individual/jquery";
-                options.JQueryUnobtrusiveAjaxCustomBundleWebRootPath = "js/individual/jquery.unobtrusive.ajax";
-            });
-            
             // Baseline services
             services.UseCoreBaseline();
 
@@ -81,26 +75,31 @@ namespace MVC
             // services.AddKenticoAuthorization();
 
             // Fluent Validator, careful not to register to assemblies as this can cause double validation on kentico form components (which kills ones like ReCaptcha)
-            services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new Assembly[] { typeof(Startup).Assembly }));
+            services.AddFluentValidationAutoValidation(fv =>
+            {
+                // Can configure
+            });
+            services.AddValidatorsFromAssemblies(new Assembly[] { typeof(Startup).Assembly });
 
             // Widget Filters
             services.AddWidgetFilter();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         public static void RegisterKenticoServices(IServiceCollection services, IWebHostEnvironment Environment, IConfiguration Configuration)
         {
             // Enable desired Kentico Xperience features
             var kenticoServiceCollection = services.AddKentico(features =>
             {
 
-                // If you install BootstrapLayoutTool.PageBuilderContainered.Kentico.MVC.Core package on MVC, you can use below for bootstrap layout tool
-                /*features.UsePageBuilder(new PageBuilderOptions()
+                features.UsePageBuilder(new PageBuilderOptions()
                 {
                     // Specifies a default section for the page builder feature
-                    DefaultSectionIdentifier = Bootstrap4LayoutToolProperties.IDENTITY,
+                    // If you install BootstrapLayoutTool.PageBuilderContainered.Kentico.MVC.Core package on MVC, you can use below for bootstrap layout tool
+                    // DefaultSectionIdentifier = Bootstrap4LayoutToolProperties.IDENTITY,
                     // Disables the system's built-in 'Default' section
                     RegisterDefaultSection = true
-                });*/
+                });
 
                 features.UsePageRouting(new PageRoutingOptions()
                 {
@@ -111,7 +110,7 @@ namespace MVC
 
                 // Data annotationslocationation?
 
-                //Enable Campaign Tracking
+                // Enable Campaign Tracking
                 // features.UseCampaignLogger();
 
                 //Allows the site to track automatic activities - External Search and Page View
@@ -154,17 +153,21 @@ namespace MVC
             });
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         public static void AddAuthentication(IServiceCollection services, IConfiguration configuration, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
         {
             // Adds Basic Kentico Authentication, needed for user context and some tools
-            services.AddCoreBaselineKenticoAuthentication(configuration, AUTHENTICATION_COOKIE_NAME)
+            services.AddCoreBaselineKenticoAuthentication()
                 .AddAuthentication();
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         internal static void RegisterGzipFileHandling(IServiceCollection services, IWebHostEnvironment environment, IConfiguration Configuration)
         {
             services.UseGzipAndCacheControlFileHandling();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         public static void RegisterLocalizationAndControllerViews(IServiceCollection services, IWebHostEnvironment Environment, IConfiguration Configuration)
         {
             // Localizer
@@ -181,8 +184,8 @@ namespace MVC
                     });
         }
 
-        
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May be used in additional configurations")]
         public static void RegisterDotNetCoreConfigurationsAndKentico(IApplicationBuilder app, IWebHostEnvironment Environment, IConfiguration Configuration)
         {
             if (Environment.IsDevelopment())
