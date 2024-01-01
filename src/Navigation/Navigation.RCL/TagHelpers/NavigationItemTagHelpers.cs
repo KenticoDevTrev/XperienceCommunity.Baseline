@@ -4,11 +4,12 @@ using System.Text.Encodings.Web;
 
 namespace Navigation.TagHelpers
 {
-    [HtmlTargetElement("li", Attributes = "[navitem-references]")]
-    [HtmlTargetElement("a", Attributes = "[navitem-references]")]
+    [HtmlTargetElement("li", Attributes = "[bl-navitem-references]")]
+    [HtmlTargetElement("a", Attributes = "[bl-navitem-references]")]
 
     public class NavigationItemNavReferenceTagHelper : TagHelper
     {
+        [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -28,12 +29,13 @@ namespace Navigation.TagHelpers
         }
     }
 
-    [HtmlTargetElement("li", Attributes = "[navitem-class]")]
-    [HtmlTargetElement("article", Attributes = "[navitem-class]")]
-    [HtmlTargetElement("a", Attributes = "[navitem-class]")]
+    [HtmlTargetElement("li", Attributes = "[bl-navitem-class]")]
+    [HtmlTargetElement("article", Attributes = "[bl-navitem-class]")]
+    [HtmlTargetElement("a", Attributes = "[bl-navitem-class]")]
 
     public class NavigationItemClassTagHelper : TagHelper
     {
+        [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -49,10 +51,11 @@ namespace Navigation.TagHelpers
         }
     }
 
-    [HtmlTargetElement("a", Attributes = "[navitem-link]")]
+    [HtmlTargetElement("a", Attributes = "[bl-navitem-link]")]
 
     public class NavigationItemLinkTagHelper : TagHelper
     {
+        [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)

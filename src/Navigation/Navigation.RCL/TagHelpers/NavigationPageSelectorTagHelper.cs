@@ -2,12 +2,15 @@
 
 namespace Navigation.TagHelpers
 {
-    [HtmlTargetElement("navigation-page-selector")]
+    [HtmlTargetElement("bl:navigation-page-selector")]
     public class NavigationPageSelectorTagHelper(
         IPageContextRepository _pageContextRepository,
         IUrlResolver _urlResolver) : TagHelper
     {
+        [HtmlAttributeName("x-parent-class")]
         public string ParentClass { get; set; } = string.Empty;
+
+        [HtmlAttributeName("x-current-page-path")]
         public string CurrentPagePath { get; set; } = string.Empty;
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)

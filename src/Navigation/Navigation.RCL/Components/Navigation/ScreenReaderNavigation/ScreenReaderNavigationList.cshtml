@@ -1,7 +1,7 @@
 ﻿@using Navigation.Components.Navigation.ScreenReaderNavigation
 @model ScreenReaderNavigationListViewModel
-<li navitem-class navitem-references navigation-item="@Model.NavItem">
-    <a aria-keyshortcuts="ArrowUp ArrowDown Left Right" navitem-link navigation-item="@Model.NavItem">
+<li bl-navitem-class bl-navitem-references bl-navigation-item="@Model.NavItem">
+    <a aria-keyshortcuts="ArrowUp ArrowDown Left Right" bl-navitem-link bl-navigation-item="@Model.NavItem">
         @Html.Raw(Model.NavItem.LinkText)
     </a>
     @if (Model.NavItem.Children.Any())
