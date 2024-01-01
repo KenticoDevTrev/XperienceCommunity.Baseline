@@ -1,8 +1,5 @@
-﻿using Core.RCL.KX13.Models.FormComponents.GuidInput;
-using Kentico.Forms.Web.Mvc;
+﻿using Kentico.Forms.Web.Mvc;
 
-// Registers a form component for use in the form builder
-[assembly: RegisterFormComponent(GuidInputComponent.IDENTIFIER, typeof(GuidInputComponent), "Guid Value", Description = "Receives a Guid typed value.", IconClass = "icon-octothorpe")]
 namespace Core.RCL.KX13.Models.FormComponents.GuidInput
 {
     /// <summary>

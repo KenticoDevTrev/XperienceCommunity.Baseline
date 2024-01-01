@@ -1,8 +1,4 @@
-﻿using Core.RCL.KX13.Models.FormComponents.DoubleInput;
-using Kentico.Forms.Web.Mvc;
-
-// Registers a form component for use in the form builder
-[assembly: RegisterFormComponent(DoubleInputComponent.IDENTIFIER, typeof(DoubleInputComponent), "Double Value", Description = "Receives a Double typed value.", IconClass = "icon-octothorpe")]
+﻿using Kentico.Forms.Web.Mvc;
 
 namespace Core.RCL.KX13.Models.FormComponents.DoubleInput
 {

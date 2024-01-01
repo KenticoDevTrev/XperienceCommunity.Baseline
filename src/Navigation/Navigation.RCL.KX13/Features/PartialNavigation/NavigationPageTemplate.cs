@@ -1,12 +1,4 @@
-﻿using Navigation.Features.PartialNavigation;
-
-[assembly: RegisterPageTemplate(
-    "Generic.Navigation_Default",
-    "Navigation",
-    typeof(NavigationPageTemplateProperties),
-    "/Features/PartialNavigation/NavigationPageTemplate.cshtml")]
-
-namespace Navigation.Features.PartialNavigation
+﻿namespace Navigation.Features.PartialNavigation
 {
     public class NavigationPageTemplateFilter : PageTypePageTemplateFilter
     {

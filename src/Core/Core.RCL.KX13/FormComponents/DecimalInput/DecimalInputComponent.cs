@@ -1,8 +1,4 @@
-﻿using Core.RCL.KX13.Models.FormComponents.DecimalInput;
-using Kentico.Forms.Web.Mvc;
-
-// Registers a form component for use in the form builder
-[assembly: RegisterFormComponent(DecimalInputComponent.IDENTIFIER, typeof(DecimalInputComponent), "Decimal Value", Description = "Receives a Decimal typed value.", IconClass = "icon-octothorpe")]
+﻿using Kentico.Forms.Web.Mvc;
 
 namespace Core.RCL.KX13.Models.FormComponents.DecimalInput
 {

@@ -1,12 +1,4 @@
-﻿using TabbedPages.Features.Tab;
-
-[assembly: RegisterPageTemplate(
-    "Generic.Tab_Default",
-    "Tab",
-    typeof(TabPageTemplateProperties),
-    "/Features/Tab/TabPageTemplate.cshtml")]
-
-namespace TabbedPages.Features.Tab
+﻿namespace TabbedPages.Features.Tab
 {
     public class TabPageTemplateFilter : PageTypePageTemplateFilter
     {

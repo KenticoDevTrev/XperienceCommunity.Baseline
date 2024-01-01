@@ -18,8 +18,6 @@ using CMS.DataEngine;
 using CMS.DocumentEngine;
 using CMS.DocumentEngine.Types.Generic;
 
-[assembly: RegisterDocumentType(Tab.CLASS_NAME, typeof(Tab))]
-
 namespace CMS.DocumentEngine.Types.Generic
 {
 	/// <summary>

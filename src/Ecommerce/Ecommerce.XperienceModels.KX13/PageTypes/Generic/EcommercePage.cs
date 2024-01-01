@@ -18,8 +18,6 @@ using CMS.DataEngine;
 using CMS.DocumentEngine;
 using CMS.DocumentEngine.Types.Generic;
 
-[assembly: RegisterDocumentType(Ecommerce.CLASS_NAME, typeof(Ecommerce))]
-
 namespace CMS.DocumentEngine.Types.Generic
 {
 	/// <summary>

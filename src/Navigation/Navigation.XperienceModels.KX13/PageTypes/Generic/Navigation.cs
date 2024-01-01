@@ -18,8 +18,6 @@ using CMS.DataEngine;
 using CMS.DocumentEngine;
 using CMS.DocumentEngine.Types.Generic;
 
-[assembly: RegisterDocumentType(Navigation.CLASS_NAME, typeof(Navigation))]
-
 namespace CMS.DocumentEngine.Types.Generic
 {
 	/// <summary>

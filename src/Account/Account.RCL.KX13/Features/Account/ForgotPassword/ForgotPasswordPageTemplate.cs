@@ -1,12 +1,4 @@
-﻿using Account.Features.Account.ForgotPassword;
-
-[assembly: RegisterPageTemplate(
-    "Generic.Account_ForgotPassword",
-    "Forgot Password",
-    typeof(ForgotPasswordPageTemplateProperties),
-    "/Features/Account/ForgotPassword/ForgotPasswordPageTemplate.cshtml")]
-
-namespace Account.Features.Account.ForgotPassword
+﻿namespace Account.Features.Account.ForgotPassword
 {
     // Template filter at /Features/Account/AccountPageTemplateFilter.cs
 

@@ -1,12 +1,4 @@
-﻿using Account.Features.Account.Registration;
-
-[assembly: RegisterPageTemplate(
-    "Generic.Account_Registration",
-    "Registration",
-    typeof(RegistrationPageTemplateProperties),
-    "/Features/Account/Registration/RegistrationPageTemplate.cshtml")]
-
-namespace Account.Features.Account.Registration
+﻿namespace Account.Features.Account.Registration
 {
     // Template filter at /Features/Account/AccountPageTemplateFilter.cs
 
