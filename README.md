@@ -1,4 +1,5 @@
-# XperienceCommunity.Baseline
+
+# XperienceCommunity.Baseline (v1)
 Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico
 
 Special thanks to my previous employer [Heartland Business Systems](https://www.hbs.net) who supported me as I created this baseline, adding things we all learned on projects into this (and other repositories) and allowing me to give them away to the Kentico Community.  If you need a kentico partner to implement a Baseline project, I would definitely get in touch with them.  If you need some small consulting assistance with it, please [reach out to me - tfayas@gmail.com](mailto:tfayas@gmail.com).
@@ -9,22 +10,21 @@ Also special thanks to my current employer [Movement Mortgage](https://www.movem
 This Baseline's goal is to provide a framework and structure to build Kentico Xperience 13 websites in such a way that they will be easily migrated to Xperience by Kentico, as well as leveraging SOLID coding principles, Internet/SEO/Accessability best practices, and other site optimizing principles.  It also serves as a "Recipe Bin" for widgets, code samples, and other things people may want to contribute to help others as a community.  
 
 ## Version 1
-Version 1 (nuget packages 1.X.X) is built on .net 6.0, and supports Kentico Xperience 13.0.5 (.net 6 support) and onwards.  The starting site (starting-site/kx13) should only be used for Kentico Xperience 13.0.5 through Kentico Xperience 13.0.130, as in hotfix 131 new features were implemented and form javascript files changed.
+This branch is for Version 1 (nuget packages 1.X.X), and is built on .net 6.0, and supports Kentico Xperience 13.0.5 (.net 6 support) and onwards.  The starting site (starting-site/kx13) should only be used for Kentico Xperience 13.0.5 through Kentico Xperience 13.0.130, as in hotfix 131 new features were implemented and form javascript files changed.
 
-## Version 2
-Version 2 (nuget packages 2.X.X) will be built on .net 8.0, and support Kentico Xperience 13.0.131+ (.net 8 support).  The starting site (starting-site/kx13) will exclude jQuery by default, and has been refactored to be more aligned with Xperience by Kentico.
-
-An Xperience by Kentico starting site, and implementations should be available over the next coming year, however you can easily look at the KX13 code and implement the logic pieces yourself and still use it.  
+**If you are going to go directly to Version 13.0.130 or above, please use Version 2.**
 
 ## Status
-August 3rd, 2023, the Baseline v1 is ready for general usage.  There is still a couple things left to do as listed below, but it's being used on my current project
+Version 1 was rebuilt and ready for usage from August 3rd, 2023 onwards.  While there were still some areas of customization i wanted to get into v1, the majority of the functionality was working well.  
 
-1. Add Installation steps for the Core, Navigation, Search, and Localization Modules
-2. Add Customization points for Navigation, Search, and Localization Modules
-6. Add Installation steps for Account, Ecommerce, and Tabbed Pages Modules
-7. Add Customization points for Account, Ecommerce, and Tabbed Pages Modules
+This branch (master-v1) is largely an **archive branch**, as V2 is now available and should be used going forward.
 
-After these are done, then in 2024 i plan on working on the Xperience by Kentico implementations of each thing.
+Version 2 supports Kentico Xperience 13.0.130 solutions that are on .net 8, and in 2024 will eventually have an Xperience by Kentico implementation.  If you are below hotfix 13.0.130, or on .net 6 or below, you can still use Version 1 and upgrade to Version 2 at a later time, functionality wise they are identical, the only differences are that version 2 has:
+
+1. Property names geared towards Xperience by Kentico (with older methods obsoleted)
+2. Classes refactored to records where appropriate
+3. Uses .net 8 vs. .net 6
+4. Has a starting site that removes jQuery dependency as this is now possible in KX 13.0.130
 
 ## Questions
 If you have questions, please reach out to me at tfayas(at)gmail
