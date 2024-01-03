@@ -7,10 +7,6 @@ Special thanks to my previous employer [Heartland Business Systems](https://www.
 
 Also special thanks to my current employer [Movement Mortgage](https://www.movement.com) who shares my desire to serve and bless others, and is excited to use this new baseline and grow it as our team works on their site. If you need a mortgage or insurance, they put their profits towards building schools, churches, and supporting ministries and organizations to help marginalized communities in the name of Jesus.
 
-## Info/Presentation
-
-For a presentation on the baseline, please view the [Technical Webinar](https://www.kentico.com/presentation/patterns-for-an-easy-to-migrate-and-easy-to-mainta) from the Kentico Conference.
-
 ## Goal
 
 This Baseline's goal is to provide a framework and structure to build Kentico Xperience 13 websites in such a way that they will be easily migrated to Xperience by Kentico, as well as leveraging SOLID coding principles, Internet/SEO/Accessibility best practices, and other site optimizing principles. It also serves as a "Recipe Bin" for widgets, code samples, and other things people may want to contribute to help others as a community.
