@@ -7,11 +7,11 @@ If you are starting a brand new Kentico instance, please follow these instructio
 1. Download the [Kentico 13 Experience Refresh 11](https://download.kentico.com/Xperience_13_Refresh11.exe) Installing file and install.
 2. Run the Installer to install a fresh .net core MVC Solution
    * I recommend creating a blank SQL database first, get the user and login set in it, and when installing to select **Install without database**, and once installation is finished and you run the admin, it will guide you through selecting an existing database and installing Kentico on it.
-3. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **Adding required Admin NuGet Packages** 
-4. Lastly, follow the instructions in **Connecting the Starting Site** section
+3. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
+4. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
 
 ## Upgrading from Portal KX12
-If you are upgrading from 12 Portal Engine, you must first migrate your site to a 12 MVC [using the Kentico12to13Converter](https://github.com/KenticoDevTrev/KX12To13Converter).  Then proceed to **Upgrading from MVC KX12**
+If you are upgrading from 12 Portal Engine, you must first migrate your site to a 12 MVC [using the Kentico12to13Converter](https://github.com/KenticoDevTrev/KX12To13Converter).  Then proceed to **[Upgrading from MVC KX12](#Upgrading-from-MVC-KX12)**
 
 ## Upgrading from MVC KX12
 If you are upgrading from 12 MVC, follow these step:
@@ -30,13 +30,13 @@ If you are upgrading from 12 MVC, follow these step:
 	 * Set the connection string to at least 600
  5. Rebuild the WebApp.sln file
  6. Run the site, this may take a while for it to run as this finishes up any upgrade procedures, make sure the event log shows a successful upgrade.
- 7. Proceed to **Hotfixing solution to KX13.0.131**
+ 7. Proceed to **[Hotfixing solution to KX13.0.131](#Hotfixing-solution-to-KX130131)**
 
 ## Hotfixing solution to KX13.0.131
 If you already have a KX13 but it's not on Hotfix 131, then you need to hotfix it to 131 (you can go higher if you want, you'll just need to make sure to update the nuget packages on the baseline projects)
       1. Follow Kentico's [Hotfix Instructions](https://docs.xperience.io/installation/hotfix-instructions-xperience-13)
       2. Make sure to update any nuget package references, clear our any old DLL references that copied from the `Lib` Folder in other projects that may not be the highest version dll.
-      3. Proceed to **Adding required Admin NuGet Packages**, then 
+      3. Proceed to **[Adding required Admin NuGet Packages](##adding-required-admin-nuget-packages)**, then 
 
 # Adding required Admin NuGet Packages
 The Baseline systems does have a dependency on two custom module for the Kentico Admin (for Categories and Relationships).
