@@ -22,10 +22,10 @@ If you are upgrading from 12 MVC, follow these step:
      * Turn Debug mode on
 	 * Add a connection string to point to your newly 'upgraded' KX13 database (from Step 2) (ex:
 	 *  `
-&lt;connectionStrings&gt;
-&lt;clear  /&gt;
-&lt;add  name="CMSConnectionString"  connectionString="Data Source=localhost\SQL2022;Initial Catalog=MyUpgradedKenticoDB;Integrated Security=False;Persist Security Info=False;User ID=sa;Password=somesapassword;Connect Timeout=600;Encrypt=False;Current Language=English;"  /&gt;
-&lt;/connectionStrings&gt;
+<connectionStrings>
+<clear  />
+<add  name="CMSConnectionString"  connectionString="Data Source=localhost\SQL2022;Initial Catalog=MyUpgradedKenticoDB;Integrated Security=False;Persist Security Info=False;User ID=sa;Password=somesapassword;Connect Timeout=600;Encrypt=False;Current Language=English;"  />
+</connectionStrings>
 `
 	 * Set the connection string to at least 600
  5. Rebuild the WebApp.sln file
@@ -59,7 +59,13 @@ There are many other `XperienceCommunity` prefixed NuGet packages, but most of t
 
 ***It is recommended that if you are also adopting the baseline starting site, that you start with the whole Baseline Starting Site Solution and then import your site code bit by bit, refactoring as you go***
 
-If you wish to use your own website solution and simply leverage Baseline NuGet packages, then follow these instructions.
+If you wish to use your own website solution and simply leverage Baseline NuGet packages, keeping in mind that the `XperienceCommunity.Baseline.Core` are required.  Each package is split up into...
+* `Models` (Kentico agnostic models and interfaces)
+* `Library` (Kentico agnostic code)
+* `RCL` (kentico agnostic view components and other razor items)
+* `KX13.Models` (kentico required page types or other module classes)
+* `KX13.Library` (Kentico implementation)
+* `KX13.RCL` (Kentico specific razor items, like page templates or widgets)
 
 ## Update to .net 8.0
 If a project is only referenced by the MVC Site (and not shared on the admin), make sure those projects are .net 8.0.  This is usually as simple as editing the .csproj and setting the .net version.  [Sean's .net 6 lifecycle article](https://community.kentico.com/blog/xperience-by-kentico-s-net-support-lifecycle-net-6) gives a great outline of what to do.
