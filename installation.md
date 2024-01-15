@@ -8,7 +8,8 @@ If you are starting a brand new Kentico instance, please follow these instructio
 2. Download the Baseline Starting Site and place somewhere in your file system (recommended a `web\yourprojectname` in the root of a drive, don't put under your user account folder)
 3. Delete the .gitkeep file found in the `KenticoAdmin` folder of the starting site.
 4. Run the Installer to install a fresh .net core MVC Solution, pointing the installation location to the `KenticoAdmin` folder from the baseline project
-   * I recommend creating a blank SQL database first, get the user and login set in it, and when installing to select **Install without database**, and once installation is finished and you run the admin, it will guide you through selecting an existing database and installing Kentico on it.
+   * I recommend creating a blank SQL database first, get the user and login set in it, and when installing to select **Install without database**, and once installation is finished and you run the admin, it will guide
+5. Once installed, you can delete the `[ProjectName]` folder and `[ProjectName].sln` files from within the `KenticoAdmin` folder, these are the kentico generated `MVC` Project files that we won't be using.
 5. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
 6. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
 
