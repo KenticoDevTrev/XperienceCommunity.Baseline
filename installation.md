@@ -22,10 +22,10 @@ If you are upgrading from 12 MVC, follow these step:
      * Turn Debug mode on
 	 * Add a connection string to point to your newly 'upgraded' KX13 database (from Step 2) (ex:
 	 *  `
-<connectionStrings>
-<clear  />
-<add  name="CMSConnectionString"  connectionString="Data Source=localhost\SQL2022;Initial Catalog=MyUpgradedKenticoDB;Integrated Security=False;Persist Security Info=False;User ID=sa;Password=somesapassword;Connect Timeout=600;Encrypt=False;Current Language=English;"  />
-</connectionStrings>
+&lt;connectionStrings&gt;
+&lt;clear  /&gt;
+&lt;add  name="CMSConnectionString"  connectionString="Data Source=localhost\SQL2022;Initial Catalog=MyUpgradedKenticoDB;Integrated Security=False;Persist Security Info=False;User ID=sa;Password=somesapassword;Connect Timeout=600;Encrypt=False;Current Language=English;"  /&gt;
+&lt;/connectionStrings&gt;
 `
 	 * Set the connection string to at least 600
  5. Rebuild the WebApp.sln file
