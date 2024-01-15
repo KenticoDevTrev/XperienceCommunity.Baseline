@@ -5,10 +5,12 @@ There are a handful of scenarios when adopting the Baseline, below are the vario
 If you are starting a brand new Kentico instance, please follow these instructions.
 
 1. Download the [Kentico 13 Experience Refresh 11](https://download.kentico.com/Xperience_13_Refresh11.exe) Installing file and install.
-2. Run the Installer to install a fresh .net core MVC Solution
+2. Download the Baseline Starting Site and place somewhere in your file system (recommended a `web\yourprojectname` in the root of a drive, don't put under your user account folder)
+3. Delete the .gitkeep file found in the `KenticoAdmin` folder of the starting site.
+4. Run the Installer to install a fresh .net core MVC Solution, pointing the installation location to the `KenticoAdmin` folder from the baseline project
    * I recommend creating a blank SQL database first, get the user and login set in it, and when installing to select **Install without database**, and once installation is finished and you run the admin, it will guide you through selecting an existing database and installing Kentico on it.
-3. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
-4. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
+5. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
+6. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
 
 ## Upgrading from Portal KX12
 If you are upgrading from 12 Portal Engine, you must first migrate your site to a 12 MVC [using the Kentico12to13Converter](https://github.com/KenticoDevTrev/KX12To13Converter).  Then proceed to **[Upgrading from MVC KX12](#Upgrading-from-MVC-KX12)**
@@ -55,7 +57,7 @@ Optionally, here are some other Admin-specific NuGet packages that are recommend
 
 There are many other `XperienceCommunity` prefixed NuGet packages, but most of the rest are for the `MVC` application only.
 
-# Connecting your Site (If not using the Starting Site
+# Connecting your Site (If not using the Starting Site)
 
 ***It is recommended that if you are also adopting the baseline starting site, that you start with the whole Baseline Starting Site Solution and then import your site code bit by bit, refactoring as you go***
 
@@ -85,8 +87,8 @@ It is recommended that when adopting the Baseline systems, that you leverage the
 
 To install the Starting site, please follow these instructions:
 
-1. Clone the KX13 Starting Site
-2. Put the Admin solution in the `KenticoAdmin` folder (this should have your `CMS`, `Lib`, `packages`, `WebApp.sln`, `GlobalAssemblyInfo.c`, and `log.txt` files directly under `KenticoAdmin`)
+1. Clone the KX13 Starting Site (if not already done)
+2. Put the Admin solution in the `KenticoAdmin` folder (this should have your `CMS`, `Lib`, `packages`, `WebApp.sln`, `GlobalAssemblyInfo.c`, and `log.txt` files directly under `KenticoAdmin`) (if not already done)
 3. If using IIS instead iis express, update your site reference to point to the new folder and update file permissions.
 4. In your `WebApp` solution, add the `Site.UniversalModels` and `XperienceModels` projects that are a sibling to `KenticoAdmin` folder and reference them on the `CMSApp` project, these are `.net standard 2.0` projects that contain your shared Kentico classes and any models that are shared between Admin and MVC
 5. Navigate to `MVC\FrontEndDev` and run in terminal `npm install` and `npm build` to build the initial front end development files (if you don't have NodeJS, [install it](https://nodejs.org/en/download), the baseline is using 9.5 but should work fine with higher versions)
