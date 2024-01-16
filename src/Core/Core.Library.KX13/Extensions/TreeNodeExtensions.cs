@@ -7,6 +7,32 @@ namespace Core.Extensions
     public static class TreeNodeExtensions
     {
         /// <summary>
+        /// Converts a TreeNode to the PageIdentity, with a conversion function to cast it to another type (ex a kentico agnostic record)
+        /// </summary>
+        /// <param name="node">The tree node</param>
+        /// <param name="conversion">The conversion function</param>
+        /// <returns></returns>
+        public static PageIdentity<T> ToPageIdentity<TNode, T>(this TNode node, Func<TNode, T> conversion) where TNode : TreeNode
+        {
+            var pageIdentity = node.ToPageIdentity();
+            var data = conversion.Invoke(node);
+            return new PageIdentity<T>(data, pageIdentity);
+        }
+
+        /// <summary>
+        /// Converts a TreeNode to the PageIdentity, with a conversion function to cast it to another type (ex a kentico agnostic record)
+        /// </summary>
+        /// <param name="node">The tree node</param>
+        /// <param name="conversion">The asynchronous conversion function</param>
+        /// <returns></returns>
+        public static async Task<PageIdentity<T>> ToPageIdentity<TNode, T>(this TNode node, Func<TNode, Task<T>> conversion) where TNode : TreeNode
+        {
+            var pageIdentity = node.ToPageIdentity();
+            var data = await conversion.Invoke(node);
+            return new PageIdentity<T>(data, pageIdentity);
+        }
+
+        /// <summary>
         /// Converts a TreeNode to the PageIdentity, useful for pages retrieved througH PageBuilder
         /// </summary>
         /// <param name="node"></param>
