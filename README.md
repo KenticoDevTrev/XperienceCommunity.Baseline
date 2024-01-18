@@ -13,6 +13,8 @@ Also special thanks to my current employer [Movement Mortgage](https://www.movem
 
 This Baseline's goal is to provide a framework and structure to build Kentico Xperience 13 websites in such a way that they will be easily migrated to Xperience by Kentico, as well as leveraging SOLID coding principles, Internet/SEO/Accessibility best practices, and other site optimizing principles. It also serves as a "Recipe Bin" for widgets, code samples, and other things people may want to contribute to help others as a community.
 
+**See more about the design principle in my talk ['Patterns for an easy-to-migrate and easy-to-maintain website'](https://www.kentico.com/presentation/patterns-for-an-easy-to-migrate-and-easy-to-mainta)**
+
 ## Current Version: 2
 
 Version 2 (nuget packages 2.X.X) is built on .net 8.0, and support Kentico Xperience 13.0.131+ (.net 8 support). The starting site (starting-site/kx13) will exclude jQuery by default, and has been refactored to be more aligned with Xperience by Kentico.
