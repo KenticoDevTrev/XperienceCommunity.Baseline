@@ -45,7 +45,7 @@ If you already have a KX13 but it's not on Hotfix 131, then you need to hotfix i
 The Baseline systems does have a dependency on two custom module for the Kentico Admin (for Categories and Relationships).
 
 1. Open you `CMSApp` solution
-2. Install the [RelationshipsExtended]([NuGet Gallery | RelationshipsExtended 13.0.9](https://www.nuget.org/packages/RelationshipsExtended)) NuGet Packages on your `CMSApp` project
+2. Install the [RelationshipsExtended](https://www.nuget.org/packages/RelationshipsExtended) NuGet Packages on your `CMSApp` project
 3. Update the `RelationshipsExtended.Base` related project to the highest version (bug fixes)
 4. Install the [XperienceCommunity.PageCustomDataControlExtender](https://www.nuget.org/packages/XperienceCommunity.PageCustomDataControlExtender)
 6. Rebuild the `CMSApp`
