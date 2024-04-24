@@ -97,7 +97,7 @@ namespace Navigation.Repositories.Implementations
                 .If(maxLevel.HasValue, query => query.NestingLevel(maxLevel.Value))
                 .If(topNumber.HasValue, query => query.TopN(topNumber.Value))
                 .Columns(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) })
-                .If(pageTypes.TryGetValueNonEmpty(out var pageTypesVal), query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypesVal.Select(x => SqlHelper.EscapeQuotes(x)))}')"))
+                .If(pageTypes.TryGetValueNonEmpty(out var pageTypesVal), query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypesVal.Select(x => SqlHelper.EscapeQuotes(x)))}'))"))
                 , cacheSettings => cacheSettings.Configure(builder, CacheMinuteTypes.Long.ToDouble(), "GetSecondaryNavigationItemsAsync", startingPath, pageTypes.GetValueOrDefault(Array.Empty<string>()), orderBy.GetValueOrDefault(string.Empty), whereCondition.GetValueOrDefault(string.Empty), maxLevel.GetValueOrDefault(0), topNumber.GetValueOrDefault(0))
             );
 
@@ -449,7 +449,7 @@ namespace Navigation.Repositories.Implementations
                             var pageTypes = navItem.PageTypes.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                             if (pageTypes.Any())
                             {
-                                query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypes)}')");
+                                query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypes)}'))");
                             }
                         }, cacheSettings => cacheSettings.Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "NodeListToHierarchyTreeNodesTreeNodeAsync", navItem.NodeGUID));
 
