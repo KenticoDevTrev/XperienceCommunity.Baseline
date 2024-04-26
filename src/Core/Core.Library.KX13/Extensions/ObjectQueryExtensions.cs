@@ -1,6 +1,7 @@
 ﻿using CMS.DataEngine;
 using CMS.DocumentEngine.Routing;
 using CMS.Relationships;
+using System.Data;
 
 namespace Core.Extensions
 {
@@ -125,6 +126,58 @@ namespace Core.Extensions
         private static string GetManyRelationshipsWhereInternal(IEnumerable<int> nodeIDs, string relationshipName)
         {
             return $"NodeID in (select {nameof(RelationshipInfo.RightNodeId)} from {RelationshipInfo.TYPEINFO.GetTableName()} R inner join {RelationshipNameInfo.TYPEINFO.GetTableName()} RN on R.{nameof(RelationshipInfo.RelationshipNameId)} = RN.{nameof(RelationshipNameInfo.RelationshipNameId)} where {nameof(RelationshipNameInfo.RelationshipName)} = '{SqlHelper.EscapeQuotes(relationshipName)}' and {nameof(RelationshipInfo.LeftNodeId)} in ({string.Join(",", nodeIDs)}))";
+        }
+
+        public static async Task<IEnumerable<DataRow>> GetEnumeratedDataRowResultsAsync<T>(this ObjectQuery<T> query) where T : BaseInfo
+        {
+            var reader = await query.ExecuteReaderAsync();
+            var dataSet = DataReaderToDataSet(reader);
+            return dataSet.Tables[0].Rows.Cast<DataRow>();
+        }
+
+        public static async Task<IEnumerable<DataRow>> GetEnumeratedDataRowResultsAsync(this ObjectQuery query)
+        {
+            var reader = await query.ExecuteReaderAsync();
+            var dataSet = DataReaderToDataSet(reader);
+            return dataSet.Tables[0].Rows.Cast<DataRow>();
+        }
+
+        public static async Task<DataSet> GetEnumeratedDataSetResultsAsync<T>(this ObjectQuery<T> query) where T : BaseInfo
+        {
+            var reader = await query.ExecuteReaderAsync();
+            return DataReaderToDataSet(reader);
+        }
+
+        public static async Task<DataSet> GetEnumeratedDataSetResultsAsync(this ObjectQuery query)
+        {
+            var reader = await query.ExecuteReaderAsync();
+            return DataReaderToDataSet(reader);
+        }
+
+        /// <summary>
+        /// Converts a DbDataReader to a DataSet, handles multiple tables in return result.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        private static DataSet DataReaderToDataSet(IDataReader reader)
+        {
+            if (reader is null)
+            {
+                var emptyDs = new DataSet();
+                emptyDs.Tables.Add(new DataTable());
+                return emptyDs;
+            }
+
+            var ds = new DataSet();
+            // read each data result into a datatable
+            do
+            {
+                var table = new DataTable();
+                table.Load(reader);
+                ds.Tables.Add(table);
+            } while (!reader.IsClosed);
+
+            return ds;
         }
     }
 }
