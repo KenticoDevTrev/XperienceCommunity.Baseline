@@ -218,7 +218,7 @@ namespace Core.Repositories.Implementation
                 mediaName: mediaFile.FileName,
                 mediaTitle: mediaFile.FileTitle.AsNullOrWhitespaceMaybe().GetValueOrDefault(mediaFile.FileName),
                 mediaExtension: mediaFile.FileExtension,
-                mediaUrl: fileUrl.DirectPath,
+                mediaDirectUrl: fileUrl.DirectPath,
                 mediaPermanentUrl: fileUrl.RelativePath
                 )
             {
@@ -233,7 +233,7 @@ namespace Core.Repositories.Implementation
             var attachmentItem = new MediaItem(
                 mediaName: attachment.AttachmentName,
                 mediaGUID: attachment.AttachmentGUID,
-                mediaUrl: urls.RelativePath,
+                mediaDirectUrl: urls.RelativePath,
                 mediaPermanentUrl: urls.RelativePath,
                 mediaTitle: attachment.AttachmentTitle.AsNullOrWhitespaceMaybe().GetValueOrDefault(attachment.AttachmentName),
                 mediaExtension: attachment.AttachmentExtension
@@ -248,7 +248,7 @@ namespace Core.Repositories.Implementation
             var attachmentItem = new MediaItem(
                 mediaName: attachment.AttachmentName,
                 mediaGUID: attachment.AttachmentGUID,
-                mediaUrl: urls.RelativePath,
+                mediaDirectUrl: urls.RelativePath,
                 mediaPermanentUrl: urls.RelativePath,
                 mediaTitle: attachment.AttachmentTitle.AsNullOrWhitespaceMaybe().GetValueOrDefault(attachment.AttachmentName),
                 mediaExtension: attachment.AttachmentExtension

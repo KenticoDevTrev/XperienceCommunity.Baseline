@@ -2,13 +2,13 @@
 {
     public record MediaItem
     {
-        public MediaItem(Guid mediaGUID, string mediaName, string mediaTitle, string mediaExtension, string mediaUrl, string mediaPermanentUrl)
+        public MediaItem(Guid mediaGUID, string mediaName, string mediaTitle, string mediaExtension, string mediaDirectUrl, string mediaPermanentUrl)
         {
             MediaGUID = mediaGUID;
             MediaName = mediaName;
             MediaTitle = mediaTitle;
             MediaExtension = mediaExtension;
-            MediaUrl = mediaUrl;
+            MediaDirectUrl = mediaDirectUrl;
             MediaPermanentUrl = mediaPermanentUrl;
         }
 
@@ -17,7 +17,11 @@
         public string MediaTitle { get; init; }
         public Maybe<string> MediaDescription { get; init; }
         public string MediaExtension { get; init; }
-        public string MediaUrl { get; init; }
+
+        [Obsolete("Please use either MediaPermanentUrl (ie /getmedia), or MediaDirectUrl (ie /MySite/media/Library/file.png)")]
+        public string MediaUrl => MediaDirectUrl;
+
+        public string MediaDirectUrl { get; init; }
         public string MediaPermanentUrl { get; init; }
 
     }
