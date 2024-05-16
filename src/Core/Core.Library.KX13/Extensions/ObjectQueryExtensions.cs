@@ -15,7 +15,7 @@ namespace Core.Extensions
             }
             else
             {
-                return baseQuery.Columns(Columns);
+                return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
 
@@ -27,7 +27,7 @@ namespace Core.Extensions
             }
             else
             {
-                return baseQuery.Columns(Columns);
+                return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Core.Extensions
             }
             else
             {
-                return baseQuery.Columns(Columns);
+                return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Core.Extensions
             }
             else
             {
-                return baseQuery.Columns(Columns);
+                return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
 
@@ -63,14 +63,11 @@ namespace Core.Extensions
             }
             else
             {
-                return baseQuery.Columns(Columns);
+                return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
 
-
-        public static DocumentQuery IncludePageIdentityColumns(this DocumentQuery baseQuery)
-        {
-            return baseQuery.Columns(new string[] {
+        private static readonly string[] _pageIdentityColumns = [
                         nameof(TreeNode.NodeID),
                         nameof(TreeNode.DocumentID),
                         nameof(TreeNode.NodeGUID),
@@ -81,42 +78,30 @@ namespace Core.Extensions
                         nameof(TreeNode.DocumentName),
                         nameof(TreeNode.NodeLevel),
                         nameof(TreeNode.NodeSiteID)
-                        })
-                        .WithPageUrlPaths();
+                        ];
+
+        public static DocumentQuery IncludePageIdentityColumns(this DocumentQuery baseQuery)
+        {
+            return baseQuery.SelectColumnsList.AnyColumnsDefined ? 
+                        baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
+                        :
+                        baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
         }
 
         public static DocumentQuery<TDocument> IncludePageIdentityColumns<TDocument>(this DocumentQuery<TDocument> baseQuery) where TDocument : TreeNode, new()
         {
-            return baseQuery.Columns(new string[] {
-                        nameof(TreeNode.NodeID),
-                        nameof(TreeNode.DocumentID),
-                        nameof(TreeNode.NodeGUID),
-                        nameof(TreeNode.DocumentGUID),
-                        nameof(TreeNode.NodeAlias),
-                        nameof(TreeNode.NodeAliasPath),
-                        nameof(TreeNode.DocumentCulture),
-                        nameof(TreeNode.DocumentName),
-                        nameof(TreeNode.NodeLevel),
-                        nameof(TreeNode.NodeSiteID)
-                        })
-                        .WithPageUrlPaths(); ;
+            return baseQuery.SelectColumnsList.AnyColumnsDefined ?
+                    baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
+                    :
+                    baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
         }
 
         public static MultiDocumentQuery IncludePageIdentityColumns(this MultiDocumentQuery baseQuery)
         {
-            return baseQuery.Columns(new string[] {
-                        nameof(TreeNode.NodeID),
-                        nameof(TreeNode.DocumentID),
-                        nameof(TreeNode.NodeGUID),
-                        nameof(TreeNode.DocumentGUID),
-                        nameof(TreeNode.NodeAlias),
-                        nameof(TreeNode.NodeAliasPath),
-                        nameof(TreeNode.DocumentCulture),
-                        nameof(TreeNode.DocumentName),
-                        nameof(TreeNode.NodeLevel),
-                        nameof(TreeNode.NodeSiteID)
-                        })
-                        .WithPageUrlPaths(); ;
+            return baseQuery.SelectColumnsList.AnyColumnsDefined ? 
+                        baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
+                        :
+                        baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
         }
 
         public static DocumentQuery InRelationshipWithMany(this DocumentQuery baseQuery, IEnumerable<int> nodeIDs, string relationshipName) => nodeIDs.Any() ? baseQuery.Where(GetManyRelationshipsWhereInternal(nodeIDs, relationshipName)) : baseQuery;
