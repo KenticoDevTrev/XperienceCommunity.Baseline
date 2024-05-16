@@ -71,7 +71,7 @@ namespace TabbedPages.Repositories.Implementations
                     .Path(path, PathTypeEnum.Children)
                     .NestingLevel(1)
                     .OnSite(siteName)
-                    .Columns(new string[] {
+                    .ColumnsSafe(new string[] {
                     nameof(Tab.DocumentID),
                     nameof(Tab.TabName),
                     nameof(Tab.DocumentCulture)

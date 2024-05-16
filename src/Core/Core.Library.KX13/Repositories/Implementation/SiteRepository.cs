@@ -70,7 +70,7 @@ namespace Core.Repositories.Implementation
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{SiteInfo.OBJECT_TYPE}|all");
                 }
                 return _siteInfoProvider.Get()
-                .Columns(nameof(SiteInfo.SiteID), nameof(SiteInfo.SiteName))
+                .ColumnsSafe(nameof(SiteInfo.SiteID), nameof(SiteInfo.SiteName))
                 .GetEnumerableTypedResult()
                 .ToDictionary(key => key.SiteID, value => value.SiteName);
 

@@ -61,7 +61,7 @@ namespace Core.Repositories.Implementation
             return _progressiveCache.Load(cs =>
             {
                 var allCategoryItems = _categoryInfoProvider.Get()
-                .Columns(nameof(CategoryInfo.CategoryID),
+                .ColumnsSafe(nameof(CategoryInfo.CategoryID),
                 nameof(CategoryInfo.CategoryName),
                 nameof(CategoryInfo.CategoryDisplayName),
                 nameof(CategoryInfo.CategoryGUID),

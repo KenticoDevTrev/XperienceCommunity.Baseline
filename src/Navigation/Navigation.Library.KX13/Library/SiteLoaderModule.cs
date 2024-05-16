@@ -35,7 +35,7 @@ namespace Navigation.Library
             {
                 if (DocumentHelper.GetDocuments<NavigationPageType>()
                     .WhereEquals("NavigationPageNodeGuid", e.Node.NodeGUID)
-                    .Columns("NodeID")
+                    .ColumnsSafe("NodeID")
                     .Count > 0)
                 {
                     CacheHelper.EnsureKey("CustomNavigationClearKey", DateTime.Now);
@@ -54,7 +54,7 @@ namespace Navigation.Library
                 // If a Navigation page was the one who was touched
                 if (DocumentHelper.GetDocuments<NavigationPageType>()
                     .WhereEquals("NodeID", Category.NodeID)
-                    .Columns("NodeID")
+                    .ColumnsSafe("NodeID")
                     .Count > 0)
                 {
                     CacheHelper.EnsureKey("CustomNavigationClearKey", DateTime.Now);

@@ -96,7 +96,7 @@ namespace Navigation.Repositories.Implementations
                 .If(whereCondition.TryGetValueNonEmpty(out var whereConditionVal), query => query.Where(whereConditionVal))
                 .If(maxLevel.HasValue, query => query.NestingLevel(maxLevel.Value))
                 .If(topNumber.HasValue, query => query.TopN(topNumber.Value))
-                .Columns(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) })
+                .ColumnsSafe(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) })
                 .If(pageTypes.TryGetValueNonEmpty(out var pageTypesVal), query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", pageTypesVal.Select(x => SqlHelper.EscapeQuotes(x)))}'))"))
                 , cacheSettings => cacheSettings.Configure(builder, CacheMinuteTypes.Long.ToDouble(), "GetSecondaryNavigationItemsAsync", startingPath, pageTypes.GetValueOrDefault(Array.Empty<string>()), orderBy.GetValueOrDefault(string.Empty), whereCondition.GetValueOrDefault(string.Empty), maxLevel.GetValueOrDefault(0), topNumber.GetValueOrDefault(0))
             );
@@ -170,7 +170,7 @@ namespace Navigation.Repositories.Implementations
             // Do not need to include in global cache, just a lookup for the path
             var result = await _pageRetriever.RetrieveAsync<TreeNode>(query =>
                     query.WhereEquals(nameof(TreeNode.NodeGUID), nodeGuid)
-                    .Columns(nameof(TreeNode.NodeAliasPath))
+                    .ColumnsSafe(nameof(TreeNode.NodeAliasPath))
                     , cacheSettings =>
                         cacheSettings
                         .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentSiteName()}|{nodeGuid}"))
@@ -186,7 +186,7 @@ namespace Navigation.Repositories.Implementations
             // Do not need to include in global cache, just a lookup for the path
             var result = await _pageRetriever.RetrieveAsync<TreeNode>(query =>
                     query.WhereEquals(nameof(TreeNode.NodeID), nodeID)
-                    .Columns(nameof(TreeNode.NodeAliasPath))
+                    .ColumnsSafe(nameof(TreeNode.NodeAliasPath))
                     , cacheSettings =>
                         cacheSettings
                         .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentSiteName()}|{nodeID}"))
@@ -338,7 +338,7 @@ namespace Navigation.Repositories.Implementations
             var treeDocument = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
                     .WhereEquals(nameof(TreeNode.NodeGUID), nodeGuid)
-                    .Columns(new string[] {
+                    .ColumnsSafe(new string[] {
                         nameof(TreeNode.DocumentName),
                         nameof(TreeNode.ClassName),
                         nameof(TreeNode.DocumentCulture),
@@ -387,7 +387,7 @@ namespace Navigation.Repositories.Implementations
 
             var results = await _pageRetriever.RetrieveAsync<NavigationPageType>(query => query
                     .OrderBy(new string[] { nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeOrder) })
-                    .Columns(new string[] {
+                    .ColumnsSafe(new string[] {
                         nameof(NavigationPageType.NodeParentID), nameof(NavigationPageType.NodeID), nameof(NavigationPageType.NodeGUID), nameof(NavigationPageType.NavigationType), nameof(NavigationPageType.NavigationPageNodeGuid), nameof(NavigationPageType.NavigationLinkText), nameof(NavigationPageType.NavigationLinkTarget), nameof(NavigationPageType.NavigationLinkUrl),
                         nameof(NavigationPageType.NavigationLinkCSS), nameof(NavigationPageType.NavigationLinkOnClick), nameof(NavigationPageType.NavigationLinkAlt), nameof(NavigationPageType.NodeAliasPath),
                         nameof(NavigationPageType.IsDynamic), nameof(NavigationPageType.Path), nameof(NavigationPageType.PageTypes), nameof(NavigationPageType.OrderBy), nameof(NavigationPageType.WhereCondition), nameof(NavigationPageType.MaxLevel), nameof(NavigationPageType.TopNumber), nameof(NavigationPageType.DocumentID), nameof(NavigationPageType.DocumentGUID)
@@ -445,7 +445,7 @@ namespace Navigation.Repositories.Implementations
                             {
                                 query.TopN(ValidationHelper.GetInteger(topN, -1));
                             }
-                            query.Columns(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) });
+                            query.ColumnsSafe(new string[] { nameof(TreeNode.DocumentName), nameof(TreeNode.ClassName), nameof(TreeNode.DocumentCulture), nameof(TreeNode.NodeID), nameof(TreeNode.DocumentID), nameof(TreeNode.DocumentGUID), nameof(TreeNode.NodeParentID), nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeGUID), nameof(TreeNode.NodeAliasPath) });
                             var pageTypes = navItem.PageTypes.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                             if (pageTypes.Any())
                             {

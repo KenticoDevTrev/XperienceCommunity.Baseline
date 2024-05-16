@@ -341,7 +341,7 @@ namespace Core.Services.Implementations
                     cs.CacheDependency = _cacheDependencyBuilderFactory.Create(false).ObjectType(SiteInfo.OBJECT_TYPE).GetCMSCacheDependency();
                 }
                 return (await _siteInfoProvider.Get()
-                 .Columns(nameof(SiteInfo.SiteName))
+                 .ColumnsSafe(nameof(SiteInfo.SiteName))
                 .GetEnumerableTypedResultAsync()
                 )
                 .Select(x => x.SiteName);
