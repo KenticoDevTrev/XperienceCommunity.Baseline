@@ -13,7 +13,7 @@ namespace Core.Extensions
         /// <param name="baseQuery"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static DocumentQuery ColumnsSafe(this DocumentQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? []) : baseQuery.Columns(columns ?? []);
+        public static DocumentQuery ColumnsSafe(this DocumentQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? Array.Empty<string>()) : baseQuery.Columns(columns ?? Array.Empty<string>());
 
         [Obsolete("Use ColumnsSafe instead")]
         public static DocumentQuery ColumnsNullHandled(this DocumentQuery baseQuery, string[] Columns) => baseQuery.ColumnsSafe(Columns);
@@ -24,7 +24,7 @@ namespace Core.Extensions
         /// <param name="baseQuery"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static DocumentQuery<TDocument> ColumnsSafe<TDocument>(this DocumentQuery<TDocument> baseQuery, params string[] columns) where TDocument : TreeNode, new() => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? []) : baseQuery.Columns(columns ?? []);
+        public static DocumentQuery<TDocument> ColumnsSafe<TDocument>(this DocumentQuery<TDocument> baseQuery, params string[] columns) where TDocument : TreeNode, new() => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? Array.Empty<string>()) : baseQuery.Columns(columns ?? Array.Empty<string>());
         public static DocumentQuery<TDocument> ColumnsNullHandled<TDocument>(this DocumentQuery<TDocument> baseQuery, string[] Columns) where TDocument : TreeNode, new() => baseQuery.ColumnsSafe(Columns);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Core.Extensions
         /// <param name="baseQuery"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static MultiDocumentQuery ColumnsSafe(this MultiDocumentQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? []) : baseQuery.Columns(columns ?? []);
+        public static MultiDocumentQuery ColumnsSafe(this MultiDocumentQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? Array.Empty<string>()) : baseQuery.Columns(columns ?? Array.Empty<string>());
 
         [Obsolete("Use ColumnsSafe instead")]
         public static MultiDocumentQuery ColumnsNullHandled(this MultiDocumentQuery baseQuery, string[] Columns) => baseQuery.ColumnsSafe(Columns);
@@ -44,7 +44,7 @@ namespace Core.Extensions
         /// <param name="baseQuery"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static ObjectQuery ColumnsSafe(this ObjectQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? []) : baseQuery.Columns(columns ?? []);
+        public static ObjectQuery ColumnsSafe(this ObjectQuery baseQuery, params string[] columns) => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? Array.Empty<string>()) : baseQuery.Columns(columns ?? Array.Empty<string>());
 
         [Obsolete("Use ColumnsSafe instead")]
         public static ObjectQuery ColumnsNullHandled(this ObjectQuery baseQuery, string[] Columns) => baseQuery.ColumnsSafe(Columns);
@@ -55,7 +55,7 @@ namespace Core.Extensions
         /// <param name="baseQuery"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static ObjectQuery<TObject> ColumnsSafe<TObject>(this ObjectQuery<TObject> baseQuery, params string[] columns) where TObject : BaseInfo, new() => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? []) : baseQuery.Columns(columns ?? []);
+        public static ObjectQuery<TObject> ColumnsSafe<TObject>(this ObjectQuery<TObject> baseQuery, params string[] columns) where TObject : BaseInfo, new() => baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(columns ?? Array.Empty<string>()) : baseQuery.Columns(columns ?? Array.Empty<string>());
 
         [Obsolete("Use ColumnsSafe instead")]
         public static ObjectQuery<TObject> ColumnsNullHandled<TObject>(this ObjectQuery<TObject> baseQuery, string[] Columns) where TObject : BaseInfo, new() => baseQuery.ColumnsSafe(Columns);
