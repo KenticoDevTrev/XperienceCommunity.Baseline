@@ -98,7 +98,7 @@ namespace Navigation.Repositories.Implementations
             var results = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
                     .IncludePageIdentityColumns()
-                    .Columns(nameof(TreeNode.NodeParentID), nameof(TreeNode.DocumentName))
+                    .ColumnsSafe(nameof(TreeNode.NodeParentID), nameof(TreeNode.DocumentName))
                     .If(validClassNames.Length != 0, query => query.Where($"NodeClassID in (select ClassID from CMS_Class where ClassName in ('{string.Join("','", validClassNames.Select(x => SqlHelper.EscapeQuotes(x)))}'))")),
                 cacheSettings => cacheSettings
                     .Dependencies((items, csbuilder) => csbuilder.PagePath("/", PathTypeEnum.Section))

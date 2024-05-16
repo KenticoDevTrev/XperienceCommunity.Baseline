@@ -22,7 +22,7 @@ namespace Core.Repositories.Implementation
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
                     .WhereEquals(nameof(TreeNode.DocumentID), contentCultureId)
-                    .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
+                    .ColumnsSafe(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
                 .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", contentCultureId)
@@ -45,7 +45,7 @@ namespace Core.Repositories.Implementation
             var page = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
                     .WhereEquals(nameof(TreeNode.DocumentGUID), contentCultureGuid)
-                    .Columns(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
+                    .ColumnsSafe(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
                     .TopN(1),
                 cacheSettings => cacheSettings
                     .Configure(builder, CacheMinuteTypes.VeryLong.ToDouble(), "GetMetaDataAsync", contentCultureGuid)

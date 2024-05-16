@@ -99,7 +99,7 @@ namespace Navigation.Repositories.Implementations
                 var actualPage = await _pageRetriever.RetrieveAsync<TreeNode>(
                     query => query
                         .Path(relativeUrl, PathTypeEnum.Single)
-                        .Columns(nameof(TreeNode.DocumentModifiedWhen))
+                        .ColumnsSafe(nameof(TreeNode.DocumentModifiedWhen))
                         ,
                     cacheSettings => cacheSettings
                         .Dependencies((items, csbuilder) => csbuilder.Pages(items))
@@ -231,7 +231,7 @@ namespace Navigation.Repositories.Implementations
             var levelResult = await _pageRetriever.RetrieveAsync<TreeNode>(query =>
                query
                    .Path(path, PathTypeEnum.Single)
-                   .Columns(nameof(TreeNode.NodeLevel)),
+                   .ColumnsSafe(nameof(TreeNode.NodeLevel)),
                cacheSettings =>
                cacheSettings
                    .Dependencies((items, csbuilder) => csbuilder.PagePath(path, PathTypeEnum.Single))
