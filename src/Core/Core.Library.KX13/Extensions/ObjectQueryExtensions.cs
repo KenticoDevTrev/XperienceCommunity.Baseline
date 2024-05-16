@@ -7,6 +7,14 @@ namespace Core.Extensions
 {
     public static class ObjectQueryExtensions
     {
+        /// <summary>
+        /// Use in place of .Columns()/.AddColumns().  Safetly either Sets the columns (if none set yet), or adds the columns (if columns are defined).
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public static DocumentQuery ColumnsSafe(this DocumentQuery baseQuery, string[] columns) => baseQuery.ColumnsNullHandled(columns);
+
         public static DocumentQuery ColumnsNullHandled(this DocumentQuery baseQuery, string[] Columns)
         {
             if (Columns == null)
@@ -19,6 +27,13 @@ namespace Core.Extensions
             }
         }
 
+        /// <summary>
+        /// Use in place of .Columns()/.AddColumns().  Safetly either Sets the columns (if none set yet), or adds the columns (if columns are defined).
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public static DocumentQuery<TDocument> ColumnsSafe<TDocument>(this DocumentQuery<TDocument> baseQuery, string[] columns) where TDocument : TreeNode, new() => baseQuery.ColumnsNullHandled(columns);
         public static DocumentQuery<TDocument> ColumnsNullHandled<TDocument>(this DocumentQuery<TDocument> baseQuery, string[] Columns) where TDocument : TreeNode, new()
         {
             if (Columns == null)
@@ -30,6 +45,14 @@ namespace Core.Extensions
                 return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
+
+        /// <summary>
+        /// Use in place of .Columns()/.AddColumns().  Safetly either Sets the columns (if none set yet), or adds the columns (if columns are defined).
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public static MultiDocumentQuery ColumnsSafe(this MultiDocumentQuery baseQuery, string[] columns) => baseQuery.ColumnsNullHandled(columns);
 
         public static MultiDocumentQuery ColumnsNullHandled(this MultiDocumentQuery baseQuery, string[] Columns)
         {
@@ -43,6 +66,14 @@ namespace Core.Extensions
             }
         }
 
+        /// <summary>
+        /// Use in place of .Columns()/.AddColumns().  Safetly either Sets the columns (if none set yet), or adds the columns (if columns are defined).
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public static ObjectQuery ColumnsSafe(this ObjectQuery baseQuery, string[] columns) => baseQuery.ColumnsNullHandled(columns);
+
         public static ObjectQuery ColumnsNullHandled(this ObjectQuery baseQuery, string[] Columns)
         {
             if (Columns == null)
@@ -54,6 +85,14 @@ namespace Core.Extensions
                 return baseQuery.SelectColumnsList.AnyColumnsDefined ? baseQuery.AddColumns(Columns) : baseQuery.Columns(Columns);
             }
         }
+
+        /// <summary>
+        /// Use in place of .Columns()/.AddColumns().  Safetly either Sets the columns (if none set yet), or adds the columns (if columns are defined).
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public static ObjectQuery<TObject> ColumnsSafe<TObject>(this ObjectQuery<TObject> baseQuery, string[] columns) where TObject : BaseInfo, new() => baseQuery.ColumnsNullHandled(columns);
 
         public static ObjectQuery<TObject> ColumnsNullHandled<TObject>(this ObjectQuery<TObject> baseQuery, string[] Columns) where TObject : BaseInfo, new()
         {
@@ -79,29 +118,46 @@ namespace Core.Extensions
                         nameof(TreeNode.NodeLevel),
                         nameof(TreeNode.NodeSiteID)
                         ];
-
+        // <summary>
+        /// Includes the columns needed for the PageIdentity fields, including the WithPageUrlPaths() joins
+        /// 
+        /// SHOULD ALWAYS BE USED IN CONJUCTION WITH .ColumnsSafe() as this will either limit or add to the columns returned.
+        /// 
+        /// If you wish to return all columns, use .WithPageUrlPaths() only, as all columns will contain the PageIdentity columns.
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <returns></returns>
         public static DocumentQuery IncludePageIdentityColumns(this DocumentQuery baseQuery)
         {
-            return baseQuery.SelectColumnsList.AnyColumnsDefined ? 
-                        baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
-                        :
-                        baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
+            return baseQuery.ColumnsSafe(_pageIdentityColumns).WithPageUrlPaths();
         }
 
+        // <summary>
+        /// Includes the columns needed for the PageIdentity fields, including the WithPageUrlPaths() joins
+        /// 
+        /// SHOULD ALWAYS BE USED IN CONJUCTION WITH .ColumnsSafe() as this will either limit or add to the columns returned.
+        /// 
+        /// If you wish to return all columns, use .WithPageUrlPaths() only, as all columns will contain the PageIdentity columns.
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <returns></returns>
         public static DocumentQuery<TDocument> IncludePageIdentityColumns<TDocument>(this DocumentQuery<TDocument> baseQuery) where TDocument : TreeNode, new()
         {
-            return baseQuery.SelectColumnsList.AnyColumnsDefined ?
-                    baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
-                    :
-                    baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
+            return baseQuery.ColumnsSafe(_pageIdentityColumns).WithPageUrlPaths();
         }
 
+        // <summary>
+        /// Includes the columns needed for the PageIdentity fields, including the WithPageUrlPaths() joins
+        /// 
+        /// SHOULD ALWAYS BE USED IN CONJUCTION WITH .ColumnsSafe() as this will either limit or add to the columns returned.
+        /// 
+        /// If you wish to return all columns, use .WithPageUrlPaths() only, as all columns will contain the PageIdentity columns.
+        /// </summary>
+        /// <param name="baseQuery"></param>
+        /// <returns></returns>
         public static MultiDocumentQuery IncludePageIdentityColumns(this MultiDocumentQuery baseQuery)
         {
-            return baseQuery.SelectColumnsList.AnyColumnsDefined ? 
-                        baseQuery.AddColumns(_pageIdentityColumns).WithPageUrlPaths()
-                        :
-                        baseQuery.Columns(_pageIdentityColumns).WithPageUrlPaths();
+            return baseQuery.ColumnsSafe(_pageIdentityColumns).WithPageUrlPaths();
         }
 
         public static DocumentQuery InRelationshipWithMany(this DocumentQuery baseQuery, IEnumerable<int> nodeIDs, string relationshipName) => nodeIDs.Any() ? baseQuery.Where(GetManyRelationshipsWhereInternal(nodeIDs, relationshipName)) : baseQuery;
