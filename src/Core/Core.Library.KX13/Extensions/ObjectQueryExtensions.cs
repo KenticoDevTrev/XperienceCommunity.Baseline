@@ -71,7 +71,8 @@ namespace Core.Extensions
                         nameof(TreeNode.DocumentCulture),
                         nameof(TreeNode.DocumentName),
                         nameof(TreeNode.NodeLevel),
-                        nameof(TreeNode.NodeSiteID)
+                        nameof(TreeNode.NodeSiteID),
+                        nameof(TreeNode.ClassName)
                         ];
         // <summary>
         /// Includes the columns needed for the PageIdentity fields, including the WithPageUrlPaths() joins

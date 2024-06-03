@@ -5,7 +5,7 @@
         /// <summary>
         /// Primary Constructor
         /// </summary>
-        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID)
+        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID, string pageType)
         {
             Name = name;
             Alias = alias;
@@ -21,11 +21,12 @@
             AbsoluteUrl = absoluteUrl;
             PageLevel = level;
             ChannelID = channelID;
+            PageType = pageType;
             Culture = culture;
         }
 
         [Obsolete("Use primary constructor, passing NodeID as both PageID and ContentID, and NodeGuid as both PageGuid and ContentGuid, NodeAlias as both Alias and ContentName, DocumentID/Guid as ContentCultureID/Guid, and SiteID as ChannelID")]
-        public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID)
+        public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID, string pageType)
         {
             Name = name;
             Alias = alias;
@@ -41,6 +42,7 @@
             AbsoluteUrl = absoluteUrl;
             PageLevel = nodeLevel;
             ChannelID = nodeSiteID;
+            PageType = pageType;
             Culture = culture;
         }
 
@@ -74,6 +76,11 @@
         /// The Channel this page identity belongs to.
         /// </summary>
         public int ChannelID { get; init; }
+
+        /// <summary>
+        /// The code name of the type the page is
+        /// </summary>
+        public string PageType { get; init;  }
 
         /// <summary>
         /// Nesting level of the page (tree)
@@ -228,7 +235,7 @@
         /// <returns></returns>
         public static PageIdentity Empty()
         {
-            return new PageIdentity("", "", 0, Guid.Empty, 0, "", Guid.Empty, 0, Guid.Empty, "/", "en-US", "/", "/", 0, 0);
+            return new PageIdentity("", "", 0, Guid.Empty, 0, "", Guid.Empty, 0, Guid.Empty, "/", "en-US", "/", "/", 0, 0, string.Empty);
         }
 
         /// <summary>
@@ -237,19 +244,19 @@
         /// <returns></returns>
         public static PageIdentity Random()
         {
-            return new PageIdentity("", "", 0, Guid.NewGuid(), 0, "", Guid.NewGuid(), 0, Guid.NewGuid(), "/", "en-US", "/", "/", 0, 0);
+            return new PageIdentity("", "", 0, Guid.NewGuid(), 0, "", Guid.NewGuid(), 0, Guid.NewGuid(), "/", "en-US", "/", "/", 0, 0, string.Empty);
         }
     }
 
     public record PageIdentity<T> : PageIdentity
     {
-        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID, T data) : base(name, alias, pageID, pageGuid, contentID, contentName, contentGuid, contentCultureID, contentCultureGuid, path, culture, relativeUrl, absoluteUrl, level, channelID)
+        public PageIdentity(string name, string alias, int pageID, Guid pageGuid, int contentID, string contentName, Guid contentGuid, int contentCultureID, Guid contentCultureGuid, string path, string culture, string relativeUrl, string absoluteUrl, int level, int channelID, string pageType, T data) : base(name, alias, pageID, pageGuid, contentID, contentName, contentGuid, contentCultureID, contentCultureGuid, path, culture, relativeUrl, absoluteUrl, level, channelID, pageType)
         {
             Data = data;
         }
 
         [Obsolete("Use primary constructor, passing NodeID as both PageID and ContentID, and NodeGuid as both PageGuid and ContentGuid, NodeAlias as both Alias and ContentName, DocumentID/Guid as ContentCultureID/Guid, and SiteID as ChannelID")]
-        public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID, T data) : base(name, alias, nodeID, nodeGUID, documentID, documentGUID, path, culture, relativeUrl, absoluteUrl, nodeLevel, nodeSiteID)
+        public PageIdentity(string name, string alias, int nodeID, Guid nodeGUID, int documentID, Guid documentGUID, string path, string culture, string relativeUrl, string absoluteUrl, int nodeLevel, int nodeSiteID, string pageType, T data) : base(name, alias, nodeID, nodeGUID, documentID, documentGUID, path, culture, relativeUrl, absoluteUrl, nodeLevel, nodeSiteID, pageType)
         {
             Data = data;
         }

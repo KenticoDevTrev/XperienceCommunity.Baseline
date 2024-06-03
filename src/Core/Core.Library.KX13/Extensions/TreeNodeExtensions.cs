@@ -105,6 +105,7 @@ namespace Core.Extensions
                 relativeAndAbsoluteUrl.Item2,
                 node.NodeLevel,
                 node.NodeSiteID,
+                node.ClassName,
                 node);
 
             return pageIdentity;
