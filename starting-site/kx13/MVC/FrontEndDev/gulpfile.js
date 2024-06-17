@@ -85,9 +85,7 @@ task("watch", () => {
     getEnvironmentConfigs(configs.typescript, true).forEach((config) => {
         var paths = config.watchPaths ?? config.paths;
         if(paths) {
-            var configArray = new Array();
-            configArray.push(config);
-            var watchFunction = () => webpackResolve(configArray);
+            var watchFunction = () => webpackResolve(config);
             watchFunction.displayName = "typescript:"+(config.name ?? config.filename);
             watch(paths, watchFunction);
         }
@@ -95,9 +93,7 @@ task("watch", () => {
     getEnvironmentConfigs(configs.react, true).forEach((config) => {
         var paths = config.watchPaths ?? config.paths;
         if(paths) {
-            var configArray = new Array();
-            configArray.push(config);
-            var watchFunction = () => webpackResolve(configArray);
+            var watchFunction = () => webpackResolve(config);
             watchFunction.displayName = "react:"+(config.name ?? config.filename);
             watch(paths, watchFunction);
         }
