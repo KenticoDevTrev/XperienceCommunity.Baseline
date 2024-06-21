@@ -13,7 +13,7 @@ namespace TabbedPages.Repositories.Implementations
         public async Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity)
         {
             // This implementation uses the NodeAliasPath, so if it's missing then we need to get it.
-            if(parentIdentity.PathAndChannelId.HasNoValue)
+            if(parentIdentity.PathChannelLookup.HasNoValue)
             {
                 var identityResult = await _identityService.HydrateTreeIdentity(parentIdentity);
                 if(identityResult.IsFailure)
@@ -23,13 +23,13 @@ namespace TabbedPages.Repositories.Implementations
             }
 
             // Should never be Maybe.None but just in case...
-            if(!parentIdentity.PathAndChannelId.TryGetValue(out var pathAndAndChannelId))
+            if(!parentIdentity.PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
                 return Array.Empty<TabItem>();
             }
 
-            string path = pathAndAndChannelId.Item1;
-            string siteName = _siteRepository.SiteNameById(pathAndAndChannelId.Item2.GetValueOrDefault(_siteService.CurrentSite.SiteID));
+            string path = pathChannelLookup.Path;
+            string siteName = _siteRepository.SiteNameById(pathChannelLookup.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID));
 
             var builder = _cacheDependencyBuilderFactory.Create(siteName)
                 .PagePath(path, PathTypeEnum.Children);
@@ -41,11 +41,11 @@ namespace TabbedPages.Repositories.Implementations
                     .Path(path, PathTypeEnum.Children)
                     .NestingLevel(1)
                     .OnSite(siteName)
-                    .ColumnsSafe(new string[] {
+                    .ColumnsSafe([
                     nameof(Tab.DocumentID),
                     nameof(Tab.TabName),
                     nameof(Tab.DocumentCulture)
-                    })
+                    ])
                     .OrderBy(nameof(TreeNode.NodeLevel), nameof(TreeNode.NodeOrder))
                     .GetEnumerableTypedResultAsync();
 
