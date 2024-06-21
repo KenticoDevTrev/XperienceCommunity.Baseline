@@ -151,7 +151,7 @@
                 {
                     ContentID = ContentID,
                     ContentGuid = ContentGuid,
-                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID)
                 };
             }
         }
@@ -164,7 +164,7 @@
                 {
                     ContentCultureID = ContentCultureID,
                     ContentCultureGuid = ContentCultureGuid,
-                    PathAndMaybeCultureAndChannelId = new Tuple<string, Maybe<string>, Maybe<int>>(Path, Culture, ChannelID)
+                    PathCultureChannelLookup = new PathCultureChannel(Path: Path, Culture: Culture, ChannelId: ChannelID)
                 };
             }
         }
@@ -177,7 +177,7 @@
                 {
                     PageID = PageID,
                     PageGuid = PageGuid,
-                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID)
                 };
             }
         }
@@ -190,7 +190,7 @@
                 {
                     PageID = PageID,
                     PageGuid = PageGuid,
-                    PathAndChannelId = new Tuple<string, Maybe<int>>(Path, ChannelID)
+                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID)
                 };
             }
         }

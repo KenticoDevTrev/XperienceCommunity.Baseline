@@ -6,15 +6,29 @@
     public record TreeIdentity : ICacheKey
     {
         public Maybe<int> PageID { get; init; }
-        public Maybe<Tuple<string, Maybe<int>>> PathAndChannelId { get; init; }
+        
         public Maybe<Guid> PageGuid { get; init; }
+        public Maybe<PathChannel> PathChannelLookup { get; init; }
+
+        [Obsolete("Use PathChannelLookup")]
+        public Maybe<Tuple<string, Maybe<int>>> PathAndChannelId
+        {
+            get
+            {
+                return PathChannelLookup.TryGetValue(out var pathChannelLookup) ? new Tuple<string, Maybe<int>>(pathChannelLookup.Path, pathChannelLookup.ChannelId) : Maybe.None;
+            }
+            init
+            {
+                PathChannelLookup = value.TryGetValue(out var tuple) ? new PathChannel(tuple.Item1, tuple.Item2) : Maybe.None;
+            }
+        }
 
         public string GetCacheKey()
         {
             var nodeAliasPathKey = "";
-            if (PathAndChannelId.TryGetValue(out var valuePath))
+            if (PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
-                nodeAliasPathKey = $"{valuePath.Item1}{valuePath.Item2.GetValueOrDefault(0)}";
+                nodeAliasPathKey = $"{pathChannelLookup.Path}{pathChannelLookup.ChannelId.GetValueOrDefault(0)}";
             }
 
             return $"{PageID.GetValueOrDefault(0)}{nodeAliasPathKey}{PageGuid.GetValueOrDefault(Guid.Empty)}";
@@ -41,9 +55,9 @@
         public new string GetCacheKey()
         {
             var nodeAliasPathKey = "";
-            if (PathAndChannelId.TryGetValue(out var valuePath))
+            if (PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
-                nodeAliasPathKey = $"{valuePath.Item1}{valuePath.Item2.GetValueOrDefault(0)}";
+                nodeAliasPathKey = $"{pathChannelLookup.Path}{pathChannelLookup.ChannelId.GetValueOrDefault(0)}";
             }
 
             return $"{PageID.GetValueOrDefault(0)}{nodeAliasPathKey}{PageGuid.GetValueOrDefault(Guid.Empty)}{Culture}";
@@ -54,4 +68,6 @@
             return GetCacheKey().GetHashCode();
         }
     }
+
+    public record PathChannel(string Path, Maybe<int> ChannelId);
 }

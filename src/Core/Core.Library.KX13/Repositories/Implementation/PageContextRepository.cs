@@ -176,18 +176,18 @@ namespace Core.Repositories.Implementation
 
                 }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByNodeGuid", nodeGuid));
             }
-            if (identity.PathAndChannelId.TryGetValue(out var pathAndAndChannelId))
+            if (identity.PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
-                if (currentPage.TryGetValue(out var currentPageVal) && currentPageVal.Path.Equals(pathAndAndChannelId.Item1, StringComparison.OrdinalIgnoreCase))
+                if (currentPage.TryGetValue(out var currentPageVal) && currentPageVal.Path.Equals(pathChannelLookup.Path, StringComparison.OrdinalIgnoreCase))
                 {
                     return currentPage;
                 }
-                builder.PagePath(pathAndAndChannelId.Item1);
+                builder.PagePath(pathChannelLookup.Path);
                 return await _progressiveCache.LoadAsync(async cs =>
                 {
                     var result = await DocumentHelper.GetDocuments()
-                    .Path(pathAndAndChannelId.Item1, PathTypeEnum.Single)
-                    .If(pathAndAndChannelId.Item2.TryGetValue(out var nodeSiteID), query => query.OnSite(nodeSiteID, false))
+                    .Path(pathChannelLookup.Path, PathTypeEnum.Single)
+                    .If(pathChannelLookup.ChannelId.TryGetValue(out var nodeSiteID), query => query.OnSite(nodeSiteID, false))
                     .WithCulturePreviewModeContext(_cacheRepositoryContext)
                     .IncludePageIdentityColumns()
                     .TopN(1)
@@ -195,9 +195,9 @@ namespace Core.Repositories.Implementation
                     .CombineWithAnyCulture()
                     .GetEnumerableTypedResultAsync();
 
-                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeAliasPath {pathAndAndChannelId.Item1}");
+                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeAliasPath {pathChannelLookup.Path}");
 
-                }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByNodePath", pathAndAndChannelId.Item1, pathAndAndChannelId.Item2.GetValueOrDefault(0)));
+                }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByNodePath", pathChannelLookup.Path, pathChannelLookup.ChannelId.GetValueOrDefault(0)));
             }
             return Result.Failure<PageIdentity>("No identifier was passed");
         }
@@ -265,17 +265,17 @@ namespace Core.Repositories.Implementation
 
                 }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByPageGuidAndCulture", pageGuid, identity.Culture));
             }
-            if (identity.PathAndChannelId.TryGetValue(out var pathAndAndChannelId))
+            if (identity.PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
                 if (currentPage.TryGetValue(out var currentPageVal) &&
-                    currentPageVal.Path.Equals(pathAndAndChannelId.Item1, StringComparison.OrdinalIgnoreCase)
-                    && (!pathAndAndChannelId.Item2.TryGetValue(out var siteID) || currentPageVal.ChannelID == siteID)
+                    currentPageVal.Path.Equals(pathChannelLookup.Path, StringComparison.OrdinalIgnoreCase)
+                    && (!pathChannelLookup.ChannelId.TryGetValue(out var siteID) || currentPageVal.ChannelID == siteID)
                     && currentPageVal.Culture.Equals(identity.Culture, StringComparison.OrdinalIgnoreCase)
                     )
                 {
                     return currentPage;
                 }
-                builder.PagePath(pathAndAndChannelId.Item1);
+                builder.PagePath(pathChannelLookup.Path);
                 return await _progressiveCache.LoadAsync(async cs =>
                 {
                     if (cs.Cached)
@@ -284,8 +284,8 @@ namespace Core.Repositories.Implementation
                     }
 
                     var result = await DocumentHelper.GetDocuments()
-                    .Path(pathAndAndChannelId.Item1, PathTypeEnum.Single)
-                    .If(pathAndAndChannelId.Item2.TryGetValue(out var channelId), query => query.OnSite(channelId, false))
+                    .Path(pathChannelLookup.Path, PathTypeEnum.Single)
+                    .If(pathChannelLookup.ChannelId.TryGetValue(out var channelId), query => query.OnSite(channelId, false))
                     .WithCulturePreviewModeContext(_cacheRepositoryContext)
                     .IncludePageIdentityColumns()
                     .TopN(1)
@@ -294,9 +294,9 @@ namespace Core.Repositories.Implementation
                     .CombineWithAnyCulture()
                     .GetEnumerableTypedResultAsync();
 
-                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeAliaPath {pathAndAndChannelId.Item1} and culture {identity.Culture}");
+                    return result.Any() ? result.First().ToPageIdentity() : Result.Failure<PageIdentity>($"Could not find a page with NodeAliaPath {pathChannelLookup.Path} and culture {identity.Culture}");
 
-                }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByPathAndCultureSite", pathAndAndChannelId.Item1, identity.Culture, pathAndAndChannelId.Item2.GetValueOrDefault(Maybe.None)));
+                }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetPageAsyncByPathAndCultureSite", pathChannelLookup.Path, identity.Culture, pathChannelLookup.ChannelId.GetValueOrDefault(Maybe.None)));
             }
             return Result.Failure<PageIdentity>("No identifier was passed");
         }

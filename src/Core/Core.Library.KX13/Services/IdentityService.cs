@@ -15,7 +15,7 @@ namespace Core.Services.Implementations
         public async Task<Result<TreeIdentity>> HydrateTreeIdentity(TreeIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.PageGuid.HasValue && identity.PageID.HasValue && identity.PathAndChannelId.TryGetValue(out var pathChannel) && pathChannel.Item2.HasValue)
+            if (identity.PageGuid.HasValue && identity.PageID.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
             {
                 return identity;
             }
@@ -33,9 +33,9 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathAndChannelValues))
+                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannelValues))
                 {
-                    string key = $"{pathAndChannelValues.Item1}|{pathAndChannelValues.Item2.GetValueOrDefault(currentSiteID)}".ToLower();
+                    string key = $"{pathAndChannelValues.Path}|{pathAndChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
                     if (dictionary.Tree.ByPathChannelIDKey.TryGetValue(key, out var newIdentityFromPath))
                     {
                         return newIdentityFromPath;
@@ -58,11 +58,11 @@ namespace Core.Services.Implementations
                     query += $"NodeGuid = @NodeGuid";
                     queryParams.Add(new DataParameter("@NodeGuid", guid));
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathAndChannel))
+                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel))
                 {
                     query += $"NodeAliasPath = @NodeAliasPath and NodeSiteID = @NodeSiteID";
-                    queryParams.Add(new DataParameter("@NodeAliasPath", pathAndChannel.Item1));
-                    queryParams.Add(new DataParameter("@NodeSiteID", pathAndChannel.Item2.GetValueOrDefault(currentSiteID)));
+                    queryParams.Add(new DataParameter("@NodeAliasPath", pathAndChannel.Path));
+                    queryParams.Add(new DataParameter("@NodeSiteID", pathAndChannel.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
@@ -71,7 +71,7 @@ namespace Core.Services.Implementations
                     {
                         PageID = (int)docRow["NodeID"],
                         PageGuid = (Guid)docRow["NodeGUID"],
-                        PathAndChannelId = new Tuple<string, Maybe<int>>((string)docRow["NodeAliasPath"], (int)docRow["NodeSiteID"])
+                        PathChannelLookup = new PathChannel(Path: (string)docRow["NodeAliasPath"], ChannelId: (int)docRow["NodeSiteID"])
                     };
                 }
                 else
@@ -84,7 +84,7 @@ namespace Core.Services.Implementations
         public async Task<Result<TreeCultureIdentity>> HydrateTreeCultureIdentity(TreeCultureIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.PageGuid.HasValue && identity.PageID.HasValue && identity.PathAndChannelId.TryGetValue(out var nodepathculture) && nodepathculture.Item2.HasValue)
+            if (identity.PageGuid.HasValue && identity.PageID.HasValue && identity.PathChannelLookup.TryGetValue(out var nodepathculture) && nodepathculture.ChannelId.HasValue)
             {
                 return identity;
             }
@@ -106,9 +106,9 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid.OrderBy(x => x.Culture.Equals(identity.Culture, StringComparison.OrdinalIgnoreCase) ? 0 : 1).First();
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathChannelValue))
+                if (identity.PathChannelLookup.TryGetValue(out var pathChannelValue))
                 {
-                    string key = $"{pathChannelValue.Item1}|{pathChannelValue.Item2.GetValueOrDefault(currentSiteID)}".ToLower();
+                    string key = $"{pathChannelValue.Path}|{pathChannelValue.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
                     if (dictionary.TreeCulture.ByPathChannelIDKey.TryGetValue(key, out var newIdentityFromPath))
                     {
                         return newIdentityFromPath.OrderBy(x => x.Culture.Equals(identity.Culture, StringComparison.OrdinalIgnoreCase) ? 0 : 1).First();
@@ -131,14 +131,14 @@ namespace Core.Services.Implementations
                     query += $"NodeGuid = @NodeGuid";
                     queryParams.Add(new DataParameter("@NodeGuid", guid));
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathChannelValue))
+                if (identity.PathChannelLookup.TryGetValue(out var pathChannelValue))
                 {
                     // for documents, culture should be a preferred otherwise use current site default or first found
                     query += $"NodeAliasPath = @NodeAliasPath and NodeSiteID = @NodeSiteID order by case when DocumentCulture = @DocumentCulture then 0 else case when DocumentCulture = @DefaultCulture then 1 else 2 end end";
-                    queryParams.Add(new DataParameter("@NodeAliasPath", pathChannelValue.Item1));
+                    queryParams.Add(new DataParameter("@NodeAliasPath", pathChannelValue.Path));
                     queryParams.Add(new DataParameter("@DocumentCulture", identity.Culture));
                     queryParams.Add(new DataParameter("@DefaultCulture", defaultCulture));
-                    queryParams.Add(new DataParameter("@NodeSiteID", pathChannelValue.Item2.GetValueOrDefault(currentSiteID)));
+                    queryParams.Add(new DataParameter("@NodeSiteID", pathChannelValue.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
@@ -147,7 +147,7 @@ namespace Core.Services.Implementations
                     {
                         PageID = (int)docRow["NodeID"],
                         PageGuid = (Guid)docRow["NodeGUID"],
-                        PathAndChannelId = new Tuple<string, Maybe<int>>((string)docRow["NodeAliasPath"], (int)docRow["NodeSiteID"])
+                        PathChannelLookup = new PathChannel(Path: (string)docRow["NodeAliasPath"], ChannelId: (int)docRow["NodeSiteID"])
                     };
                 }
                 else
@@ -160,7 +160,7 @@ namespace Core.Services.Implementations
         public async Task<Result<ContentIdentity>> HydrateContentIdentity(ContentIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.ContentID.HasValue && identity.ContentID.HasValue && identity.PathAndChannelId.TryGetValue(out var pathChannel) && pathChannel.Item2.HasValue)
+            if (identity.ContentID.HasValue && identity.ContentID.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
             {
                 return identity;
             }
@@ -178,9 +178,9 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathAndChannelValues))
+                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannelValues))
                 {
-                    string key = $"{pathAndChannelValues.Item1}|{pathAndChannelValues.Item2.GetValueOrDefault(currentSiteID)}".ToLower();
+                    string key = $"{pathAndChannelValues.Path}|{pathAndChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
                     if (dictionary.Content.ByPathChannelIDKey.TryGetValue(key, out var newIdentityFromPath))
                     {
                         return newIdentityFromPath;
@@ -203,11 +203,11 @@ namespace Core.Services.Implementations
                     query += $"NodeGuid = @NodeGuid";
                     queryParams.Add(new DataParameter("@NodeGuid", guid));
                 }
-                if (identity.PathAndChannelId.TryGetValue(out var pathAndChannel))
+                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel))
                 {
                     query += $"NodeAliasPath = @NodeAliasPath and NodeSiteID = @NodeSiteID";
-                    queryParams.Add(new DataParameter("@NodeAliasPath", pathAndChannel.Item1));
-                    queryParams.Add(new DataParameter("@NodeSiteID", pathAndChannel.Item2.GetValueOrDefault(currentSiteID)));
+                    queryParams.Add(new DataParameter("@NodeAliasPath", pathAndChannel.Path));
+                    queryParams.Add(new DataParameter("@NodeSiteID", pathAndChannel.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
@@ -216,7 +216,7 @@ namespace Core.Services.Implementations
                     {
                         ContentID = (int)docRow["NodeID"],
                         ContentGuid = (Guid)docRow["NodeGUID"],
-                        PathAndChannelId = new Tuple<string, Maybe<int>>((string)docRow["NodeAliasPath"], (int)docRow["NodeSiteID"])
+                        PathChannelLookup = new PathChannel(Path: (string)docRow["NodeAliasPath"], ChannelId: (int)docRow["NodeSiteID"])
                     };
                 }
                 else
@@ -229,7 +229,7 @@ namespace Core.Services.Implementations
         public async Task<Result<ContentCultureIdentity>> HydrateContentCultureIdentity(ContentCultureIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.ContentCultureID.HasValue && identity.ContentCultureID.HasValue && identity.PathAndMaybeCultureAndChannelId.TryGetValue(out var nodepathculture) && nodepathculture.Item2.HasValue && nodepathculture.Item3.HasValue)
+            if (identity.ContentCultureID.HasValue && identity.ContentCultureID.HasValue && identity.PathCultureChannelLookup.TryGetValue(out var nodepathculture) && nodepathculture.ChannelId.HasValue && nodepathculture.Culture.HasValue)
             {
                 return identity;
             }
@@ -252,15 +252,15 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
-                if (identity.PathAndMaybeCultureAndChannelId.TryGetValue(out var pathCultureChannelValues))
+                if (identity.PathCultureChannelLookup.TryGetValue(out var pathCultureChannelValues))
                 {
-                    string key = $"{pathCultureChannelValues.Item1}|{pathCultureChannelValues.Item2.GetValueOrDefault(culture)}|{pathCultureChannelValues.Item3.GetValueOrDefault(currentSiteID)}".ToLower();
+                    string key = $"{pathCultureChannelValues.Path}|{pathCultureChannelValues.Culture.GetValueOrDefault(culture)}|{pathCultureChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
                     if (dictionary.ContentCulture.ByPathChannelCultureIDKey.TryGetValue(key, out var newIdentityFromPath))
                     {
                         return newIdentityFromPath;
                     }
 
-                    string keyCultureLess = $"{pathCultureChannelValues.Item1}|{pathCultureChannelValues.Item3.GetValueOrDefault(currentSiteID)}".ToLower();
+                    string keyCultureLess = $"{pathCultureChannelValues.Path}|{pathCultureChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
                     if (dictionary.ContentCulture.ByPathChannelIDKey.TryGetValue(keyCultureLess, out var newIdentityFromPathNoCulture))
                     {
                         return newIdentityFromPathNoCulture;
@@ -283,14 +283,14 @@ namespace Core.Services.Implementations
                     query += $"DocumentGuid = @DocumentGuid";
                     queryParams.Add(new DataParameter("@DocumentGuid", guid));
                 }
-                if (identity.PathAndMaybeCultureAndChannelId.TryGetValue(out var nodePathValues))
+                if (identity.PathCultureChannelLookup.TryGetValue(out var nodePathValues))
                 {
                     // for documents, culture should be a preferred otherwise use current site default or first found
                     query += $"NodeAliasPath = @NodeAliasPath and NodeSiteID = @NodeSiteID order by case when DocumentCulture = @DocumentCulture then 0 else case when DocumentCulture = @DefaultCulture then 1 else 2 end end";
-                    queryParams.Add(new DataParameter("@NodeAliasPath", nodePathValues.Item1));
-                    queryParams.Add(new DataParameter("@DocumentCulture", nodePathValues.Item2.GetValueOrDefault(culture)));
+                    queryParams.Add(new DataParameter("@NodeAliasPath", nodePathValues.Path));
+                    queryParams.Add(new DataParameter("@DocumentCulture", nodePathValues.Culture.GetValueOrDefault(culture)));
                     queryParams.Add(new DataParameter("@DefaultCulture", defaultCulture));
-                    queryParams.Add(new DataParameter("@NodeSiteID", nodePathValues.Item3.GetValueOrDefault(currentSiteID)));
+                    queryParams.Add(new DataParameter("@NodeSiteID", nodePathValues.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
@@ -299,7 +299,7 @@ namespace Core.Services.Implementations
                     {
                         ContentCultureID = (int)docRow["DocumentID"],
                         ContentCultureGuid = (Guid)docRow["DocumentGuid"],
-                        PathAndMaybeCultureAndChannelId = new Tuple<string, Maybe<string>, Maybe<int>>((string)docRow["NodeAliasPath"], (string)docRow["DocumentCulture"], (int)docRow["NodeSiteID"])
+                        PathCultureChannelLookup = new PathCultureChannel(Path: (string)docRow["NodeAliasPath"], Culture: (string)docRow["DocumentCulture"], ChannelId: (int)docRow["NodeSiteID"])
                     };
                 }
                 else
@@ -483,7 +483,7 @@ namespace Core.Services.Implementations
                     {
                         PageID = firstItem.NodeId,
                         PageGuid = firstItem.NodeGuid,
-                        PathAndChannelId = new Tuple<string, Maybe<int>>(firstItem.NodeAliasPath, firstItem.NodeSiteID)
+                        PathChannelLookup = new PathChannel(Path: firstItem.NodeAliasPath, ChannelId: firstItem.NodeSiteID)
                     };
                     var nodeKey = $"{firstItem.NodeAliasPath}|{firstItem.NodeSiteID}".ToLower();
                     treeIdentityDictionaries.ById.TryAdd(firstItem.NodeId, treeIdentity);
@@ -497,7 +497,7 @@ namespace Core.Services.Implementations
                         {
                             PageID = document.NodeId,
                             PageGuid = document.NodeGuid,
-                            PathAndChannelId = new Tuple<string, Maybe<int>>(document.NodeAliasPath, document.NodeSiteID)
+                            PathChannelLookup = new PathChannel(Path: document.NodeAliasPath, ChannelId: document.NodeSiteID)
                         };
                         var documentKey = $"{document.NodeAliasPath}|{document.NodeSiteID}".ToLower();
                         var documentCulturelessKey = $"{document.NodeAliasPath}|{document.NodeSiteID}".ToLower();
@@ -548,7 +548,7 @@ namespace Core.Services.Implementations
                     {
                         ContentID = firstItem.NodeId,
                         ContentGuid = firstItem.NodeGuid,
-                        PathAndChannelId = new Tuple<string, Maybe<int>>(firstItem.NodeAliasPath, firstItem.NodeSiteID)
+                        PathChannelLookup = new PathChannel(Path: firstItem.NodeAliasPath, ChannelId: firstItem.NodeSiteID)
                     };
                     var pathChannelKey = $"{firstItem.NodeAliasPath}|{firstItem.NodeSiteID}".ToLower();
                     contentIdentityDictionaries.ById.TryAdd(firstItem.NodeId, contentIdentity);
@@ -562,7 +562,7 @@ namespace Core.Services.Implementations
                         {
                             ContentCultureID = document.DocumentID,
                             ContentCultureGuid = document.DocumentGuid,
-                            PathAndMaybeCultureAndChannelId = new Tuple<string, Maybe<string>, Maybe<int>>(document.NodeAliasPath, document.DocumentCulture, document.NodeSiteID)
+                            PathCultureChannelLookup = new PathCultureChannel(Path: document.NodeAliasPath, Culture: document.DocumentCulture, ChannelId: document.NodeSiteID)
                         };
 
                         var contentIDCultureKey = $"{document.NodeId}|{document.DocumentCulture}".ToLower();

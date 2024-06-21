@@ -32,6 +32,39 @@ namespace Core.Extensions
             return new PageIdentity<T>(data, pageIdentity);
         }
 
+        public static TreeIdentity ToTreeIdentity(this TreeNode node)
+        {
+            return new TreeIdentity()
+            {
+                PageGuid = node.NodeGUID.Equals(Guid.Empty) ? Maybe.None : node.NodeGUID,
+                PageID = node.NodeID < 1 ? Maybe.None : node.NodeID,
+                PathChannelLookup = !string.IsNullOrWhiteSpace(node.NodeAliasPath) ? new PathChannel(Path: node.NodeAliasPath, ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None
+            };
+        }
+
+        public static ContentIdentity ToContentIdentity(this TreeNode node)
+        {
+            return new ContentIdentity()
+            {
+                ContentGuid = node.NodeGUID.Equals(Guid.Empty) ? Maybe.None : node.NodeGUID,
+                ContentID = node.NodeID < 1 ? Maybe.None : node.NodeID,
+                PathChannelLookup = !string.IsNullOrWhiteSpace(node.NodeAliasPath) ? new PathChannel(Path: node.NodeAliasPath, ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None
+            };
+        }
+
+        public static ContentCultureIdentity ToContentCultureIdentity(this TreeNode node)
+        {
+            return new ContentCultureIdentity()
+            {
+                ContentCultureGuid = node.DocumentGUID.Equals(Guid.Empty) ? Maybe.None : node.DocumentGUID,
+                ContentCultureID = node.DocumentID < 1 ? Maybe.None : node.DocumentID,
+                PathCultureChannelLookup = !string.IsNullOrWhiteSpace(node.NodeAliasPath) ? new PathCultureChannel(Path: node.NodeAliasPath,
+                                                                                                                               Culture: string.IsNullOrWhiteSpace(node.DocumentCulture) ? Maybe.None : node.DocumentCulture,
+                                                                                                                               ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None,
+                ContentCultureLookup = node.NodeID < 1 ? Maybe.None : new ContentCulture(ContentId: node.NodeID, Culture: string.IsNullOrWhiteSpace(node.DocumentCulture) ? Maybe.None : node.DocumentCulture)
+            };
+        }
+
         /// <summary>
         /// Converts a TreeNode to the PageIdentity, useful for pages retrieved througH PageBuilder
         /// </summary>
