@@ -151,7 +151,8 @@
                 {
                     ContentID = ContentID,
                     ContentGuid = ContentGuid,
-                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID)
+                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID),
+                    ContentName = (Path.Split("/", StringSplitOptions.RemoveEmptyEntries).Last() ?? string.Empty).AsNullOrWhitespaceMaybe()
                 };
             }
         }

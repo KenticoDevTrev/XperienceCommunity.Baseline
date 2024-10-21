@@ -8,6 +8,9 @@
         public Maybe<int> PageID { get; init; }
         
         public Maybe<Guid> PageGuid { get; init; }
+
+        public Maybe<string> PageName { get; init; }
+        
         public Maybe<PathChannel> PathChannelLookup { get; init; }
 
         [Obsolete("Use PathChannelLookup")]
@@ -69,5 +72,11 @@
         }
     }
 
-    public record PathChannel(string Path, Maybe<int> ChannelId);
+    public record PathChannel(string Path, Maybe<int> ChannelId) : ICacheKey
+    {
+        public string GetCacheKey()
+        {
+            return $"{Path}|{ChannelId.GetValueOrDefault(0)}";
+        }
+    }
 }

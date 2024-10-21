@@ -48,6 +48,7 @@ namespace Core.Extensions
             {
                 ContentGuid = node.NodeGUID.Equals(Guid.Empty) ? Maybe.None : node.NodeGUID,
                 ContentID = node.NodeID < 1 ? Maybe.None : node.NodeID,
+                ContentName = !string.IsNullOrWhiteSpace(node.NodeAlias) ? node.NodeAlias : Maybe.None,
                 PathChannelLookup = !string.IsNullOrWhiteSpace(node.NodeAliasPath) ? new PathChannel(Path: node.NodeAliasPath, ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None
             };
         }
