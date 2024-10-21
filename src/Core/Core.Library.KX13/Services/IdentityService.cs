@@ -15,7 +15,7 @@ namespace Core.Services.Implementations
         public async Task<Result<TreeIdentity>> HydrateTreeIdentity(TreeIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.PageGuid.HasValue && identity.PageID.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
+            if (identity.PageID.HasValue && identity.PageGuid.HasValue && identity.PageName.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
             {
                 return identity;
             }
@@ -33,6 +33,9 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
+                if (identity.PageName.TryGetValue(out var name) && dictionary.Tree.ByName.TryGetValue(name.ToLowerInvariant(), out var newIdentityFromName)) {
+                    return newIdentityFromName;
+                }
                 if (identity.PathChannelLookup.TryGetValue(out var pathAndChannelValues))
                 {
                     string key = $"{pathAndChannelValues.Path}|{pathAndChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
@@ -47,7 +50,7 @@ namespace Core.Services.Implementations
             {
                 // Can't use cached version, so just generate manually
                 var queryParams = new QueryDataParameters();
-                var query = $"select NodeID, NodeGUID, NodeAliasPath, NodeSiteID from View_CMS_Tree_Joined where ";
+                var query = $"select NodeID, NodeGUID, NodeAlias, NodeAliasPath, NodeSiteID from View_CMS_Tree_Joined where ";
                 if (identity.PageID.TryGetValue(out var id))
                 {
                     query += $"NodeID = @NodeID";
@@ -57,6 +60,10 @@ namespace Core.Services.Implementations
                 {
                     query += $"NodeGuid = @NodeGuid";
                     queryParams.Add(new DataParameter("@NodeGuid", guid));
+                }
+                if (identity.PageName.TryGetValue(out var pageName)) {
+                    query += $"NodeAlias = @NodeAlias";
+                    queryParams.Add(new DataParameter("@NodeAlias", pageName));
                 }
                 if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel))
                 {
@@ -71,6 +78,7 @@ namespace Core.Services.Implementations
                     {
                         PageID = (int)docRow["NodeID"],
                         PageGuid = (Guid)docRow["NodeGUID"],
+                        PageName = (string)docRow["NodeAlias"],
                         PathChannelLookup = new PathChannel(Path: (string)docRow["NodeAliasPath"], ChannelId: (int)docRow["NodeSiteID"])
                     };
                 }
@@ -160,10 +168,12 @@ namespace Core.Services.Implementations
         public async Task<Result<ContentIdentity>> HydrateContentIdentity(ContentIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.ContentID.HasValue && identity.ContentID.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
+            if (identity.ContentID.HasValue && identity.ContentGuid.HasValue && identity.ContentName.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
             {
                 return identity;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var currentSiteID = _siteService.CurrentSite.SiteID;
 
@@ -178,6 +188,9 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
+                // Don't do lookup by name, it's not unique in KX13
+
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                 if (identity.PathChannelLookup.TryGetValue(out var pathAndChannelValues))
                 {
                     string key = $"{pathAndChannelValues.Path}|{pathAndChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
@@ -186,13 +199,14 @@ namespace Core.Services.Implementations
                         return newIdentityFromPath;
                     }
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
                 return Result.Failure<ContentIdentity>("Could not find content identity.");
             }
             else
             {
                 // Can't use cached version, so just generate manually
                 var queryParams = new QueryDataParameters();
-                var query = $"select NodeID, NodeGUID, NodeAliasPath, NodeSiteID from View_CMS_Tree_Joined where ";
+                var query = $"select NodeID, NodeGUID, NodeAliasPath, NodeAlias, NodeSiteID from View_CMS_Tree_Joined where ";
                 if (identity.ContentID.TryGetValue(out var id))
                 {
                     query += $"NodeID = @NodeID";
@@ -203,21 +217,26 @@ namespace Core.Services.Implementations
                     query += $"NodeGuid = @NodeGuid";
                     queryParams.Add(new DataParameter("@NodeGuid", guid));
                 }
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                 if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel))
                 {
                     query += $"NodeAliasPath = @NodeAliasPath and NodeSiteID = @NodeSiteID";
                     queryParams.Add(new DataParameter("@NodeAliasPath", pathAndChannel.Path));
                     queryParams.Add(new DataParameter("@NodeSiteID", pathAndChannel.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
                 {
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                     return new ContentIdentity()
                     {
                         ContentID = (int)docRow["NodeID"],
                         ContentGuid = (Guid)docRow["NodeGUID"],
+                        ContentName = (string)docRow["NodeAlias"],
                         PathChannelLookup = new PathChannel(Path: (string)docRow["NodeAliasPath"], ChannelId: (int)docRow["NodeSiteID"])
                     };
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
                 else
                 {
@@ -229,10 +248,12 @@ namespace Core.Services.Implementations
         public async Task<Result<ContentCultureIdentity>> HydrateContentCultureIdentity(ContentCultureIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.ContentCultureID.HasValue && identity.ContentCultureID.HasValue && identity.PathCultureChannelLookup.TryGetValue(out var nodepathculture) && nodepathculture.ChannelId.HasValue && nodepathculture.Culture.HasValue)
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
+            if (identity.ContentCultureID.HasValue && identity.ContentCultureGuid.HasValue && identity.PathCultureChannelLookup.TryGetValue(out var nodepathculture) && nodepathculture.ChannelId.HasValue && nodepathculture.Culture.HasValue)
             {
                 return identity;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
             var currentSiteID = _siteService.CurrentSite.SiteID;
 
             // Site settings are already cached in the Provider
@@ -252,6 +273,7 @@ namespace Core.Services.Implementations
                 {
                     return newIdentityFromGuid;
                 }
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                 if (identity.PathCultureChannelLookup.TryGetValue(out var pathCultureChannelValues))
                 {
                     string key = $"{pathCultureChannelValues.Path}|{pathCultureChannelValues.Culture.GetValueOrDefault(culture)}|{pathCultureChannelValues.ChannelId.GetValueOrDefault(currentSiteID)}".ToLower();
@@ -266,6 +288,7 @@ namespace Core.Services.Implementations
                         return newIdentityFromPathNoCulture;
                     }
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
                 return Result.Failure<ContentCultureIdentity>("Could not find content culture identity.");
             }
             else
@@ -283,6 +306,7 @@ namespace Core.Services.Implementations
                     query += $"DocumentGuid = @DocumentGuid";
                     queryParams.Add(new DataParameter("@DocumentGuid", guid));
                 }
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                 if (identity.PathCultureChannelLookup.TryGetValue(out var nodePathValues))
                 {
                     // for documents, culture should be a preferred otherwise use current site default or first found
@@ -292,15 +316,18 @@ namespace Core.Services.Implementations
                     queryParams.Add(new DataParameter("@DefaultCulture", defaultCulture));
                     queryParams.Add(new DataParameter("@NodeSiteID", nodePathValues.ChannelId.GetValueOrDefault(currentSiteID)));
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 if (item.FirstOrMaybe().TryGetValue(out var docRow))
                 {
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                     return new ContentCultureIdentity()
                     {
                         ContentCultureID = (int)docRow["DocumentID"],
                         ContentCultureGuid = (Guid)docRow["DocumentGuid"],
                         PathCultureChannelLookup = new PathCultureChannel(Path: (string)docRow["NodeAliasPath"], Culture: (string)docRow["DocumentCulture"], ChannelId: (int)docRow["NodeSiteID"])
                     };
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
                 else
                 {
@@ -489,6 +516,7 @@ namespace Core.Services.Implementations
                     treeIdentityDictionaries.ById.TryAdd(firstItem.NodeId, treeIdentity);
                     treeIdentityDictionaries.ByPathChannelIDKey.TryAdd(nodeKey, treeIdentity);
                     treeIdentityDictionaries.ByGuid.TryAdd(firstItem.NodeGuid, treeIdentity);
+                    treeIdentityDictionaries.ByName.TryAdd(firstItem.NodeAliasPath.Trim('/').Split('/').Last().ToLowerInvariant(), treeIdentity);
 
                     // Order by the default culture item first
                     foreach (var document in nodeGrouping.OrderBy(x => x.DocumentCulture.Equals(channelIdToCulture[x.NodeSiteID], StringComparison.OrdinalIgnoreCase) ? 0 : 1))
@@ -544,12 +572,16 @@ namespace Core.Services.Implementations
                 foreach (var nodeGrouping in allPages.GroupBy(x => x.NodeId))
                 {
                     var firstItem = nodeGrouping.First();
+                    var pathSplit = firstItem.NodeAliasPath.Split("/", StringSplitOptions.RemoveEmptyEntries).Last() ?? string.Empty;
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                     var contentIdentity = new ContentIdentity()
                     {
                         ContentID = firstItem.NodeId,
                         ContentGuid = firstItem.NodeGuid,
+                        ContentName = (firstItem.NodeAliasPath.Split("/", StringSplitOptions.RemoveEmptyEntries).Last() ?? string.Empty).AsNullOrWhitespaceMaybe(),
                         PathChannelLookup = new PathChannel(Path: firstItem.NodeAliasPath, ChannelId: firstItem.NodeSiteID)
                     };
+#pragma warning restore CS0618 // Type or member is obsolete
                     var pathChannelKey = $"{firstItem.NodeAliasPath}|{firstItem.NodeSiteID}".ToLower();
                     contentIdentityDictionaries.ById.TryAdd(firstItem.NodeId, contentIdentity);
                     contentIdentityDictionaries.ByPathChannelIDKey.TryAdd(pathChannelKey, contentIdentity);
@@ -558,12 +590,14 @@ namespace Core.Services.Implementations
                     // Order by the default culture item first
                     foreach (var document in nodeGrouping)
                     {
+#pragma warning disable CS0618 // Type or member is obsolete - This is valid in KX13
                         var documentIdentity = new ContentCultureIdentity()
                         {
                             ContentCultureID = document.DocumentID,
                             ContentCultureGuid = document.DocumentGuid,
                             PathCultureChannelLookup = new PathCultureChannel(Path: document.NodeAliasPath, Culture: document.DocumentCulture, ChannelId: document.NodeSiteID)
                         };
+#pragma warning restore CS0618 // Type or member is obsolete
 
                         var contentIDCultureKey = $"{document.NodeId}|{document.DocumentCulture}".ToLower();
                         var pathCultureChannelKey = $"{document.NodeAliasPath}|{document.NodeSiteID}|{document.DocumentCulture}".ToLower();
@@ -711,6 +745,154 @@ namespace Core.Services.Implementations
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetBaseNodeAndDocumentData"));
         }
 
+        public async Task<Result<string>> GetContentType(TreeIdentity identity)
+        {
+            var dictionary = await GetTreeIdentityToContentItemIdDictionaries();
+            if (identity.PageID.TryGetValue(out var pageId) && dictionary.ByWebPageItemId.TryGetValue(pageId, out var contentItemIdById)) {
+                return await GetContentType(contentItemIdById.ToContentIdentity());
+            }
+            if (identity.PageGuid.TryGetValue(out var pageGuid) && dictionary.ByWebPageItemGuid.TryGetValue(pageGuid, out var contentItemIdByGuid)) {
+                return await GetContentType(contentItemIdByGuid.ToContentIdentity());
+            }
+            if (identity.PageName.TryGetValue(out var pageName) && dictionary.ByWebPageItemName.TryGetValue(pageName, out var contentItemIdByName)) {
+                return await GetContentType(contentItemIdByName.ToContentIdentity());
+            }
+            if (identity.PathChannelLookup.TryGetValue(out var pathChannel) && dictionary.ByWebPageItemPathChannel.TryGetValue(new PathChannel(pathChannel.Path, pathChannel.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID)).GetCacheKey().ToLowerInvariant(), out var contentItemIdByPath)) {
+                return await GetContentType(contentItemIdByPath.ToContentIdentity());
+            }
+            return Result.Failure<string>("Could not find class name for this TreeIdentity");
+        }
+
+        public async Task<Result<string>> GetContentType(ContentIdentity identity)
+        {
+            var classIdToString = await GetClassIdToNameDictionary();
+            var dictionary = await GetContentItemToClassIdDictionaries();
+            if (identity.ContentID.TryGetValue(out var contentId) && dictionary.ByContentItemId.TryGetValue(contentId, out var classIdById) && classIdToString.TryGetValue(classIdById, out var classById)) {
+                return classById;
+            }
+            if (identity.ContentGuid.TryGetValue(out var contentGuid) && dictionary.ByContentItemGuid.TryGetValue(contentGuid, out var classIdByGuid) && classIdToString.TryGetValue(classIdByGuid, out var classByGuid)) {
+                return classByGuid;
+            }
+            if (identity.ContentName.TryGetValue(out var contentName) && dictionary.ByContentItemName.TryGetValue(contentName.ToLowerInvariant().Trim(), out var classIdByName) && classIdToString.TryGetValue(classIdByName, out var classByName)) {
+                return classByName;
+            }
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
+            if (identity.PathChannelLookup.TryGetValue(out var pathChannel)) {
+                return await GetContentType(new TreeIdentity() { PathChannelLookup = new PathChannel(pathChannel.Path, pathChannel.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID)) });
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return Result.Failure<string>("Could not find class name for this ContentIdentity");
+        }
+
+        public Task<Result<string>> GetContentType(TreeCultureIdentity identity) => GetContentType((TreeIdentity)identity);
+
+        public async Task<Result<string>> GetContentType(ContentCultureIdentity identity)
+        {
+            var dictionary = await GetContentItemCultureToContentItemIdDictionaries();
+            Maybe<int> contentId = Maybe.None;
+            if (identity.ContentCultureID.TryGetValue(out var contentCultureId) && dictionary.ByContentItemCommonDataId.TryGetValue(contentCultureId, out var contentItemIdById)) {
+                return await GetContentType(contentItemIdById.ToContentIdentity());
+            } 
+            if (identity.ContentCultureGuid.TryGetValue(out var contentCultureGuid) && dictionary.ByContentItemCommonDataGuid.TryGetValue(contentCultureGuid, out var contentItemIdByGuId)) {
+                return await GetContentType(contentItemIdByGuId.ToContentIdentity());
+            }
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
+            if (identity.PathCultureChannelLookup.TryGetValue(out var pathChannel)) {
+                return await GetContentType(new TreeIdentity() { PathChannelLookup = new PathChannel(pathChannel.Path, pathChannel.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID)) });
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return Result.Failure<string>("Could not find class name for this ContentCultureIdentity");
+        }
+
+        private async Task<ContentItemToClassIdDictionaries> GetContentItemToClassIdDictionaries()
+        {
+            var allNodeDependencies = await GetAllNodesDependencyKey();
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(allNodeDependencies);
+                }
+                var query = $"select {nameof(TreeNode.NodeID)}, {nameof(TreeNode.NodeGUID)}, {nameof(TreeNode.NodeAlias)}, NodeClassID from CMS_Tree";
+                var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
+                var byId = new Dictionary<int, int>();
+                var byGuid = new Dictionary<Guid, int>();
+                var byName = new Dictionary<string, int>();
+                foreach (var dr in results) {
+                    int classId = (int)dr["NodeClassID"];
+                    byId.Add((int)dr[nameof(TreeNode.NodeID)], classId);
+                    byGuid.Add((Guid)dr[nameof(TreeNode.NodeGUID)], classId);
+                    byName.TryAdd(((string)dr[nameof(TreeNode.NodeAlias)]).ToLowerInvariant().Trim(), classId);
+                }
+                return new ContentItemToClassIdDictionaries(byId, byName, byGuid);
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetContentItemToClassIdDictionaries"));
+        }
+
+        private async Task<ContentItemCultureToContentItemIdDictionaries> GetContentItemCultureToContentItemIdDictionaries()
+        {
+            var allNodeDependencies = await GetAllNodesDependencyKey();
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
+                }
+                var query = $"select {nameof(TreeNode.DocumentID)}, {nameof(TreeNode.DocumentGUID)}, DocumentNodeID from CMS_Document";
+                var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
+                var byId = new Dictionary<int, int>();
+                var byGuid = new Dictionary<Guid, int>();
+                foreach (var dr in results) {
+                    int contentItemId = (int)dr["DocumentNodeID"];
+                    byId.Add((int)dr[nameof(TreeNode.DocumentID)], contentItemId);
+                    byGuid.Add((Guid)dr[nameof(TreeNode.DocumentGUID)], contentItemId);
+                }
+                return new ContentItemCultureToContentItemIdDictionaries(byId, byGuid);
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetContentItemCultureToContentItemIdDictionaries"));
+        }
+
+        private Task<TreeIdentityToContentItemIdDictionaries> GetTreeIdentityToContentItemIdDictionaries()
+        {
+            return _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"webpageitem|all");
+                }
+                var query = $"select {nameof(TreeNode.NodeID)}, {nameof(TreeNode.NodeGUID)}, {nameof(TreeNode.NodeAlias)}, {nameof(TreeNode.NodeAliasPath)}, {nameof(TreeNode.NodeSiteID)}, DocumentNodeID from CMS_WebPageItem";
+                var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
+                var byId = new Dictionary<int, int>();
+                var byName = new Dictionary<string, int>();
+                var byGuid = new Dictionary<Guid, int>();
+                var byPathChannelKey = new Dictionary<string, int>();
+                foreach (var dr in results) {
+                    int contentItemId = (int)dr["DocumentNodeID"];
+                    byId.Add((int)dr[nameof(TreeNode.NodeID)], contentItemId);
+                    byGuid.Add((Guid)dr[nameof(TreeNode.NodeGUID)], contentItemId);
+                    byName.TryAdd(((string)dr[nameof(TreeNode.NodeAlias)]).ToLowerInvariant().Trim(), contentItemId);
+                    byPathChannelKey.Add(new PathChannel(((string)dr[nameof(TreeNode.NodeAliasPath)]).ToLowerInvariant().Trim(), (int)dr[nameof(TreeNode.NodeSiteID)]).GetCacheKey().ToLowerInvariant(), contentItemId);
+                }
+                return new TreeIdentityToContentItemIdDictionaries(byId, byName, byGuid, byPathChannelKey);
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetTreeIdentityToContentItemIdDictionaries"));
+        }
+
+
+        private async Task<Dictionary<int, string>> GetClassIdToNameDictionary()
+        {
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"cms.class|all");
+                }
+                var query = $"select {nameof(DataClassInfo.ClassID)}, {nameof(DataClassInfo.ClassName)} from CMS_Class";
+                return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>()
+                .ToDictionary(key => (int)key[nameof(DataClassInfo.ClassID)], value => (string)value[nameof(DataClassInfo.ClassName)]);
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetClassIdToNameDictionary"));
+        }
+
+        private async Task<string[]> GetAllNodesDependencyKey()
+        {
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"cms.site|all");
+                }
+                return (await _siteInfoProvider.Get().Columns(nameof(SiteInfo.SiteName)).GetEnumerableTypedResultAsync()).Select(x => $"node|{x.SiteName}|/|childnodes").ToArray();
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetAllNodesDependencyKey"));
+        }
+
+
         private record AllPagesData(int NodeId, Guid NodeGuid, string NodeAliasPath, int NodeSiteID, string DocumentCulture, int DocumentID, Guid DocumentGuid);
 
         #endregion
@@ -752,6 +934,7 @@ namespace Core.Services.Implementations
             public Dictionary<int, TreeIdentity> ById { get; set; } = [];
             public Dictionary<string, TreeIdentity> ByPathChannelIDKey { get; set; } = [];
             public Dictionary<Guid, TreeIdentity> ByGuid { get; set; } = [];
+            public Dictionary<string, TreeIdentity> ByName { get; set; } = [];
         }
 
         private class TreeCultureIdentityDictionaries
@@ -783,6 +966,13 @@ namespace Core.Services.Implementations
             public Dictionary<string, ObjectIdentity> ByCodeName { get; set; } = [];
             public Dictionary<Guid, ObjectIdentity> ByGuid { get; set; } = [];
         }
+
+        private record ContentItemToClassIdDictionaries(Dictionary<int, int> ByContentItemId, Dictionary<string, int> ByContentItemName, Dictionary<Guid, int> ByContentItemGuid);
+
+        private record ContentItemCultureToContentItemIdDictionaries(Dictionary<int, int> ByContentItemCommonDataId, Dictionary<Guid, int> ByContentItemCommonDataGuid);
+
+        private record TreeIdentityToContentItemIdDictionaries(Dictionary<int, int> ByWebPageItemId, Dictionary<string, int> ByWebPageItemName, Dictionary<Guid, int> ByWebPageItemGuid, Dictionary<string, int> ByWebPageItemPathChannel);
+
 
         #endregion
     }

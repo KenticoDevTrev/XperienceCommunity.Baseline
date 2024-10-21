@@ -15,6 +15,14 @@
 
         Task<Result<ObjectIdentity>> HydrateObjectIdentity(ObjectIdentity identity, string className);
 
+        Task<Result<string>> GetContentType(TreeIdentity identity);
+        
+        Task<Result<string>> GetContentType(ContentIdentity identity);
+        
+        Task<Result<string>> GetContentType(TreeCultureIdentity identity);
+        
+        Task<Result<string>> GetContentType(ContentCultureIdentity identity);
+
         [Obsolete("Use HydrateTreeIdentity or HydrateContentIdentity")]
         Task<Result<NodeIdentity>> HydrateNodeIdentity(NodeIdentity identity);
         
