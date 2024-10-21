@@ -22,7 +22,9 @@ namespace Core
                 .AddScoped<IIdentityService, IdentityService>()
                 .AddScoped<ILogger, Logger>()
                 .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
-                .AddScoped<IUrlResolver, UrlResolver>();
+                .AddScoped<IUrlResolver, UrlResolver>()
+                .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>();
+
             return services;
 
         }

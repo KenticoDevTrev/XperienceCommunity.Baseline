@@ -5,9 +5,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core.Xperience</RootNamespace>
+		<RootNamespace>Core</RootNamespace>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Kentico.Xperience.WebApp" Version="29.5.2" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Core.Library.Xperience\Core.Library.Xperience.csproj" />

@@ -83,8 +83,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Search.RCL.KX13", "Search\S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoNotes", "RepoNotes", "{CA588846-ED19-4936-959C-D6BA7B9C05F8}"
 	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
 		RepoNotes\GlobalUsing.KX13.cs = RepoNotes\GlobalUsing.KX13.cs
+		..\README.md = ..\README.md
 		RepoNotes\_ViewImports.KX13.cshtml = RepoNotes\_ViewImports.KX13.cshtml
 	EndProjectSection
 EndProject
@@ -94,11 +94,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.XperienceModels.Xperience", "Core\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj", "{898A1D10-52DB-4C0A-A29A-AAA24EF62A17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.XperienceModels.Xperience", "Core\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj", "{898A1D10-52DB-4C0A-A29A-AAA24EF62A17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Library.Xperience", "Core\Core.Library.Xperience\Core.Library.Xperience.csproj", "{62943648-4171-4BE3-BD57-7423B65DF96D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Library.Xperience", "Core\Core.Library.Xperience\Core.Library.Xperience.csproj", "{62943648-4171-4BE3-BD57-7423B65DF96D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.RCL.Xperience", "Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj", "{0808A36B-FDFA-4485-8981-DF3FF4F943CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.RCL.Xperience", "Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj", "{0808A36B-FDFA-4485-8981-DF3FF4F943CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
