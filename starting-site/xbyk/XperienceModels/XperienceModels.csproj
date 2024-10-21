@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XperienceModels</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>NU1603</NoWarn>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Core" Version="29.5.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PageTypes\Generic\" />
+  </ItemGroup>
+
+</Project>

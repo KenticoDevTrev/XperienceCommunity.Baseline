@@ -1,0 +1,16 @@
+﻿@{
+    Layout = null;
+    // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
+}
+<!DOCTYPE html>
+<html dir="ltr" lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0])">
+<head>
+  
+</head>
+<body>
+   
+
+    @RenderBody()
+
+</body>
+</html>

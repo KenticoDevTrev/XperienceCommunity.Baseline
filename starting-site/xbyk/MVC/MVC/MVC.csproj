@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="kentico.xperience.azurestorage" Version="29.5.2" />
+    <PackageReference Include="kentico.xperience.imageprocessing" Version="29.5.2" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.5.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Admin\XperienceCommunity.RelationshipsExtended.Web.Admin.csproj" />
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
+    <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
+    <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
+  </ItemGroup>
+</Project>
