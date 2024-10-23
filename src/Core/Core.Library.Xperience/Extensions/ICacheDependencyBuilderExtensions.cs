@@ -20,14 +20,18 @@
         /// <returns></returns>
         public static ICacheDependencyBuilder TranslationKeys(this ICacheDependencyBuilder builder)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             return builder
                 .AddKey($"{CMS.Localization.ResourceStringInfo.OBJECT_TYPE}|all")
                 .AddKey($"{CMS.Localization.ResourceTranslationInfo.OBJECT_TYPE}|all");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public static ICacheDependencyBuilder TranslationKeys(this ICacheDependencyBuilder builder, IEnumerable<string> translationKeys)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             return builder.AddKeys(translationKeys.Select(x => $"{CMS.Localization.ResourceStringInfo.OBJECT_TYPE}|byname|{x}"));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public static bool DependenciesNotTouchedSince(this ICacheDependencyBuilder builder, TimeSpan forThisTime)
