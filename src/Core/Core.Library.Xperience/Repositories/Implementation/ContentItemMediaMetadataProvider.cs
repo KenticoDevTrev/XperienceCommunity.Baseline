@@ -4,20 +4,35 @@ using System.Xml.XPath;
 
 namespace Core.Repositories.Implementation
 {
-    public class ContentItemMediaMetadataProvider(IProgressiveCache progressiveCache, IUrlResolver urlResolver, IHttpClientFactory HttpClientFactory) : IContentItemMediaMetadataProvider
+    public class ContentItemMediaCustomizer(IProgressiveCache progressiveCache, IUrlResolver urlResolver, IHttpClientFactory HttpClientFactory) : IContentItemMediaCustomizer
     {
         private static readonly string[] _imageExtensions = ["png", "gif", "bmp", "jpg", "jpeg", "webp"];
 
         public IProgressiveCache ProgressiveCache { get; } = progressiveCache;
         public IUrlResolver UrlResolver { get; } = urlResolver;
 
+        public Task<MediaItem> CustomizeMediaItem(IContentQueryDataContainer contentQueryDataContainer, ContentItemAssetMetadata assetMetadata, MediaItem mediaItem)
+        {
+            /*
+            // Can clone and use DI to replace this to do customizations, including doing type casts.  This is often coupled with a custom IContentItemMediaMetadataQueryEditor implementation
+            if (contentQueryDataContainer.ContentTypeName.Equals(Generic.File.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
+                Custom.PdfFile file = ContentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
+                // access to data directly with cast.  Can also GetValue without this though.
+                return mediaItem with { MediaTitle = file.FileName };
+            }
+            */
+
+            return Task.FromResult(mediaItem);
+        }
+
         public async Task<Result<IMediaMetadata>> GetMediaMetadata(IContentQueryDataContainer contentQueryDataContainer, ContentItemAssetMetadata assetMetadata, MediaItem mediaItem)
         {
             /*
-            // Can clone and use DI to replace this to do customizations, including doing type casts.
+            // Can clone and use DI to replace this to do customizations, including doing type casts.  This is often coupled with a custom IContentItemMediaMetadataQueryEditor implementation
             if (contentQueryDataContainer.ContentTypeName.Equals(Generic.File.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
-                Generic.File file = ContentQueryResultMapper.Map<Generic.File>(contentQueryDataContainer);
+                Custom.PdfFile file = ContentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
                 // access to data directly with cast.  Can also GetValue without this though.
+                return new PdfMediaMetadata(Owner: file.PdfOwner);
             }
             */
 

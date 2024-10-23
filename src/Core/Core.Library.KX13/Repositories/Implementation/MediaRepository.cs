@@ -53,17 +53,17 @@ namespace Core.Repositories.Implementation
 
         public async Task<Result<MediaItem>> GetContentItemLanguageMetadataAsset(int? contentItemMetadataId, string assetFieldName) => (await GetPageAttachmentsInternal(contentItemMetadataId ?? (_pageDataContextRetriever.TryRetrieve<TreeNode>(out var currentPage) ? currentPage.Page.DocumentID : 0))).FirstOrMaybe().TryGetValue(out var attachment) ? attachment : Result.Failure<MediaItem>("Could not find any attachments on that document");
 
-        public Task<Result<MediaItem>> GetContentItemAsset(ObjectIdentity contentItem, Guid assetFieldGuid, string? language = null) => GetContentItemAsset(contentItem, string.Empty);
+        public Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, Guid assetFieldGuid, string? language = null) => GetContentItemAsset(contentItem, string.Empty);
 
-        public async Task<Result<MediaItem>> GetContentItemAsset(ObjectIdentity contentItem, string assetFieldName, string? language = null) => contentItem.Guid.TryGetValue(out var attachmentGuid) ? await GetAttachmentInternal(attachmentGuid) : Result.Failure<MediaItem>("For KX13, the ContentItem Identity must be the Attachment Guid");
+        public async Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, string assetFieldName, string? language = null) => contentItem.ContentGuid.TryGetValue(out var attachmentGuid) ? await GetAttachmentInternal(attachmentGuid) : Result.Failure<MediaItem>("For KX13, the ContentItem Identity must be the Attachment Guid");
 
-        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ObjectIdentity> contentItems, string? language = null) => GetAttachmentsInternal(contentItems.Where(x => x.Guid.HasValue).Select(x => x.Guid.Value));
+        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ContentIdentity> contentItems, string? language = null) => GetAttachmentsInternal(contentItems.Where(x => x.ContentGuid.HasValue).Select(x => x.ContentGuid.Value));
 
-        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ObjectIdentity> contentItems, Guid assetFieldGuid, string? language = null) => GetContentItemAssets(contentItems);
+        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ContentIdentity> contentItems, Guid assetFieldGuid, string? language = null) => GetContentItemAssets(contentItems);
 
-        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ObjectIdentity> contentItems, string assetFieldName, string? language = null) => GetContentItemAssets(contentItems);
+        public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ContentIdentity> contentItems, string assetFieldName, string? language = null) => GetContentItemAssets(contentItems);
 
-        public Task<IEnumerable<MediaItem>> GetContentItemAssets(ObjectIdentity contentItem, string? language = null) => GetContentItemAssets([contentItem]);
+        public Task<IEnumerable<MediaItem>> GetContentItemAssets(ContentIdentity contentItem, string? language = null) => GetContentItemAssets([contentItem]);
 
         public async Task<Result<MediaItem>> GetMediaItemAsync(Guid fileGuid)
         {
@@ -145,7 +145,6 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetMediaItemsByPathAsync", path, libraryName));
         }
 
-        [Obsolete("")]
         public async Task<Result<string>> GetMediaAttachmentSiteNameAsync(Guid mediaOrAttachmentGuid)
         {
             // Get dictionary of Guid to SiteID
@@ -156,11 +155,11 @@ namespace Core.Repositories.Implementation
                     Select AttachmentGUID as [Guid], AttachmentSiteID as [SiteId] from CMS_Attachment", [], QueryTypeEnum.SQLQuery);
 
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(new string[]
-                    {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(
+                    [
                         $"{MediaFileInfo.OBJECT_TYPE}|all",
                         $"{AttachmentInfo.OBJECT_TYPE}|all",
-                    });
+                    ]);
                 }
 
                 return data.Tables[0].Rows.Cast<DataRow>()
@@ -220,7 +219,7 @@ namespace Core.Repositories.Implementation
             if (results.Any()) {
                 return results.First().Attachments.ToList().Select(x => AttachmentToMediaItem(x));
             } else {
-                return Array.Empty<MediaItem>();
+                return [];
             }
         }
 
