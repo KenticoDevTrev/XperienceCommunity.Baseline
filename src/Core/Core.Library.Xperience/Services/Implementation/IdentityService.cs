@@ -2,72 +2,87 @@
 using CMS.Websites.Routing;
 using System.Data;
 
-namespace Core.Services
+namespace Core.Services.Implementation
 {
     public class IdentityService(IProgressiveCache progressiveCache,
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
         IContentLanguageRetriever contentLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext,
-        ICachingReferenceService cachingReferenceService) : IIdentityService
+        ICacheReferenceService cacheReferenceService,
+        ILanguageFallbackRepository languageFallbackRepository) : IIdentityService
     {
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
         private readonly IContentLanguageRetriever _contentLanguageRetriever = contentLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
-        private readonly ICachingReferenceService _cachingReferenceService = cachingReferenceService;
+        private readonly ICacheReferenceService _cacheReferenceService = cacheReferenceService;
+        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
 
         #region "Content Hydration"
 
         public async Task<Result<ContentIdentity>> HydrateContentIdentity(ContentIdentity identity)
         {
-            if (identity.ContentID.HasValue && identity.ContentGuid.HasValue && identity.ContentName.HasValue) {
+            if (identity.ContentID.HasValue && identity.ContentGuid.HasValue && identity.ContentName.HasValue)
+            {
                 return identity;
             }
-            if (identity.ContentID.HasNoValue && identity.ContentGuid.HasNoValue && identity.ContentName.HasNoValue) {
+            if (identity.ContentID.HasNoValue && identity.ContentGuid.HasNoValue && identity.ContentName.HasNoValue)
+            {
                 return Result.Failure<ContentIdentity>("No data given, can't hydrate");
             }
 
-            var currentChannelID = _websiteChannelContext.WebsiteChannelID;
-
             var dictionaryResult = await GetContentIdentityHolder();
-            if (dictionaryResult.TryGetValue(out var dictionary)) {
-                if (identity.ContentID.TryGetValue(out var id) && dictionary.Content.ById.TryGetValue(id, out var newIdentityFromId)) {
+            if (dictionaryResult.TryGetValue(out var dictionary))
+            {
+                if (identity.ContentID.TryGetValue(out var id) && dictionary.Content.ById.TryGetValue(id, out var newIdentityFromId))
+                {
                     return newIdentityFromId;
                 }
-                if (identity.ContentGuid.TryGetValue(out var guid) && dictionary.Content.ByGuid.TryGetValue(guid, out var newIdentityFromGuid)) {
+                if (identity.ContentGuid.TryGetValue(out var guid) && dictionary.Content.ByGuid.TryGetValue(guid, out var newIdentityFromGuid))
+                {
                     return newIdentityFromGuid;
                 }
-                if (identity.ContentName.TryGetValue(out var name) && dictionary.Content.ByName.TryGetValue(name, out var newIdentityFromName)) {
+                if (identity.ContentName.TryGetValue(out var name) && dictionary.Content.ByName.TryGetValue(name, out var newIdentityFromName))
+                {
                     return newIdentityFromName;
                 }
                 return Result.Failure<ContentIdentity>("Could not find content identity.");
-            } else {
+            }
+            else
+            {
                 // Can't use cached version, so just generate manually
                 var queryParams = new QueryDataParameters();
                 var query = $"select ContentItemID, ContentItemGuid, ContentItemName from CMS_ContentItem where 1=1";
-                if (identity.ContentID.TryGetValue(out var id)) {
+                if (identity.ContentID.TryGetValue(out var id))
+                {
                     query += $" and ContentItemID = @ContentItemID";
                     queryParams.Add(new DataParameter("@ContentItemID", id));
                 }
-                if (identity.ContentGuid.TryGetValue(out var guid)) {
+                if (identity.ContentGuid.TryGetValue(out var guid))
+                {
                     query += $" and ContentItemGuid = @ContentItemGuid";
                     queryParams.Add(new DataParameter("@ContentItemGuid", guid));
                 }
-                if (identity.ContentName.TryGetValue(out var name)) {
+                if (identity.ContentName.TryGetValue(out var name))
+                {
                     query += $" and ContentItemName = @ContentItemName";
                     queryParams.Add(new DataParameter("@ContentItemName", name));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var docRow)) {
+                if (item.FirstOrMaybe().TryGetValue(out var docRow))
+                {
 
-                    return new ContentIdentity() {
+                    return new ContentIdentity()
+                    {
                         ContentID = (int)docRow["ContentItemID"],
                         ContentGuid = (Guid)docRow["ContentItemGuid"],
                         ContentName = (string)docRow["ContentItemName"]
                     };
-                } else {
+                }
+                else
+                {
                     return Result.Failure<ContentIdentity>("Could not find a content item with the given identity");
                 }
             }
@@ -76,77 +91,87 @@ namespace Core.Services
         public async Task<Result<ContentCultureIdentity>> HydrateContentCultureIdentity(ContentCultureIdentity identity)
         {
             // If current identity is full, then just return it.
-            if (identity.ContentCultureID.HasValue && identity.ContentCultureGuid.HasValue && identity.ContentCultureLookup.TryGetValue(out var contentCultureLookupCheck) && contentCultureLookupCheck.Culture.HasValue) {
+            if (identity.ContentCultureID.HasValue && identity.ContentCultureGuid.HasValue && identity.ContentCultureLookup.TryGetValue(out var contentCultureLookupCheck) && contentCultureLookupCheck.Culture.HasValue)
+            {
                 return identity;
             }
-            if (identity.ContentCultureID.HasNoValue && identity.ContentCultureGuid.HasNoValue && identity.ContentCultureLookup.HasNoValue) {
+            if (identity.ContentCultureID.HasNoValue && identity.ContentCultureGuid.HasNoValue && identity.ContentCultureLookup.HasNoValue)
+            {
                 return Result.Failure<ContentCultureIdentity>("No data given, can't hydrate");
             }
 
             // Parse proper culture for lookups
             var currentChannelID = _websiteChannelContext.WebsiteChannelID;
             var defaultContentCulture = (await _contentLanguageRetriever.GetDefaultContentLanguage()).ContentLanguageName;
-            var cultureFallback = currentChannelID == default ? defaultContentCulture : _cachingReferenceService.GetDefaultLanguageName(currentChannelID);
+            var cultureFallback = currentChannelID == default ? defaultContentCulture : _cacheReferenceService.GetDefaultLanguageName(currentChannelID);
             var requestedCulture = identity.ContentCultureLookup.TryGetValue(out var contentCultureLookupForCulture) ? contentCultureLookupForCulture.Culture.GetValueOrDefault(cultureFallback) : cultureFallback;
 
             var cultureToFallback = await GetCultureToFallbackDictionary();
 
             var dictionaryResult = await GetContentIdentityHolder();
-            if (dictionaryResult.TryGetValue(out var dictionary)) {
-                if (identity.ContentCultureID.TryGetValue(out var id) && dictionary.ContentCulture.ById.TryGetValue(id, out var newIdentityFromId)) {
+            if (dictionaryResult.TryGetValue(out var dictionary))
+            {
+                if (identity.ContentCultureID.TryGetValue(out var id) && dictionary.ContentCulture.ById.TryGetValue(id, out var newIdentityFromId))
+                {
                     return newIdentityFromId;
                 }
-                if (identity.ContentCultureGuid.TryGetValue(out var guid) && dictionary.ContentCulture.ByGuid.TryGetValue(guid, out var newIdentityFromGuid)) {
+                if (identity.ContentCultureGuid.TryGetValue(out var guid) && dictionary.ContentCulture.ByGuid.TryGetValue(guid, out var newIdentityFromGuid))
+                {
                     return newIdentityFromGuid;
                 }
-                if (identity.ContentCultureLookup.TryGetValue(out var contentCultureLookup) && dictionary.ContentCulture.ByContentIDAndCulture.TryGetValue(contentCultureLookup.ContentId, out var cultureToCultureIdentity)) {
+                if (identity.ContentCultureLookup.TryGetValue(out var contentCultureLookup) && dictionary.ContentCulture.ByContentIDAndCulture.TryGetValue(contentCultureLookup.ContentId, out var cultureToCultureIdentity))
+                {
                     // Look through content culture variations by the given language, falling back to fallbacks
-                    Maybe<string> lookupCulture = requestedCulture;
-
-                    while (lookupCulture.HasValue) {
-                        if (cultureToCultureIdentity.TryGetValue(lookupCulture.Value.ToLowerInvariant(), out var cultureMatch)) {
-                            return cultureMatch;
-                        }
-                        lookupCulture = cultureToFallback.TryGetValue(lookupCulture.Value.ToLowerInvariant(), out var fallbackValue) ? fallbackValue : Maybe<string>.None;
+                    if((await _languageFallbackRepository.GetLanguagueToSelect(cultureToCultureIdentity.Keys, requestedCulture, true)).TryGetValue(out var cultureToUse)
+                        && cultureToCultureIdentity.TryGetValue(cultureToUse.ToLowerInvariant(), out var cultureMatch)) {
+                        return cultureMatch;
                     }
                     return Result.Failure<ContentCultureIdentity>("Could not find content culture identity in the language given or any valid fallback");
                 }
                 return Result.Failure<ContentCultureIdentity>("Could not find content culture identity.");
-            } else {
+            }
+            else
+            {
                 // Can't use cached version, so just generate manually, and use the API 
 
                 var cultureToCheck = Maybe<string>.None;
                 var queryParams = new QueryDataParameters();
                 var query = @$"select ContentItemLanguageMetadataID, ContentItemLanguageMetadataGUID, ContentItemLanguageMetadataContentItemID, ContentLanguageName from CMS_ContentItemLanguageMetadata
 inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadataContentLanguageID where 1=1";
-                if (identity.ContentCultureID.TryGetValue(out var id)) {
+                if (identity.ContentCultureID.TryGetValue(out var id))
+                {
                     query += $" and ContentItemLanguageMetadataID = @ContentItemLanguageMetadataID";
                     queryParams.Add(new DataParameter("@ContentItemLanguageMetadataID", id));
                 }
-                if (identity.ContentCultureGuid.TryGetValue(out var guid)) {
+                if (identity.ContentCultureGuid.TryGetValue(out var guid))
+                {
                     query += $" and ContentItemLanguageMetadataGUID = @ContentItemLanguageMetadataGUID";
                     queryParams.Add(new DataParameter("@ContentItemLanguageMetadataGUID", guid));
                 }
-                if (identity.ContentCultureLookup.TryGetValue(out var contentCultureLookupForQuery)) {
+                if (identity.ContentCultureLookup.TryGetValue(out var contentCultureLookupForQuery))
+                {
                     query += $" and ContentItemLanguageMetadataContentItemID = @ContentItemLanguageMetadataContentItemID";
                     queryParams.Add(new DataParameter("@ContentItemLanguageMetadataContentItemID", contentCultureLookupForQuery.ContentId));
                     cultureToCheck = contentCultureLookupForQuery.Culture.GetValueOrDefault(requestedCulture);
                 }
 
                 var items = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                switch (items.Count()) {
+                switch (items.Count())
+                {
                     case 0:
                         return Result.Failure<ContentCultureIdentity>("Could not find a content culture item with the given content culture identity");
                     case 1:
                         var firstRow = items.First();
-                        return new ContentCultureIdentity() {
+                        return new ContentCultureIdentity()
+                        {
                             ContentCultureID = (int)firstRow["DocumentID"],
                             ContentCultureGuid = (Guid)firstRow["DocumentGuid"],
                             ContentCultureLookup = new ContentCulture((int)firstRow["ContentItemLanguageMetadataContentItemID"], (string)firstRow["ContentLanguageName"])
                         };
                     default:
                         // multiple, must have been lookup on the ContentID, convert to dictionary by the language name
-                        var itemsByLang = items.ToDictionary(key => ((string)key["ContentLanguageName"]).ToLowerInvariant(), value => new ContentCultureIdentity() {
+                        var itemsByLang = items.ToDictionary(key => ((string)key["ContentLanguageName"]).ToLowerInvariant(), value => new ContentCultureIdentity()
+                        {
                             ContentCultureID = (int)value["DocumentID"],
                             ContentCultureGuid = (Guid)value["DocumentGuid"],
                             ContentCultureLookup = new ContentCulture((int)value["ContentItemLanguageMetadataContentItemID"], (string)value["ContentLanguageName"])
@@ -154,8 +179,10 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
 
                         Maybe<string> lookupCulture = requestedCulture;
 
-                        while (lookupCulture.HasValue) {
-                            if (itemsByLang.TryGetValue(lookupCulture.Value.ToLowerInvariant(), out var cultureMatch)) {
+                        while (lookupCulture.HasValue)
+                        {
+                            if (itemsByLang.TryGetValue(lookupCulture.Value.ToLowerInvariant(), out var cultureMatch))
+                            {
                                 return cultureMatch;
                             }
                             lookupCulture = cultureToFallback.TryGetValue(lookupCulture.Value.ToLowerInvariant(), out var fallbackValue) ? fallbackValue : Maybe<string>.None;
@@ -167,60 +194,77 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
 
         public async Task<Result<TreeIdentity>> HydrateTreeIdentity(TreeIdentity identity)
         {
-            if (identity.PageID.HasValue && identity.PageGuid.HasValue && identity.PageName.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue) {
+            if (identity.PageID.HasValue && identity.PageGuid.HasValue && identity.PageName.HasValue && identity.PathChannelLookup.TryGetValue(out var pathChannel) && pathChannel.ChannelId.HasValue)
+            {
                 return identity;
             }
-            if (identity.PageID.HasNoValue && identity.PageGuid.HasNoValue && identity.PageName.HasNoValue && identity.PathChannelLookup.HasNoValue) {
+            if (identity.PageID.HasNoValue && identity.PageGuid.HasNoValue && identity.PageName.HasNoValue && identity.PathChannelLookup.HasNoValue)
+            {
                 return Result.Failure<TreeIdentity>("No data given, can't hydrate");
             }
 
             var currentChannelID = _websiteChannelContext.WebsiteChannelID;
 
             var dictionaryResult = await GetContentIdentityHolder();
-            if (dictionaryResult.TryGetValue(out var dictionary)) {
-                if (identity.PageID.TryGetValue(out var pageID) && dictionary.Tree.ById.TryGetValue(pageID, out var newIdentityFromId)) {
+            if (dictionaryResult.TryGetValue(out var dictionary))
+            {
+                if (identity.PageID.TryGetValue(out var pageID) && dictionary.Tree.ById.TryGetValue(pageID, out var newIdentityFromId))
+                {
                     return newIdentityFromId;
                 }
-                if (identity.PageGuid.TryGetValue(out var pageGuid) && dictionary.Tree.ByGuid.TryGetValue(pageGuid, out var newIdentityFromGuid)) {
+                if (identity.PageGuid.TryGetValue(out var pageGuid) && dictionary.Tree.ByGuid.TryGetValue(pageGuid, out var newIdentityFromGuid))
+                {
                     return newIdentityFromGuid;
                 }
-                if (identity.PageName.TryGetValue(out var pageName) && dictionary.Tree.ByName.TryGetValue(pageName.ToLowerInvariant(), out var newIdentityFromName)) {
+                if (identity.PageName.TryGetValue(out var pageName) && dictionary.Tree.ByName.TryGetValue(pageName.ToLowerInvariant(), out var newIdentityFromName))
+                {
                     return newIdentityFromName;
                 }
-                if (identity.PathChannelLookup.TryGetValue(out var pathChannelLookup) && dictionary.Tree.ByPathChannelIDKey.TryGetValue(new PathChannel(pathChannelLookup.Path, pathChannelLookup.ChannelId.GetValueOrDefault(currentChannelID)).GetCacheKey().ToLowerInvariant(), out var identityFromPathChannel)) {
+                if (identity.PathChannelLookup.TryGetValue(out var pathChannelLookup) && dictionary.Tree.ByPathChannelIDKey.TryGetValue(new PathChannel(pathChannelLookup.Path, pathChannelLookup.ChannelId.GetValueOrDefault(currentChannelID)).GetCacheKey().ToLowerInvariant(), out var identityFromPathChannel))
+                {
                     return identityFromPathChannel;
                 }
                 return Result.Failure<TreeIdentity>("Could not find TreeIdentity");
-            } else {
+            }
+            else
+            {
                 // Can't use cached version, generate manually
                 var queryParams = new QueryDataParameters();
                 var query = @"select WebPageItemID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath, WebPageItemWebsiteChannelID from CMS_WebPageItem where 1=1";
-                if (identity.PageID.TryGetValue(out var id)) {
+                if (identity.PageID.TryGetValue(out var id))
+                {
                     query += $" and WebPageItemID = @WebPageItemID";
                     queryParams.Add(new DataParameter("@WebPageItemID", id));
                 }
-                if (identity.PageGuid.TryGetValue(out var guid)) {
+                if (identity.PageGuid.TryGetValue(out var guid))
+                {
                     query += $" and WebPageItemGUID = @WebPageItemGUID";
                     queryParams.Add(new DataParameter("@WebPageItemGUID", guid));
                 }
-                if (identity.PageName.TryGetValue(out var pageName)) {
+                if (identity.PageName.TryGetValue(out var pageName))
+                {
                     query += $" and WebPageItemName = @WebPageItemName";
                     queryParams.Add(new DataParameter("@WebPageItemName", pageName));
                 }
-                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel)) {
+                if (identity.PathChannelLookup.TryGetValue(out var pathAndChannel))
+                {
                     query += $" and WebPageItemTreePath = @WebPageItemTreePath and WebPageItemWebsiteChannelID = @WebPageItemWebsiteChannelID";
                     queryParams.Add(new DataParameter("@WebPageItemTreePath", pathAndChannel.Path));
                     queryParams.Add(new DataParameter("@WebPageItemWebsiteChannelID", pathAndChannel.ChannelId.GetValueOrDefault(currentChannelID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var docRow)) {
-                    return new TreeIdentity() {
+                if (item.FirstOrMaybe().TryGetValue(out var docRow))
+                {
+                    return new TreeIdentity()
+                    {
                         PageID = (int)docRow["WebPageItemID"],
                         PageGuid = (Guid)docRow["WebPageItemGUID"],
                         PageName = (string)docRow["WebPageItemName"],
                         PathChannelLookup = new PathChannel(Path: (string)docRow["WebPageItemTreePath"], ChannelId: (int)docRow["WebPageItemWebsiteChannelID"])
                     };
-                } else {
+                }
+                else
+                {
                     return Result.Failure<TreeIdentity>("Could not find a web page item with the given tree identity");
                 }
             }
@@ -228,7 +272,8 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
 
         }
 
-        public async Task<Result<TreeCultureIdentity>> HydrateTreeCultureIdentity(TreeCultureIdentity identity) => (await HydrateTreeIdentity((TreeIdentity)identity)).TryGetValue(out var value, out var error) ? new TreeCultureIdentity(identity.Culture) {
+        public async Task<Result<TreeCultureIdentity>> HydrateTreeCultureIdentity(TreeCultureIdentity identity) => (await HydrateTreeIdentity(identity)).TryGetValue(out var value, out var error) ? new TreeCultureIdentity(identity.Culture)
+        {
             PathChannelLookup = value.PathChannelLookup,
             PageID = value.PageID,
             PageGuid = value.PageGuid,
@@ -243,13 +288,16 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         {
             var classIdToString = await GetClassIdToNameDictionary();
             var dictionary = await GetContentItemToClassIdDictionaries();
-            if (identity.ContentID.TryGetValue(out var contentId) && dictionary.ByContentItemId.TryGetValue(contentId, out var classIdById) && classIdToString.TryGetValue(classIdById, out var classById)) {
+            if (identity.ContentID.TryGetValue(out var contentId) && dictionary.ByContentItemId.TryGetValue(contentId, out var classIdById) && classIdToString.TryGetValue(classIdById, out var classById))
+            {
                 return classById;
             }
-            if (identity.ContentGuid.TryGetValue(out var contentGuid) && dictionary.ByContentItemGuid.TryGetValue(contentGuid, out var classIdByGuid) && classIdToString.TryGetValue(classIdByGuid, out var classByGuid)) {
+            if (identity.ContentGuid.TryGetValue(out var contentGuid) && dictionary.ByContentItemGuid.TryGetValue(contentGuid, out var classIdByGuid) && classIdToString.TryGetValue(classIdByGuid, out var classByGuid))
+            {
                 return classByGuid;
             }
-            if (identity.ContentName.TryGetValue(out var contentName) && dictionary.ByContentItemName.TryGetValue(contentName.ToLowerInvariant().Trim(), out var classIdByName) && classIdToString.TryGetValue(classIdByName, out var classByName)) {
+            if (identity.ContentName.TryGetValue(out var contentName) && dictionary.ByContentItemName.TryGetValue(contentName.ToLowerInvariant().Trim(), out var classIdByName) && classIdToString.TryGetValue(classIdByName, out var classByName))
+            {
                 return classByName;
             }
             return Result.Failure<string>("Could not find class name for this ContentIdentity");
@@ -258,10 +306,12 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         public async Task<Result<string>> GetContentType(ContentCultureIdentity identity)
         {
             var dictionary = await GetContentItemCultureToContentItemIdDictionaries();
-            Maybe<int> contentId = Maybe.None;
-            if (identity.ContentCultureID.TryGetValue(out var contentCultureId) && dictionary.ByContentItemCommonDataId.TryGetValue(contentCultureId, out var contentItemIdById)) {
+            if (identity.ContentCultureID.TryGetValue(out var contentCultureId) && dictionary.ByContentItemCommonDataId.TryGetValue(contentCultureId, out var contentItemIdById))
+            {
                 return await GetContentType(contentItemIdById.ToContentIdentity());
-            } else if (identity.ContentCultureGuid.TryGetValue(out var contentCultureGuid) && dictionary.ByContentItemCommonDataGuid.TryGetValue(contentCultureGuid, out var contentItemIdByGuId)) {
+            }
+            else if (identity.ContentCultureGuid.TryGetValue(out var contentCultureGuid) && dictionary.ByContentItemCommonDataGuid.TryGetValue(contentCultureGuid, out var contentItemIdByGuId))
+            {
                 return await GetContentType(contentItemIdByGuId.ToContentIdentity());
             }
             return Result.Failure<string>("Could not find class name for this ContentCultureIdentity");
@@ -270,16 +320,20 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         public async Task<Result<string>> GetContentType(TreeIdentity identity)
         {
             var dictionary = await GetTreeIdentityToContentItemIdDictionaries();
-            if (identity.PageID.TryGetValue(out var pageId) && dictionary.ByWebPageItemId.TryGetValue(pageId, out var contentItemIdById)) {
+            if (identity.PageID.TryGetValue(out var pageId) && dictionary.ByWebPageItemId.TryGetValue(pageId, out var contentItemIdById))
+            {
                 return await GetContentType(contentItemIdById.ToContentIdentity());
             }
-            if (identity.PageGuid.TryGetValue(out var pageGuid) && dictionary.ByWebPageItemGuid.TryGetValue(pageGuid, out var contentItemIdByGuid)) {
+            if (identity.PageGuid.TryGetValue(out var pageGuid) && dictionary.ByWebPageItemGuid.TryGetValue(pageGuid, out var contentItemIdByGuid))
+            {
                 return await GetContentType(contentItemIdByGuid.ToContentIdentity());
             }
-            if (identity.PageName.TryGetValue(out var pageName) && dictionary.ByWebPageItemName.TryGetValue(pageName, out var contentItemIdByName)) {
+            if (identity.PageName.TryGetValue(out var pageName) && dictionary.ByWebPageItemName.TryGetValue(pageName, out var contentItemIdByName))
+            {
                 return await GetContentType(contentItemIdByName.ToContentIdentity());
             }
-            if (identity.PathChannelLookup.TryGetValue(out var pathChannel) && dictionary.ByWebPageItemPathChannel.TryGetValue(new PathChannel(pathChannel.Path, pathChannel.ChannelId.GetValueOrDefault(_websiteChannelContext.WebsiteChannelID)).GetCacheKey().ToLowerInvariant(), out var contentItemIdByPath)) {
+            if (identity.PathChannelLookup.TryGetValue(out var pathChannel) && dictionary.ByWebPageItemPathChannel.TryGetValue(new PathChannel(pathChannel.Path, pathChannel.ChannelId.GetValueOrDefault(_websiteChannelContext.WebsiteChannelID)).GetCacheKey().ToLowerInvariant(), out var contentItemIdByPath))
+            {
                 return await GetContentType(contentItemIdByPath.ToContentIdentity());
             }
             return Result.Failure<string>("Could not find class name for this TreeIdentity");
@@ -293,39 +347,50 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
 
         public async Task<Result<ObjectIdentity>> HydrateObjectIdentity(ObjectIdentity identity, string className)
         {
-            if (identity.Id.HasNoValue && identity.Guid.HasNoValue && identity.CodeName.HasNoValue) {
+            if (identity.Id.HasNoValue && identity.Guid.HasNoValue && identity.CodeName.HasNoValue)
+            {
                 return Result.Failure<ObjectIdentity>("No identities provided from the given identity, cannot parse.");
             }
 
-            var classInfo = _progressiveCache.Load(cs => {
-                if (cs.Cached) {
+            var classInfo = _progressiveCache.Load(cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = _cacheDependencyBuilderFactory.Create(false).ObjectType(DataClassInfo.OBJECT_TYPE).GetCMSCacheDependency();
                 }
                 return DataClassInfoProvider.GetDataClassInfo(className);
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetClassInfoForHydration", className));
 
-            if (classInfo == null) {
+            if (classInfo == null)
+            {
                 return Result.Failure<ObjectIdentity>($"Class of {className} not found.");
             }
 
-            var classObj = (new InfoObjectFactory(className).Singleton);
-            if (classObj is not BaseInfo baseClassObj) {
+            var classObj = new InfoObjectFactory(className).Singleton;
+            if (classObj is not BaseInfo baseClassObj)
+            {
                 return Result.Failure<ObjectIdentity>($"Class of {className} not a BaseInfo typed class, cannot parse.");
             }
 
             var dictionaryResult = await GetObjectIdentities(classInfo, baseClassObj);
-            if (dictionaryResult.TryGetValue(out var dictionary)) {
-                if (identity.Id.TryGetValue(out var idVal) && dictionary.ById.TryGetValue(idVal, out var objectIdentityFromId)) {
+            if (dictionaryResult.TryGetValue(out var dictionary))
+            {
+                if (identity.Id.TryGetValue(out var idVal) && dictionary.ById.TryGetValue(idVal, out var objectIdentityFromId))
+                {
                     return objectIdentityFromId;
                 }
-                if (identity.CodeName.TryGetValue(out var codeNameVal) && dictionary.ByCodeName.TryGetValue(codeNameVal.ToLower(), out var objectIdentitFromCodeName)) {
+                if (identity.CodeName.TryGetValue(out var codeNameVal) && dictionary.ByCodeName.TryGetValue(codeNameVal.ToLower(), out var objectIdentitFromCodeName))
+                {
                     return objectIdentitFromCodeName;
                 }
-                if (identity.Guid.TryGetValue(out var guidVal) && dictionary.ByGuid.TryGetValue(guidVal, out var objectIdentityFromGuid)) {
+                if (identity.Guid.TryGetValue(out var guidVal) && dictionary.ByGuid.TryGetValue(guidVal, out var objectIdentityFromGuid))
+                {
                     return objectIdentityFromGuid;
                 }
                 return Result.Failure<ObjectIdentity>($"Could not find any matching {className} objects for any of the identity's values:  [{identity.Id.GetValueOrDefault(0)}-{identity.CodeName.GetValueOrDefault(string.Empty)}-{identity.Guid.GetValueOrDefault(Guid.Empty)}]");
-            } else {
+            }
+            else
+            {
                 // Dependencies are touching too much, use non cached version
                 string query = GetObjectIdentitySelectStatement(classInfo, baseClassObj);
                 var typeInfo = baseClassObj.TypeInfo;
@@ -333,40 +398,50 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
                 var guidColumnMaybe = typeInfo.GUIDColumn.AsNullOrWhitespaceMaybe();
                 var codeNameColumnMaybe = typeInfo.CodeNameColumn.AsNullOrWhitespaceMaybe();
                 var queryParams = new QueryDataParameters();
-                if (identity.Id.TryGetValue(out var id) && idColumnMaybe.TryGetValue(out var idColumn)) {
+                if (identity.Id.TryGetValue(out var id) && idColumnMaybe.TryGetValue(out var idColumn))
+                {
                     query += $"[{idColumn}] = @ID";
                     queryParams.Add(new DataParameter("@ID", id));
                 }
-                if (identity.Guid.TryGetValue(out var guid) && guidColumnMaybe.TryGetValue(out var guidColumn)) {
+                if (identity.Guid.TryGetValue(out var guid) && guidColumnMaybe.TryGetValue(out var guidColumn))
+                {
                     query += $"[{guidColumn}] = @Guid";
                     queryParams.Add(new DataParameter("@Guid", guid));
                 }
-                if (identity.CodeName.TryGetValue(out var codeName) && codeNameColumnMaybe.TryGetValue(out var codeNameColumn)) {
+                if (identity.CodeName.TryGetValue(out var codeName) && codeNameColumnMaybe.TryGetValue(out var codeNameColumn))
+                {
                     query += $"[{codeNameColumn}] = @CodeName";
                     queryParams.Add(new DataParameter("@CodeName", codeName));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var objRow)) {
+                if (item.FirstOrMaybe().TryGetValue(out var objRow))
+                {
                     Maybe<int> idMaybe = Maybe.None;
                     Maybe<Guid> guidMaybe = Maybe.None;
                     Maybe<string> codeNameMaybe = Maybe.None;
-                    if (idColumnMaybe.TryGetValue(out var idColumnVal)) {
+                    if (idColumnMaybe.TryGetValue(out var idColumnVal))
+                    {
                         idMaybe = ValidationHelper.GetInteger(objRow[idColumnVal], 0).WithMatchAsNone(0);
                     }
-                    if (guidColumnMaybe.TryGetValue(out var guidColumnVal)) {
+                    if (guidColumnMaybe.TryGetValue(out var guidColumnVal))
+                    {
                         guidMaybe = ValidationHelper.GetGuid(objRow[guidColumnVal], Guid.Empty).WithMatchAsNone(Guid.Empty);
                     }
-                    if (codeNameColumnMaybe.TryGetValue(out var codeNameColumnVal)) {
+                    if (codeNameColumnMaybe.TryGetValue(out var codeNameColumnVal))
+                    {
                         codeNameMaybe = ValidationHelper.GetString(objRow[codeNameColumnVal], string.Empty).WithMatchAsNone(string.Empty);
                     }
 
-                    var newIdentity = new ObjectIdentity() {
+                    var newIdentity = new ObjectIdentity()
+                    {
                         Id = idMaybe,
                         Guid = guidMaybe,
                         CodeName = codeNameMaybe
                     };
                     return newIdentity;
-                } else {
+                }
+                else
+                {
                     return Result.Failure<ObjectIdentity>($"Could not find an object of type {className} with the given identity [{identity.Id.GetValueOrDefault(0)}-{identity.CodeName.GetValueOrDefault(string.Empty)}-{identity.Guid.GetValueOrDefault(Guid.Empty)}]");
                 }
             }
@@ -385,12 +460,15 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         private async Task<Result<ObjectIdentityDictionaries>> GetObjectIdentities(DataClassInfo classInfo, BaseInfo baseClassObj)
         {
             var builder = _cacheDependencyBuilderFactory.Create(false).ObjectType(baseClassObj.TypeInfo.ObjectClassName);
-            if (!builder.DependenciesNotTouchedSince(TimeSpan.FromSeconds(30))) {
+            if (!builder.DependenciesNotTouchedSince(TimeSpan.FromSeconds(30)))
+            {
                 return Result.Failure<ObjectIdentityDictionaries>("Dependency recently touched, waiting 30 seconds before using cached version.");
             }
 
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
                 var allItems = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(GetObjectIdentitySelectStatement(classInfo, baseClassObj), [], QueryTypeEnum.SQLQuery))
@@ -399,31 +477,38 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
                 var byId = new Dictionary<int, ObjectIdentity>();
                 var byGuid = new Dictionary<Guid, ObjectIdentity>();
                 var byName = new Dictionary<string, ObjectIdentity>();
-                foreach (DataRow item in allItems) {
+                foreach (DataRow item in allItems)
+                {
                     // Create
                     Maybe<Guid> guidMaybe = Maybe.None;
                     Maybe<string> codeNameMaybe = Maybe.None;
-                    if (baseClassObj.TypeInfo.GUIDColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var guidColumn)) {
+                    if (baseClassObj.TypeInfo.GUIDColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var guidColumn))
+                    {
                         guidMaybe = ValidationHelper.GetGuid(item[guidColumn], Guid.Empty).WithMatchAsNone(Guid.Empty);
                     }
-                    if (baseClassObj.TypeInfo.CodeNameColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var codeNameColumn)) {
+                    if (baseClassObj.TypeInfo.CodeNameColumn.AsNullOrWhitespaceMaybe().TryGetValue(out var codeNameColumn))
+                    {
                         codeNameMaybe = ValidationHelper.GetString(item[codeNameColumn], string.Empty).WithMatchAsNone(string.Empty);
                     }
 
-                    var objectIdentity = new ObjectIdentity() {
+                    var objectIdentity = new ObjectIdentity()
+                    {
                         Id = (int)item[baseClassObj.TypeInfo.IDColumn],
                         Guid = guidMaybe,
                         CodeName = codeNameMaybe
                     };
 
                     // Add
-                    if (objectIdentity.Id.TryGetValue(out var idVal)) {
+                    if (objectIdentity.Id.TryGetValue(out var idVal))
+                    {
                         byId.TryAdd(idVal, objectIdentity);
                     }
-                    if (objectIdentity.Guid.TryGetValue(out var guidVal)) {
+                    if (objectIdentity.Guid.TryGetValue(out var guidVal))
+                    {
                         byGuid.TryAdd(guidVal, objectIdentity);
                     }
-                    if (objectIdentity.CodeName.TryGetValue(out var codeNameVal)) {
+                    if (objectIdentity.CodeName.TryGetValue(out var codeNameVal))
+                    {
                         byName.TryAdd(codeNameVal.ToLowerInvariant(), objectIdentity);
                     }
                 }
@@ -449,12 +534,15 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         {
             var builder = _cacheDependencyBuilderFactory.Create(false).AddKey("contentitem|all");
 
-            if (!builder.DependenciesNotTouchedSince(TimeSpan.FromSeconds(30))) {
+            if (!builder.DependenciesNotTouchedSince(TimeSpan.FromSeconds(30)))
+            {
                 return Result.Failure<ContentIdentityBaseDataDictionary>("Dependency recently touched, waiting 30 seconds before using cached version.");
             }
 
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
                 }
 
@@ -462,7 +550,7 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
                 var query = @$"select {nameof(ContentItemInfo.ContentItemID)}, {nameof(ContentItemInfo.ContentItemGUID)}, {nameof(ContentItemInfo.ContentItemName)} from CMS_ContentItem order by {nameof(ContentItemInfo.ContentItemID)} 
 select {nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataContentItemID)}, {nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataID)}, {nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataGUID)}, {nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataContentLanguageID)}  from CMS_ContentItemLanguageMetadata order by {nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataContentItemID)} 
 select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath, WebPageItemWebsiteChannelID from CMS_WebPageItem order by WebPageItemContentItemID";
-                var dataSet = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery));
+                var dataSet = await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery);
 
                 var contentBaseData = dataSet.Tables[0].Rows.Cast<DataRow>()
                     .ToDictionary(
@@ -511,7 +599,8 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
         {
             // Only build if the data is not changing frequently.
             var allContentResult = await GetContentIdentityBaseDataDictionary();
-            if (!allContentResult.TryGetValue(out var allContent, out var error)) {
+            if (!allContentResult.TryGetValue(out var allContent, out var error))
+            {
                 return Result.Failure<ContentIdentityHolder>(error);
             }
 
@@ -519,11 +608,13 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
             var channelIdToCulture = await ChannelToDefaultCulture();
             var languageIdToCulture = await GetLanguageNameById();
 
-            return _progressiveCache.Load(cs => {
+            return _progressiveCache.Load(cs =>
+            {
                 var builder = _cacheDependencyBuilderFactory.Create(false)
                     .AddKey("contentitem|all");
 
-                if (cs.Cached) {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = builder
                         .GetCMSCacheDependency();
                 }
@@ -548,39 +639,50 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
                 var contentLanguageMetadataByContentItemId = allContent.ContentItemLanguageMetadataByContentItemID;
                 var webPageItemByContentItemID = allContent.WebPageItemByContentItemID;
 
-                foreach (var contentItemID in contentItemsById.Keys) {
+                foreach (var contentItemID in contentItemsById.Keys)
+                {
                     var contentItem = contentItemsById[contentItemID];
-                    var contentIdentity = new ContentIdentity() {
+                    var contentIdentity = new ContentIdentity()
+                    {
                         ContentID = contentItem.Id,
                         ContentGuid = contentItem.Guid,
                         ContentName = contentItem.Name
                     };
-                    try {
+                    try
+                    {
                         contentItemById.Add(contentItem.Id, contentIdentity);
                         contentItemByGuid.Add(contentItem.Guid, contentIdentity);
                         contentItemByName.Add(contentItem.Name.ToLowerInvariant(), contentIdentity);
-                    } catch (Exception) {
+                    }
+                    catch (Exception)
+                    {
                         // should never hit this but just in case
                     }
 
 
                     // now handle language variants
 
-                    if (contentLanguageMetadataByContentItemId.TryGetValue(contentItemID, out var contentLanguageMetadataByContentItem)) {
+                    if (contentLanguageMetadataByContentItemId.TryGetValue(contentItemID, out var contentLanguageMetadataByContentItem))
+                    {
                         var languageToCultureIdentity = new Dictionary<string, ContentCultureIdentity>();
-                        foreach (var contentLanguageMetadata in contentLanguageMetadataByContentItem) {
+                        foreach (var contentLanguageMetadata in contentLanguageMetadataByContentItem)
+                        {
                             var cultureLookup = new ContentCulture(contentItem.Id, languageIdToCulture[contentLanguageMetadata.LanguageId]);
-                            var contentCultureIdentity = new ContentCultureIdentity() {
+                            var contentCultureIdentity = new ContentCultureIdentity()
+                            {
                                 ContentCultureID = contentLanguageMetadata.Id,
                                 ContentCultureGuid = contentLanguageMetadata.Guid,
                                 ContentCultureLookup = cultureLookup
                             };
 
-                            try {
+                            try
+                            {
                                 contentItemCultureById.Add(contentLanguageMetadata.Id, contentCultureIdentity);
                                 contentItemCultureByGuid.Add(contentLanguageMetadata.Guid, contentCultureIdentity);
                                 languageToCultureIdentity.Add(languageIdToCulture[contentLanguageMetadata.LanguageId].ToLowerInvariant(), contentCultureIdentity);
-                            } catch (Exception) {
+                            }
+                            catch (Exception)
+                            {
                                 // should never hit this, but just in case
                             }
                         }
@@ -588,20 +690,25 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
                     }
 
                     // Now web page items
-                    if (webPageItemByContentItemID.TryGetValue(contentItemID, out var webPageBaseData)) {
+                    if (webPageItemByContentItemID.TryGetValue(contentItemID, out var webPageBaseData))
+                    {
                         var pathChannelLookup = new PathChannel(webPageBaseData.Path, webPageBaseData.ChannelId);
-                        var treeIdentity = new TreeIdentity() {
+                        var treeIdentity = new TreeIdentity()
+                        {
                             PageID = webPageBaseData.Id,
                             PageGuid = webPageBaseData.Guid,
                             PageName = webPageBaseData.Name,
                             PathChannelLookup = pathChannelLookup
                         };
-                        try {
+                        try
+                        {
                             treeIdentityById.Add(webPageBaseData.Id, treeIdentity);
                             treeIdentityByGuid.Add(webPageBaseData.Guid, treeIdentity);
                             treeIdentityByName.Add(webPageBaseData.Name, treeIdentity);
                             treeIdentityByPathChannelIDKey.Add(pathChannelLookup.GetCacheKey().ToLowerInvariant(), treeIdentity);
-                        } catch (Exception) {
+                        }
+                        catch (Exception)
+                        {
                             // Should never hit this, but just in case.
                         }
                     }
@@ -623,8 +730,10 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
 
         private async Task<Dictionary<int, string>> GetClassIdToNameDictionary()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"cms.class|all");
                 }
                 var query = $"select {nameof(DataClassInfo.ClassID)}, {nameof(DataClassInfo.ClassName)} from CMS_Class";
@@ -635,8 +744,10 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
 
         private async Task<ContentItemToClassIdDictionaries> GetContentItemToClassIdDictionaries()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
                 }
                 var query = $"select {nameof(ContentItemInfo.ContentItemID)}, {nameof(ContentItemInfo.ContentItemGUID)}, {nameof(ContentItemInfo.ContentItemName)}, {nameof(ContentItemInfo.ContentItemContentTypeID)} from CMS_ContentItem";
@@ -644,7 +755,8 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
                 var byId = new Dictionary<int, int>();
                 var byGuid = new Dictionary<Guid, int>();
                 var byName = new Dictionary<string, int>();
-                foreach (var dr in results) {
+                foreach (var dr in results)
+                {
                     int classId = (int)dr[nameof(ContentItemInfo.ContentItemContentTypeID)];
                     byId.Add((int)dr[nameof(ContentItemInfo.ContentItemID)], classId);
                     byGuid.Add((Guid)dr[nameof(ContentItemInfo.ContentItemGUID)], classId);
@@ -656,15 +768,18 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
 
         private async Task<ContentItemCultureToContentItemIdDictionaries> GetContentItemCultureToContentItemIdDictionaries()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
                 }
                 var query = $"select {nameof(ContentItemCommonDataInfo.ContentItemCommonDataID)}, {nameof(ContentItemCommonDataInfo.ContentItemCommonDataGUID)}, {nameof(ContentItemCommonDataInfo.ContentItemCommonDataContentItemID)} from CMS_ContentItemCommonData";
                 var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 var byId = new Dictionary<int, int>();
                 var byGuid = new Dictionary<Guid, int>();
-                foreach (var dr in results) {
+                foreach (var dr in results)
+                {
                     int contentItemId = (int)dr[nameof(ContentItemCommonDataInfo.ContentItemCommonDataContentItemID)];
                     byId.Add((int)dr[nameof(ContentItemCommonDataInfo.ContentItemCommonDataID)], contentItemId);
                     byGuid.Add((Guid)dr[nameof(ContentItemCommonDataInfo.ContentItemCommonDataGUID)], contentItemId);
@@ -675,8 +790,10 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
 
         private async Task<TreeIdentityToContentItemIdDictionaries> GetTreeIdentityToContentItemIdDictionaries()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"webpageitem|all");
                 }
                 var query = $"select WebPageItemID, WebPageItemGUID, WebPageItemName, WebPageItemTreePath,  WebPageItemWebsiteChannelID, WebPageItemContentItemID from CMS_WebPageItem";
@@ -685,7 +802,8 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
                 var byName = new Dictionary<string, int>();
                 var byGuid = new Dictionary<Guid, int>();
                 var byPathChannelKey = new Dictionary<string, int>();
-                foreach (var dr in results) {
+                foreach (var dr in results)
+                {
                     int contentItemId = (int)dr["WebPageItemContentItemID"];
                     byId.Add((int)dr["WebPageItemID"], contentItemId);
                     byGuid.Add((Guid)dr["WebPageItemGUID"], contentItemId);
@@ -705,8 +823,10 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
             var builder = _cacheDependencyBuilderFactory.Create()
                 .ObjectType(ChannelInfo.OBJECT_TYPE);
 
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
                 var query = $@"SELECT WebsiteChannelChannelID as ChannelID, ContentLanguageName FROM CMS_WebsiteChannel
@@ -721,8 +841,10 @@ where ChannelID not in (Select WebsiteChannelChannelID from CMS_WebsiteChannel)"
 
         private async Task<Dictionary<int, string>> GetLanguageNameById()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{ContentLanguageInfo.OBJECT_TYPE}|all");
                 }
                 return (await _contentLanguageInfoProvider.Get()
@@ -733,8 +855,10 @@ where ChannelID not in (Select WebsiteChannelChannelID from CMS_WebsiteChannel)"
 
         private async Task<Dictionary<string, Maybe<string>>> GetCultureToFallbackDictionary()
         {
-            return await _progressiveCache.LoadAsync(async cs => {
-                if (cs.Cached) {
+            return await _progressiveCache.LoadAsync(async cs =>
+            {
+                if (cs.Cached)
+                {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{ContentLanguageInfo.OBJECT_TYPE}|all");
                 }
                 var query = @$"select main.ContentLanguageName as ContentLanguageName, fallback.ContentLanguageName as Fallback from CMS_ContentLanguage main 
@@ -834,7 +958,7 @@ where ChannelID not in (Select WebsiteChannelChannelID from CMS_WebsiteChannel)"
 
         #region "Obsolete Methods"
 
-        #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
         public Task<Result<DocumentIdentity>> HydrateDocumentIdentity(DocumentIdentity identity)
         {
             throw new NotImplementedException("This is not implemented in XbyK, only there for KX13 cross compatability");
@@ -844,7 +968,7 @@ where ChannelID not in (Select WebsiteChannelChannelID from CMS_WebsiteChannel)"
         {
             throw new NotImplementedException("This is not implemented in XbyK, only there for KX13 cross compatability");
         }
-        #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
 
         #endregion
     }

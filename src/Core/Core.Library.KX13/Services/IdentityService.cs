@@ -789,7 +789,6 @@ namespace Core.Services.Implementations
         public async Task<Result<string>> GetContentType(ContentCultureIdentity identity)
         {
             var dictionary = await GetContentItemCultureToContentItemIdDictionaries();
-            Maybe<int> contentId = Maybe.None;
             if (identity.ContentCultureID.TryGetValue(out var contentCultureId) && dictionary.ByContentItemCommonDataId.TryGetValue(contentCultureId, out var contentItemIdById)) {
                 return await GetContentType(contentItemIdById.ToContentIdentity());
             } 
