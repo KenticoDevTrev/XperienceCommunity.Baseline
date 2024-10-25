@@ -9,55 +9,46 @@ namespace Core.Repositories.Implementation
         ISiteInfoProvider _siteInfoProvider,
         IProgressiveCache _progressiveCache) : ISiteRepository
     {
-        public string CurrentSiteName()
-        {
-            return _siteService.CurrentSite.SiteName;
-        }
+        public string CurrentSiteName() => CurrentChannelName().Value;
 
-        public string CurrentSiteDisplayName()
-        {
-            return _siteService.CurrentSite.DisplayName;
-        }
+        public string CurrentSiteDisplayName() => CurrentChannelDisplayName().Value;
 
-        public int CurrentSiteID()
-        {
-            return _siteService.CurrentSite.SiteID;
-        }
+        public int CurrentSiteID() => CurrentChannelID().Value;
 
-        public Task<string> CurrentSiteNameAsync()
-        {
-            return Task.FromResult(_siteService.CurrentSite.SiteName);
-        }
+        public Task<string> CurrentSiteNameAsync() => Task.FromResult(CurrentChannelName().Value);
 
-        public async Task<int> GetSiteIDAsync(string? siteName = null)
+        public Task<int> GetSiteIDAsync(string? siteName = null) => Task.FromResult(GetChannelID(siteName).GetValueOrDefault(0));
+
+        public string SiteNameById(int siteId) => ChannelNameById(siteId);
+
+        public Maybe<int> GetChannelID(string? channelName = null)
         {
-            if (siteName.AsNullOrWhitespaceMaybe().HasNoValue || _siteService.CurrentSite.SiteName.Equals(siteName, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return SiteContext.CurrentSiteID;
-            }
-            else
-            {
+            if (channelName.AsNullOrWhitespaceMaybe().HasNoValue || _siteService.CurrentSite.SiteName.Equals(channelName, StringComparison.InvariantCultureIgnoreCase)) {
+                return _siteService.CurrentSite.SiteID;
+            } else {
                 // Does have value here
-                string siteNameVal = siteName.GetValueOrDefault(string.Empty);
-                var siteID = await _progressiveCache.LoadAsync(async cs =>
-                {
-                    if (cs.Cached)
-                    {
+                string siteNameVal = channelName.GetValueOrDefault(string.Empty);
+                var siteID = _progressiveCache.Load(cs => {
+                    if (cs.Cached) {
                         cs.CacheDependency = CacheHelper.GetCacheDependency($"{SiteInfo.OBJECT_TYPE}|byname|{siteNameVal}");
                     }
-                    return (await _siteInfoProvider.GetAsync(siteNameVal))?.SiteID ?? 0;
-                }, new CacheSettings(1440, "GetSiteID", siteNameVal));
-                return siteID;
+                    return _siteInfoProvider.Get(siteNameVal)?.SiteID ?? 0;
+                }, new CacheSettings(1440, "GetChannelID", siteNameVal));
+                return siteID.AsMaybeIfTrue(x => x > 0);
             }
         }
 
-        public string SiteNameById(int siteId)
+        public Maybe<string> CurrentChannelName() => _siteService.CurrentSite.SiteName;
+
+        public Maybe<string> CurrentChannelDisplayName() => _siteService.CurrentSite.DisplayName;
+
+        public Maybe<int> CurrentChannelID() => _siteService.CurrentSite.SiteID;
+
+        public string ChannelNameById(int channelID)
         {
             // Doing non async as this may be referenced a lot and once cached will not impact anything.
-            Dictionary<int, string> siteIdToName = _progressiveCache.Load(cs =>
-            {
-                if (cs.Cached)
-                {
+            var siteIdToName = _progressiveCache.Load(cs => {
+                if (cs.Cached) {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{SiteInfo.OBJECT_TYPE}|all");
                 }
                 return _siteInfoProvider.Get()
@@ -66,7 +57,7 @@ namespace Core.Repositories.Implementation
                 .ToDictionary(key => key.SiteID, value => value.SiteName);
 
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "SiteNameByID"));
-            return siteIdToName.GetValueOrMaybe(siteId).GetValueOrDefault(string.Empty);
+            return siteIdToName.GetValueOrMaybe(channelID).GetValueOrDefault(string.Empty);
         }
     }
 }
