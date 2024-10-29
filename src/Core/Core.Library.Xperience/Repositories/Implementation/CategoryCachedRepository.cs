@@ -43,7 +43,6 @@
             return Result.Failure<CategoryItem>("Could not find category by that identity");
         }
 
-
         private CategoryDictionaryHolder GetCategoriesCached()
         {
             var builder = CacheDependencyBuilderFactory.Create()
@@ -80,7 +79,6 @@
 
         }
 
-
         private record CategoryDictionaryHolder(Dictionary<int, CategoryItem> CategoryById, Dictionary<string, CategoryItem> CategoryByCodeName, Dictionary<Guid, CategoryItem> CategoryByGuid);
     }
 
@@ -91,8 +89,9 @@
             return new CategoryItem(categoryID: tagInfo.TagID,
                                     categoryGuid: tagInfo.TagGUID,
                                     categoryName: tagInfo.TagName,
-                                    categoryParentID: tagInfo.TagParentID,
-                                    categoryDisplayName: tagInfo.TagTitle) {
+                                    categoryTypeID: tagInfo.TagTaxonomyID,
+                                    categoryDisplayName: tagInfo.TagTitle,
+                                    categoryParentID: tagInfo.TagParentID.AsMaybeIfTrue(x => x > 0).AsNullableIntValue()) {
                 CategoryDescription = tagInfo.TagDescription.AsNullOrWhitespaceMaybe()
             };
         }

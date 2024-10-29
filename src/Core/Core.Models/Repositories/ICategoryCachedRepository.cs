@@ -16,14 +16,14 @@
         /// <summary>
         /// Gets the CategoryItems based on the given Category Identity (id, code name, or guid).  You can use the string/int/guid.ToObjectIdentity() helper
         /// </summary>
-        /// <param name="categoryNames"></param>
+        /// <param name="categoryIdentity"></param>
         /// <returns></returns>
         IEnumerable<CategoryItem> GetCategoryIdentifiertoCategoryCached(IEnumerable<ObjectIdentity> categoryIdentity);
 
         /// <summary>
         /// Gets the Category based on the given category object identity (id, code name, or guid).  You can use the string/int/guid.ToObjectIdentity() helper
         /// </summary>
-        /// <param name="categoryName"></param>
+        /// <param name="categoryIdentity"></param>
         /// <returns></returns>
         Result<CategoryItem> GetCategoryIdentifiertoCategoryCached(ObjectIdentity categoryIdentity);
 

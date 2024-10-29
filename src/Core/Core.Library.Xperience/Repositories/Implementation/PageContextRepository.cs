@@ -6,7 +6,7 @@ using System.Data;
 namespace Core.Repositories.Implementation
 {
     public class PageContextRepository(IWebPageDataContextRetriever webPageDataContextRetriever,
-        IPageBuilderDataContext pageBuilderDataContext,
+        IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IProgressiveCache progressiveCache,
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
         ICacheRepositoryContext cacheRepositoryContext,
@@ -17,7 +17,7 @@ namespace Core.Repositories.Implementation
         ) : IPageContextRepository
     {
         private readonly IWebPageDataContextRetriever _webPageDataContextRetriever = webPageDataContextRetriever;
-        private readonly IPageBuilderDataContext _pageBuilderDataContext = pageBuilderDataContext;
+        private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
@@ -45,7 +45,7 @@ namespace Core.Repositories.Implementation
             throw new NotImplementedException("Not supported in Xperience by Kentico, use GetPageAsync(TreeIdentity)");
         }
 
-        public Task<bool> IsEditModeAsync() => Task.FromResult(_pageBuilderDataContext.EditMode);
+        public Task<bool> IsEditModeAsync() => Task.FromResult(_pageBuilderDataContextRetriever.Retrieve().EditMode);
 
         private async Task<Result<PageIdentity>> GetPageInternal(int webPageItemID, string? language = null)
         {

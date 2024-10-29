@@ -281,21 +281,25 @@ namespace Core.Repositories.Implementation
                     // Media Guid is the Content Item Guid
                     var internalBuilder = _cacheDependencyBuilderFactory.Create(false).ContentItemsOnLanguage(allMediaItems.Select(x => x.MediaGUID), language);
 
-                    // generate builder
-                    _cacheDependenciesScope.End();
+                    // Get any keys from customize interface calls
+                    var keys = _cacheDependenciesScope.End();
 
+                    if(cs.Cached) {
+                        cs.CacheDependency = CacheHelper.GetCacheDependency(keys);
+                    }
 
-                    return allMediaItems;
+                    return new MediaItemsAndKeys(allMediaItems, keys);
 
                 }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetContentItemsOfSameTypeToMediaItem", contentType, contentItems.Select(x => x.GetCacheKey()), language, assetFields.Select(x => x.FieldGuid.ToString()).Join("|")));
 
                 // Add dependencies to the cache scope
                 var builder = _cacheDependencyBuilderFactory.Create()
-                    .ContentItemsOnLanguage(mediaItems.Select(x => x.MediaGUID), language);
+                    .AddKeys(mediaItems.Keys);
 
-                return mediaItems;
+                return mediaItems.MediaItems;
             }
         }
+
 
         private async Task<Dictionary<Guid, Dictionary<Guid, Dictionary<string, MediaItem>>>> GetCachedContentGuidToFieldGuidToLanguageMediaItems(string contentType)
         {
@@ -617,7 +621,8 @@ namespace Core.Repositories.Implementation
         private record ContentTypeAssetConfigurations(List<AssetFieldIdentifier> AssetFields, bool PreCache);
 
         private record ContentIdentityAndLanguage(ContentIdentity ContentIdentity, string Language);
+        private record MediaItemsAndKeys(IEnumerable<MediaItem> MediaItems, string[] Keys);
 
-        #endregion
-    }
+    #endregion
+}
 }

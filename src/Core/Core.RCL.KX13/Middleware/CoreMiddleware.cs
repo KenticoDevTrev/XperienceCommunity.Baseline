@@ -1,4 +1,5 @@
-﻿using Core.Repositories.Implementation;
+﻿using Core.KX13.Repositories.Implementation;
+using Core.Repositories.Implementation;
 using Core.Services.Implementations;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
@@ -11,11 +12,13 @@ namespace Core
     {
         public static IServiceCollection UseCoreBaseline(this IServiceCollection services)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             services.AddScoped<IBaselinePageBuilderContext, BaselinePageBuilderContext>()
                 .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
                 .AddScoped<IMediaRepository, MediaRepository>()
                 .AddScoped<IMetaDataRepository, MetaDataRepository>()
-                .AddScoped<IPageCategoryRepository, PageCategoryRepository>()
+                .AddScoped<IPageCategoryRepository, PageCategoryRepository>() // Replaced by below
+                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>()
                 .AddScoped<IPageContextRepository, PageContextRepository>()
                 .AddScoped<ISiteRepository, SiteRepository>()
                 .AddScoped<IUserRepository, UserRepository>()
@@ -24,6 +27,7 @@ namespace Core
                 .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
                 .AddScoped<IUrlResolver, UrlResolver>()
                 .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return services;
 

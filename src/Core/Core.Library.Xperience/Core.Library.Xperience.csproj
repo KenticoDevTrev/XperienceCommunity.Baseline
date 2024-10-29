@@ -9,13 +9,14 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\xperience-query-extensions\src\XperienceCommunity.DevTools.QueryExtensions\XperienceCommunity.QueryExtensions.csproj" />
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
     <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="XperienceCommunity.DevTools.MVCCaching" Version="1.1.0" />
+    <PackageReference Include="XperienceCommunity.DevTools.QueryExtensions" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
