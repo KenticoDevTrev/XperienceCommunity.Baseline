@@ -87,7 +87,6 @@ namespace MVC.Configuration
         public static void AddAuthentication(WebApplicationBuilder builder, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
         {
             // Adds Basic Kentico Authentication, needed for user context and some tools
-            builder.Services.AddCoreBaselineKenticoAuthentication();
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
         }
@@ -153,7 +152,8 @@ namespace MVC.Configuration
 
             // Standard HttpError handling
             // See Features/HttpErrors/HttpErrorsController.cs
-            app.UseStatusCodePagesWithReExecute("/error/{0}");
+            // TODO: This breaks things due too admin, so will need to figure out if can resolve.
+            // app.UseStatusCodePagesWithReExecute("/error/{0}");
 
             // BizStream's Status Code Pages
             // See Features/HttpErrors/XperienceStausCodePage.cs
@@ -185,7 +185,6 @@ namespace MVC.Configuration
                 });
             */
 
-
             app.UseStaticFiles();
 
             // Make sure to call the middleware in the provided order
@@ -196,6 +195,9 @@ namespace MVC.Configuration
 
             // Needed for Page Builder, not just normal auth
             app.UseAuthentication();
+
+            // Only for Saas
+            // app.useKenticoCloud()
 
             // Enables Kentico middleware and configuration
             app.UseKentico();

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="29.5.2" />
   </ItemGroup>
 

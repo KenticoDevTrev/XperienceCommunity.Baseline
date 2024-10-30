@@ -9,6 +9,10 @@
 	</PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
     <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />

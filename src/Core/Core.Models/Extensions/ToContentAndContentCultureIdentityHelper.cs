@@ -12,7 +12,8 @@
             ContentCultureGuid = value
         };
 
-        public static ContentCultureIdentity ToContentCultureIdentity(this string value, string? culture = null, int? channelId = null) => new()
+        [Obsolete("While still applicable for KX13, should use TreeIdentity instead")]
+        public static ContentCultureIdentity ToContentCultureIdentityPath(this string value, string? culture = null, int? channelId = null) => new()
         {
             PathCultureChannelLookup = new PathCultureChannel(Path: value, Culture: (culture ?? string.Empty).AsNullOrWhitespaceMaybe(), ChannelId: (channelId ?? 0) <= 0 ? Maybe<int>.None : Maybe<int>.From(channelId ?? 0))
         };
@@ -27,9 +28,14 @@
             ContentGuid = value
         };
 
-        public static ContentIdentity ToContentIdentity(this string value, int? channelId = null) => new()
+        [Obsolete("While still applicable for KX13, should use TreeIdentity instead")]
+        public static ContentIdentity ToContentIdentityPath(this string value, int? channelId = null) => new()
         {
             PathChannelLookup = new PathChannel(Path: value, ChannelId: (channelId ?? 0) <= 0 ? Maybe<int>.None : Maybe<int>.From(channelId ?? 0))
+        };
+
+        public static ContentIdentity ToContentIdentity(this string value) => new() {
+            ContentName = value
         };
 
         public static TreeIdentity ToTreeIdentity(this string value, int? channelId = null) => new()

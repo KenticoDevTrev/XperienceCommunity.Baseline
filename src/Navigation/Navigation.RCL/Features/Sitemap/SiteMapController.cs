@@ -13,7 +13,7 @@ namespace Navigation.Features.Sitemap
         {
             var nodes = new List<SitemapNode>();
 
-            var siteName = _siteRepository.CurrentSiteName().ToLower();
+            var siteName = _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty).ToLower();
             if(_sitemapConfiguration.SiteNameToConfigurations.TryGetValue(siteName, out var configs))
             {
                 foreach(var config in configs)

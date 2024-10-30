@@ -13,26 +13,24 @@ namespace MVC
             app.Kentico().MapRoutes();
 
             app.UseRouting();
-
-            app.MapControllerRoute(
+           
+             app.MapControllerRoute(
                 name: "error",
                 pattern: "error/{code}",
                    defaults: new { controller = "HttpErrors", action = "Error" }
             );
 
-            /*
-               app.MapControllerRoute(
+            app.MapControllerRoute(
                    name: "MySiteMap",
                    pattern: "sitemap.xml",
                    defaults: new { controller = "Sitemap", action = "Index" }
                );
 
-               app.MapControllerRoute(
-                   name: "MySiteMap_Google",
-                   pattern: "googlesitemap.xml",
-                   defaults: new { controller = "Sitemap", action = "Index" }
-               );
-            */
+            app.MapControllerRoute(
+                name: "MySiteMap_Google",
+                pattern: "googlesitemap.xml",
+                defaults: new { controller = "Sitemap", action = "Index" }
+            );
 
             app.MapControllerRoute(
                 name: "default",
@@ -40,7 +38,7 @@ namespace MVC
 
             // Only enable until home page is set
             // app.MapGet("/", () => "The MVC site has not been configured yet.");
-
+            
         }
     }
 }

@@ -6,6 +6,8 @@ using Core.Services.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Interfaces;
 using Core.Models;
+using Kentico.Membership;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core
 {
@@ -73,32 +75,6 @@ namespace Core
 
             return services;
 
-        }
-
-        public static IServiceCollection AddCoreBaselineKenticoAuthentication(this IServiceCollection services)
-        {
-                       
-            // Required for authentication
-            /*
-            services.AddScoped<IPasswordHasher<ApplicationUser>, Kentico.Membership.PasswordHasher<ApplicationUser>>();
-            services.AddScoped<IMessageService, MessageService>();
-            services.AddApplicationIdentity<ApplicationUser, ApplicationRole>(options => {
-                // Note: These settings are effective only when password policies are turned off in the administration settings.
-                options.Password.RequireDigit = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 0;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequiredUniqueChars = 0;
-            })
-            .AddApplicationDefaultTokenProviders()
-            .AddUserStore<ApplicationUserStore<ApplicationUser>>()
-            .AddRoleStore<ApplicationRoleStore<ApplicationRole>>()
-            .AddUserManager<ApplicationUserManager<ApplicationUser>>()
-            .AddSignInManager<SignInManager<ApplicationUser>>();
-            */
-            return services;
-            
         }
     }
 }
