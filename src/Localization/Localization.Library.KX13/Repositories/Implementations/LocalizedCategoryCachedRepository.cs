@@ -201,7 +201,7 @@ where C.CategoryDescription not like '{$%$}'";
                 categoryID: item.CategoryID,
                 categoryName: item.CategoryName,
                 categoryGuid: item.CategoryGuid,
-                categoryParentID: item.CategoryParentID,
+                categoryParentID: item.CategoryParentID.GetValueOrDefault(0),
                 categoryDisplayName: item.CategoryDisplayName)
             {
                 CategoryDescription= item.CategoryDescription

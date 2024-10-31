@@ -17,25 +17,7 @@ namespace Account.Services.Implementation
         IEventLogService _eventLogService) : IUserService
     {
 
-        public Task<User> CreateUserAsync(User user, string password, bool enabled = false)
-        {
-            // Create basic user
-            var newUser = new UserInfo()
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
-                Enabled = enabled
-            };
-            _userInfoProvider.Set(newUser);
-
-            // Generate new password, and save any other settings
-            UserInfoProvider.SetPassword(newUser, password);
-
-            return Task.FromResult(newUser.ToUser());
-        }
+        public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).Value;
 
         public async Task SendRegistrationConfirmationEmailAsync(User user, string confirmationUrl)
         {
@@ -118,14 +100,41 @@ namespace Account.Services.Implementation
             }, new CacheSettings(15, "GetUserInfoAsync", userName));
         }
 
-        public Task CreateExternalUserAsync(User user)
+        public Task CreateExternalUserAsync(User user) => CreateExternalUser(user);
+
+        public async Task SendVerificationCodeEmailAsync(User user, string token)
+        {
+            // Creates and sends the confirmation email to the user's address
+            await _emailService.SendEmailAsync(user.Email, "Verification Code",
+                $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>");
+        }
+
+        public Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
         {
             // Create basic user
-            var newUser = new UserInfo()
-            {
+            var newUser = new UserInfo() {
                 UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.FirstName.GetValueOrDefault(string.Empty),
+                LastName = user.LastName.GetValueOrDefault(string.Empty),
+                Email = user.Email,
+                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
+                Enabled = enabled
+            };
+            _userInfoProvider.Set(newUser);
+
+            // Generate new password, and save any other settings
+            UserInfoProvider.SetPassword(newUser, password);
+
+            return Task.FromResult(Result.Success(newUser.ToUser()));
+        }
+
+        public Task<Result<User>> CreateExternalUser(User user)
+        {
+            // Create basic user
+            var newUser = new UserInfo() {
+                UserName = user.UserName,
+                FirstName = user.FirstName.GetValueOrDefault(string.Empty),
+                LastName = user.LastName.GetValueOrDefault(string.Empty),
                 Email = user.Email,
                 SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
                 Enabled = user.Enabled,
@@ -133,14 +142,7 @@ namespace Account.Services.Implementation
             };
             _userInfoProvider.Set(newUser);
 
-            return Task.FromResult(newUser.ToUser());
-        }
-
-        public async Task SendVerificationCodeEmailAsync(User user, string token)
-        {
-            // Creates and sends the confirmation email to the user's address
-            await _emailService.SendEmailAsync(user.Email, "Verification Code",
-                $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>");
+            return Task.FromResult(Result.Success(newUser.ToUser()));
         }
     }
 }

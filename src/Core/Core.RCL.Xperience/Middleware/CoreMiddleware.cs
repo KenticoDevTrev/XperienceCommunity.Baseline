@@ -53,6 +53,7 @@ namespace Core
                 .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
                 .AddScoped<IIdentityService, IdentityService>()
                 .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
+                .AddScoped<IModelStateService, ModelStateService>()
 
                 // Some internal APIs
                 .AddScoped<IPageContextRepository, PageContextRepository>()

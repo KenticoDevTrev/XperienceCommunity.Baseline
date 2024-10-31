@@ -214,7 +214,7 @@ namespace Account.Features.Account.LogIn
                 var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
                 var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
 
-                await _userService.CreateExternalUserAsync(new User(
+                var createResult = await _userService.CreateExternalUser(new User(
                     email: email,
                     userName: email,
                     enabled: true,
@@ -223,6 +223,13 @@ namespace Account.Features.Account.LogIn
                     isExternal: true,
                     isPublic: false
                     ));
+
+                // Failure to create the user for some reason.
+                if(createResult.IsFailure) {
+                    return Redirect(loginUrl);
+                }
+
+                model.Result = SignInResult.Success;
             }
 
             // Sign in

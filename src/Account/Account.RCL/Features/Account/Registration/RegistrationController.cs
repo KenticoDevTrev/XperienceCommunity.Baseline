@@ -47,8 +47,10 @@ namespace Account.Features.Account.Registration
             // Create a basic Kentico User and assign the portal ID
             try
             {
-                var newUser = await _userService.CreateUserAsync(userAccountModel.User.GetUser(), userAccountModel.Password);
-
+                var newUserResult = await _userService.CreateUser(userAccountModel.User.GetUser(), userAccountModel.Password);
+                if(!newUserResult.TryGetValue(out var newUser, out var error)) {
+                    throw new Exception(error);
+                }
                 // Send confirmation email with registration link
                 string confirmationUrl = await _accountSettingsRepository.GetAccountConfirmationUrlAsync(ConfirmationController.GetUrl());
                 await _userService.SendRegistrationConfirmationEmailAsync(newUser, _urlResolver.GetAbsoluteUrl(confirmationUrl));

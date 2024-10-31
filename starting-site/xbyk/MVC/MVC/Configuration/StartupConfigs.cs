@@ -13,6 +13,8 @@ using XperienceCommunity.RelationshipsExtended.Models;
 using Testing;
 using Core;
 using Core.Interfaces;
+using Kentico.Membership;
+using Microsoft.AspNetCore.Identity;
 
 namespace MVC.Configuration
 {
@@ -84,10 +86,25 @@ namespace MVC.Configuration
             */
         }
 
-        public static void AddAuthentication(WebApplicationBuilder builder, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
+        public static void AddStandardKenticoAuthentication(WebApplicationBuilder builder)
         {
             // Adds Basic Kentico Authentication, needed for user context and some tools
             builder.Services.AddAuthentication();
+
+            // Adds and configures ASP.NET Identity for the application
+            builder.Services.AddIdentity<ApplicationUser, NoOpApplicationRole>(options =>
+            {
+                // Ensures that disabled member accounts cannot sign in
+                options.SignIn.RequireConfirmedAccount = true;
+                // Ensures unique emails for registered accounts
+                options.User.RequireUniqueEmail = true;
+            })
+                .AddUserStore<ApplicationUserStore<ApplicationUser>>()
+                .AddRoleStore<NoOpApplicationRoleStore>()
+                .AddUserManager<UserManager<ApplicationUser>>()
+                .AddSignInManager<SignInManager<ApplicationUser>>();
+
+            // Adds authorization support to the app
             builder.Services.AddAuthorization();
         }
 
@@ -139,29 +156,8 @@ namespace MVC.Configuration
             // Must be first!
             app.InitKentico();
 
-            if (builder.Environment.IsDevelopment()) {
-                app.UseDeveloperExceptionPage();
-            } else {
-                app.UseExceptionHandler("/error/500");
-                app.UseHsts();
-            }
 
-            //////////////////////////////
-            //////// ERROR HANDLING //////
-            //////////////////////////////
-
-            // Standard HttpError handling
-            // See Features/HttpErrors/HttpErrorsController.cs
-            // TODO: This breaks things due too admin, so will need to figure out if can resolve.
-            // app.UseStatusCodePagesWithReExecute("/error/{0}");
-
-            // BizStream's Status Code Pages
-            // See Features/HttpErrors/XperienceStausCodePage.cs
-            // app.UseXperienceStatusCodePages();
-
-            //////////////////////////////
-            //////// ERROR HANDLING //////
-            //////////////////////////////
+           
 
             // While IIS and IIS Express automatically handle StaticFiles from the root, default Kestrel doesn't, so safer to 
             // add this for any Site Media Libraries if you ever plan on linking directly to the file.  /getmedia linkes are not
@@ -204,6 +200,33 @@ namespace MVC.Configuration
 
             // Enables Authorization, used in admin too
             app.UseAuthorization();
+
+            if (builder.Environment.IsDevelopment()) {
+                app.UseDeveloperExceptionPage();
+            }
+
+            //////////////////////////////
+            //////// ERROR HANDLING //////
+            //////////////////////////////
+
+            // Standard HttpError handling
+            // See Features/HttpErrors/HttpErrorsController.cs
+            // TODO: This breaks things due too admin, so will need to figure out if can resolve.
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
+
+            if (!builder.Environment.IsDevelopment()) {
+                app.UseExceptionHandler("/error/500");
+                app.UseHsts();
+            }
+
+            // BizStream's Status Code Pages
+            // See Features/HttpErrors/XperienceStausCodePage.cs
+            // app.UseXperienceStatusCodePages();
+
+            //////////////////////////////
+            //////// ERROR HANDLING //////
+            //////////////////////////////
+
         }
     }
 }

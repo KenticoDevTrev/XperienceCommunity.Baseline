@@ -6,21 +6,21 @@ namespace Account.Extensions
     {
         public static IRuleBuilderOptions<T, string> ValidPassword<T>(this IRuleBuilder<T, string> ruleBuilder, PasswordPolicySettings settings)
         {
-            string message = !string.IsNullOrWhiteSpace(settings.ViolationMessage) ? settings.ViolationMessage : "Invalid Password";
+            string message = settings.ViolationMessage.GetValueOrDefault("Invalid Password");
             var options = ruleBuilder.NotNull();
             if (settings.UsePasswordPolicy)
             {
-                if (settings.MinLength > 0)
+                if (settings.MinLength.TryGetValue(out var minLength) && minLength > 0)
                 {
-                    options.MinimumLength(settings.MinLength).WithMessage(message);
+                    options.MinimumLength(minLength).WithMessage(message);
                 }
-                if (!string.IsNullOrWhiteSpace(settings.Regex))
+                if (settings.Regex.TryGetValue(out var regex))
                 {
-                    options.Matches(settings.Regex).WithMessage(message);
+                    options.Matches(regex).WithMessage(message);
                 }
-                if (settings.NumNonAlphanumericChars > 0)
+                if (settings.NumNonAlphanumericChars.TryGetValue(out var numNonAlphaNumericaChars))
                 {
-                    options.Matches($"^(?=.{{{settings.NumNonAlphanumericChars},999}}\\W).*$").WithMessage(message);
+                    options.Matches($"^(?=.{{{numNonAlphaNumericaChars},999}}\\W).*$").WithMessage(message);
                 }
             }
             return options;

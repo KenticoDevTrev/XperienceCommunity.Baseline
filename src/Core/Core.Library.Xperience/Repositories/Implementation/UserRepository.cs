@@ -1,4 +1,5 @@
 ﻿using CMS.Membership;
+using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Repositories.Implementation
@@ -137,6 +138,24 @@ namespace CMS.Membership
                 isPublic: userInfo.MemberName.Equals("public", StringComparison.OrdinalIgnoreCase)
                 ) {
             };
+        }
+    }
+
+    public static class UserExtensions
+    {
+        public static ApplicationUser ToApplicationUser(this User user)
+        {
+            var appUser = new ApplicationUser() {
+                UserName = user.UserName,
+                Enabled = user.Enabled,
+                Email = user.Email,
+                IsExternal = user.IsExternal,
+            };
+            if(user.UserID.TryGetValue(out var userId)) {
+                appUser.Id = userId;
+            }
+
+            return appUser;
         }
     }
 }
