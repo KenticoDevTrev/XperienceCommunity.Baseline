@@ -8,8 +8,18 @@
     <RootNamespace>Account</RootNamespace>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
+  
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+  
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Core" Version="29.6.1" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.6.1" />
   </ItemGroup>
 
   <ItemGroup>

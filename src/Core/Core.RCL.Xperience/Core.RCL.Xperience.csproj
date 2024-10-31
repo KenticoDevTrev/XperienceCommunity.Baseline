@@ -7,14 +7,20 @@
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<RootNamespace>Core</RootNamespace>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Kentico.Xperience.WebApp" Version="29.5.2" />
+	  <PackageReference Include="Kentico.Xperience.WebApp" Version="29.6.1" />
 	</ItemGroup>
 
 	<ItemGroup>

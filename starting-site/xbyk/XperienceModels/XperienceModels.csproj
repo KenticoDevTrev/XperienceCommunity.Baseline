@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
     <RootNamespace>XperienceModels</RootNamespace>
   </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <NoWarn>NU1603</NoWarn>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
@@ -14,7 +20,7 @@
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Core" Version="29.5.2" />
+    <PackageReference Include="Kentico.Xperience.Core" Version="29.6.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />

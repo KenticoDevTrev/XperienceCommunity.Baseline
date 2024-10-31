@@ -5,6 +5,12 @@
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Core" Version="29.5.2" />
+    <PackageReference Include="Kentico.Xperience.Core" Version="29.6.1" />
   </ItemGroup>
 
 </Project>

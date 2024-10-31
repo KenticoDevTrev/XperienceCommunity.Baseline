@@ -7,8 +7,13 @@
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="29.6.1" />
   </ItemGroup>
 
   <ItemGroup>

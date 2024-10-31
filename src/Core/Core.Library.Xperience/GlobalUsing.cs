@@ -19,3 +19,4 @@ global using CMS.Helpers;
 global using XperienceCommunity.QueryExtensions.Objects;
 global using XperienceCommunity.QueryExtensions.Collections;
 global using XperienceCommunity.QueryExtensions.ContentItems;
+global using Result = CSharpFunctionalExtensions.Result;

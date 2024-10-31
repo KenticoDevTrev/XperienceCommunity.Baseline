@@ -404,7 +404,7 @@ namespace Core.Repositories.Implementation
             foreach (var contentItem in contentItems) {
                 if ((await _identityService.GetContentType(contentItem)).TryGetValue(out var type)) {
                     if (!contentIdentitiesByType.TryGetValue(type.ToLowerInvariant(), out var identityList)) {
-                        identityList = new List<ContentIdentity>();
+                        identityList = [];
                         contentIdentitiesByType.Add(type.ToLowerInvariant(), identityList);
                     }
                     identityList.Add(contentItem);
@@ -574,11 +574,8 @@ namespace Core.Repositories.Implementation
 
         #region "Media Helpers"
 
-        private MediaItem MediaFileInfoToMediaItemCached(MediaFileInfo mediaFile)
+        private static MediaItem MediaFileInfoToMediaItemCached(MediaFileInfo mediaFile)
         {
-            // using own logic since media file url retriever is not optimized
-            var extension = mediaFile.FileExtension.Trim('.').ToLower();
-
             return new MediaItem(
                 mediaGUID: mediaFile.FileGUID,
                 mediaName: mediaFile.FileName,
