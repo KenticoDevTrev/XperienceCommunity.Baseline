@@ -9,9 +9,10 @@ If you are starting a brand new Kentico instance, please follow these instructio
 3. Delete the .gitkeep file found in the `KenticoAdmin` folder of the starting site.
 4. Run the Installer to install a fresh .net core MVC Solution, pointing the installation location to the `KenticoAdmin` folder from the baseline project
    * I recommend creating a blank SQL database first, get the user and login set in it, and when installing to select **Install without database**, and once installation is finished and you run the admin, it will guide
-5. Once installed, you can delete the `[ProjectName]` folder and `[ProjectName].sln` files from within the `KenticoAdmin` folder, these are the kentico generated `MVC` Project files that we won't be using.
-5. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
-6. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
+5. Create a new Site in the Admin (Admin -> Sites -> new Site)
+6. Once installed, you can delete the `[ProjectName]` folder and `[ProjectName].sln` files from within the `KenticoAdmin` folder, these are the kentico generated `MVC` Project files that we won't be using.
+7. Once your site is installed and you can run the admin application, install the NuGet packages outlined in the section **[Adding required Admin NuGet Packages](#Adding-required-Admin-NuGet-Packages)** 
+8. Lastly, follow the instructions in **[Connecting the Starting Site](#Connecting-the-Starting-Site)** section
 
 ## Upgrading from Portal KX12
 If you are upgrading from 12 Portal Engine, you must first migrate your site to a 12 MVC [using the Kentico12to13Converter](https://github.com/KenticoDevTrev/KX12To13Converter).  Then proceed to **[Upgrading from MVC KX12](#Upgrading-from-MVC-KX12)**
