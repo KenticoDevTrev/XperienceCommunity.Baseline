@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Options;
 using MVC;
 using MVC.Configuration;
+using XperienceCommunity.ChannelSettings.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 StartupConfigs.RegisterKenticoServices(builder);
+
+builder.Services.AddChannelCustomSettings();
 
 // IIS Hosting only - See https://docs.kentico.com/developers-and-admins/development/website-development-basics/configure-new-projects#configure-application-startup
 // builder.Services.Configure<IISApplicationInitializationOptions>(options => {

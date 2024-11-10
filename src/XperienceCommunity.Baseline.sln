@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Models", "Core\Core.Models\Core.Models.csproj", "{227F2495-3FD6-44D1-84CC-95643914BCEC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Navigation", "Navigation", "{389F825B-1B60-4DB6-91D7-DD3AEAF4B7CD}"
+	ProjectSection(SolutionItems) = preProject
+		Navigation\Navigation.Library.Xperience\Navigation.Library.Xperience.csproj = Navigation\Navigation.Library.Xperience\Navigation.Library.Xperience.csproj
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Library.KX13", "Core\Core.Library.KX13\Core.Library.KX13.csproj", "{6F16469A-320E-408B-9259-F2DCD1AA7AE6}"
 EndProject
@@ -99,6 +102,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Library.Xperience", "Core\Core.Library.Xperience\Core.Library.Xperience.csproj", "{62943648-4171-4BE3-BD57-7423B65DF96D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.RCL.Xperience", "Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj", "{0808A36B-FDFA-4485-8981-DF3FF4F943CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Navigation.XperienceModels.Xperience", "Navigation\Navigation.XperienceModels.Xperience\Navigation.XperienceModels.Xperience.csproj", "{55805D21-09D8-4E52-A704-F7126DFD03A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -530,6 +535,18 @@ Global
 		{0808A36B-FDFA-4485-8981-DF3FF4F943CE}.Release|x64.Build.0 = Release|Any CPU
 		{0808A36B-FDFA-4485-8981-DF3FF4F943CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{0808A36B-FDFA-4485-8981-DF3FF4F943CE}.Release|x86.Build.0 = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|x64.Build.0 = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Debug|x86.Build.0 = Debug|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|x64.ActiveCfg = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|x64.Build.0 = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|x86.ActiveCfg = Release|Any CPU
+		{55805D21-09D8-4E52-A704-F7126DFD03A4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -570,6 +587,7 @@ Global
 		{898A1D10-52DB-4C0A-A29A-AAA24EF62A17} = {AEA84302-1508-420C-85C3-E0AF8016CBB5}
 		{62943648-4171-4BE3-BD57-7423B65DF96D} = {AEA84302-1508-420C-85C3-E0AF8016CBB5}
 		{0808A36B-FDFA-4485-8981-DF3FF4F943CE} = {AEA84302-1508-420C-85C3-E0AF8016CBB5}
+		{55805D21-09D8-4E52-A704-F7126DFD03A4} = {389F825B-1B60-4DB6-91D7-DD3AEAF4B7CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EFC1B12-4B51-451A-8051-FBA2C799FE5D}

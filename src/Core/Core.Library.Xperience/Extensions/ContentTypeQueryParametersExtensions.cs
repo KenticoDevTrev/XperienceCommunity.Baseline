@@ -209,5 +209,21 @@ namespace CMS.ContentEngine
         public static ContentTypeQueryParameters InTreeCultureIdentities(this ContentTypeQueryParameters queryParams, IEnumerable<TreeCultureIdentity> identities) => queryParams.InTreeIdentities(identities);
         
         public static ContentTypeQueryParameters InTreeCultureIdentity(this ContentTypeQueryParameters queryParams, TreeIdentity identity) => queryParams.InTreeIdentities([identity]);
+
+        [Obsolete("No longer needed, base .Columns now handles if there are or aren't existing columns listings")]
+        public static ContentTypeQueryParameters ColumnsSafe(this ContentTypeQueryParameters queryParams, params string[] columns) => queryParams.Columns(columns);
+
+        public static ContentTypeQueryParameters Path(this ContentTypeQueryParameters queryParams, string path, PathTypeEnum type = PathTypeEnum.Explicit)
+        {
+            var pathNormalized = $"/{path.Trim('%').Trim('/')}";
+            return type switch {
+                PathTypeEnum.Section => queryParams.Where(where => where.WhereEquals(nameof(WebPageFields.WebPageItemTreePath), pathNormalized)
+                                    .Or()
+                                    .WhereLike(nameof(WebPageFields.WebPageItemTreePath), $"{pathNormalized}/%")),
+                PathTypeEnum.Single => queryParams.Where(where => where.WhereEquals(nameof(WebPageFields.WebPageItemTreePath), pathNormalized)),
+                PathTypeEnum.Children => queryParams.Where(where => where.WhereLike(nameof(WebPageFields.WebPageItemTreePath), $"{pathNormalized}/%")),
+                _ or PathTypeEnum.Explicit => queryParams.Where(where => where.WhereEquals(nameof(WebPageFields.WebPageItemTreePath), path)),
+            };
+        }
     }
 }

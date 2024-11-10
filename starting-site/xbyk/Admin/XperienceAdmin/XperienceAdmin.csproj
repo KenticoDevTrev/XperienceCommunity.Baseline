@@ -11,9 +11,18 @@
   <PropertyGroup>
     <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="29.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.ChannelSettings\src\XperienceCommunity.ChannelSettings.Admin\XperienceCommunity.ChannelSettings.Admin.csproj" />
+    <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 
 </Project>
