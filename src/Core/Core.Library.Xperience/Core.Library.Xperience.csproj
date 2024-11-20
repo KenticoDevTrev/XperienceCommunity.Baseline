@@ -27,6 +27,7 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="29.6.1" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="29.6.1" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.1" />
     <PackageReference Include="XperienceCommunity.DevTools.MVCCaching" Version="1.1.0" />
     <PackageReference Include="XperienceCommunity.DevTools.QueryExtensions" Version="2.0.0" />
   </ItemGroup>

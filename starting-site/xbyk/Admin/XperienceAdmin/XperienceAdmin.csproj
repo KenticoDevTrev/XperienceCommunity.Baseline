@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.ChannelSettings\src\XperienceCommunity.ChannelSettings.Admin\XperienceCommunity.ChannelSettings.Admin.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 

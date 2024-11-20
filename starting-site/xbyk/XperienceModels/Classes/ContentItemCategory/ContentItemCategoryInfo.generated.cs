@@ -25,7 +25,6 @@ namespace RelationshipsExtended
         /// <summary>
         /// Type information.
         /// </summary>
-#warning "You will need to configure the type info."
         public static readonly ObjectTypeInfo TYPEINFO = new ObjectTypeInfo(typeof(ContentItemCategoryInfoProvider), OBJECT_TYPE, "RelationshipsExtended.ContentItemCategory", "ContentItemCategoryID", null, null, null, null, null, "ContentItemCategoryContentItemID", "cms.contentitem")
         {
             TouchCacheDependencies = true,

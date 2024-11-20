@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.ChannelSettings\src\XperienceCommunity.ChannelSettings.Core\XperienceCommunity.ChannelSettings.Core.csproj" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
