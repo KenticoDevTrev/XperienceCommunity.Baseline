@@ -18,8 +18,8 @@
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Core" Version="29.6.1" />
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.6.1" />
+    <PackageReference Include="Kentico.Xperience.Core" Version="29.7.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.7.0" />
   </ItemGroup>
 
   <ItemGroup>

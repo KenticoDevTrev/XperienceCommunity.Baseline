@@ -3,14 +3,17 @@
     <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="kentico.xperience.azurestorage" Version="29.6.1" />
-    <PackageReference Include="kentico.xperience.imageprocessing" Version="29.6.1" />
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.6.1" />
+    <PackageReference Include="kentico.xperience.azurestorage" Version="29.7.0" />
+    <PackageReference Include="kentico.xperience.imageprocessing" Version="29.7.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.7.0" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.MemberRoles\src\XperienceCommunity.MemberRoles.Admin\XperienceCommunity.MemberRoles.Admin.csproj" />
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.MemberRoles\src\XperienceCommunity.MemberRoles.Core\XperienceCommunity.MemberRoles.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.MemberRoles\src\XperienceCommunity.MemberRoles\XperienceCommunity.MemberRoles.csproj" />
     <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Admin\XperienceCommunity.RelationshipsExtended.Web.Admin.csproj" />
     <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\..\..\..\src\Account\Account.RCL.Xperience\Account.RCL.Xperience.csproj" />

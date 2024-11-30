@@ -19,6 +19,8 @@ builder.Services.AddChannelCustomSettings();
 // //////////////////////////////////////////
 // 
 // XperienceCommunity.Baseline.Account.RCL.Xperience - If using Member Logins on web site
+
+/*
 builder.AddBaselineKenticoAuthentication(identityOptions => {
 
     // Can customize things here, the below are the default but you get the idea
@@ -43,6 +45,7 @@ passwordPolicySettings: new Account.Models.PasswordPolicySettings(
     regex: null,
     violationMessage: "Invalid Password")
 );
+*/
 
 // //////////////////////////////////////////
 // /////////  Authentication (Member) ///////
@@ -54,6 +57,8 @@ passwordPolicySettings: new Account.Models.PasswordPolicySettings(
 StartupConfigs.RegisterLocalizationAndControllerViews(builder);
 
 StartupConfigs.RegisterInterfaces(builder);
+
+StartupConfigs.AddStandardKenticoAuthentication(builder);
 
 var app = builder.Build();
 

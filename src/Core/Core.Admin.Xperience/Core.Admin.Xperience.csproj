@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" Version="29.6.1" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="29.7.0" />
     <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.1" />
   </ItemGroup>
 

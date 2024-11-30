@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
 using CMS.MediaLibrary;
+using XperienceCommunity.MemberRoles;
+using XperienceCommunity;
 
 namespace Generic
 {
@@ -21,7 +23,7 @@ namespace Generic
 	/// Represents a page of type <see cref="BasicPage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BasicPage : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect
+	public partial class BasicPage : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -100,5 +102,23 @@ namespace Generic
 		/// PageUsePermanentRedirects.
 		/// </summary>
 		public bool PageUsePermanentRedirects { get; set; }
+
+
+        /// <summary>
+        /// MemberPermissionOverride.
+        /// </summary>
+        public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

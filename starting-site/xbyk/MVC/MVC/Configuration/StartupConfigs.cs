@@ -15,6 +15,8 @@ using Core;
 using Core.Interfaces;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
+using XperienceCommunity.MemberRoles.Services.Implementations;
+using XperienceCommunity.MemberRoles.Models;
 
 namespace MVC.Configuration
 {
@@ -74,7 +76,8 @@ namespace MVC.Configuration
             // Baseline services
             builder.Services.AddScoped<IUrlResolver, UrlResolver>();
 
-            builder.Services.UseCoreBaseline();
+            builder.Services.AddCoreBaseline();
+
 
             // Override Baseline customization points if wanted
             /*
@@ -92,15 +95,16 @@ namespace MVC.Configuration
             builder.Services.AddAuthentication();
 
             // Adds and configures ASP.NET Identity for the application
-            builder.Services.AddIdentity<ApplicationUser, NoOpApplicationRole>(options =>
-            {
+
+            // XperienceCommunity.MemberRoles, make sure Role is TagApplicationUserRole or an inherited member here
+            builder.Services.AddIdentity<ApplicationUser, TagApplicationUserRole>(options => {
                 // Ensures that disabled member accounts cannot sign in
                 options.SignIn.RequireConfirmedAccount = true;
                 // Ensures unique emails for registered accounts
                 options.User.RequireUniqueEmail = true;
             })
                 .AddUserStore<ApplicationUserStore<ApplicationUser>>()
-                .AddRoleStore<NoOpApplicationRoleStore>()
+                .AddMemberRolesStores<ApplicationUser, TagApplicationUserRole>() // XperienceCommunity.MemberRoles
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddSignInManager<SignInManager<ApplicationUser>>();
 

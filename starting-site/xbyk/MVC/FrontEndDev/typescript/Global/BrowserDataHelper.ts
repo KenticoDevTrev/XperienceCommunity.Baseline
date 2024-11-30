@@ -109,7 +109,8 @@ export class BrowserDataHelper {
 
         // Custom Expiration Logic
         if(expirationDays > 0) {
-            var expDate = new Date(new Date().getDate()+expirationDays);
+            var expDate = new Date();
+            expDate.setDate(expDate.getDate()+expirationDays);
             window.localStorage.setItem(name+"-expiration", expDate.toUTCString());
         }
     }
@@ -119,7 +120,8 @@ export class BrowserDataHelper {
 
         // Custom Expiration Logic
         if(expirationDays > 0) {
-            var expDate = new Date(new Date().getDate()+expirationDays);
+            var expDate = new Date();
+            expDate.setDate(expDate.getDate()+expirationDays);
             window.localStorage.setItem(name+"-expiration", expDate.toUTCString());
         }
     }

@@ -13,7 +13,7 @@ namespace Core
 {
     public static class CoreMiddleware
     {
-        public static IServiceCollection UseCoreBaseline(this IServiceCollection services,
+        public static IServiceCollection AddCoreBaseline(this IServiceCollection services,
             Action<ContentItemAssetOptions>? contentItemAssetOptions = null,
             Action<MediaFileOptions>? mediaFileOptions = null,
             Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptions = null)
