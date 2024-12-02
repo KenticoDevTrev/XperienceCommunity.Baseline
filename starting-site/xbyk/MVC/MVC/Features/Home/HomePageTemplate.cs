@@ -1,6 +1,7 @@
 using BaselineSiteElements.Features.Home;
 using Generic;
-
+using XperienceCommunity.Authorization;
+[assembly: RegisterPageBuilderAuthorization(PageBuilderAuthorizationTypes.ByPageTemplate, "Generic.Home_", AuthorizationType.ByPageACL, templateIdentifiersArePrefix: true)]
 [assembly: RegisterPageTemplate(
     "Generic.Home_Default",
     "Home Page (Default)",

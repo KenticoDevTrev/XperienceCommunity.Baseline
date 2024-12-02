@@ -131,7 +131,7 @@ inner join CMS_ContentItemLanguageMetadata on ContentItemLanguageMetadataContent
 inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadataContentLanguageID
 inner join CMS_WebsiteChannel on WebsiteChannelID = WebPageItemWebsiteChannelID
 inner join CMS_Class on ClassID = ContentItemContentTypeID
-inner join CMS_WebPageUrlPath on WebPageUrlPathWebPageItemID = WebPageItemID
+inner join CMS_WebPageUrlPath on WebPageUrlPathWebPageItemID = WebPageItemID and WebPageUrlPathContentLanguageID = ContentLanguageID
 inner join CMS_ContentItemCommonData on ContentItemCommonDataContentItemID = ContentItemID and ContentItemCommonDataContentLanguageID = ContentItemLanguageMetadataContentLanguageID
 where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
 ";

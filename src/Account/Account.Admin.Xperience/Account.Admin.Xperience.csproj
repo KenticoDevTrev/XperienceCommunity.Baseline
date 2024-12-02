@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
     <ProjectReference Include="..\Account.Library.Xperience\Account.Library.Xperience.csproj" />
   </ItemGroup>

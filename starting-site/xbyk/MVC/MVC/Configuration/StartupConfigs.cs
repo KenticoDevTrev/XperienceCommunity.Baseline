@@ -17,6 +17,8 @@ using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
 using XperienceCommunity.MemberRoles.Services.Implementations;
 using XperienceCommunity.MemberRoles.Models;
+using XperienceCommunity.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace MVC.Configuration
 {
@@ -78,6 +80,8 @@ namespace MVC.Configuration
 
             builder.Services.AddCoreBaseline();
 
+            builder.Services.AddKenticoAuthorization()
+                .AddScoped<BobAuthorization>();
 
             // Override Baseline customization points if wanted
             /*
@@ -109,6 +113,14 @@ namespace MVC.Configuration
                 .AddSignInManager<SignInManager<ApplicationUser>>();
 
             // Adds authorization support to the app
+            builder.Services.ConfigureApplicationCookie(options => {
+                options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                options.SlidingExpiration = true;
+                options.LoginPath = new PathString("/Account/Signin");
+                options.AccessDeniedPath = new PathString("/Error/403");
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+            });
             builder.Services.AddAuthorization();
         }
 
@@ -117,7 +129,9 @@ namespace MVC.Configuration
             // Localizer
             builder.Services.AddLocalization()
                     //.AddXperienceLocalizer() // Call after AddLocalization
-                    .AddControllersWithViews() // .AddControllersWithViewsAndKenticoAuthorization()
+                    .AddControllersWithViews(options => {
+                        options.Filters.AddKenticoAuthorizationFilters(); // XperienceCommunity.DevTools.Authorization
+                    }) // .AddControllersWithViewsAndKenticoAuthorization()
                     .AddViewLocalization()
                     .AddDataAnnotationsLocalization(options => {
                         options.DataAnnotationLocalizerProvider = (type, factory) => {

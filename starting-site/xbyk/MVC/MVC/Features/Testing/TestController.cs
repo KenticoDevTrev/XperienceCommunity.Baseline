@@ -8,6 +8,7 @@ using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
 using Testing;
 using XperienceCommunity;
+using XperienceCommunity.Authorization;
 using XperienceCommunity.MemberRoles;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.MemberRoles.Repositories;
@@ -31,9 +32,10 @@ namespace MVC.Features.Testing
         private readonly IUserRoleStore<ApplicationUser> _userRoleStore = userRoleStore;
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
 
+
+        [ControllerActionAuthorization(AuthorizationType.ByAuthenticated)]
         public async Task<string> Index()
         {
-
             var testMember = await _userStore.FindByNameAsync("TestMember", CancellationToken.None);
             var roles = await _userRoleStore.GetRolesAsync(testMember, CancellationToken.None);
             var studentRoleStatus = await _roleStore.CreateAsync(new TagApplicationUserRole() {
