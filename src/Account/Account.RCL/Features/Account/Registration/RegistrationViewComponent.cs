@@ -1,14 +1,10 @@
 ﻿namespace Account.Features.Account.Registration
 {
     [ViewComponent]
-    public class RegistrationViewComponent : ViewComponent
+    public class RegistrationViewComponent(IModelStateService modelStateService) : ViewComponent
     {
-        private readonly IModelStateService _modelStateService;
+        private readonly IModelStateService _modelStateService = modelStateService;
 
-        public RegistrationViewComponent(IModelStateService modelStateService )
-        {
-            _modelStateService = modelStateService;
-        }
         /// <summary>
         /// Uses the current page context to render meta data
         /// </summary>

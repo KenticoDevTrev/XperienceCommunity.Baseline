@@ -1,6 +1,10 @@
-﻿using Account.Features.Account.LogIn;
+﻿using Account.Features.Account.ForgottenPasswordReset;
+using Account.Features.Account.LogIn;
+using Account.Features.Account.Registration;
+using Account.Features.Account.ResetPassword;
 using Account.Repositories.Implementation;
 using CMS.Helpers;
+using FluentValidation;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -58,6 +62,12 @@ namespace Account
                     .AddUserManager<ApplicationUserManager<ApplicationUser>>()
                     .AddSignInManager<SignInManager<ApplicationUser>>();
             
+            // Add validators
+            services.AddScoped<IValidator<BasicUser>, BasicUserValidator>()
+                .AddScoped<IValidator<ForgottenPasswordResetViewModel>, ForgottenPasswordResetViewModelValidator>()
+                .AddScoped<IValidator<RegistrationViewModel>, RegistrationViewModelValidator>()
+                .AddScoped<IValidator<ResetPasswordViewModel>, ResetPasswordValidator>();
+
             // Get default 
             var authBuilder = services.AddAuthentication();
 

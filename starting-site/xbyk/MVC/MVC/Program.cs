@@ -14,51 +14,35 @@ builder.Services.AddChannelCustomSettings();
 //     options.UseDefaultSystemResponseForPreload = true;
 // });
 
-// //////////////////////////////////////////
-// /////////  Authentication (Member) ///////
-// //////////////////////////////////////////
-// 
-// XperienceCommunity.Baseline.Account.RCL.Xperience - If using Member Logins on web site
 
-/*
-builder.AddBaselineKenticoAuthentication(identityOptions => {
+// --- CHOOSE EITHER STANDARD OR BASELINE, NOT BOTH ---- //
 
-    // Can customize things here, the below are the default but you get the idea
+// /////////////////////////////////////////////////
+// /// Standard Kentico Account / Authorization  ///
+// /////////////////////////////////////////////////
 
-    // Ensures that disabled member accounts cannot sign in
-    identityOptions.SignIn.RequireConfirmedAccount = true;
-    // Ensures unique emails for registered accounts
-    identityOptions.User.RequireUniqueEmail = true;
+//StartupConfigs.AddStandardKenticoAuthentication(builder);
+//StartupConfigs.RegisterStandardKenticoLocalizationAndControllerViews(builder);
 
-    identityOptions.Password.RequireDigit = true;
-    identityOptions.Password.RequireNonAlphanumeric = true;
-    identityOptions.Password.RequiredLength = 10;
-    identityOptions.Password.RequireUppercase = true;
-    identityOptions.Password.RequireLowercase = true;
-    identityOptions.Password.RequiredUniqueChars = 3;
-},
-// At this time can't modify Web Channel Settings to make this dynamic, so need to set manually
-passwordPolicySettings: new Account.Models.PasswordPolicySettings(
-    usePasswordPolicy: true,
-    minLength: 10,
-    numNonAlphanumericChars: 1,
-    regex: null,
-    violationMessage: "Invalid Password")
-);
-*/
+// /////////////////////////////////////////////////
+// /// Standard Kentico Account / Authorization  ///
+// /////////////////////////////////////////////////
 
-// //////////////////////////////////////////
-// /////////  Authentication (Member) ///////
-// //////////////////////////////////////////
+// OR
 
-// Use below if not using the AddBaselineKenticoAuthentication
-// StartupConfigs.AddStandardKenticoAuthentication(builder);
+// /////////////////////////////////////////
+// ///  Baseline Account / Authorization ///
+// /////////////////////////////////////////
 
-StartupConfigs.RegisterLocalizationAndControllerViews(builder);
+StartupConfigs.AddBaselineKenticoAuthentication(builder);
+StartupConfigs.RegisterBaselineAccountLocalizationAndControllerViews(builder);
+
+// /////////////////////////////////////////
+// ///  Baseline Account / Authorization ///
+// /////////////////////////////////////////
+
 
 StartupConfigs.RegisterInterfaces(builder);
-
-StartupConfigs.AddStandardKenticoAuthentication(builder);
 
 var app = builder.Build();
 

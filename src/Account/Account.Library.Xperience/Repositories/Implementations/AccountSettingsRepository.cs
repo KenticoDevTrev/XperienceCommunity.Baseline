@@ -1,150 +1,141 @@
 ﻿using Account.Models;
 using CMS.Core;
 using Core.Services;
+using CSharpFunctionalExtensions;
+using Kentico.Membership;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using MVCCaching;
+using XperienceCommunity.ChannelSettings.Repositories;
 
 namespace Account.Repositories.Implementations
 {
     /// <summary>
-    /// TODO: Once WebsiteChannelSettings are configurable, should add these Urls to them.
+    /// 
     /// </summary>
     /// <param name="urlResolver"></param>
     /// <param name="settingsService"></param>
     /// <param name="cacheDependencyBuilderFactory"></param>
     /// <param name="passwordPolicySettings"></param>
-    public class AccountSettingsRepository(IUrlResolver urlResolver, 
-        ISettingsService settingsService,
+    public class AccountSettingsRepository(IUrlResolver urlResolver,
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-        PasswordPolicySettings passwordPolicySettings) : IAccountSettingsRepository
+        IChannelCustomSettingsRepository channelCustomSettingsRepository,
+        IOptions<IdentityOptions> identityOptions) : IAccountSettingsRepository
     {
         private readonly IUrlResolver _urlResolver = urlResolver;
-        private readonly ISettingsService _settingsService = settingsService;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-        private readonly PasswordPolicySettings _passwordPolicySettings = passwordPolicySettings;
+        private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
+        private readonly IOptions<IdentityOptions> _identityOptions = identityOptions;
 
-        public Task<string> GetAccountConfirmationUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountConfirmationUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountConfirmationUrl");
-            string url = _settingsService["AccountConfirmationUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountConfirmationUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountForgottenPasswordResetUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountForgottenPasswordResetUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountForgottenPasswordResetUrl");
-            string url = _settingsService["AccountForgottenPasswordResetUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountForgottenPasswordResetUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountForgotPasswordUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountForgotPasswordUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountForgotPasswordUrl");
-            string url = _settingsService["AccountForgotPasswordUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountForgotPasswordUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountLoginUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountLoginUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountLoginUrl");
-            string url = _settingsService["AccountLoginUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountLoginUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountRegistrationUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountRegistrationUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountRegistrationUrl");
-            string url = _settingsService["AccountRegistrationUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountRegistrationUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountMyAccountUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountMyAccountUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountMyAccountUrl");
-            string url = _settingsService["AccountMyAccountUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountMyAccountUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<bool> GetAccountRedirectToAccountAfterLoginAsync()
+        public async Task<bool> GetAccountRedirectToAccountAfterLoginAsync()
         {
-            return Task.FromResult(false);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountRedirectToAccountAfterLogin");
-            return Task.FromResult(ValidationHelper.GetBoolean(_settingsService["AccountRedirectToAccountAfterLogin"], false));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return (await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountRedirectToAccountAfterLogin;
         }
 
-        public Task<string> GetAccountLogOutUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountLogOutUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountLogOutUrl");
-            string url = _settingsService["AccountLogOutUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountLogOutUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccountResetPasswordUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccountResetPasswordUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountResetPassword");
-            string url = _settingsService["AccountResetPassword"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountResetPassword.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<string> GetAccessDeniedUrlAsync(string fallBackUrl)
+        public async Task<string> GetAccessDeniedUrlAsync(string fallBackUrl)
         {
-            return Task.FromResult(fallBackUrl);
-            /*
-            _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccessDeniedUrl");
-            string url = _settingsService["AccessDeniedUrl"];
-            url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
-            return Task.FromResult(_urlResolver.ResolveUrl(url));
-            */
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccessDeniedUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
-        public Task<PasswordPolicySettings> GetPasswordPolicyAsync()
+        public async Task<PasswordPolicySettings> GetPasswordPolicyAsync()
         {
-            return Task.FromResult(GetPasswordPolicy());
+            var model = await _channelCustomSettingsRepository.GetSettingsModel<MemberPasswordChannelSettings>();
+            if (model.UsePasswordPolicy) {
+                return new PasswordPolicySettings(model.UsePasswordPolicy, model.MinLength, model.NumNonAlphanumericChars, model.Regex.AsNullOrWhitespaceMaybe().AsNullableValue(), model.ViolationMessage.AsNullOrWhitespaceMaybe().AsNullableValue());
+            }
+
+            try {
+                var passwordOptions = _identityOptions.Value.Password;
+                // Convert to our basic rules
+                if(!(passwordOptions.RequiredLength > 0 || passwordOptions.RequireDigit || passwordOptions.RequireLowercase || passwordOptions.RequireUppercase || passwordOptions.RequireNonAlphanumeric || passwordOptions.RequiredUniqueChars > 0)) {
+                    return new PasswordPolicySettings();
+                }
+                // generate Regex from settings
+                var regex = $"^";
+                if (passwordOptions.RequiredLength > 0) {
+                    regex += $"(?=.{{{passwordOptions.RequiredLength},}})";
+                }
+                if (passwordOptions.RequireDigit) {
+                    regex += "(?=(.*\\d))";
+                }
+                if (passwordOptions.RequireLowercase) {
+                    regex += "(?=(.*[a-z]))";
+                }
+                if (passwordOptions.RequireUppercase) {
+                    regex += "(?=(.*[A-Z]))";
+                }
+                if (passwordOptions.RequireNonAlphanumeric) {
+                    regex += "(?=(.*[^\\w\\s]))";
+                }
+
+                regex += ".*$";
+
+                var passwordSettings = new PasswordPolicySettings() {
+                    UsePasswordPolicy = (passwordOptions.RequiredLength > 0 || passwordOptions.RequireDigit || passwordOptions.RequireLowercase || passwordOptions.RequireUppercase || passwordOptions.RequireNonAlphanumeric || passwordOptions.RequiredUniqueChars > 0),
+                    MinLength = passwordOptions.RequiredLength,
+                    NumNonAlphanumericChars = passwordOptions.RequireNonAlphanumeric ? 1 : 0,
+                    UniqueChars = passwordOptions.RequiredUniqueChars,
+                    Regex = regex
+                };
+                
+
+            } catch(Exception) {
+
+            }
+
+            return new PasswordPolicySettings();
         }
 
-        public PasswordPolicySettings GetPasswordPolicy() => _passwordPolicySettings;
+        public PasswordPolicySettings GetPasswordPolicy() => GetPasswordPolicyAsync().GetAwaiter().GetResult();
     }
 }

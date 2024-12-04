@@ -1,4 +1,5 @@
 ﻿using Account.Features.Account.LogIn;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
 namespace Account.Features.Account.ForgottenPasswordReset
@@ -8,9 +9,11 @@ namespace Account.Features.Account.ForgottenPasswordReset
         IAccountSettingsRepository _accountSettingsRepository,
         IUserService _userService,
         ILogger _logger,
-        IModelStateService _modelStateService) : Controller
+        IModelStateService _modelStateService,
+        IValidator<ForgottenPasswordResetViewModel> validator) : Controller
     {
         public const string _routeUrl = "Account/ForgottenPasswordReset";
+        private readonly IValidator<ForgottenPasswordResetViewModel> _validator = validator;
 
         /// <summary>
         /// Retrieves the UserGUID and the Token and presents the password reset.
@@ -34,11 +37,8 @@ namespace Account.Features.Account.ForgottenPasswordReset
         public async Task<ActionResult> ForgottenPasswordReset(ForgottenPasswordResetViewModel model)
         {
             var forgottenPasswordResetUrl = await _accountSettingsRepository.GetAccountForgottenPasswordResetUrlAsync(GetUrl());
-            var passwordValid = await _userService.ValidatePasswordPolicyAsync(model.Password);
-            if (!passwordValid)
-            {
-                ModelState.AddModelError(nameof(model.Password), "Password does not meet this site's complexity requirement");
-            }
+            var validationResults = await _validator.ValidateAsync(model);
+            ModelState.ApplyFluentValidationResults(validationResults);
             if (!ModelState.IsValid)
             {
                 return Redirect(forgottenPasswordResetUrl);

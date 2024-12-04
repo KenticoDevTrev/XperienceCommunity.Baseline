@@ -1,4 +1,5 @@
 ﻿using Account.Features.Account.ForgottenPasswordReset;
+using FluentValidation;
 
 namespace Account.Features.Account.ForgotPassword
 {

@@ -1,35 +1,33 @@
-﻿using Account.Repositories;
+﻿using Account.Models;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.EmailEngine;
 using CMS.Helpers;
 using CMS.Membership;
 using Core.Models;
-using Core.Repositories;
 using CSharpFunctionalExtensions;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 using System.Web;
+using XperienceCommunity.ChannelSettings.Repositories;
 
 namespace Account.Services.Implementations
 {
     public class UserService(
         UserManager<ApplicationUser> userManager,
-        IProgressiveCache progressiveCache,
-        ISiteRepository siteRepository,
         IEventLogService eventLogService,
         IInfoProvider<MemberInfo> memberInfoProvider,
         IEmailService emailService,
-        IAccountSettingsRepository accountSettingsRepository
+        IPasswordValidator<ApplicationUser> passwordValidator,
+        IChannelCustomSettingsRepository channelCustomSettingsRepository
         ) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ISiteRepository _siteRepository = siteRepository;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
         private readonly IEmailService _emailService = emailService;
-        private readonly IAccountSettingsRepository _accountSettingsRepository = accountSettingsRepository;
+        private readonly IPasswordValidator<ApplicationUser> _passwordValidator = passwordValidator;
+        private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
         private readonly IEventLogService _eventLogService = eventLogService;
 
         public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).GetValueOrDefault(user);
@@ -126,15 +124,22 @@ namespace Account.Services.Implementations
 
         public async Task<bool> ValidatePasswordPolicyAsync(string password)
         {
-            var passwordPolicy = await _accountSettingsRepository.GetPasswordPolicyAsync();
+            // Check for Channel Specific Password policy
+            var model = await _channelCustomSettingsRepository.GetSettingsModel<MemberPasswordChannelSettings>();
+            if (model.UsePasswordPolicy) {
+                var policy = new PasswordPolicySettings(model.UsePasswordPolicy, model.MinLength, model.NumNonAlphanumericChars, model.Regex.AsNullOrWhitespaceMaybe().AsNullableValue(), model.ViolationMessage.AsNullOrWhitespaceMaybe().AsNullableValue());
+                return CheckPasswordPolicy(password, policy);
+            }
 
-            return !passwordPolicy.UsePasswordPolicy || CheckPasswordPolicy(password, passwordPolicy.MinLength, passwordPolicy.NumNonAlphanumericChars, passwordPolicy.Regex);
+            // Use normal Identity password validator
+            var result = await _passwordValidator.ValidateAsync(_userManager, new ApplicationUser(), password);
+            return result.Succeeded;
         }
 
-        private static bool CheckPasswordPolicy(string password, Maybe<int> minLength, Maybe<int> minNonAlphaNum, Maybe<string> regularExpression)
+        private static bool CheckPasswordPolicy(string password, PasswordPolicySettings passwordSettings)
         {
             // Check minimal length
-            if (minLength.TryGetValue(out var minLengthVal) && password.Length < minLengthVal) {
+            if (passwordSettings.MinLength.TryGetValue(out var minLengthVal) && password.Length < minLengthVal) {
                 return false;
             }
 
@@ -146,12 +151,16 @@ namespace Account.Services.Implementations
                 }
             }
 
-            if (minNonAlphaNum.TryGetValue(out var nonAlphaNum) && counter < nonAlphaNum) {
+            if (passwordSettings.NumNonAlphanumericChars.TryGetValue(out var nonAlphaNum) && counter < nonAlphaNum) {
+                return false;
+            }
+
+            if(passwordSettings.UniqueChars.TryGetValue(out var uniqueChars) && password.ToCharArray().Distinct().Count() < uniqueChars) {
                 return false;
             }
 
             // Check regular expression
-            if (regularExpression.TryGetValue(out var regexVal)) {
+            if (passwordSettings.Regex.TryGetValue(out var regexVal)) {
                 Regex regex = RegexHelper.GetRegex(regexVal);
                 if (!regex.IsMatch(password)) {
                     return false;

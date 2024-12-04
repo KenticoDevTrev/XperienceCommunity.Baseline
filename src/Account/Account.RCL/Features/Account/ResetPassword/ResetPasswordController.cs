@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Account.Features.Account.ResetPassword
 {
@@ -7,9 +9,11 @@ namespace Account.Features.Account.ResetPassword
         IAccountSettingsRepository _accountSettingsRepository,
         IUserService _userService,
         ILogger _logger,
-        IModelStateService _modelStateService) : Controller
+        IModelStateService _modelStateService,
+        IValidator<ResetPasswordViewModel> validator) : Controller
     {
         public const string _routeUrl = "Account/ResetPassword";
+        private readonly IValidator<ResetPasswordViewModel> _validator = validator;
 
         /// <summary>
         /// Password Reset, must be authenticated to reset password this way.
@@ -32,11 +36,8 @@ namespace Account.Features.Account.ResetPassword
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             string resetPasswordUrl = await _accountSettingsRepository.GetAccountResetPasswordUrlAsync(GetUrl());
-            var passwordValid = await _userService.ValidatePasswordPolicyAsync(model.Password);
-            if (!passwordValid)
-            {
-                ModelState.AddModelError(nameof(ResetPasswordViewModel.Password), "Password does not meet this site's complexity requirement");
-            }
+            var validationResults = await _validator.ValidateAsync(model);
+            ModelState.ApplyFluentValidationResults(validationResults);
             if (!ModelState.IsValid)
             {
                 return Redirect(resetPasswordUrl);

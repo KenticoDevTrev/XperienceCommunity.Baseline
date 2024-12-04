@@ -19,6 +19,18 @@ using XperienceCommunity.MemberRoles.Services.Implementations;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.Authorization;
 using Microsoft.Extensions.Options;
+using Account.Admin.Xperience.Models;
+using Kentico.Xperience.Admin.Base;
+using CMS.Core;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+[assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
+                slug: "member-password-channel-custom-settings",
+                uiPageType: typeof(MemberPasswordChannelSettingsExtender),
+                name: "Member Password Settings",
+                templateName: TemplateNames.EDIT,
+                order: UIPageOrder.NoOrder)]
 
 namespace MVC.Configuration
 {
@@ -80,8 +92,25 @@ namespace MVC.Configuration
 
             builder.Services.AddCoreBaseline();
 
-            builder.Services.AddKenticoAuthorization()
-                .AddScoped<BobAuthorization>();
+            builder.Services.AddKenticoAuthorization();
+
+            
+            
+            // Add up IUrlHelper
+            builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            builder.Services.AddScoped(x => {
+                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+                if (actionContext == null) {
+                    // Should never really occur
+                    return new UrlHelper(new ActionContext());
+                }
+                var factory = x.GetRequiredService<IUrlHelperFactory>();
+                return factory.GetUrlHelper(actionContext);
+
+            });
+
+            // Widget Filters
+            //builder.Services.AddWidgetFilter();
 
             // Override Baseline customization points if wanted
             /*
@@ -101,14 +130,21 @@ namespace MVC.Configuration
             // Adds and configures ASP.NET Identity for the application
 
             // XperienceCommunity.MemberRoles, make sure Role is TagApplicationUserRole or an inherited member here
-            builder.Services.AddIdentity<ApplicationUser, TagApplicationUserRole>(options => {
+            builder.Services.AddIdentity<ApplicationUser, NoOpApplicationRole>(options => {
                 // Ensures that disabled member accounts cannot sign in
                 options.SignIn.RequireConfirmedAccount = true;
                 // Ensures unique emails for registered accounts
                 options.User.RequireUniqueEmail = true;
+
+                // Note: Can customize password requirements here, there is no longer a 'settings' in Kentico for this.
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 10;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequiredUniqueChars = 3;
             })
                 .AddUserStore<ApplicationUserStore<ApplicationUser>>()
-                .AddMemberRolesStores<ApplicationUser, TagApplicationUserRole>() // XperienceCommunity.MemberRoles
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddSignInManager<SignInManager<ApplicationUser>>();
 
@@ -124,14 +160,68 @@ namespace MVC.Configuration
             builder.Services.AddAuthorization();
         }
 
-        public static void RegisterLocalizationAndControllerViews(WebApplicationBuilder builder)
+        /// <summary>
+        /// Standard Controller view and Localization hookup, use if NOT Using the Baseline Account Module
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void RegisterStandardKenticoLocalizationAndControllerViews(WebApplicationBuilder builder)
         {
             // Localizer
             builder.Services.AddLocalization()
                     //.AddXperienceLocalizer() // Call after AddLocalization
-                    .AddControllersWithViews(options => {
-                        options.Filters.AddKenticoAuthorizationFilters(); // XperienceCommunity.DevTools.Authorization
-                    }) // .AddControllersWithViewsAndKenticoAuthorization()
+                    .AddControllersWithViews()
+                    .AddViewLocalization()
+                    .AddDataAnnotationsLocalization(options => {
+                        options.DataAnnotationLocalizerProvider = (type, factory) => {
+                            return factory.Create(typeof(SharedResources));
+                        };
+                    });
+        }
+
+        /// <summary>
+        /// Use this if using the Baseline Account Module to hook up Member Roles, Authorization, and Logins
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddBaselineKenticoAuthentication(WebApplicationBuilder builder)
+        {
+            builder.AddBaselineKenticoAuthentication(
+            identityOptions => {
+                // Customize IdentityOptions, including Password Settings (fall back if no ChannelSettings is defined
+                identityOptions.Password.RequireDigit = false;
+                identityOptions.Password.RequireLowercase = false;
+                identityOptions.Password.RequireNonAlphanumeric = false;
+                identityOptions.Password.RequireUppercase = false;
+                identityOptions.Password.RequiredLength = 0;
+            },
+            authenticationConfigurations => {
+                // Customize Baseline's Authentication settings, including two form and additional roles per Auth Type
+            },
+            cookieAuthenticationOptions => {
+                // Customize Cookie Auth Options
+                // Note that the LoginPath/LogoutPath/AccessDeniedPath are handled in SiteSettingsCookieAuthenticationEvents
+            }
+            );
+            /* To define Channel Specific Password Settings, add the below assembly tag somewhere, then in Xperience Admin select your Channel, the side menu will show these settings configurations */
+            /*
+             [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
+                slug: "member-password-channel-custom-settings",
+                uiPageType: typeof(MemberPasswordChannelSettingsExtender),
+                name: "Member Password Settings",
+                templateName: TemplateNames.EDIT,
+                order: UIPageOrder.NoOrder)]
+            */
+        }
+
+        /// <summary>
+        /// Use this if using the Baseline Account Module to hook up Authorization logic
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void RegisterBaselineAccountLocalizationAndControllerViews(WebApplicationBuilder builder)
+        {
+            // Localizer
+            builder.Services.AddLocalization()
+                    //.AddXperienceLocalizer() // Call after AddLocalization
+                    .AddControllersWithViewsWithKenticoAuthorization()
                     .AddViewLocalization()
                     .AddDataAnnotationsLocalization(options => {
                         options.DataAnnotationLocalizerProvider = (type, factory) => {
@@ -175,7 +265,7 @@ namespace MVC.Configuration
             app.InitKentico();
 
 
-           
+
 
             // While IIS and IIS Express automatically handle StaticFiles from the root, default Kestrel doesn't, so safer to 
             // add this for any Site Media Libraries if you ever plan on linking directly to the file.  /getmedia linkes are not
@@ -219,6 +309,7 @@ namespace MVC.Configuration
             // Enables Authorization, used in admin too
             app.UseAuthorization();
 
+
             if (builder.Environment.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
@@ -244,6 +335,32 @@ namespace MVC.Configuration
             //////////////////////////////
             //////// ERROR HANDLING //////
             //////////////////////////////
+
+        }
+
+        /// <summary>
+        /// Sample on how to enable Session State
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="builder"></param>
+        public static void EnableSession(IApplicationBuilder app, WebApplicationBuilder builder)
+        {
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options => {
+                options.Cookie = new CookieBuilder() {
+                    Name = "SessionId",
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    SecurePolicy = CookieSecurePolicy.Always,
+                    Expiration = TimeSpan.FromDays(1),
+                    IsEssential = true
+                };
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
+            });
+
+            // Enables session - Needed for Account Post-Redirect-Get Export Model State Logic
+            app.UseSession();
 
         }
     }

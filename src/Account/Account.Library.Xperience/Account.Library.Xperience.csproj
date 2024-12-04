@@ -20,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="29.7.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="29.7.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.1" />
     <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="1.0.0" />
   </ItemGroup>
 

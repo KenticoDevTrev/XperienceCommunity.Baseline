@@ -1,4 +1,5 @@
 ﻿using Account.Features.Account.Confirmation;
+using FluentValidation;
 
 namespace Account.Features.Account.Registration
 {
@@ -7,9 +8,11 @@ namespace Account.Features.Account.Registration
         IUserService _userService,
         ILogger _logger,
         IUrlResolver _urlResolver,
-        IModelStateService _modelStateService) : Controller
+        IModelStateService _modelStateService,
+        IValidator<RegistrationViewModel> validator) : Controller
     {
         public const string _routeUrl = "Account/Registration";
+        private readonly IValidator<RegistrationViewModel> _validator = validator;
 
         /// <summary>
         /// Fall back, should use Account Page Templates instead
@@ -33,14 +36,13 @@ namespace Account.Features.Account.Registration
         public async Task<ActionResult> Registration(RegistrationViewModel userAccountModel)
         {
             var registrationUrl = await _accountSettingsRepository.GetAccountRegistrationUrlAsync(GetUrl());
+            
             // Ensure valid
-            var passwordValid = await _userService.ValidatePasswordPolicyAsync(userAccountModel.Password);
-            if (!passwordValid)
+            var result = await _validator.ValidateAsync(userAccountModel);
+            ModelState.ApplyFluentValidationResults(result);
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(nameof(RegistrationViewModel.Password), "Password does not meet this site's complexity requirement");
-            }
-            if (!ModelState.IsValid || !passwordValid)
-            {
+                _modelStateService.StoreViewModel(TempData, userAccountModel);
                 return Redirect(registrationUrl);
             }
 
@@ -64,7 +66,7 @@ namespace Account.Features.Account.Registration
             }
 
             // Store view model for retrieval
-            _modelStateService.StoreViewModel<RegistrationViewModel>(TempData, userAccountModel);
+            _modelStateService.StoreViewModel(TempData, userAccountModel);
 
             return Redirect(registrationUrl);
 

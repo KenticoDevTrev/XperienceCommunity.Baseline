@@ -1,9 +1,13 @@
-﻿using Account.Features.Account.LogIn;
+﻿using Account.Features.Account.ForgottenPasswordReset;
+using Account.Features.Account.LogIn;
+using Account.Features.Account.Registration;
+using Account.Features.Account.ResetPassword;
 using Account.Models;
 using Account.Repositories;
 using Account.Repositories.Implementations;
 using Account.Services;
 using Account.Services.Implementations;
+using FluentValidation;
 using Kentico.Membership;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication;
@@ -15,7 +19,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-//using XperienceCommunity.Authorization;
+using XperienceCommunity.Authorization;
+using XperienceCommunity.MemberRoles.Models;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -25,13 +30,14 @@ namespace Microsoft.AspNetCore.Builder
 
         public static IMvcBuilder AddControllersWithViewsWithKenticoAuthorization(this IServiceCollection services)
         {
-            return services.AddControllersWithViews();
-            // TODO: Once built, add this back in
-            //return services.AddControllersWithViews(opt => opt.Filters.AddKenticoAuthorization());
+            return services.AddControllersWithViews(options => {
+                options.Filters.AddKenticoAuthorizationFilters(); // XperienceCommunity.DevTools.Authorization
+            });
         }
 
-        public static WebApplicationBuilder AddBaselineKenticoAuthentication(this WebApplicationBuilder builder, Action<IdentityOptions>? identityOptions = null, Action<AuthenticationConfigurations>? authenticationConfigurations = null, PasswordPolicySettings? passwordPolicySettings = null, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
+        public static WebApplicationBuilder AddBaselineKenticoAuthentication(this WebApplicationBuilder builder, Action<IdentityOptions>? identityOptions = null, Action<AuthenticationConfigurations>? authenticationConfigurations = null, Action<CookieAuthenticationOptions>? cookieConfigurations = null, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
         {
+
             // Register DI
             builder.Services.AddScoped<IAccountSettingsRepository, AccountSettingsRepository>()
                 .AddScoped<IRoleRepository, RoleRepository>()
@@ -39,6 +45,12 @@ namespace Microsoft.AspNetCore.Builder
                 .AddScoped<ISignInManagerService, SignInManagerService>()
                 .AddScoped<IUserManagerService, UserManagerService>()
                 .AddScoped<IUserService, UserService>();
+
+            // Register Validators from Fluent Validation
+            builder.Services.AddScoped<IValidator<BasicUser>, BasicUserValidator>()
+                .AddScoped<IValidator<ForgottenPasswordResetViewModel>, ForgottenPasswordResetViewModelValidator>()
+                .AddScoped<IValidator<RegistrationViewModel>, RegistrationViewModelValidator>()
+                .AddScoped<IValidator<ResetPasswordViewModel>, ResetPasswordValidator>();
 
             // Baseline Configuration of External Authentication
             var defaultObj = new AuthenticationConfigurations() {
@@ -48,46 +60,30 @@ namespace Microsoft.AspNetCore.Builder
             authenticationConfigurations?.Invoke(defaultObj);
             builder.Services.AddSingleton<IAuthenticationConfigurations>(defaultObj);
 
+            // Adds Basic Kentico Authentication, needed for user context and some tools
+            builder.Services.AddAuthentication();
 
             // Adds and configures ASP.NET Identity for the application
-            builder.Services.AddIdentity<ApplicationUser, NoOpApplicationRole>(options => {
+            builder.Services.AddIdentity<ApplicationUser, TagApplicationUserRole>(options => {
                 // Ensures that disabled member accounts cannot sign in
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // Ensures unique emails for registered accounts
                 options.User.RequireUniqueEmail = true;
 
-                // Note: Can customize password requirements here, there is no longer a 'settings' in Kentico for this.
-                options.Password.RequireDigit = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequiredLength = 10;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequiredUniqueChars = 3;
-
                 identityOptions?.Invoke(options);
             })
                 .AddUserStore<ApplicationUserStore<ApplicationUser>>()
-                // TODO: Experiment with how to set 'roles' for membership in future
-                .AddRoleStore<NoOpApplicationRoleStore>()
-                //.AddRoleStore<ApplicationRoleStore<ApplicationRole>>()
-
+                .AddMemberRolesStores<ApplicationUser, TagApplicationUserRole>() // XperienceCommunity.MemberRoles
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddSignInManager<SignInManager<ApplicationUser>>();
-
-            builder.Services.AddSingleton(passwordPolicySettings ?? new PasswordPolicySettings(
-               usePasswordPolicy: false
-               )
-           );
 
             // Get default 
             var authBuilder = builder.Services.AddAuthentication();
 
             var googleAuth = builder.Configuration.GetSection("Authentication:Google");
-            if (googleAuth.Exists())
-            {
-                authBuilder.AddGoogle("Google", opt =>
-                {
+            if (googleAuth.Exists()) {
+                authBuilder.AddGoogle("Google", opt => {
                     opt.ClientId = googleAuth["ClientId"] ?? string.Empty;
                     opt.ClientSecret = googleAuth["ClientSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
@@ -95,21 +91,17 @@ namespace Microsoft.AspNetCore.Builder
                 });
             }
             var facebookAuth = builder.Configuration.GetSection("Authentication:Facebook");
-            if (facebookAuth.Exists())
-            {
-                authBuilder.AddFacebook("Facebook", opt =>
-                 {
-                     opt.AppId = facebookAuth["AppId"] ?? string.Empty;
-                     opt.AppSecret = facebookAuth["AppSecret"] ?? string.Empty;
-                     opt.SignInScheme = IdentityConstants.ExternalScheme;
-                     opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
-                 });
+            if (facebookAuth.Exists()) {
+                authBuilder.AddFacebook("Facebook", opt => {
+                    opt.AppId = facebookAuth["AppId"] ?? string.Empty;
+                    opt.AppSecret = facebookAuth["AppSecret"] ?? string.Empty;
+                    opt.SignInScheme = IdentityConstants.ExternalScheme;
+                    opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
+                });
             }
             var twitterAuth = builder.Configuration.GetSection("Authentication:Twitter");
-            if(twitterAuth.Exists())
-            {
-                authBuilder.AddTwitter(opt =>
-                {
+            if (twitterAuth.Exists()) {
+                authBuilder.AddTwitter(opt => {
                     opt.ConsumerKey = twitterAuth["APIKey"];
                     opt.ConsumerSecret = twitterAuth["APIKeySecret"];
                     opt.RetrieveUserDetails = true;
@@ -117,14 +109,12 @@ namespace Microsoft.AspNetCore.Builder
                 });
             }
             var microsoftAuth = builder.Configuration.GetSection("Authentication:Microsoft");
-            if (microsoftAuth.Exists())
-            {
-                authBuilder.AddMicrosoftAccount(opt =>
-                 {
-                     opt.ClientId = microsoftAuth["ClientId"] ?? string.Empty;
-                     opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
-                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
-                 });
+            if (microsoftAuth.Exists()) {
+                authBuilder.AddMicrosoftAccount(opt => {
+                    opt.ClientId = microsoftAuth["ClientId"] ?? string.Empty;
+                    opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
+                    opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
+                });
             }
 
             builder.Services.AddAuthorization();
@@ -137,24 +127,27 @@ namespace Microsoft.AspNetCore.Builder
                             .AddScoped<SiteSettingsTwitterOauthAuthenticationEvents>();
 
             // Configures the application's authentication cookie
-            builder.Services.ConfigureApplicationCookie(c =>
-            {
+            builder.Services.ConfigureApplicationCookie(c => {
                 // These 3 are actually handled on the SiteSettingsOauthAuthenticationEvents
                 // and are overwritten by site settings
                 c.LoginPath = new PathString("/Account/Signin");
                 c.LogoutPath = new PathString("/Account/Signout");
                 c.AccessDeniedPath = new PathString("/Error/403");
-
-                c.ExpireTimeSpan = TimeSpan.FromDays(14);
+                c.ExpireTimeSpan = TimeSpan.FromDays(1);
                 c.SlidingExpiration = true;
-                c.Cookie.Name = AUTHENTICATION_COOKIE_NAME;
                 c.EventsType = typeof(SiteSettingsCookieAuthenticationEvents);
+                c.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                c.Cookie.SameSite = SameSiteMode.Lax;
+                c.Cookie.Name = AUTHENTICATION_COOKIE_NAME;
+                c.Cookie.IsEssential = true;
+                // Customize
+                cookieConfigurations?.Invoke(c);
             });
 
             builder.Services.Configure<CookieLevelOptions>(options => {
                 options.CookieConfigurations.Add(AUTHENTICATION_COOKIE_NAME, CookieLevel.Essential);
             });
-            
+
             return builder;
         }
     }
@@ -179,13 +172,10 @@ namespace Microsoft.AspNetCore.Builder
         public override async Task RedirectToAccessDenied(RedirectContext<CookieAuthenticationOptions> context)
         {
             string url = await _accountSiteSettingsRepository.GetAccessDeniedUrlAsync(string.Empty);
-            if (url.AsNullOrWhitespaceMaybe().TryGetValue(out var accessDeniedUrl))
-            {
+            if (url.AsNullOrWhitespaceMaybe().TryGetValue(out var accessDeniedUrl)) {
                 context.RedirectUri = accessDeniedUrl;
                 await base.RedirectToLogout(context);
-            }
-            else
-            {
+            } else {
                 await base.RedirectToLogout(context);
             }
         }
@@ -200,8 +190,7 @@ namespace Microsoft.AspNetCore.Builder
         }
         public override Task RedirectToAuthorizationEndpoint(RedirectContext<OAuthOptions> context)
         {
-            if (context.Properties.Parameters.TryGetValue("AuthType", out var authTypeObj) && authTypeObj is string authType)
-            {
+            if (context.Properties.Parameters.TryGetValue("AuthType", out var authTypeObj) && authTypeObj is string authType) {
                 context.RedirectUri = QueryHelpers.AddQueryString(context.RedirectUri, "auth_type", authType);
             }
 
