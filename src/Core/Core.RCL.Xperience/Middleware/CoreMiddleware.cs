@@ -6,8 +6,9 @@ using Core.Services.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Interfaces;
 using Core.Models;
-using Kentico.Membership;
-using Microsoft.AspNetCore.Identity;
+using MVCCaching;
+using XperienceCommunity.ChannelSettings.Configuration;
+using XperienceCommunity.RelationshipsExtended;
 
 namespace Core
 {
@@ -16,7 +17,8 @@ namespace Core
         public static IServiceCollection AddCoreBaseline(this IServiceCollection services,
             Action<ContentItemAssetOptions>? contentItemAssetOptions = null,
             Action<MediaFileOptions>? mediaFileOptions = null,
-            Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptions = null)
+            Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptions = null,
+            Action<RelationshipsExtendedOptions>? relationshipsExtendedOptions = null)
         {
             // Configuration Points
             if (contentItemAssetOptions != null) {
@@ -42,6 +44,19 @@ namespace Core
             } else {
                 services.AddSingleton(new ContentItemTaxonomyOptions());
             }
+
+            // XperienceCommunity.DevTools.RelationshipsExtended
+            services.AddRelationshipsExtended((configuration) => {
+                configuration.AllowContentItemCategories = true;
+                relationshipsExtendedOptions?.Invoke(configuration);
+            });
+
+
+            // Add MVC Caching which Core depends on
+            services.AddMVCCaching();
+
+            // Enables Channel Custom Settings which some modules leverage.
+            services.AddChannelCustomSettings();
 
             services
                 // Largely Only dependent upon Kentico's APIs

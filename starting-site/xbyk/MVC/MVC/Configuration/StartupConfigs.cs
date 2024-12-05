@@ -1,6 +1,4 @@
 ﻿using CMS.Base.Configuration;
-using Core.Services.Implementations;
-using Core.Services;
 using Generic;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.Web.Mvc;
@@ -12,19 +10,16 @@ using MVCCaching;
 using XperienceCommunity.RelationshipsExtended.Models;
 using Testing;
 using Core;
-using Core.Interfaces;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
-using XperienceCommunity.MemberRoles.Services.Implementations;
-using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.Authorization;
-using Microsoft.Extensions.Options;
 using Account.Admin.Xperience.Models;
 using Kentico.Xperience.Admin.Base;
-using CMS.Core;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using XperienceCommunity.ChannelSettings.Configuration;
+using CMS.Core;
+using Core.Middleware;
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
                 slug: "member-password-channel-custom-settings",
                 uiPageType: typeof(MemberPasswordChannelSettingsExtender),
@@ -71,32 +66,11 @@ namespace MVC.Configuration
 
         public static void RegisterInterfaces(WebApplicationBuilder builder)
         {
-            builder.Services.AddRelationshipsExtended((configuration) => {
-                configuration.AllowContentItemCategories = true;
-                configuration.AllowLanguageSyncConfiguration = true;
-                var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
-                    new (WebPage.CONTENT_TYPE_NAME, [
-                        nameof(WebPage.TestLanguageAgnosticValue),
-                        nameof(WebPage.TestObjectNames)
-                        ])
-                };
-                configuration.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
-
-            });
-
-            builder.Services.AddMVCCaching();
+            // XperienceCommunity.DevTools.MVCCaching
+            // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
-
-            // Baseline services
-            builder.Services.AddScoped<IUrlResolver, UrlResolver>();
-
-            builder.Services.AddCoreBaseline();
-
-            builder.Services.AddKenticoAuthorization();
-
             
-            
-            // Add up IUrlHelper
+            // Optional - Add up IUrlHelper if you wish to use it
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             builder.Services.AddScoped(x => {
                 var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
@@ -106,7 +80,6 @@ namespace MVC.Configuration
                 }
                 var factory = x.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
-
             });
 
             // Widget Filters
@@ -122,7 +95,7 @@ namespace MVC.Configuration
             */
         }
 
-        public static void AddStandardKenticoAuthentication(WebApplicationBuilder builder)
+        public static void AddStandardKenticoAuthenticationAndControllerViews(WebApplicationBuilder builder)
         {
             // Adds Basic Kentico Authentication, needed for user context and some tools
             builder.Services.AddAuthentication();
@@ -158,14 +131,7 @@ namespace MVC.Configuration
                 options.Cookie.SameSite = SameSiteMode.Lax;
             });
             builder.Services.AddAuthorization();
-        }
 
-        /// <summary>
-        /// Standard Controller view and Localization hookup, use if NOT Using the Baseline Account Module
-        /// </summary>
-        /// <param name="builder"></param>
-        public static void RegisterStandardKenticoLocalizationAndControllerViews(WebApplicationBuilder builder)
-        {
             // Localizer
             builder.Services.AddLocalization()
                     //.AddXperienceLocalizer() // Call after AddLocalization
@@ -182,7 +148,7 @@ namespace MVC.Configuration
         /// Use this if using the Baseline Account Module to hook up Member Roles, Authorization, and Logins
         /// </summary>
         /// <param name="builder"></param>
-        public static void AddBaselineKenticoAuthentication(WebApplicationBuilder builder)
+        public static void AddBaselineAccountAuthenticationAndControllerViews(WebApplicationBuilder builder)
         {
             builder.AddBaselineKenticoAuthentication(
             identityOptions => {
@@ -210,14 +176,7 @@ namespace MVC.Configuration
                 templateName: TemplateNames.EDIT,
                 order: UIPageOrder.NoOrder)]
             */
-        }
 
-        /// <summary>
-        /// Use this if using the Baseline Account Module to hook up Authorization logic
-        /// </summary>
-        /// <param name="builder"></param>
-        public static void RegisterBaselineAccountLocalizationAndControllerViews(WebApplicationBuilder builder)
-        {
             // Localizer
             builder.Services.AddLocalization()
                     //.AddXperienceLocalizer() // Call after AddLocalization
@@ -230,8 +189,7 @@ namespace MVC.Configuration
                     });
         }
 
-
-        public static void RegisterStaticFileHandling(WebApplicationBuilder builder)
+        public static void RegisterStaticFileHandlingGzipAndCacheControls(WebApplicationBuilder builder)
         {
 
             // While IIS and IIS Express automatically handle StaticFiles from the root, default Kestrel doesn't, so safer to 
@@ -257,15 +215,15 @@ namespace MVC.Configuration
             */
 
             builder.WebHost.UseStaticWebAssets();
+
+            // Gzip compression handling for js.gz, css.gz and map.gz files and setting CacheControl headers based on ?v parameter detection
+            builder.Services.UseGzipAndCacheControlFileHandling();
         }
 
         public static void RegisterDotNetCoreConfigurationsAndKentico(IApplicationBuilder app, WebApplicationBuilder builder)
         {
             // Must be first!
             app.InitKentico();
-
-
-
 
             // While IIS and IIS Express automatically handle StaticFiles from the root, default Kestrel doesn't, so safer to 
             // add this for any Site Media Libraries if you ever plan on linking directly to the file.  /getmedia linkes are not
@@ -313,6 +271,9 @@ namespace MVC.Configuration
             if (builder.Environment.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
+
+            // OPTIONAL - Enable Session Session
+            // EnableSession(app, builder);
 
             //////////////////////////////
             //////// ERROR HANDLING //////
@@ -362,6 +323,22 @@ namespace MVC.Configuration
             // Enables session - Needed for Account Post-Redirect-Get Export Model State Logic
             app.UseSession();
 
+        }
+
+        public static void AddBaselineCore(WebApplicationBuilder builder)
+        {
+            // Modify as needed
+            builder.Services.AddCoreBaseline(relationshipsExtendedOptions: (configuration) => {
+                configuration.AllowLanguageSyncConfiguration = true;
+
+                var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
+                    new (WebPage.CONTENT_TYPE_NAME, [
+                        nameof(WebPage.TestLanguageAgnosticValue),
+                        nameof(WebPage.TestObjectNames)
+                        ])
+                };
+                configuration.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
+            });
         }
     }
 }

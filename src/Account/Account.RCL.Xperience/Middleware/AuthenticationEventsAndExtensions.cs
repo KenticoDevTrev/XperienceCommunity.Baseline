@@ -117,7 +117,11 @@ namespace Microsoft.AspNetCore.Builder
                 });
             }
 
+            // Kentico's normal Authorization
             builder.Services.AddAuthorization();
+
+            // Member Role Authorization (XperienceCommunity.Authorization)
+            builder.Services.AddKenticoAuthorization();
 
             // Register authentication cookie
             // Overwrite login logout based on site settings, with fall back to the default controllers
