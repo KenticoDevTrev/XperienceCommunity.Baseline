@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 
 namespace Account.Features.Account.ResetPassword
 {

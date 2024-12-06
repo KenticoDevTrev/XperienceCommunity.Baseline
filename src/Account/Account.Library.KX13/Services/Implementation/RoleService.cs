@@ -18,7 +18,7 @@ namespace Account.Services.Implementation
                 {
                     RoleName = roleName,
                     RoleDisplayName = roleName,
-                    SiteID = await _siteRepository.GetSiteIDAsync(siteName),
+                    SiteID = _siteRepository.GetChannelID(siteName).GetValueOrDefault(0),
                     RoleDescription = "auto generated from IAuthenticationConfiguration settings"
                 };
                 _roleInfoProvider.Set(newRole);

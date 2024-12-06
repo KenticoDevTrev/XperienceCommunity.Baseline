@@ -1,8 +1,15 @@
-﻿using System.Security.Claims;
+﻿using Account.Features.Account.MyAccount;
+using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.Design;
+using System.Security.Claims;
+using System.Web;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Account.Features.Account.LogIn
 {
+    /// <summary>
+    /// NOTICE: This implementation will be force to inject the standard User version of various interfaces
+    /// </summary>
     public class LogInController(
         IUserRepository _userRepository,
         IAccountSettingsRepository _accountSettingsRepository,
@@ -13,18 +20,22 @@ namespace Account.Features.Account.LogIn
         IModelStateService _modelStateService,
         IAuthenticationConfigurations _authenticationConfigurations,
         ISignInManagerService _signInManagerService,
-        IUserManagerService _userManagerService) : Controller
+        IUserManagerService _userManagerService,
+        IUrlResolver urlResolver) : Controller
     {
         public const string _routeUrl = "Account/LogIn";
         public const string _twoFormAuthenticationUrl = "Account/TwoFormAuthentication";
+        private readonly IUrlResolver _urlResolver = urlResolver;
 
         /// <summary>
         /// Fall back if not using Page Templates
         /// </summary>
         [HttpGet]
         [Route(_routeUrl)]
-        public ActionResult LogIn()
+        public ActionResult LogIn([FromQuery] string returnUrl)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             return View("/Features/Account/LogIn/LogInManual.cshtml");
         }
 
@@ -35,7 +46,7 @@ namespace Account.Features.Account.LogIn
         [Route(_routeUrl)]
         [ValidateAntiForgeryToken]
         [ExportModelState]
-        public async Task<ActionResult> LogIn(LogInViewModel model, [FromQuery] string returnUrl)
+        public async Task<IActionResult> LogIn(LogInViewModel model, [FromQuery] string returnUrl)
         {
             string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
 
@@ -73,7 +84,10 @@ namespace Account.Features.Account.LogIn
                     {
                         // Sign in and proceed.
                         await _signInManagerService.SignInByNameAsync(actualUser.UserName, model.StayLogedIn);
-                        return await LoggedInRedirect(model.RedirectUrl);
+                        // May be Redirecting away from Login, clear TempData so if they return to login it doesn't persist
+                        _modelStateService.ClearViewModel<LogInViewModel>(TempData);
+                        ModelState.Clear();
+                        return await LoggedInRedirect(model.ReturnUrl);
                     }
                     else
                     {
@@ -117,7 +131,10 @@ namespace Account.Features.Account.LogIn
                 return Redirect(loginUrl);
             }
 
-            return await LoggedInRedirect(model.RedirectUrl);
+            // May be Redirecting away from Login, clear TempData so if they return to login it doesn't persist
+            _modelStateService.ClearViewModel<LogInViewModel>(TempData);
+            ModelState.Clear();
+            return await LoggedInRedirect(model.ReturnUrl);
         }
 
         [HttpGet]
@@ -160,7 +177,9 @@ namespace Account.Features.Account.LogIn
                     await _signInManagerService.SignInByNameAsync(model.UserName, model.StayLoggedIn);
                     // Redirectig away from Login, clear TempData so if they return to login it doesn't persist
                     _modelStateService.ClearViewModel<TwoFormAuthenticationViewModel>(TempData);
+                    _modelStateService.ClearViewModel<LogInViewModel>(TempData);
                     ModelState.Clear();
+
                     return await LoggedInRedirect(model.RedirectUrl);
                 }
 
@@ -177,16 +196,20 @@ namespace Account.Features.Account.LogIn
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = "")
         {
-            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
-            var properties = _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl ?? "/");
+            var redirectUrl = _urlResolver.ResolveUrl(Url.Action(nameof(ExternalLoginCallback), "Account") ?? "/")+(!string.IsNullOrWhiteSpace(returnUrl) ? $"?returnUrl={HttpUtility.UrlEncode(returnUrl)}" : "");
+            var properties = _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             properties.SetParameter("AuthType", "reauthorize");
             return Challenge(properties, provider);
         }
 
         [HttpGet]
         [Route("Account/ExternalLoginCallback")]
-        public async Task<IActionResult> ExternalLoginCallback(LogInViewModel model)
+        [Route("signin-twitter")] // Required for localhost testing and default routing
+        [Route("signin-microsoft")] // Required for localhost testing and default routing
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "")
         {
+            var model = new LogInViewModel();
+
             string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
 
             var infoResult = await _signInManagerService.GetExternalLoginInfoAsync();
@@ -214,21 +237,21 @@ namespace Account.Features.Account.LogIn
                 var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
                 var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
 
-                var createResult = await _userService.CreateExternalUser(new User(
-                    email: email,
-                    userName: email,
-                    enabled: true,
-                    firstName: firstName ?? string.Empty,
-                    lastName: lastName ?? string.Empty,
-                    isExternal: true,
-                    isPublic: false
-                    ));
+                var createResult = await _userService.CreateExternalUser(new User() {
+                    Email = email,
+                    UserName = email,
+                    Enabled = true,
+                    FirstName = firstName ?? string.Empty,
+                    LastName = lastName ?? string.Empty,
+                    IsExternal = true,
+                    IsPublic = false
+                });
+                  
 
                 // Failure to create the user for some reason.
                 if(createResult.IsFailure) {
                     return Redirect(loginUrl);
                 }
-
                 model.Result = SignInResult.Success;
             }
 
@@ -261,9 +284,11 @@ namespace Account.Features.Account.LogIn
                 await _roleService.CreateRoleIfNotExisting(role, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty));
                 await _roleService.SetUserRole(userId, role, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty), true);
             }
-            model.Result = SignInResult.Success;
 
-            return await LoggedInRedirect(model.RedirectUrl);
+            // May be Redirecting away from Login, clear TempData so if they return to login it doesn't persist
+            _modelStateService.ClearViewModel<LogInViewModel>(TempData);
+            ModelState.Clear();
+            return await LoggedInRedirect(returnUrl);
         }
 
         /// <summary>
@@ -271,34 +296,26 @@ namespace Account.Features.Account.LogIn
         /// </summary>
         /// <param name="redirectUrl"></param>
         /// <returns></returns>
-        private async Task<RedirectResult> LoggedInRedirect(string redirectUrl)
+        private async Task<IActionResult> LoggedInRedirect(string redirectUrl)
         {
-            if (await _accountSettingsRepository.GetAccountRedirectToAccountAfterLoginAsync())
-            {
-                // Redirectig away from Login, clear TempData so if they return to login it doesn't persist
+            var actualRedirectUrl = "";
+            if (!string.IsNullOrEmpty(redirectUrl)) {
+                actualRedirectUrl = redirectUrl;
+            } else if (await _accountSettingsRepository.GetAccountRedirectToAccountAfterLoginAsync()) {
+                actualRedirectUrl = await _accountSettingsRepository.GetAccountMyAccountUrlAsync($"/{MyAccountControllerPath._routeUrl}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(actualRedirectUrl)) {
+                // Redirecting away from Login, clear TempData so if they return to login it doesn't persist
                 _modelStateService.ClearViewModel<LogInViewModel>(TempData);
                 ModelState.Clear();
-
-                string actualRedirectUrl = "";
-                // Try to get returnUrl from query
-                if (!string.IsNullOrWhiteSpace(redirectUrl))
-                {
-                    actualRedirectUrl = redirectUrl;
-                }
-                if (string.IsNullOrWhiteSpace(redirectUrl))
-                {
-                    actualRedirectUrl = await _accountSettingsRepository.GetAccountMyAccountUrlAsync("/Account/MyAccount");
-                }
-                if (string.IsNullOrWhiteSpace(redirectUrl))
-                {
-                    actualRedirectUrl = "/";
-                }
                 return Redirect(actualRedirectUrl);
             }
-            else
-            {
-                return Redirect("/");
-            }
+
+            // Redirecting back to the Login, should set the view model state
+            ModelState.Clear();
+            _modelStateService.StoreViewModel(TempData, new LogInViewModel() { Result = SignInResult.Success });
+            return Redirect(await _accountSettingsRepository.GetAccountLoginUrlAsync($"/{_routeUrl}"));
         }
 
         public static string GetUrl()

@@ -4,20 +4,37 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Repositories.Implementation
 {
-    public class UserRepository(IHttpContextAccessor httpContextAccessor,
+    public class UserRepository(IUserRepository<User> userRepository) : IUserRepository
+    {
+        private readonly IUserRepository<User> _userRepository = userRepository;
+
+        public Task<User> GetCurrentUserAsync() => _userRepository.GetCurrentUserAsync();
+
+        public Task<Result<User>> GetUserAsync(int userID) => _userRepository.GetUserAsync(userID);
+
+        public Task<Result<User>> GetUserAsync(string userName) => _userRepository.GetUserAsync(userName);
+
+        public Task<Result<User>> GetUserAsync(Guid userGuid) => _userRepository.GetUserAsync(userGuid);
+
+        public Task<Result<User>> GetUserByEmailAsync(string email) => _userRepository.GetUserByEmailAsync(email);
+    }
+
+    public class UserRepository<TUser, TGenericUser>(IHttpContextAccessor httpContextAccessor,
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IProgressiveCache _progressiveCache,
         IInfoProvider<MemberInfo> memberInfoProvider,
         IUserMetadataProvider userMetadataProvider,
-        ICacheDependenciesScope cacheDependenciesScope) : IUserRepository
+        ICacheDependenciesScope cacheDependenciesScope,
+        IBaselineUserMapper<TUser, TGenericUser> baselineUserMapper) : IUserRepository<TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
     {
         private const string _userName = "Public";
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
         private readonly IUserMetadataProvider _userMetadataProvider = userMetadataProvider;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
+        private readonly IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper = baselineUserMapper;
 
-        public async Task<User> GetCurrentUserAsync()
+        public async Task<TGenericUser> GetCurrentUserAsync()
         {
             var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "public";
             var user = await GetUserInternal(
@@ -26,41 +43,42 @@ namespace Core.Repositories.Implementation
                 guid: Maybe.None,
                 id: Maybe.None
                 );
-            return user.TryGetValue(out var foundUser) ? foundUser : new User(
-                userName: _userName,
-                firstName: "Public",
-                lastName: "User",
-                email: "public@public.com",
-                enabled: true,
-                isExternal: false,
-                isPublic: true);
+            return user.TryGetValue(out var foundUser) ? foundUser : new TGenericUser() {
+                UserName = _userName,
+                FirstName = "Public",
+                LastName = "User",
+                Email = "public@localhost",
+                Enabled = true,
+                IsExternal = false,
+                IsPublic = true
+            };
         }
 
-        public Task<Result<User>> GetUserAsync(int userID) => GetUserInternal(
+        public Task<Result<TGenericUser>> GetUserAsync(int userID) => GetUserInternal(
                 username: Maybe.None,
                 email: Maybe.None,
                 guid: Maybe.None,
                 id: userID);
 
-        public Task<Result<User>> GetUserAsync(string userName) => GetUserInternal(
+        public Task<Result<TGenericUser>> GetUserAsync(string userName) => GetUserInternal(
                 username: userName.AsNullOrWhitespaceMaybe(),
                 email: Maybe.None,
                 guid: Maybe.None,
                 id: Maybe.None);
 
-        public Task<Result<User>> GetUserAsync(Guid userGuid) => GetUserInternal(
+        public Task<Result<TGenericUser>> GetUserAsync(Guid userGuid) => GetUserInternal(
                 username: Maybe.None,
                 email: Maybe.None,
                 guid: userGuid,
                 id: Maybe.None);
 
-        public Task<Result<User>> GetUserByEmailAsync(string email) => GetUserInternal(
+        public Task<Result<TGenericUser>> GetUserByEmailAsync(string email) => GetUserInternal(
                 username: Maybe.None,
                 email: email.AsNullOrWhitespaceMaybe(),
                 guid: Maybe.None,
                 id: Maybe.None);
 
-        private async Task<Result<User>> GetUserInternal(Maybe<string> username, Maybe<string> email, Maybe<Guid> guid, Maybe<int> id)
+        private async Task<Result<TGenericUser>> GetUserInternal(Maybe<string> username, Maybe<string> email, Maybe<Guid> guid, Maybe<int> id)
         {
             var result = await _progressiveCache.LoadAsync(async cs => {
                 var userquery = _memberInfoProvider.Get()
@@ -102,7 +120,7 @@ namespace Core.Repositories.Implementation
                 .AddKeys(result.AdditionalDependencies);
 
             if (result.Result.TryGetValue(out var memberInfo, out var error)) {
-                var user = memberInfo.ToUser();
+                var user = await _baselineUserMapper.ToUser(memberInfo);
                 _cacheDependenciesScope.Begin();
 
                 if ((await _userMetadataProvider.GetUserMetadata(memberInfo, user)).TryGetValue(out var metaData)) {
@@ -112,50 +130,7 @@ namespace Core.Repositories.Implementation
 
                 return user;
             }
-            return Result.Failure<User>(error);
-        }
-    }
-}
-
-namespace CMS.Membership
-{
-    public static class UserInfoExtensions
-    {
-        /// <summary>
-        /// Convert UserInfo to User, used in multiple files so made extension
-        /// </summary>
-        /// <param name="userInfo"></param>
-        /// <returns></returns>
-        public static User ToUser(this MemberInfo userInfo)
-        {
-            return new User(
-                userID: userInfo.MemberID,
-                userName: userInfo.MemberName,
-                userGUID: userInfo.MemberGuid,
-                email: userInfo.MemberEmail,
-                enabled: userInfo.MemberEnabled,
-                isExternal: userInfo.MemberIsExternal,
-                isPublic: userInfo.MemberName.Equals("public", StringComparison.OrdinalIgnoreCase)
-                ) {
-            };
-        }
-    }
-
-    public static class UserExtensions
-    {
-        public static ApplicationUser ToApplicationUser(this User user)
-        {
-            var appUser = new ApplicationUser() {
-                UserName = user.UserName,
-                Enabled = user.Enabled,
-                Email = user.Email,
-                IsExternal = user.IsExternal,
-            };
-            if(user.UserID.TryGetValue(out var userId)) {
-                appUser.Id = userId;
-            }
-
-            return appUser;
+            return Result.Failure<TGenericUser>(error);
         }
     }
 }

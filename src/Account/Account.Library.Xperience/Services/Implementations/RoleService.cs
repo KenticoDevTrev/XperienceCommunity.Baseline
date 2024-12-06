@@ -4,16 +4,18 @@ using XperienceCommunity.MemberRoles.Models;
 
 namespace Account.Services.Implementations
 {
-    public class RoleService(IRoleStore<TagApplicationUserRole> roleStore, IUserRoleStore<ApplicationUser> userRoleStore, IUserStore<ApplicationUser> userStore) : IRoleService
+    public class RoleService<TUser, TRole>(IRoleStore<TRole> roleStore,
+                                           IUserRoleStore<TUser> userRoleStore,
+                                           IUserStore<TUser> userStore) : IRoleService where TUser : ApplicationUser, new() where TRole : TagApplicationUserRole, new()
     {
-        private readonly IRoleStore<TagApplicationUserRole> _roleStore = roleStore;
-        private readonly IUserRoleStore<ApplicationUser> _userRoleStore = userRoleStore;
-        private readonly IUserStore<ApplicationUser> _userStore = userStore;
+        private readonly IRoleStore<TRole> _roleStore = roleStore;
+        private readonly IUserRoleStore<TUser> _userRoleStore = userRoleStore;
+        private readonly IUserStore<TUser> _userStore = userStore;
 
         public async Task CreateRoleIfNotExisting(string roleName, string siteName)
         {
             // This will create if it doesn't exist, if it does then it's fine.
-            await _roleStore.CreateAsync(new TagApplicationUserRole() {
+            await _roleStore.CreateAsync(new TRole() {
                 Name = roleName,
                 NormalizedName = roleName.Normalize()
             }, CancellationToken.None);

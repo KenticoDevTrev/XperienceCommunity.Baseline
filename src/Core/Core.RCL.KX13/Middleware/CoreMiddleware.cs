@@ -10,23 +10,48 @@ namespace Core
 {
     public static class CoreMiddleware
     {
+        [Obsolete("Use AddCoreBaseline<TUser, TGenericUser> with ApplicationUser and User types or your own custom ones")]
         public static IServiceCollection UseCoreBaseline(this IServiceCollection services)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            services.AddScoped<IBaselinePageBuilderContext, BaselinePageBuilderContext>()
-                .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
-                .AddScoped<IMediaRepository, MediaRepository>()
-                .AddScoped<IMetaDataRepository, MetaDataRepository>()
-                .AddScoped<IPageCategoryRepository, PageCategoryRepository>() // Replaced by below
-                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>()
-                .AddScoped<IPageContextRepository, PageContextRepository>()
-                .AddScoped<ISiteRepository, SiteRepository>()
-                .AddScoped<IUserRepository, UserRepository>()
-                .AddScoped<IIdentityService, IdentityService>()
+            return services.AddCoreBaseline<ApplicationUser, User>();
+        }
+
+        public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services) where TUser : ApplicationUser, new() where TGenericUser : User, new()
+        {
+            // Add MVC Caching which Core depends on
+            services.AddMVCCaching();
+
+            services
+                // Largely Only dependent upon Kentico's APIs
                 .AddScoped<ILogger, Logger>()
-                .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
+                .AddScoped<ISiteRepository, SiteRepository>()
                 .AddScoped<IUrlResolver, UrlResolver>()
-                .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>();
+                .AddScoped<IBaselinePageBuilderContext, BaselinePageBuilderContext>()
+                .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
+                .AddScoped<IIdentityService, IdentityService>()
+                .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
+                .AddScoped<IModelStateService, ModelStateService>()
+
+                // Some internal APIs
+                .AddScoped<IPageContextRepository, PageContextRepository>()
+
+                // User Customization Points
+                .AddScoped<IBaselineUserMapper<TUser, TGenericUser>, BaselineUserMapper<TUser, TGenericUser>>()
+                .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>()
+
+                // Main item retrieval that depends on baseline apis and user customizations
+                .AddScoped<IUserRepository<TGenericUser>, UserRepository<TUser, TGenericUser>>()
+                .AddScoped<IMediaRepository, MediaRepository>()
+                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>()
+
+                // Add fallback untyped versions for existing code
+                .AddScoped<IBaselineUserMapper<TUser, User>, BaselineUserMapper<TUser, User>>()
+                .AddScoped<IUserRepository<User>, UserRepository<TUser, User>>()
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<IMetaDataRepository, MetaDataRepository>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            services.AddScoped<IPageCategoryRepository, PageCategoryRepository>();
 #pragma warning restore CS0618 // Type or member is obsolete
 
             return services;

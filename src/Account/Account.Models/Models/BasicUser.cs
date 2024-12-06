@@ -28,23 +28,24 @@ namespace Account.Models
         /// Converts a basic user to a user object
         /// </summary>
         /// <returns></returns>
-        public User GetUser()
+        public TGenericUser GetUser<TGenericUser>() where TGenericUser : User, new()
         {
-            return new User(
-                userName: UserName,
-                firstName: FirstName,
-                lastName: LastName,
-                email: UserEmail,
-                enabled: false,
-                isExternal: false,
-                isPublic: false
-            );
+            return new TGenericUser() {
+                UserName = UserName,
+                FirstName = FirstName,
+                LastName = LastName,
+                Email = UserEmail,
+                Enabled = false,
+                IsExternal = false,
+                IsPublic = false
+            };
         }
     }
 
-    public class BasicUserValidator : AbstractValidator<BasicUser>
+    // TODO: Test if this works...
+    public class BasicUserValidator<TGenericUser> : AbstractValidator<BasicUser> where TGenericUser : User, new()
     {
-        public BasicUserValidator(IUserRepository _userRepository)
+        public BasicUserValidator(IUserRepository<TGenericUser> _userRepository)
         {
             RuleFor(model => model.UserEmail)
                 .EmailAddress()

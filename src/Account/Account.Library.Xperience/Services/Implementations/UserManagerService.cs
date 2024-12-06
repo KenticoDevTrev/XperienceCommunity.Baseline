@@ -3,13 +3,15 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Account.Services.Implementations
 {
-    public class UserManagerService(UserManager<ApplicationUser> _userManager) : IUserManagerService
+    public class UserManagerService<TUser>(UserManager<TUser> UserManager) : IUserManagerService where TUser : ApplicationUser, new()
     {
+        private readonly UserManager<TUser> _userManager = UserManager;
+
         public async Task<bool> CheckPasswordByNameAsync(string userName, string password) => await CheckPasswordAsync(await _userManager.FindByNameAsync(userName), password);
         public async Task<bool> CheckPasswordByEmailAsync(string email, string password) => await CheckPasswordAsync(await _userManager.FindByEmailAsync(email), password);
         public async Task<bool> CheckPasswordByIdAsync(string userId, string password) => await CheckPasswordAsync(await _userManager.FindByIdAsync(userId), password);
         public async Task<bool> CheckPasswordByLoginAsync(string loginProvider, string providerKey, string password) => await CheckPasswordAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey), password);
-        private async Task<bool> CheckPasswordAsync(ApplicationUser? applicationUser, string password)
+        private async Task<bool> CheckPasswordAsync(TUser? applicationUser, string password)
         {
             if (applicationUser == null) {
                 return false;
@@ -23,7 +25,7 @@ namespace Account.Services.Implementations
         public async Task<string> GenerateTwoFactorTokenByIdAsync(string userId, string tokenProvider) => await GenerateTwoFactorTokenAsync(await _userManager.FindByIdAsync(userId), tokenProvider);
         public async Task<string> GenerateTwoFactorTokenByLoginAsync(string loginProvider, string providerKey, string tokenProvider) => await GenerateTwoFactorTokenAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey), tokenProvider);
 
-        private async Task<string> GenerateTwoFactorTokenAsync(ApplicationUser? applicationUser, string tokenProvider)
+        private async Task<string> GenerateTwoFactorTokenAsync(TUser? applicationUser, string tokenProvider)
         {
             if (applicationUser == null) {
                 return string.Empty;
@@ -47,7 +49,7 @@ namespace Account.Services.Implementations
         public async Task<bool> VerifyTwoFactorTokenByEmailAsync(string email, string tokenProvider, string twoFormCode) => await VerifyTwoFactorTokenAsync(await _userManager.FindByEmailAsync(email), tokenProvider, twoFormCode);
         public async Task<bool> VerifyTwoFactorTokenByIdAsync(string userId, string tokenProvider, string twoFormCode) => await VerifyTwoFactorTokenAsync(await _userManager.FindByIdAsync(userId), tokenProvider, twoFormCode);
         public async Task<bool> VerifyTwoFactorTokenByLoginAsync(string loginProvider, string providerKey, string tokenProvider, string twoFormCode) => await VerifyTwoFactorTokenAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey), tokenProvider, twoFormCode);
-        private async Task<bool> VerifyTwoFactorTokenAsync(ApplicationUser? applicationUser, string tokenProvider, string twoFormCode)
+        private async Task<bool> VerifyTwoFactorTokenAsync(TUser? applicationUser, string tokenProvider, string twoFormCode)
         {
             if (applicationUser == null) {
                 return false;
@@ -60,7 +62,7 @@ namespace Account.Services.Implementations
         public async Task<bool> EnableUserByIdAsync(string userId, bool setAsExternalIfExternal) => await EnableUserAsync(await _userManager.FindByIdAsync(userId), setAsExternalIfExternal);
         public async Task<bool> EnableUserByLoginAsync(string loginProvider, string providerKey, bool setAsExternalIfExternal) => await EnableUserAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey), setAsExternalIfExternal);
 
-        private async Task<bool> EnableUserAsync(ApplicationUser? applicationUser, bool setAsExternalIfExternal)
+        private async Task<bool> EnableUserAsync(TUser? applicationUser, bool setAsExternalIfExternal)
         {
             if (applicationUser == null) {
                 return false;

@@ -1,17 +1,21 @@
 ﻿using Account.Features.Account.ForgottenPasswordReset;
-using FluentValidation;
 
 namespace Account.Features.Account.ForgotPassword
 {
     public class ForgotPasswordController(
-        IUserRepository _userRepository,
-        IAccountSettingsRepository _accountSettingsRepository,
-        IUserService _userService,
-        IUrlResolver _urlResolver,
-        IModelStateService _modelStateService) : Controller
+    IAccountSettingsRepository accountSettingsRepository,
+    IUserService userService,
+    IUserRepository userRepository,
+    IUrlResolver urlResolver,
+    IModelStateService modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ForgotPassword";
-
+        private readonly IAccountSettingsRepository _accountSettingsRepository = accountSettingsRepository;
+        private readonly IUserService _userService = userService;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IUrlResolver _urlResolver = urlResolver;
+        private readonly IModelStateService _modelStateService = modelStateService;
+        
         /// <summary>
         /// Fallback if not using Page Templates
         /// </summary>

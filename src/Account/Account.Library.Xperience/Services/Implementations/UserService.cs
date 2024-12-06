@@ -5,6 +5,7 @@ using CMS.EmailEngine;
 using CMS.Helpers;
 using CMS.Membership;
 using Core.Models;
+using Core.Services;
 using CSharpFunctionalExtensions;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
@@ -14,28 +15,62 @@ using XperienceCommunity.ChannelSettings.Repositories;
 
 namespace Account.Services.Implementations
 {
-    public class UserService(
-        UserManager<ApplicationUser> userManager,
+    public class UserService<TUser>(
+        IUserService<User> userService) : IUserService where TUser : ApplicationUser, new()
+    {
+        private readonly IUserService<User> _userService = userService;
+
+        public Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(User user, string token) => _userService.ConfirmRegistrationConfirmationTokenAsync(user, token);
+
+        public Task<Result<User>> CreateExternalUser(User user) => _userService.CreateExternalUser(user);
+
+        [Obsolete]
+        public Task CreateExternalUserAsync(User user) => _userService.CreateExternalUserAsync(user);
+
+        public Task<Result<User>> CreateUser(User user, string password, bool enabled = false) => _userService.CreateUser(user, password, enabled);
+
+        [Obsolete]
+        public Task<User> CreateUserAsync(User user, string password, bool enabled = false) => _userService.CreateUserAsync(user, password, enabled);
+
+        public Task ResetPasswordAsync(User user, string password) => _userService.ResetPasswordAsync(user, password);
+
+        public Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string token, string newPassword) => _userService.ResetPasswordFromTokenAsync(user, token, newPassword);
+
+        public Task SendPasswordResetEmailAsync(User user, string confirmationLink) => _userService.SendPasswordResetEmailAsync(user, confirmationLink);
+
+        public Task SendRegistrationConfirmationEmailAsync(User user, string confirmationLink) => _userService.SendRegistrationConfirmationEmailAsync(user, confirmationLink);
+
+        public Task SendVerificationCodeEmailAsync(User actualUser, string token) => _userService.SendVerificationCodeEmailAsync(actualUser, token);
+
+        public Task<bool> ValidatePasswordPolicyAsync(string password) => _userService.ValidatePasswordPolicyAsync(password);
+
+        public Task<bool> ValidateUserPasswordAsync(User user, string password) => _userService.ValidateUserPasswordAsync(user, password);
+    }
+
+    public class UserService<TUser, TGenericUser>(
+        UserManager<TUser> userManager,
         IEventLogService eventLogService,
         IInfoProvider<MemberInfo> memberInfoProvider,
         IEmailService emailService,
-        IPasswordValidator<ApplicationUser> passwordValidator,
-        IChannelCustomSettingsRepository channelCustomSettingsRepository
-        ) : IUserService
+        IPasswordValidator<TUser> passwordValidator,
+        IChannelCustomSettingsRepository channelCustomSettingsRepository,
+        IBaselineUserMapper<TUser, TGenericUser> baselineUserMapper
+        ) : IUserService<TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly UserManager<TUser> _userManager = userManager;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
         private readonly IEmailService _emailService = emailService;
-        private readonly IPasswordValidator<ApplicationUser> _passwordValidator = passwordValidator;
+        private readonly IPasswordValidator<TUser> _passwordValidator = passwordValidator;
         private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
+        private readonly IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper = baselineUserMapper;
         private readonly IEventLogService _eventLogService = eventLogService;
 
-        public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).GetValueOrDefault(user);
+        public async Task<TGenericUser> CreateUserAsync(TGenericUser user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).GetValueOrDefault(user);
 
-        public async Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
+        public async Task<Result<TGenericUser>> CreateUser(TGenericUser user, string password, bool enabled = false)
         {
             // Create basic user
-            var applicationUser = user.ToApplicationUser();
+            var applicationUser = await _baselineUserMapper.ToApplicationUser(user);
 
             try {
                 var registerResult = await _userManager.CreateAsync(applicationUser, password);
@@ -45,19 +80,19 @@ namespace Account.Services.Implementations
                         .WhereEquals(nameof(MemberInfo.MemberName), user.UserName)
                         .GetEnumerableTypedResultAsync();
                     if (members.FirstOrMaybe().TryGetValue(out var member)) {
-                        return member.ToUser();
+                        return await _baselineUserMapper.ToUser(member);
                     }
-                    return Result.Failure<User>("<p>Could not retrieve newly created user...</p>");
+                    return Result.Failure<TGenericUser>("<p>Could not retrieve newly created user...</p>");
                 } else {
-                    return Result.Failure<User>($"<p>Could not create user: </p><ul class='registration-error-list'><li>{string.Join("</li><li>", registerResult.Errors.Select(x => $"{x.Code} - {x.Description}"))}</li></ul>");
+                    return Result.Failure<TGenericUser>($"<p>Could not create user: </p><ul class='registration-error-list'><li>{string.Join("</li><li>", registerResult.Errors.Select(x => $"{x.Code} - {x.Description}"))}</li></ul>");
                 }
             } catch (Exception ex) {
                 _eventLogService.LogException("UserService", "CreateUserAsync", ex);
-                return Result.Failure<User>($"<p>Could not create user: {ex.Message}</p>");
+                return Result.Failure<TGenericUser>($"<p>Could not create user: {ex.Message}</p>");
             }
         }
 
-        public async Task SendRegistrationConfirmationEmailAsync(User user, string confirmationUrl)
+        public async Task SendRegistrationConfirmationEmailAsync(TGenericUser user, string confirmationUrl)
         {
             var appUser = await _userManager.FindByNameAsync(user.UserName);
             if (appUser == null) {
@@ -74,7 +109,7 @@ namespace Account.Services.Implementations
             });
         }
 
-        public async Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(User user, string token)
+        public async Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(TGenericUser user, string token)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null) {
@@ -84,7 +119,7 @@ namespace Account.Services.Implementations
             return await _userManager.ConfirmEmailAsync(appUser, token);
         }
 
-        public async Task SendPasswordResetEmailAsync(User user, string confirmationLink)
+        public async Task SendPasswordResetEmailAsync(TGenericUser user, string confirmationLink)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null) {
@@ -101,7 +136,7 @@ namespace Account.Services.Implementations
             });
         }
 
-        public async Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string token, string newPassword)
+        public async Task<IdentityResult> ResetPasswordFromTokenAsync(TGenericUser user, string token, string newPassword)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null) {
@@ -111,15 +146,15 @@ namespace Account.Services.Implementations
             return await _userManager.ResetPasswordAsync(appUser, token, newPassword);
         }
 
-        public async Task<bool> ValidateUserPasswordAsync(User user, string password)
+        public async Task<bool> ValidateUserPasswordAsync(TGenericUser user, string password)
         {
-            return await _userManager.CheckPasswordAsync(user.ToApplicationUser(), password);
+            return await _userManager.CheckPasswordAsync(await _baselineUserMapper.ToApplicationUser(user), password);
         }
 
-        public async Task ResetPasswordAsync(User user, string password)
+        public async Task ResetPasswordAsync(TGenericUser user, string password)
         {
-            await _userManager.RemovePasswordAsync(user.ToApplicationUser());
-            await _userManager.AddPasswordAsync(user.ToApplicationUser(), password);
+            await _userManager.RemovePasswordAsync(await _baselineUserMapper.ToApplicationUser(user));
+            await _userManager.AddPasswordAsync(await _baselineUserMapper.ToApplicationUser(user), password);
         }
 
         public async Task<bool> ValidatePasswordPolicyAsync(string password)
@@ -132,7 +167,7 @@ namespace Account.Services.Implementations
             }
 
             // Use normal Identity password validator
-            var result = await _passwordValidator.ValidateAsync(_userManager, new ApplicationUser(), password);
+            var result = await _passwordValidator.ValidateAsync(_userManager, new TUser(), password);
             return result.Succeeded;
         }
 
@@ -170,16 +205,16 @@ namespace Account.Services.Implementations
             return true;
         }
 
-        public async Task CreateExternalUserAsync(User user)
+        public async Task CreateExternalUserAsync(TGenericUser user)
         {
             await CreateExternalUser(user);
             return;
         }
 
-        public async Task<Result<User>> CreateExternalUser(User user)
+        public async Task<Result<TGenericUser>> CreateExternalUser(TGenericUser user)
         {
             // Create basic user
-            var applicationUser = user.ToApplicationUser();
+            var applicationUser = await _baselineUserMapper.ToApplicationUser(user);
 
             try {
                 var registerResult = await _userManager.CreateAsync(applicationUser);
@@ -189,19 +224,19 @@ namespace Account.Services.Implementations
                         .WhereEquals(nameof(MemberInfo.MemberName), user.UserName)
                         .GetEnumerableTypedResultAsync();
                     if (members.FirstOrMaybe().TryGetValue(out var member)) {
-                        return member.ToUser();
+                        return await _baselineUserMapper.ToUser(member);
                     }
-                    return Result.Failure<User>("Could not retrieve newly created user...");
+                    return Result.Failure<TGenericUser>("Could not retrieve newly created user...");
                 } else {
-                    return Result.Failure<User>("Could not create user: " + registerResult.Errors);
+                    return Result.Failure<TGenericUser>("Could not create user: " + registerResult.Errors);
                 }
             } catch (Exception ex) {
                 _eventLogService.LogException("UserService", "CreateUserAsync", ex);
-                return Result.Failure<User>("Could not create user: " + ex.Message); ;
+                return Result.Failure<TGenericUser>("Could not create user: " + ex.Message); ;
             }
         }
 
-        public async Task SendVerificationCodeEmailAsync(User user, string token)
+        public async Task SendVerificationCodeEmailAsync(TGenericUser user, string token)
         {
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmail(new EmailMessage() {

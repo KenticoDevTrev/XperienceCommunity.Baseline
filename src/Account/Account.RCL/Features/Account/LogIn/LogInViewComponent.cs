@@ -38,7 +38,7 @@ namespace Account.Features.Account.LogIn
 
             var model = new LogInViewModel()
             {
-                RedirectUrl = redirectUrl,
+                ReturnUrl = redirectUrl,
                 MyAccountUrl = await _accountSettingsRepository.GetAccountMyAccountUrlAsync(MyAccountControllerPath.GetUrl()),
                 RegistrationUrl = await _accountSettingsRepository.GetAccountRegistrationUrlAsync(RegistrationController.GetUrl()),
                 ForgotPassword = await _accountSettingsRepository.GetAccountForgotPasswordUrlAsync(ForgotPasswordController.GetUrl()),

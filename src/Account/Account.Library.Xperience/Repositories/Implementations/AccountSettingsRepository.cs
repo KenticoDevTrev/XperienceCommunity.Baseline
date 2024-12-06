@@ -1,8 +1,6 @@
 ﻿using Account.Models;
-using CMS.Core;
 using Core.Services;
 using CSharpFunctionalExtensions;
-using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MVCCaching;

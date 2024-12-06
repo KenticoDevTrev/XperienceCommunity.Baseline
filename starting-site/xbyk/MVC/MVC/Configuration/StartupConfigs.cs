@@ -12,14 +12,13 @@ using Testing;
 using Core;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
-using XperienceCommunity.Authorization;
 using Account.Admin.Xperience.Models;
 using Kentico.Xperience.Admin.Base;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using XperienceCommunity.ChannelSettings.Configuration;
-using CMS.Core;
 using Core.Middleware;
+using XperienceModels.Classes.Membership;
+using XperienceCommunity.MemberRoles.Models;
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
                 slug: "member-password-channel-custom-settings",
                 uiPageType: typeof(MemberPasswordChannelSettingsExtender),
@@ -66,6 +65,10 @@ namespace MVC.Configuration
 
         public static void RegisterInterfaces(WebApplicationBuilder builder)
         {
+
+            // Gzip compression handling for js.gz, css.gz and map.gz files and setting CacheControl headers based on ?v parameter detection
+            builder.Services.UseGzipAndCacheControlFileHandling();
+
             // XperienceCommunity.DevTools.MVCCaching
             // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
@@ -150,7 +153,10 @@ namespace MVC.Configuration
         /// <param name="builder"></param>
         public static void AddBaselineAccountAuthenticationAndControllerViews(WebApplicationBuilder builder)
         {
-            builder.AddBaselineKenticoAuthentication(
+            // If you wish to hook up the various Microsoft.AspNetCore.Authentication types (Facebook, Google, MicrosoftAccount, Twitter),
+            // please see this documentation https://learn.microsoft.com/en-us/aspnet/core/security/authentication/social/?view=aspnetcore-8.0&tabs=visual-studio and update your AppSettings.json with the IDs
+
+            builder.AddBaselineAccountAuthentication<ApplicationUserWithNames, TagApplicationUserRole, UserExtended>(
             identityOptions => {
                 // Customize IdentityOptions, including Password Settings (fall back if no ChannelSettings is defined
                 identityOptions.Password.RequireDigit = false;
@@ -187,6 +193,9 @@ namespace MVC.Configuration
                             return factory.Create(typeof(SharedResources));
                         };
                     });
+
+            // If you are leveraging the Account.RCL controllers and such, use this to hook up the validation.  If you are using your own, then disregard.
+            builder.AddBaselineAccountRcl<UserExtended>();
         }
 
         public static void RegisterStaticFileHandlingGzipAndCacheControls(WebApplicationBuilder builder)
@@ -215,9 +224,6 @@ namespace MVC.Configuration
             */
 
             builder.WebHost.UseStaticWebAssets();
-
-            // Gzip compression handling for js.gz, css.gz and map.gz files and setting CacheControl headers based on ?v parameter detection
-            builder.Services.UseGzipAndCacheControlFileHandling();
         }
 
         public static void RegisterDotNetCoreConfigurationsAndKentico(IApplicationBuilder app, WebApplicationBuilder builder)
@@ -328,7 +334,7 @@ namespace MVC.Configuration
         public static void AddBaselineCore(WebApplicationBuilder builder)
         {
             // Modify as needed
-            builder.Services.AddCoreBaseline(relationshipsExtendedOptions: (configuration) => {
+            builder.Services.AddCoreBaseline<ApplicationUserWithNames, UserExtended>(relationshipsExtendedOptions: (configuration) => {
                 configuration.AllowLanguageSyncConfiguration = true;
 
                 var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
@@ -339,6 +345,33 @@ namespace MVC.Configuration
                 };
                 configuration.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
             });
+        }
+    }
+
+    public record UserExtended : User
+    {
+        public UserExtended()
+        {
+        }
+
+        public UserExtended(string userName, string email, bool enabled, bool isExternal, bool isPublic) : base(userName, email, enabled, isExternal, isPublic)
+        {
+        }
+
+        public UserExtended(string userName, string firstName, string lastName, string email, bool enabled, bool isExternal, bool isPublic) : base(userName, firstName, lastName, email, enabled, isExternal, isPublic)
+        {
+        }
+
+        public UserExtended(int userID, string userName, Guid userGUID, string email, bool enabled, bool isExternal, bool isPublic = false) : base(userID, userName, userGUID, email, enabled, isExternal, isPublic)
+        {
+        }
+
+        public UserExtended(int userID, string userName, Guid userGUID, string email, string firstName, string middleName, string lastName, bool enabled, bool isExternal, bool isPublic = false) : base(userID, userName, userGUID, email, firstName, middleName, lastName, enabled, isExternal, isPublic)
+        {
+        }
+
+        protected UserExtended(User original) : base(original)
+        {
         }
     }
 }

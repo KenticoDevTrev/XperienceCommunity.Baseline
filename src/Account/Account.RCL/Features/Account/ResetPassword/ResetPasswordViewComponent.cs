@@ -1,14 +1,9 @@
 ﻿namespace Account.Features.Account.ResetPassword
 {
     [ViewComponent]
-    public class ResetPasswordViewComponent : ViewComponent
+    public class ResetPasswordViewComponent(IModelStateService modelStateService) : ViewComponent
     {
-        private readonly IModelStateService _modelStateService;
-
-        public ResetPasswordViewComponent(IModelStateService modelStateService)
-        {
-            _modelStateService = modelStateService;
-        }
+        private readonly IModelStateService _modelStateService = modelStateService;
 
         /// <summary>
         /// Uses the current page context to render meta data

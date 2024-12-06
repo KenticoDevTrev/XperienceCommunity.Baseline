@@ -22,6 +22,7 @@ using Kentico.Forms.Web.Mvc;
 using Core;
 using RelationshipsExtended;
 using FluentValidation;
+using Kentico.Membership;
 
 namespace MVC
 {

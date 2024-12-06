@@ -28,9 +28,9 @@ namespace Account.Features.Account.Registration
             User = new BasicUser();
         }
     }
-    public class RegistrationViewModelValidator : AbstractValidator<RegistrationViewModel>
+    public class RegistrationViewModelValidator<TGenericUser> : AbstractValidator<RegistrationViewModel> where TGenericUser : User, new()
     {
-        public RegistrationViewModelValidator(IAccountSettingsRepository _accountSettingsRepository, IUserRepository userRepository)
+        public RegistrationViewModelValidator(IAccountSettingsRepository _accountSettingsRepository, IUserRepository<TGenericUser> userRepository)
         {
             var passwordSettings = _accountSettingsRepository.GetPasswordPolicy();
 

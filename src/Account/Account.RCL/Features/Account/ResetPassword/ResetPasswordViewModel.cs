@@ -27,12 +27,12 @@ namespace Account.Features.Account.ResetPassword
         public bool? Succeeded { get; set; }
     }
 
-    public class ResetPasswordValidator : AbstractValidator<ResetPasswordViewModel>
+    public class ResetPasswordValidator<TGenericUser> : AbstractValidator<ResetPasswordViewModel> where TGenericUser : User, new()
     {
 
         public ResetPasswordValidator(IAccountSettingsRepository _accountSettingsRepository,
-            IUserRepository _userRepository,
-            IUserService _userService
+            IUserRepository<TGenericUser> _userRepository,
+            IUserService<TGenericUser> _userService
             )
         {
             var passwordSettings = _accountSettingsRepository.GetPasswordPolicy();

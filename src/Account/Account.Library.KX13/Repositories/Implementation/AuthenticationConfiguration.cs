@@ -33,6 +33,7 @@ namespace Account.Repositories.Implementation
 
     public static class AuthenticationConfigurationExtensions
     {
+        [Obsolete("This is now part of the AddBaselineAccountAuthentication where you can configure with the action, use this instead")]
         public static AuthenticationBuilder ConfigureAuthentication(this AuthenticationBuilder builder, Action<AuthenticationConfiguration> configuration)
         {
             var defaultObj = new AuthenticationConfiguration()

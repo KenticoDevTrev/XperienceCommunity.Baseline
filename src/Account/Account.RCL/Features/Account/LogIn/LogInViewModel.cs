@@ -25,7 +25,7 @@ namespace Account.Features.Account.LogIn
         public string ForgotPassword { get; set; } = string.Empty;
         public bool AlreadyLogedIn { get; set; } = false;
         public SignInResult? Result { get; set; }
-        public string RedirectUrl { get; set; } = string.Empty;
+        public string ReturnUrl { get; set; } = string.Empty;
         public List<AuthenticationScheme> ExternalLoginProviders { get; set; } = [];
     }
 }

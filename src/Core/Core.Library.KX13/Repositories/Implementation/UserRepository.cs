@@ -1,17 +1,32 @@
-﻿using CMS.Helpers;
-using CMS.Membership;
+﻿using CMS.Membership;
+using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Repositories.Implementation
 {
-    [AutoDependencyInjection]
-    public class UserRepository(
+    public class UserRepository(IUserRepository<User> userRepository) : IUserRepository
+    {
+        private readonly IUserRepository<User> _userRepository = userRepository;
+
+        public Task<User> GetCurrentUserAsync() => _userRepository.GetCurrentUserAsync();
+
+        public Task<Result<User>> GetUserAsync(int userID) => _userRepository.GetUserAsync(userID);
+
+        public Task<Result<User>> GetUserAsync(string userName) => _userRepository.GetUserAsync(userName);
+
+        public Task<Result<User>> GetUserAsync(Guid userGuid) => _userRepository.GetUserAsync(userGuid);
+
+        public Task<Result<User>> GetUserByEmailAsync(string email) => _userRepository.GetUserByEmailAsync(email);
+    }
+
+    public class UserRepository<TUser, TGenericUser>(
         IUserInfoProvider _userInfoProvider,
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IProgressiveCache _progressiveCache,
-        IHttpContextAccessor _httpContextAccessor) : IUserRepository
+        IHttpContextAccessor _httpContextAccessor,
+        IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper) : IUserRepository<TGenericUser> where TUser : ApplicationUser, new () where TGenericUser : User, new ()
     {
-        public async Task<User> GetCurrentUserAsync()
+        public async Task<TGenericUser> GetCurrentUserAsync()
         {
             var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "public";
             var user = await GetUserAsync(username);
@@ -19,17 +34,19 @@ namespace Core.Repositories.Implementation
             {
                 return user.Value;
             }
-            return new User(
-                userName: "Public",
-                firstName: "Public",
-                lastName: "User",
-                email: "public@public.com",
-                enabled: true,
-                isExternal: false,
-                isPublic: true);
+            return new TGenericUser() {
+                UserName = "Public",
+                FirstName = "Public",
+                LastName = "User",
+                Email = "public@public.com",
+                Enabled = true,
+                IsExternal = false,
+                IsPublic = true
+            };
+                
         }
 
-        public async Task<Result<User>> GetUserAsync(int userID)
+        public async Task<Result<TGenericUser>> GetUserAsync(int userID)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.Object(UserInfo.OBJECT_TYPE, userID);
@@ -45,12 +62,12 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userID));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
-            return Result.Failure<User>("Couldn't find User by ID");
+            return Result.Failure<TGenericUser>("Couldn't find User by ID");
         }
 
-        public async Task<Result<User>> GetUserAsync(string userName)
+        public async Task<Result<TGenericUser>> GetUserAsync(string userName)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.Object(UserInfo.OBJECT_TYPE, userName);
@@ -66,12 +83,12 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userName));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
-            return Result.Failure<User>("Could not find user by username");
+            return Result.Failure<TGenericUser>("Could not find user by username");
         }
 
-        public async Task<Result<User>> GetUserAsync(Guid userGuid)
+        public async Task<Result<TGenericUser>> GetUserAsync(Guid userGuid)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.Object(UserInfo.OBJECT_TYPE, userGuid);
@@ -87,13 +104,13 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userGuid));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
-            return Result.Failure<User>("Could not find user by guid");
+            return Result.Failure<TGenericUser>("Could not find user by guid");
 
         }
 
-        public async Task<Result<User>> GetUserByEmailAsync(string email)
+        public async Task<Result<TGenericUser>> GetUserByEmailAsync(string email)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.ObjectType(UserInfo.OBJECT_TYPE);
@@ -112,9 +129,9 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserByEmailAsync", email));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
-            return Result.Failure<User>("Could not find user by email");
+            return Result.Failure<TGenericUser>("Could not find user by email");
         }
 
     }
@@ -129,6 +146,7 @@ namespace CMS.Membership
         /// </summary>
         /// <param name="userInfo"></param>
         /// <returns></returns>
+        [Obsolete("Use IBaselineUserMapper instead")]
         public static User ToUser(this UserInfo userInfo)
         {
             return new User(

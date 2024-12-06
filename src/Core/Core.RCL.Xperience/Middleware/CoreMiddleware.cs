@@ -9,16 +9,17 @@ using Core.Models;
 using MVCCaching;
 using XperienceCommunity.ChannelSettings.Configuration;
 using XperienceCommunity.RelationshipsExtended;
+using Kentico.Membership;
 
 namespace Core
 {
     public static class CoreMiddleware
     {
-        public static IServiceCollection AddCoreBaseline(this IServiceCollection services,
+        public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services,
             Action<ContentItemAssetOptions>? contentItemAssetOptions = null,
             Action<MediaFileOptions>? mediaFileOptions = null,
             Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptions = null,
-            Action<RelationshipsExtendedOptions>? relationshipsExtendedOptions = null)
+            Action<RelationshipsExtendedOptions>? relationshipsExtendedOptions = null) where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
             // Configuration Points
             if (contentItemAssetOptions != null) {
@@ -74,6 +75,7 @@ namespace Core
                 .AddScoped<IPageContextRepository, PageContextRepository>()
 
                 // User Customization Points
+                .AddScoped<IBaselineUserMapper<TUser, TGenericUser>, BaselineUserMapper<TUser, TGenericUser>>()
                 .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>()
                 .AddScoped<IContentItemMediaCustomizer, ContentItemMediaCustomizer>()
                 .AddScoped<IContentItemMediaMetadataQueryEditor, ContentItemMediaMetadataQueryEditor>()
@@ -81,9 +83,14 @@ namespace Core
                 .AddScoped<IUserMetadataProvider, UserMetadataProvider>()
 
                 // Main item retrieval that depends on baseline apis and user customizations
-                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<IUserRepository<TGenericUser>, UserRepository<TUser, TGenericUser>>()
                 .AddScoped<IMediaRepository, MediaRepository>()
-                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>();
+                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>()
+
+                // Add fallback untyped versions for existing code
+                .AddScoped<IBaselineUserMapper<TUser, User>, BaselineUserMapper<TUser, User>>()
+                .AddScoped<IUserRepository<User>, UserRepository<TUser, User>>()
+                .AddScoped<IUserRepository, UserRepository>();
 
 #pragma warning disable CS0618 // Type or member is obsolete
             services.AddScoped<IPageCategoryRepository, PageCategoryRepository>();

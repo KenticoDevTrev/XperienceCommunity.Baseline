@@ -49,7 +49,7 @@ namespace Account.Features.Account.Registration
             // Create a basic Kentico User and assign the portal ID
             try
             {
-                var newUserResult = await _userService.CreateUser(userAccountModel.User.GetUser(), userAccountModel.Password);
+                var newUserResult = await _userService.CreateUser(userAccountModel.User.GetUser<User>(), userAccountModel.Password);
                 if(!newUserResult.TryGetValue(out var newUser, out var error)) {
                     throw new Exception(error);
                 }

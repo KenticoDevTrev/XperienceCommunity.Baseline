@@ -1,6 +1,7 @@
 ﻿using Account.Models;
 using AngleSharp.Common;
 using CMS.ContentEngine;
+using CMS.Core;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Websites.Routing;
@@ -8,24 +9,26 @@ using Core.Enums;
 using CSharpFunctionalExtensions;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using MVCCaching;
+using System.ComponentModel.Design;
 using XperienceCommunity.MemberRoles.Models;
 
 namespace Account.Repositories.Implementations
 {
-    public class RoleRepository(IRoleStore<TagApplicationUserRole> roleStore,
+    public class RoleRepository<TUser, TRole>(IRoleStore<TRole> roleStore,
                                 IWebsiteChannelContext websiteChannelContext,
                                 IInfoProvider<TagInfo> tagInfoProvider,
                                 IProgressiveCache progressiveCache,
-                                IUserRoleStore<ApplicationUser> userRoleStore,
-                                IUserStore<ApplicationUser> userStore) : IRoleRepository
+                                IUserRoleStore<TUser> userRoleStore,
+                                IUserStore<TUser> userStore) : IRoleRepository where TUser : ApplicationUser, new() where TRole : TagApplicationUserRole, new()
     {
-        private readonly IRoleStore<TagApplicationUserRole> _roleStore = roleStore;
+        private readonly IRoleStore<TRole> _roleStore = roleStore;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly IUserRoleStore<ApplicationUser> _userRoleStore = userRoleStore;
-        private readonly IUserStore<ApplicationUser> _userStore = userStore;
+        private readonly IUserRoleStore<TUser> _userRoleStore = userRoleStore;
+        private readonly IUserStore<TUser> _userStore = userStore;
 
         public async Task<Result<RoleItem>> GetRoleAsync(string roleName, string siteName)
         {

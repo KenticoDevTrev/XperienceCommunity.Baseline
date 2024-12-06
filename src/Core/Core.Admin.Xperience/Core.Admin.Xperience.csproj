@@ -14,8 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="29.7.0" />
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.1" />
-    <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="1.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.2" />
+    <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
