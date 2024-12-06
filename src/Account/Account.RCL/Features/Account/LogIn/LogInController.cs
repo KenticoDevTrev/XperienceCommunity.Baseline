@@ -1,4 +1,5 @@
 ﻿using Account.Features.Account.MyAccount;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.Design;
 using System.Security.Claims;
@@ -46,7 +47,7 @@ namespace Account.Features.Account.LogIn
         [Route(_routeUrl)]
         [ValidateAntiForgeryToken]
         [ExportModelState]
-        public async Task<IActionResult> LogIn(LogInViewModel model, [FromQuery] string returnUrl)
+        public async Task<IActionResult> LogIn(LogInViewModel model, [FromQuery] string? returnUrl = null)
         {
             string loginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(GetUrl());
 
@@ -93,13 +94,13 @@ namespace Account.Features.Account.LogIn
                     {
                         // Send email
                         var token = await _userManagerService.GenerateTwoFactorTokenByNameAsync(actualUser.UserName, "Email");
-                        await _userService.SendVerificationCodeEmailAsync(actualUser, "Email");
+                        await _userService.SendVerificationCodeEmailAsync(actualUser, token);
 
                         // Redirect to Two form auth page
                         var twoFormAuthViewModel = new TwoFormAuthenticationViewModel()
                         {
                             UserName = actualUser.UserName,
-                            RedirectUrl = returnUrl,
+                            RedirectUrl = model.ReturnUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(returnUrl ?? string.Empty),
                             StayLoggedIn = model.StayLogedIn
                         };
 
@@ -296,7 +297,7 @@ namespace Account.Features.Account.LogIn
         /// </summary>
         /// <param name="redirectUrl"></param>
         /// <returns></returns>
-        private async Task<IActionResult> LoggedInRedirect(string redirectUrl)
+        private async Task<IActionResult> LoggedInRedirect(string? redirectUrl)
         {
             var actualRedirectUrl = "";
             if (!string.IsNullOrEmpty(redirectUrl)) {

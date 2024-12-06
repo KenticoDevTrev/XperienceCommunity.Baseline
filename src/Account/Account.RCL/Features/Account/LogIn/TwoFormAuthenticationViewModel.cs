@@ -5,7 +5,7 @@ namespace Account.Features.Account.LogIn
     public record TwoFormAuthenticationViewModel
     {
         public string UserName { get; init; } = string.Empty;
-        public string RedirectUrl { get; init; } = string.Empty;
+        public string? RedirectUrl { get; init; } = string.Empty;
         [Display(Name = "Code")]
         [Required(ErrorMessage = "Must provide code")]
         public string TwoFormCode { get; init; } = string.Empty;

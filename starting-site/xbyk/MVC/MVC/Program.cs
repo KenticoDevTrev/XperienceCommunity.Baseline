@@ -18,6 +18,9 @@ StartupConfigs.AddBaselineCore(builder);
 // Register other interfaces
 StartupConfigs.RegisterInterfaces(builder);
 
+// Optional - If you want Session
+// StartupConfigs.AddSession(builder);
+
 // --- CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH ---- //
 // Standard Kentico Account / Authorization
 //StartupConfigs.AddStandardKenticoAuthenticationAndControllerViews(builder);
@@ -27,8 +30,10 @@ StartupConfigs.AddBaselineAccountAuthenticationAndControllerViews(builder);
 
 var app = builder.Build();
 
-
 StartupConfigs.RegisterDotNetCoreConfigurationsAndKentico(app, builder);
+
+// Optional - If you want Session
+// StartupConfigs.UseSession(app);
 
 RouteConfig.RegisterRoutes(app);
 

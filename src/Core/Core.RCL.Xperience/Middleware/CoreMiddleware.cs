@@ -10,6 +10,9 @@ using MVCCaching;
 using XperienceCommunity.ChannelSettings.Configuration;
 using XperienceCommunity.RelationshipsExtended;
 using Kentico.Membership;
+using Microsoft.AspNetCore.Mvc;
+using Kentico.Web.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Core
 {
@@ -19,7 +22,9 @@ namespace Core
             Action<ContentItemAssetOptions>? contentItemAssetOptions = null,
             Action<MediaFileOptions>? mediaFileOptions = null,
             Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptions = null,
-            Action<RelationshipsExtendedOptions>? relationshipsExtendedOptions = null) where TUser : ApplicationUser, new() where TGenericUser : User, new()
+            Action<RelationshipsExtendedOptions>? relationshipsExtendedOptions = null,
+            Action<CookieTempDataProviderOptions>? tempDataCookieConfigurations = null,
+            string tempDataCookieName = "TEMPDATA") where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
             // Configuration Points
             if (contentItemAssetOptions != null) {
@@ -95,6 +100,16 @@ namespace Core
 #pragma warning disable CS0618 // Type or member is obsolete
             services.AddScoped<IPageCategoryRepository, PageCategoryRepository>();
 #pragma warning restore CS0618 // Type or member is obsolete
+
+            // Needed for the TempData persistance without session
+            services.Configure<CookieTempDataProviderOptions>(options => {
+                options.Cookie.Name = tempDataCookieName;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                tempDataCookieConfigurations?.Invoke(options);
+            });
+            services.Configure<CookieLevelOptions>(options => {
+                options.CookieConfigurations.Add(tempDataCookieName, CookieLevel.Essential);
+            });
 
             return services;
 

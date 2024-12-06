@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -118,14 +119,6 @@ namespace Account
                 });
             }
 
-            // Baseline Configuration of External Authentication
-            authBuilder.ConfigureAuthentication(config =>
-            {
-                config.ExistingInternalUserBehavior = ExistingInternalUserBehavior.SetToExternal;
-                config.FacebookUserRoles.Add("facebook-user");
-                config.UseTwoFormAuthentication = false;
-            });
-
             services.AddAuthorization();
 
             // Register authentication cookie
@@ -153,7 +146,6 @@ namespace Account
                 // Customize
                 cookieConfigurations?.Invoke(c);
             });
-
 
             CookieHelper.RegisterCookie(AUTHENTICATION_COOKIE_NAME, CookieLevel.Essential);
 

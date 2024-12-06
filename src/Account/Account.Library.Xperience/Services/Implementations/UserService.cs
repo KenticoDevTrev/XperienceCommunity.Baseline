@@ -9,6 +9,7 @@ using Core.Services;
 using CSharpFunctionalExtensions;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 using System.Web;
 using XperienceCommunity.ChannelSettings.Repositories;
@@ -54,7 +55,8 @@ namespace Account.Services.Implementations
         IEmailService emailService,
         IPasswordValidator<TUser> passwordValidator,
         IChannelCustomSettingsRepository channelCustomSettingsRepository,
-        IBaselineUserMapper<TUser, TGenericUser> baselineUserMapper
+        IBaselineUserMapper<TUser, TGenericUser> baselineUserMapper,
+        IOptions<SystemEmailOptions> systemEmailOptions
         ) : IUserService<TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
     {
         private readonly UserManager<TUser> _userManager = userManager;
@@ -63,6 +65,7 @@ namespace Account.Services.Implementations
         private readonly IPasswordValidator<TUser> _passwordValidator = passwordValidator;
         private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
         private readonly IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper = baselineUserMapper;
+        private readonly SystemEmailOptions _systemEmailOptions = systemEmailOptions.Value;
         private readonly IEventLogService _eventLogService = eventLogService;
 
         public async Task<TGenericUser> CreateUserAsync(TGenericUser user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).GetValueOrDefault(user);
@@ -103,6 +106,7 @@ namespace Account.Services.Implementations
 
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmail(new EmailMessage() {
+                From = $"no-reply@{_systemEmailOptions.SendingDomain}",
                 Recipients = appUser.Email,
                 Subject = "Confirm your new account",
                 Body = string.Format($"Please confirm your new account by clicking <a href=\"{confirmationUrl}?userId={user.UserGUID}&token={HttpUtility.UrlEncode(token)}\">here</a>")
@@ -130,6 +134,7 @@ namespace Account.Services.Implementations
 
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmail(new EmailMessage() {
+                From = $"no-reply@{_systemEmailOptions.SendingDomain}",
                 Recipients = user.Email,
                 Subject = "Password Reset Request",
                 Body = $"A Password reset request has been generated for your account.  If you have generated this request, you may reset your password by clicking <a href=\"{confirmationLink}?userId={user.UserGUID}&token={HttpUtility.UrlEncode(token)}\">here</a>."
@@ -240,6 +245,7 @@ namespace Account.Services.Implementations
         {
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmail(new EmailMessage() {
+                From = $"no-reply@{_systemEmailOptions.SendingDomain}",
                 Recipients = user.Email,
                 Subject = "Verification Code",
                 Body = $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>"

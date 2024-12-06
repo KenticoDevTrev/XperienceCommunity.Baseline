@@ -14,7 +14,7 @@ else
             <h1 class="text-center pt-4 pb-2">Enter Authentication Code</h1>
             <p>An email has been sent to the address on record.  Please enter the code below to log in.</p>
             <div asp-validation-summary="All" class="alert alert-danger text-danger col-12" role="alert"></div>
-
+            Redirect: @Model.RedirectUrl
             <input type="hidden" asp-for=RedirectUrl />
             <input type="hidden" asp-for=UserName />
             <input type="hidden" asp-for=StayLoggedIn />

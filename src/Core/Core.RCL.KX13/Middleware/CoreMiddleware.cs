@@ -1,4 +1,5 @@
-﻿using Core.KX13.Repositories.Implementation;
+﻿using CMS.Helpers;
+using Core.KX13.Repositories.Implementation;
 using Core.Repositories.Implementation;
 using Core.Services.Implementations;
 using Kentico.Membership;
@@ -16,7 +17,10 @@ namespace Core
             return services.AddCoreBaseline<ApplicationUser, User>();
         }
 
-        public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services) where TUser : ApplicationUser, new() where TGenericUser : User, new()
+        public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services,
+            Action<CookieTempDataProviderOptions>? tempDataCookieConfigurations = null,
+            string tempDataCookieName = "TEMPDATA"
+            ) where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
             // Add MVC Caching which Core depends on
             services.AddMVCCaching();
@@ -53,6 +57,15 @@ namespace Core
 #pragma warning disable CS0618 // Type or member is obsolete
             services.AddScoped<IPageCategoryRepository, PageCategoryRepository>();
 #pragma warning restore CS0618 // Type or member is obsolete
+
+            // Temp Data Cookie necessary for the TempData to persis with the ModelState logic
+            services.Configure<CookieTempDataProviderOptions>(options => {
+                options.Cookie.Name = tempDataCookieName;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                tempDataCookieConfigurations?.Invoke(options);
+            });
+
+            CookieHelper.RegisterCookie(tempDataCookieName, CookieLevel.Essential);
 
             return services;
 

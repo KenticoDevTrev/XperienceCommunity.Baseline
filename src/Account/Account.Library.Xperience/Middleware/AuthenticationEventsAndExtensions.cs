@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +80,7 @@ namespace Microsoft.AspNetCore.Builder
 
                 identityOptions?.Invoke(options);
             })
+                .AddDefaultTokenProviders()
                 .AddUserStore<ApplicationUserStore<TUser>>()
                 .AddMemberRolesStores<TUser, TRole>() // XperienceCommunity.MemberRoles
                 .AddUserManager<UserManager<TUser>>()
@@ -220,7 +223,7 @@ namespace Microsoft.AspNetCore.Builder
 
     }
 
-    public class SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository)
+    public class SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : OAuthEvents
     {
         public override async Task AccessDenied(AccessDeniedContext context)
         {

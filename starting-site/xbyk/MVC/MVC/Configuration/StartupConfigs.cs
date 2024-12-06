@@ -167,6 +167,7 @@ namespace MVC.Configuration
             },
             authenticationConfigurations => {
                 // Customize Baseline's Authentication settings, including two form and additional roles per Auth Type
+                authenticationConfigurations.UseTwoFormAuthentication = true;
             },
             cookieAuthenticationOptions => {
                 // Customize Cookie Auth Options
@@ -278,9 +279,6 @@ namespace MVC.Configuration
                 app.UseDeveloperExceptionPage();
             }
 
-            // OPTIONAL - Enable Session Session
-            // EnableSession(app, builder);
-
             //////////////////////////////
             //////// ERROR HANDLING //////
             //////////////////////////////
@@ -310,7 +308,7 @@ namespace MVC.Configuration
         /// </summary>
         /// <param name="app"></param>
         /// <param name="builder"></param>
-        public static void EnableSession(IApplicationBuilder app, WebApplicationBuilder builder)
+        public static void AddSession(WebApplicationBuilder builder)
         {
 
             builder.Services.AddDistributedMemoryCache();
@@ -326,10 +324,20 @@ namespace MVC.Configuration
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
             });
 
+        }
+
+        /// <summary>
+        /// Sample on how to enable Session State
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="builder"></param>
+        public static void UseSession(IApplicationBuilder app)
+        {
             // Enables session - Needed for Account Post-Redirect-Get Export Model State Logic
             app.UseSession();
-
         }
+
+       
 
         public static void AddBaselineCore(WebApplicationBuilder builder)
         {
