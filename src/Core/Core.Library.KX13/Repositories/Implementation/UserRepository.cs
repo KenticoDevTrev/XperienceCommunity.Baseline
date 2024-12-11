@@ -1,15 +1,15 @@
-﻿using CMS.Helpers;
-using CMS.Membership;
+﻿using CMS.Membership;
+using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Repositories.Implementation
 {
-    [AutoDependencyInjection]
-    public class UserRepository(
+    public class UserRepository<TUser>(
         IUserInfoProvider _userInfoProvider,
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IProgressiveCache _progressiveCache,
-        IHttpContextAccessor _httpContextAccessor) : IUserRepository
+        IHttpContextAccessor _httpContextAccessor,
+        IBaselineUserMapper<TUser> _baselineUserMapper) : IUserRepository where TUser : ApplicationUser, new ()
     {
         public async Task<User> GetCurrentUserAsync()
         {
@@ -19,14 +19,15 @@ namespace Core.Repositories.Implementation
             {
                 return user.Value;
             }
-            return new User(
-                userName: "Public",
-                firstName: "Public",
-                lastName: "User",
-                email: "public@public.com",
-                enabled: true,
-                isExternal: false,
-                isPublic: true);
+            return new User() {
+                UserName = "Public",
+                FirstName = "Public",
+                LastName = "User",
+                Email = "public@public.com",
+                Enabled = true,
+                IsExternal = false,
+                IsPublic = true
+            };
         }
 
         public async Task<Result<User>> GetUserAsync(int userID)
@@ -45,7 +46,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userID));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
             return Result.Failure<User>("Couldn't find User by ID");
         }
@@ -66,7 +67,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userName));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
             return Result.Failure<User>("Could not find user by username");
         }
@@ -87,7 +88,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserAsync", userGuid));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
             return Result.Failure<User>("Could not find user by guid");
 
@@ -112,7 +113,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetUserByEmailAsync", email));
             if (user != null)
             {
-                return user.ToUser();
+                return await _baselineUserMapper.ToUser(user);
             }
             return Result.Failure<User>("Could not find user by email");
         }
@@ -129,6 +130,7 @@ namespace CMS.Membership
         /// </summary>
         /// <param name="userInfo"></param>
         /// <returns></returns>
+        [Obsolete("Use IBaselineUserMapper instead")]
         public static User ToUser(this UserInfo userInfo)
         {
             return new User(

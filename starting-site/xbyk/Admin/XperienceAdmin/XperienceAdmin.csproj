@@ -17,10 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" Version="29.6.1" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="29.7.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Account\Account.Admin.Xperience\Account.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>

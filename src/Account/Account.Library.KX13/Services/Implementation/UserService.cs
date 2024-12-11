@@ -7,14 +7,14 @@ using System.Web;
 
 namespace Account.Services.Implementation
 {
-    [AutoDependencyInjection]
-    public class UserService(
+    public class UserService<TUser>(
         IUserInfoProvider _userInfoProvider,
         ApplicationUserManager<ApplicationUser> _userManager,
         IMessageService _emailService,
         IProgressiveCache _progressiveCache,
         ISiteRepository _siteRepository,
-        IEventLogService _eventLogService) : IUserService
+        IEventLogService _eventLogService,
+        IBaselineUserMapper<TUser> _baselineUserMapper) : IUserService where TUser : ApplicationUser, new()
     {
 
         public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).Value;
@@ -85,7 +85,7 @@ namespace Account.Services.Implementation
 
         public Task<bool> ValidatePasswordPolicyAsync(string password)
         {
-            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentSiteName()));
+            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty)));
         }
 
         private async Task<UserInfo> GetUserInfoAsync(string userName)
@@ -109,7 +109,7 @@ namespace Account.Services.Implementation
                 $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>");
         }
 
-        public Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
+        public async Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
         {
             // Create basic user
             var newUser = new UserInfo() {
@@ -125,10 +125,10 @@ namespace Account.Services.Implementation
             // Generate new password, and save any other settings
             UserInfoProvider.SetPassword(newUser, password);
 
-            return Task.FromResult(Result.Success(newUser.ToUser()));
+            return Result.Success(await _baselineUserMapper.ToUser(newUser));
         }
 
-        public Task<Result<User>> CreateExternalUser(User user)
+        public async Task<Result<User>> CreateExternalUser(User user)
         {
             // Create basic user
             var newUser = new UserInfo() {
@@ -142,7 +142,7 @@ namespace Account.Services.Implementation
             };
             _userInfoProvider.Set(newUser);
 
-            return Task.FromResult(Result.Success(newUser.ToUser()));
+            return Result.Success(await _baselineUserMapper.ToUser(newUser));
         }
     }
 }

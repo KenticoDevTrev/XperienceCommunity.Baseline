@@ -420,7 +420,7 @@ namespace Core.Repositories.Implementation
         public async Task<Result<MediaItem>> GetMediaItemAsync(Guid fileGuid)
         {
             // use cached if possible, much faster, but does have some drawbacks like the DirectUrl is excluded for performance
-            if (
+            if ( 
                 _mediaFileOptions.UseCachedMediaFiles
                 &&  _cacheDependencyBuilderFactory.Create(false)
                         .ObjectType(MediaFileInfo.OBJECT_TYPE)

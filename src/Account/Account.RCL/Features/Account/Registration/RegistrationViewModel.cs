@@ -28,6 +28,14 @@ namespace Account.Features.Account.Registration
             User = new BasicUser();
         }
     }
+
+    [Serializable]
+    public class ResendConfirmationViewModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string VerificationCheck { get; set; } = string.Empty;
+    }
+
     public class RegistrationViewModelValidator : AbstractValidator<RegistrationViewModel>
     {
         public RegistrationViewModelValidator(IAccountSettingsRepository _accountSettingsRepository, IUserRepository userRepository)
@@ -35,7 +43,7 @@ namespace Account.Features.Account.Registration
             var passwordSettings = _accountSettingsRepository.GetPasswordPolicy();
 
             RuleFor(model => model.Password).ValidPassword(passwordSettings);
-            RuleFor(model => model.PasswordConfirm).Equal(model => model.Password);
+            RuleFor(model => model.PasswordConfirm).Equal(model => model.Password).WithMessage("Passwords do not match");
             RuleFor(model => model.User.UserName).MustAsync(async (model, cancellationToken) =>
             {
                 return (await userRepository.GetUserAsync(model)).IsFailure;

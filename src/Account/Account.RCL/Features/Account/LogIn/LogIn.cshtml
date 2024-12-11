@@ -1,6 +1,7 @@
 ﻿@model Account.Features.Account.LogIn.LogInViewModel
-@if (Model.AlreadyLogedIn)
-{
+@using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+
+@if (Model.AlreadyLogedIn) {
     <page-builder-mode exclude="Edit">
 
         <script type="text/javascript">
@@ -9,24 +10,24 @@
             }, 3000);
         </script>
     </page-builder-mode>
-}
-@if (Model.AlreadyLogedIn)
-{
     <p>Already Loged in, redirecting to account page...</p>
-}
-else if (Model.Result?.Succeeded ?? false)
-{
+} else if (Model.ResultOfSignIn?.Succeeded ?? false) {
     <p>Login Successful!</p>
-}
-else
-{
+} else if (Model.ResultOfSignIn != null && Model.ResultOfSignIn == SignInResult.NotAllowed) {
+<form asp-controller="Registration" asp-action="ResendRegistration" method="POST" asp-antiforgery="true">
+    <input type="hidden" name="@(nameof(Account.Features.Account.Registration.ResendConfirmationViewModel.UserName))" value="@Model.UserName" />
+    <input type="hidden" name="@(nameof(Account.Features.Account.Registration.ResendConfirmationViewModel.VerificationCheck))" value="@Model.ResendConfirmationToken" />
+
+    <p>Your account is disabled.  If you wish to enable your account, <a href="javascript:void(0)" onclick="this.closest('form').submit();return false;">resend a confirmation email</a> (you will be redirected back to the Log In page afterwards).</p>
+</form>
+} else {
     <form asp-controller="LogIn" asp-action="LogIn" method="POST" asp-antiforgery="true">
 
         <div class="container">
             <h1 class="text-center pt-4 pb-2">Log in to your account</h1>
             <div asp-validation-summary="All" class="alert alert-danger text-danger col-12" role="alert"></div>
 
-            <input type="hidden" asp-for=RedirectUrl />
+            <input type="hidden" asp-for=ReturnUrl />
             <div class="row">
                 <div class="col-12 col-sm-6 m-auto">
                     <div class="form-group">
@@ -63,8 +64,7 @@ else
             </div>
         </div>
     </form>
-    @if (Model.ExternalLoginProviders.Any())
-    {
+    @if (Model.ExternalLoginProviders.Any()) {
         <div class="col-md-4 offset-2">
             <section>
                 <h4>Use different service for log in:</h4>
@@ -73,8 +73,7 @@ else
                     <form asp-controller="Login" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
                         <div>
                             <p>
-                                @foreach (var provider in Model.ExternalLoginProviders)
-                                {
+                                @foreach (var provider in Model.ExternalLoginProviders) {
                                     <input type="submit" class="btn btn-info" value="@provider.Name" name="provider" />
                                 }
                             </p>

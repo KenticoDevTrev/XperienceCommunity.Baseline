@@ -4,8 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Account</RootNamespace>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.2" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="1.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />

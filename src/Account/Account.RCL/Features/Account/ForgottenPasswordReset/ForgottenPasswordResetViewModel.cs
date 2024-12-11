@@ -23,7 +23,7 @@ namespace Account.Features.Account.ForgottenPasswordReset
         [DisplayName("Confirm New Password")]
         public string PasswordConfirm { get; set; } = string.Empty;
 
-        public IdentityResult? Result { get; set; }
+        public IdentityResult? ResultIdentity { get; set; }
 
         /// <summary>
         /// Identityresult doesn't serialize/deserialize properly so need to use this as a toggle

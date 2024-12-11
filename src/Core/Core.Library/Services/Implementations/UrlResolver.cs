@@ -2,7 +2,6 @@
 
 namespace Core.Services.Implementations
 {
-    [AutoDependencyInjection]
     public class UrlResolver(IHttpContextAccessor _httpContextAccessor) : IUrlResolver
     {
         public string GetAbsoluteUrl(string relativeUrl)

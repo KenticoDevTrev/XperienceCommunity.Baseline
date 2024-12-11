@@ -54,5 +54,10 @@ namespace Generic
 		/// MetaData_ThumbnailLarge.
 		/// </summary>
 		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
-	}
+
+        /// <summary>
+        /// MetaData_NoIndex.
+        /// </summary>
+        public bool MetaData_NoIndex { get; set; }
+    }
 }

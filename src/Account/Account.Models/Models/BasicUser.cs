@@ -30,15 +30,15 @@ namespace Account.Models
         /// <returns></returns>
         public User GetUser()
         {
-            return new User(
-                userName: UserName,
-                firstName: FirstName,
-                lastName: LastName,
-                email: UserEmail,
-                enabled: false,
-                isExternal: false,
-                isPublic: false
-            );
+            return new User() {
+                UserName = UserName,
+                FirstName = FirstName,
+                LastName = LastName,
+                Email = UserEmail,
+                Enabled = false,
+                IsExternal = false,
+                IsPublic = false
+            };
         }
     }
 

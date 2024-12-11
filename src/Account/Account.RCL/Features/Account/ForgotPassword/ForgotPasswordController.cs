@@ -3,14 +3,19 @@
 namespace Account.Features.Account.ForgotPassword
 {
     public class ForgotPasswordController(
-        IUserRepository _userRepository,
-        IAccountSettingsRepository _accountSettingsRepository,
-        IUserService _userService,
-        IUrlResolver _urlResolver,
-        IModelStateService _modelStateService) : Controller
+    IAccountSettingsRepository accountSettingsRepository,
+    IUserService userService,
+    IUserRepository userRepository,
+    IUrlResolver urlResolver,
+    IModelStateService modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ForgotPassword";
-
+        private readonly IAccountSettingsRepository _accountSettingsRepository = accountSettingsRepository;
+        private readonly IUserService _userService = userService;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IUrlResolver _urlResolver = urlResolver;
+        private readonly IModelStateService _modelStateService = modelStateService;
+        
         /// <summary>
         /// Fallback if not using Page Templates
         /// </summary>
@@ -41,17 +46,21 @@ namespace Account.Features.Account.ForgotPassword
                 var userResult = await _userRepository.GetUserByEmailAsync(model.EmailAddress);
                 if (userResult.TryGetValue(out var user))
                 {
-                    string forgottenPasswordResetUrl = await _accountSettingsRepository.GetAccountForgottenPasswordResetUrlAsync(ForgottenPasswordResetController.GetUrl());
-                    await _userService.SendPasswordResetEmailAsync(user, _urlResolver.GetAbsoluteUrl(forgottenPasswordResetUrl));
+                    if(user.IsExternal) {
+                        model.Succeeded = false;
+                        model.Error = "Your user is an External User (authenticated externally), there is no password to reset, please log in with the appropriate Single Sign On Provider.";
+                    } else { 
+                        string forgottenPasswordResetUrl = await _accountSettingsRepository.GetAccountForgottenPasswordResetUrlAsync(ForgottenPasswordResetController.GetUrl());
+                        await _userService.SendPasswordResetEmailAsync(user, _urlResolver.GetAbsoluteUrl(forgottenPasswordResetUrl));
+                        model.Succeeded = true;
+                    }
                 }
-                model.Succeeded = true;
             }
             catch (Exception ex)
             {
                 model.Succeeded = false;
                 model.Error = ex.Message;
             }
-
             _modelStateService.StoreViewModel(TempData, model);
 
             return Redirect(forgotPasswordUrl);

@@ -102,6 +102,7 @@ namespace CMS.Taxonomy
                 categoryName: category.CategoryName,
                 categoryGuid: category.CategoryGUID,
                 categoryParentID: category.CategoryParentID,
+                categoryTypeID: category.CategoryParentID,
                 categoryDisplayName: category.CategoryDisplayName
                 )
             {

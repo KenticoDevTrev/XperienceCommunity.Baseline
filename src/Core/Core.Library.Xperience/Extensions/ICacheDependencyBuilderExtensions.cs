@@ -43,7 +43,7 @@
             var firstRunCheckTime = CacheHelper.Cache(cs =>
             {
                 return DateTime.Now;
-            }, new CacheSettings(double.MaxValue, cacheKey));
+            }, new CacheSettings(525600, cacheKey));
             var firstRun = DateTime.Now.Subtract(firstRunCheckTime).Seconds < 1;
 
             var lastTouched = CacheHelper.Cache(cs =>
@@ -54,7 +54,7 @@
                 }
                 // For first run, adjust the time to be before the forThisTime, otherwise the current date
                 return firstRun ? DateTime.Now.Subtract(forThisTime) : DateTime.Now;
-            }, new CacheSettings(double.MaxValue, "DependenciesNotTouched", cacheKey));
+            }, new CacheSettings(525600, "DependenciesNotTouched", cacheKey));
 
             // If the last touched time is less than the forThisTime, then it cleared recently and should wait until the forThisTime Buffer to re-cache
             return (DateTime.Now - lastTouched > forThisTime);

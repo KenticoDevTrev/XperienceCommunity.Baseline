@@ -34,5 +34,14 @@ namespace Core.Services
         /// <typeparam name="T"></typeparam>
         /// <param name="tempData"></param>
         void ClearViewModel<T>(ITempDataDictionary tempData);
+
+        /// <summary>
+        /// Removes the View Model from TempData after the request is completed, this should be called from ViewComponents that ultimately shouldn't keep the context after they have rendered themselves.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tempData"></param>
+        void ClearViewModelAfterRequest<T>(ITempDataDictionary tempData, IHttpContextAccessor httpContextAccessor);
+
+
     }
 }

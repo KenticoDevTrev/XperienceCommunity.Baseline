@@ -1,11 +1,11 @@
 ﻿using Core.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Core.Services.Implementations
 {
-    [AutoDependencyInjection]
     public class ModelStateService : IModelStateService
     {
         public void MergeModelState(ModelStateDictionary modelState, ITempDataDictionary tempData)
@@ -27,7 +27,15 @@ namespace Core.Services.Implementations
                         var stateItem = retrievedModelState[modelStateKey];
                         if (stateItem != null)
                         {
-                            modelState.SetModelValue(modelStateKey, stateItem.RawValue, stateItem.AttemptedValue);
+                            // handle boolean conversion
+                            if (stateItem.RawValue?.ToString() == "false" || stateItem.AttemptedValue?.ToString() == "false,true") {
+                                modelState.SetModelValue(modelStateKey, false, stateItem.AttemptedValue);
+
+                            } else if(stateItem.RawValue?.ToString() == "true" || stateItem.AttemptedValue?.ToString() == "true,false") {
+                                modelState.SetModelValue(modelStateKey, true, stateItem.AttemptedValue);
+                            } else { 
+                                modelState.SetModelValue(modelStateKey, stateItem.RawValue, stateItem.AttemptedValue);
+                            }
                             foreach (var error in stateItem.Errors)
                             {
                                 modelState.AddModelError(modelStateKey, error.ErrorMessage);
@@ -52,6 +60,14 @@ namespace Core.Services.Implementations
         public void ClearViewModel<TModel>(ITempDataDictionary tempData)
         {
             tempData.Remove($"GetViewModel_{typeof(TModel).FullName}");
+        }
+
+        public void ClearViewModelAfterRequest<T>(ITempDataDictionary tempData, IHttpContextAccessor httpContextAccessor)
+        {
+            if(httpContextAccessor.HttpContext != null) {
+                httpContextAccessor.HttpContext.Items.Add("ClearViewModelAfterRequestTempData", tempData);
+                httpContextAccessor.HttpContext.Items.Add("ClearViewModelAfterRequestType", typeof(T));
+            }
         }
     }
 

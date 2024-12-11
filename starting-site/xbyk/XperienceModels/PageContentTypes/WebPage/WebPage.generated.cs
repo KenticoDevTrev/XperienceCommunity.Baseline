@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
+using XperienceCommunity;
+using XperienceCommunity.MemberRoles;
 
 namespace Testing
 {
@@ -20,7 +22,7 @@ namespace Testing
 	/// Represents a page of type <see cref="WebPage"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class WebPage : IWebPageFieldsSource
+	public partial class WebPage : IWebPageFieldsSource, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -69,5 +71,23 @@ namespace Testing
 		/// TestLanguageAgnosticValue.
 		/// </summary>
 		public string TestLanguageAgnosticValue { get; set; }
+
+
+        /// <summary>
+        /// MemberPermissionOverride.
+        /// </summary>
+        public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

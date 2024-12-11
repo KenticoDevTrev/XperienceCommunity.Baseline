@@ -21,6 +21,16 @@ namespace Core.Attributes
                 {
                 if (filterContext.Controller is Controller controller && filterContext.ModelState != null)
                 {
+                    // Try to clear out any passwords, not fool-proof but hopefully keys have "Password" in them...
+                    var passwordKeys = filterContext.ModelState.Keys.Where(x => x.Contains("password", StringComparison.OrdinalIgnoreCase));
+                    foreach (var passwordKey in passwordKeys) {
+                        var item = filterContext.ModelState[passwordKey];
+                        if (item != null) {
+                            item.AttemptedValue = string.Empty;
+                            item.RawValue = null;
+                        }
+                    }
+
                     var modelState = ModelStateHelpers.SerialiseModelState(filterContext.ModelState);
                     controller.TempData[Key] = modelState;
                 }

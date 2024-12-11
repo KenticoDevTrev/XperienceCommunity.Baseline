@@ -2,6 +2,33 @@
 {
     public record User : IObjectIdentifiable
     {
+        // Should only use for generic typed
+        public User()
+        {
+            UserName = "Public";
+            Email = "public@localhost";
+            Enabled = true;
+            IsExternal = false;
+            IsPublic = true;
+        }
+
+        /// <summary>
+        /// Bare Minimum Constructor
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="email"></param>
+        /// <param name="enabled"></param>
+        /// <param name="isExternal"></param>
+        /// <param name="isPublic"></param>
+        public User(string userName, string email, bool enabled, bool isExternal, bool isPublic)
+        {
+            UserName = userName;
+            Email = email;
+            Enabled = enabled;
+            IsExternal = isExternal;
+            IsPublic = isPublic;
+        }
+
         public User(string userName, string firstName, string lastName, string email, bool enabled, bool isExternal, bool isPublic)
         {
             UserName = userName;

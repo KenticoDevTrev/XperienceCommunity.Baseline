@@ -1,6 +1,5 @@
 ﻿namespace Core.Services.Implementations
 {
-    [AutoDependencyInjection]
     public class PageIdentityFactory : IPageIdentityFactory
     {
         public PageIdentity<TData> Convert<TData, TOriginalData>(PageIdentity<TOriginalData> pageIdentity, Func<TOriginalData, TData> conversion)

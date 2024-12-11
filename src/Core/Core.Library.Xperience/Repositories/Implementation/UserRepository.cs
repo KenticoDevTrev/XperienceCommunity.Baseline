@@ -1,21 +1,24 @@
 ﻿using CMS.Membership;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core.Repositories.Implementation
 {
-    public class UserRepository(IHttpContextAccessor httpContextAccessor,
+    public class UserRepository<TUser>(IHttpContextAccessor httpContextAccessor,
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IProgressiveCache _progressiveCache,
         IInfoProvider<MemberInfo> memberInfoProvider,
-        IUserMetadataProvider userMetadataProvider,
-        ICacheDependenciesScope cacheDependenciesScope) : IUserRepository
+        ICacheDependenciesScope cacheDependenciesScope,
+        IBaselineUserMapper<TUser> baselineUserMapper,
+        UserManager<TUser> userManager) : IUserRepository where TUser : ApplicationUser, new()
     {
         private const string _userName = "Public";
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
-        private readonly IUserMetadataProvider _userMetadataProvider = userMetadataProvider;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
+        private readonly IBaselineUserMapper<TUser> _baselineUserMapper = baselineUserMapper;
+        private readonly UserManager<TUser> _userManager = userManager;
 
         public async Task<User> GetCurrentUserAsync()
         {
@@ -26,14 +29,15 @@ namespace Core.Repositories.Implementation
                 guid: Maybe.None,
                 id: Maybe.None
                 );
-            return user.TryGetValue(out var foundUser) ? foundUser : new User(
-                userName: _userName,
-                firstName: "Public",
-                lastName: "User",
-                email: "public@public.com",
-                enabled: true,
-                isExternal: false,
-                isPublic: true);
+            return user.TryGetValue(out var foundUser) ? foundUser : new User() {
+                UserName = _userName,
+                FirstName = "Public",
+                LastName = "User",
+                Email = "public@localhost",
+                Enabled = true,
+                IsExternal = false,
+                IsPublic = true
+            };
         }
 
         public Task<Result<User>> GetUserAsync(int userID) => GetUserInternal(
@@ -64,7 +68,8 @@ namespace Core.Repositories.Implementation
         {
             var result = await _progressiveCache.LoadAsync(async cs => {
                 var userquery = _memberInfoProvider.Get()
-                .TopN(1);
+                                    .Columns(nameof(MemberInfo.MemberName))
+                                    .TopN(1);
 
                 var internalBuilder = _cacheDependencyBuilderFactory.Create(false);
 
@@ -82,80 +87,41 @@ namespace Core.Repositories.Implementation
 
                 var user = (await userquery.GetEnumerableTypedResultAsync()).FirstOrMaybe();
 
-                if (user.TryGetValue(out var userInfo)) {
-                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userInfo.MemberID);
+                if (user.TryGetValue(out var userMember)) {
+                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userMember.MemberName);
+
+                    // In case in converting MemberInfo to the object type, there are other dependencies added to scope
+                    _cacheDependenciesScope.Begin();
+                    var applicationUser = await _userManager.FindByNameAsync(userMember.MemberName);
+                    internalBuilder.AddKeys(_cacheDependenciesScope.End());
+
                     if (cs.Cached) {
                         cs.CacheDependency = internalBuilder.GetCMSCacheDependency();
                     }
-                    return new DTOWithDependencies<Result<MemberInfo>>(Result.Success(userInfo), internalBuilder.GetKeys().ToList());
+
+                    if (applicationUser != null) { 
+                        return new DTOWithDependencies<Result<TUser>>(Result.Success(applicationUser), internalBuilder.GetKeys().ToList());
+                    }
                 }
                 // Not found
                 internalBuilder.ObjectType(MemberInfo.OBJECT_TYPE);
                 if (cs.Cached) {
                     cs.CacheDependency = internalBuilder.GetCMSCacheDependency();
                 }
-                return new DTOWithDependencies<Result<MemberInfo>>(Result.Failure<MemberInfo>("Could not find member by identifiers"), internalBuilder.GetKeys().ToList());
-            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetUserInternal", email));
+                return new DTOWithDependencies<Result<TUser>>(Result.Failure<TUser>("Could not find member by identifiers"), internalBuilder.GetKeys().ToList());
+            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetUserInternal", username.GetValueOrDefault(string.Empty), email.GetValueOrDefault(string.Empty), guid.GetValueOrDefault(Guid.Empty), id.GetValueOrDefault(0)));
 
             // Add Keys to global scope now
             var builder = _cacheDependencyBuilderFactory.Create()
                 .AddKeys(result.AdditionalDependencies);
 
-            if (result.Result.TryGetValue(out var memberInfo, out var error)) {
-                var user = memberInfo.ToUser();
+            if (result.Result.TryGetValue(out var appUser, out var error)) {
                 _cacheDependenciesScope.Begin();
-
-                if ((await _userMetadataProvider.GetUserMetadata(memberInfo, user)).TryGetValue(out var metaData)) {
-                    user = user with { MetaData = metaData.AsMaybe() };
-                };
+                var user = await _baselineUserMapper.ToUser(appUser);
                 builder.AddKeys(_cacheDependenciesScope.End());
-
                 return user;
             }
             return Result.Failure<User>(error);
-        }
-    }
-}
-
-namespace CMS.Membership
-{
-    public static class UserInfoExtensions
-    {
-        /// <summary>
-        /// Convert UserInfo to User, used in multiple files so made extension
-        /// </summary>
-        /// <param name="userInfo"></param>
-        /// <returns></returns>
-        public static User ToUser(this MemberInfo userInfo)
-        {
-            return new User(
-                userID: userInfo.MemberID,
-                userName: userInfo.MemberName,
-                userGUID: userInfo.MemberGuid,
-                email: userInfo.MemberEmail,
-                enabled: userInfo.MemberEnabled,
-                isExternal: userInfo.MemberIsExternal,
-                isPublic: userInfo.MemberName.Equals("public", StringComparison.OrdinalIgnoreCase)
-                ) {
-            };
-        }
-    }
-
-    public static class UserExtensions
-    {
-        public static ApplicationUser ToApplicationUser(this User user)
-        {
-            var appUser = new ApplicationUser() {
-                UserName = user.UserName,
-                Enabled = user.Enabled,
-                Email = user.Email,
-                IsExternal = user.IsExternal,
-            };
-            if(user.UserID.TryGetValue(out var userId)) {
-                appUser.Id = userId;
-            }
-
-            return appUser;
         }
     }
 }

@@ -9,6 +9,12 @@
         Task<bool> IsEditModeAsync();
 
         /// <summary>
+        /// If the current page is in preview mode
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> IsPreviewModeAsync();
+
+        /// <summary>
         /// Gets the current Page Identity if the request was derived from routing
         /// </summary>
         /// <returns></returns>

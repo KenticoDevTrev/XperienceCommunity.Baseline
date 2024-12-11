@@ -21,7 +21,7 @@ namespace Account.Repositories.Implementations
                 {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
-                return await _roleInfoProvider.GetAsync(roleName, await _siteRepository.GetSiteIDAsync(siteName));
+                return await _roleInfoProvider.GetAsync(roleName, _siteRepository.GetChannelID(siteName).GetValueOrDefault(0));
             }, new CacheSettings(60, "GetRoleAsync", roleName, siteName));
 
             if (role != null)

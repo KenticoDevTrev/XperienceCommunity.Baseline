@@ -68,9 +68,10 @@ namespace Account.Services
         /// <summary>
         /// Resets the password of the given user
         /// </summary>
-        /// <param name="userName">The Username</param>
-        /// <param name="password">The password to reset it to</param>
-        Task ResetPasswordAsync(User user, string password);
+        /// <param name="user">The Username</param>
+        /// <param name="newPassword">The password to reset it to</param>
+        /// <param name="currentPassword">the current password, must match</param>
+        Task ResetPasswordAsync(User user, string newPassword, string currentPassword);
 
         /// <summary>
         /// Validates that the given password passes the site's Password Policy

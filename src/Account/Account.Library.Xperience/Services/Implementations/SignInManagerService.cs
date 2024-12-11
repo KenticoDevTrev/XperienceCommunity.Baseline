@@ -4,16 +4,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 namespace Account.Services.Implementations
 {
-    public class SignInManagerService(
-        UserManager<ApplicationUser> _userManager,
-        SignInManager<ApplicationUser> _signInManager) : ISignInManagerService
+    public class SignInManagerService<TUser>(
+        UserManager<TUser> UserManager,
+        SignInManager<TUser> SignInManager) : ISignInManagerService where TUser : ApplicationUser, new()
     {
+        private readonly UserManager<TUser> _userManager = UserManager;
+        private readonly SignInManager<TUser> _signInManager = SignInManager;
 
         public async Task<bool> IsTwoFactorClientRememberedByNameAsync(string userName) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByNameAsync(userName));
         public async Task<bool> IsTwoFactorClientRememberedByEmailAsync(string email) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByEmailAsync(email));
         public async Task<bool> IsTwoFactorClientRememberedByIdAsync(string userId) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByIdAsync(userId));
         public async Task<bool> IsTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey) => await IsTwoFactorClientRememberedAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey));
-        private async Task<bool> IsTwoFactorClientRememberedAsync(ApplicationUser? applicationUser)
+        private async Task<bool> IsTwoFactorClientRememberedAsync(TUser? applicationUser)
         {
             if (applicationUser == null) {
                 return false;
@@ -21,11 +23,23 @@ namespace Account.Services.Implementations
             return await _signInManager.IsTwoFactorClientRememberedAsync(applicationUser);
         }
 
+        public async Task RememberTwoFactorClientRememberedByNameAsync(string userName) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByNameAsync(userName));
+        public async Task RememberTwoFactorClientRememberedByEmailAsync(string email) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByEmailAsync(email));
+        public async Task RememberTwoFactorClientRememberedByIdAsync(string userId) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByIdAsync(userId));
+        public async Task RememberTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey));
+        private async Task RememberTwoFactorClientRememberedAsync(TUser? applicationUser)
+        {
+            if (applicationUser == null) {
+                return;
+            }
+            await _signInManager.RememberTwoFactorClientAsync(applicationUser);
+        }
+
         public async Task SignInByNameAsync(string userName, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByNameAsync(userName), stayLoggedIn);
         public async Task SignInByEmailAsync(string email, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByEmailAsync(email), stayLoggedIn);
         public async Task SignInByIdAsync(string userId, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByIdAsync(userId), stayLoggedIn);
         public async Task SignInByLoginAsync(string loginProvider, string providerKey, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey), stayLoggedIn);
-        private async Task SignInAsync(ApplicationUser? applicationUser, bool stayLoggedIn)
+        private async Task SignInAsync(TUser? applicationUser, bool stayLoggedIn)
         {
             if (applicationUser == null) {
                 return;
@@ -36,7 +50,7 @@ namespace Account.Services.Implementations
         public async Task<SignInResult> PasswordSignInByNameAsync(string userName, string password, bool stayLoggedIn, bool lockoutOnFailure) => await PasswordSignInAsync(await _userManager.FindByNameAsync(userName), password, stayLoggedIn, lockoutOnFailure);
         public async Task<SignInResult> PasswordSignInByEmailAsync(string email, string password, bool stayLoggedIn, bool lockoutOnFailure) => await PasswordSignInAsync(await _userManager.FindByEmailAsync(email), password, stayLoggedIn, lockoutOnFailure);
         public async Task<SignInResult> PasswordSignInByIdAsync(string userId, string password, bool stayLoggedIn, bool lockoutOnFailure) => await PasswordSignInAsync(await _userManager.FindByIdAsync(userId), password, stayLoggedIn, lockoutOnFailure);
-        private async Task<SignInResult> PasswordSignInAsync(ApplicationUser? applicationUser, string password, bool stayLoggedIn, bool lockoutOnFailure)
+        private async Task<SignInResult> PasswordSignInAsync(TUser? applicationUser, string password, bool stayLoggedIn, bool lockoutOnFailure)
         {
             if (applicationUser == null) {
                 return SignInResult.Failed;

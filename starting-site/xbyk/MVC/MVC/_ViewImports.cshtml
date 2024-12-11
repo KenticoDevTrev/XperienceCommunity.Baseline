@@ -4,15 +4,15 @@
 @using Microsoft.Extensions.Localization
 @using CSharpFunctionalExtensions
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject IUrlHelper Url
 @*
-@inject IUrlResolver UrlResolver
+    @inject IUrlResolver UrlResolver
 *@
 @*  Kentico *@
 @using CMS.Helpers
 @using Kentico.Web.Mvc
 @using Kentico.Content.Web.Mvc
 @using Kentico.PageBuilder.Web.Mvc
+@using Kentico.Content.Web.Mvc.PageBuilder
 @addTagHelper *, Kentico.Content.Web.Mvc
 
 @* Baseline Core*@
@@ -24,7 +24,7 @@
 @using Core.Extensions
 @using Core.Middleware
 @using MVCCaching
-@*
+
 @inject ICacheDependenciesScope CacheScope
 @inject ICacheRepositoryContext CacheContext
 @inject IPageContextRepository PageContextRepository
@@ -33,24 +33,21 @@
 @inject IPageIdentityFactory PageIdentityFactory
 
 @addTagHelper *, XperienceCommunity.Baseline.Core.RCL
-@addTagHelper *, XperienceCommunity.Baseline.Core.RCL.KX13
+@addTagHelper *, XperienceCommunity.Baseline.Core.RCL.Xperience
 @addTagHelper *, XperienceCommunity.PageBuilderTagHelpers
-*@
 
 @*  Site *@
 
 @addTagHelper *, MVC
-@*
 @addTagHelper *, Site.Components
+
+@* Navigation
+    @addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
+    @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
+    @addTagHelper *, XperienceCommunity.Baseline.Navigation.KX13.RCL
 *@
 
-@* Navigation 
-@addTagHelper *, PartialWidgetPage.Kentico.MVC.Core
-@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
-@addTagHelper *, XperienceCommunity.Baseline.Navigation.KX13.RCL
-*@
-
-@* Widget Filter 
-@addTagHelper *, XperienceCommunity.WidgetFilter
+@* Widget Filter
+    @addTagHelper *, XperienceCommunity.WidgetFilter
 *@
 
