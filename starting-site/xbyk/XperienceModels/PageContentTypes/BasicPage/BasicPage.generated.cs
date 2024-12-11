@@ -73,11 +73,15 @@ namespace Generic
 		/// </summary>
 		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
 
+        /// <summary>
+        /// MetaData_NoIndex.
+        /// </summary>
+        public bool MetaData_NoIndex { get; set; }
 
-		/// <summary>
-		/// PageRedirectionType.
-		/// </summary>
-		public string PageRedirectionType { get; set; }
+        /// <summary>
+        /// PageRedirectionType.
+        /// </summary>
+        public string PageRedirectionType { get; set; }
 
 
 		/// <summary>

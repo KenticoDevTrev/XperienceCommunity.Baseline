@@ -1,13 +1,12 @@
 ﻿using CMS.Membership;
 using Kentico.Membership;
 
-
 namespace Core.Services
 {
-    public interface IBaselineUserMapper<TUser, TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
+    public interface IBaselineUserMapper<TUser> where TUser : ApplicationUser, new()
     {
-        Task<TGenericUser> ToUser(UserInfo memberInfo);
+        Task<User> ToUser(UserInfo userInfo);
 
-        Task<TUser> ToApplicationUser(TGenericUser user);
+        Task<TUser> ToApplicationUser(User user);
     }
 }

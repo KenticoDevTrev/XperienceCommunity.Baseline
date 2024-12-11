@@ -49,6 +49,12 @@ namespace Account.Repositories.Implementations
             return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountLoginUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
         }
 
+        public async Task<string> GetAccountTwoFormAuthenticationUrlAsync(string fallBackUrl)
+        {
+            _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());
+            return _urlResolver.ResolveUrl((await _channelCustomSettingsRepository.GetSettingsModel<AccountChannelSettings>()).AccountTwoFormAuthenticationUrl.AsNullOrWhitespaceMaybe().GetValueOrDefault(fallBackUrl));
+        }
+
         public async Task<string> GetAccountRegistrationUrlAsync(string fallBackUrl)
         {
             _cacheDependencyBuilderFactory.Create().AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<AccountChannelSettings>());

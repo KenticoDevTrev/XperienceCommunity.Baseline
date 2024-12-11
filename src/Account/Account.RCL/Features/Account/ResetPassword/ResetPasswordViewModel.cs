@@ -25,14 +25,16 @@ namespace Account.Features.Account.ResetPassword
         public string Error { get; set; } = string.Empty;
 
         public bool? Succeeded { get; set; }
+        public bool IsExternal { get; set; }
+        public string MyAccountUrl { get; set; } = string.Empty;
     }
 
-    public class ResetPasswordValidator<TGenericUser> : AbstractValidator<ResetPasswordViewModel> where TGenericUser : User, new()
+    public class ResetPasswordValidator : AbstractValidator<ResetPasswordViewModel> 
     {
 
         public ResetPasswordValidator(IAccountSettingsRepository _accountSettingsRepository,
-            IUserRepository<TGenericUser> _userRepository,
-            IUserService<TGenericUser> _userService
+            IUserRepository _userRepository,
+            IUserService _userService
             )
         {
             var passwordSettings = _accountSettingsRepository.GetPasswordPolicy();

@@ -13,5 +13,6 @@ namespace Account.Features.Account.LogIn
         [Display(Name = "Remember Device")]
         public bool RememberComputer { get; init; } = false;
         public bool Failure { get; set; } = false;
+        public string LoginUrl { get; init; } = string.Empty;
     }
 }

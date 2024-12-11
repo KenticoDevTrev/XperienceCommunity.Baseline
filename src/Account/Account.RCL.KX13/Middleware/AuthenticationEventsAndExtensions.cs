@@ -13,12 +13,11 @@ namespace Account
         public static WebApplicationBuilder AddBaselineAccountRcl<TGenericUser>(this WebApplicationBuilder builder)
             where TGenericUser : User, new()
         {
-
             // Register Validators from Fluent Validation
-            builder.Services.AddScoped<IValidator<BasicUser>, BasicUserValidator<TGenericUser>>()
+            builder.Services.AddScoped<IValidator<BasicUser>, BasicUserValidator>()
                 .AddScoped<IValidator<ForgottenPasswordResetViewModel>, ForgottenPasswordResetViewModelValidator>()
-                .AddScoped<IValidator<RegistrationViewModel>, RegistrationViewModelValidator<TGenericUser>>()
-                .AddScoped<IValidator<ResetPasswordViewModel>, ResetPasswordValidator<TGenericUser>>();
+                .AddScoped<IValidator<RegistrationViewModel>, RegistrationViewModelValidator>()
+                .AddScoped<IValidator<ResetPasswordViewModel>, ResetPasswordValidator>();
 
             return builder;
         }

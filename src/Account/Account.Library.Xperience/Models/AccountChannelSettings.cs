@@ -16,6 +16,9 @@ namespace Account.Models
         [XperienceSettingsData("Baseline.Account.AccountLoginUrl", "")]
         public virtual string AccountLoginUrl { get; set; } = string.Empty;
 
+        [XperienceSettingsData("Baseline.Account.AccountTwoFormAuthenticationUrl", "")]
+        public virtual string AccountTwoFormAuthenticationUrl { get; set; } = string.Empty;
+
         [XperienceSettingsData("Baseline.Account.AccountMyAccountUrl", "")]
         public virtual string AccountMyAccountUrl { get; set; } = string.Empty;
 

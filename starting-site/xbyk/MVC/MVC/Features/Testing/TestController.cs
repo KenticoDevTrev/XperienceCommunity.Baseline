@@ -1,13 +1,11 @@
-﻿using CMS.ContentEngine;
+﻿using Account.Services;
+using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
-using Core.Interfaces;
-using Core.Repositories;
-using Core.Services;
 using Generic;
-using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
+using System.Data;
 using Testing;
-using XperienceCommunity;
 using XperienceCommunity.Authorization;
 using XperienceCommunity.MemberRoles;
 using XperienceCommunity.MemberRoles.Models;
@@ -20,8 +18,10 @@ namespace MVC.Features.Testing
         IContentQueryResultMapper contentQueryResultMapper,
         IMemberAuthenticationContext memberAuthenticationContext,
         IRoleStore<TagApplicationUserRole> roleStore,
-        IUserRoleStore<ApplicationUser> userRoleStore,
-        IUserStore<ApplicationUser> userStore
+        IUserRoleStore<ApplicationUserBaseline> userRoleStore,
+        IUserStore<ApplicationUserBaseline> userStore,
+        IHttpContextAccessor httpContextAccessor,
+        UserManager<ApplicationUserBaseline> userManager
         ) : Controller
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
@@ -29,13 +29,42 @@ namespace MVC.Features.Testing
         private readonly IContentQueryResultMapper _contentQueryResultMapper = contentQueryResultMapper;
         private readonly IMemberAuthenticationContext _memberAuthenticationContext = memberAuthenticationContext;
         private readonly IRoleStore<TagApplicationUserRole> _roleStore = roleStore;
-        private readonly IUserRoleStore<ApplicationUser> _userRoleStore = userRoleStore;
-        private readonly IUserStore<ApplicationUser> _userStore = userStore;
+        private readonly IUserRoleStore<ApplicationUserBaseline> _userRoleStore = userRoleStore;
+        private readonly IUserStore<ApplicationUserBaseline> _userStore = userStore;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly UserManager<ApplicationUserBaseline> _userManager = userManager;
+
+        public async Task<string> Index()
+        {
+            var username = "public";
+            var authenticated = false;
+            var roles = new List<string>();
+
+            var context = _httpContextAccessor.HttpContext;
+            if (context is not null) {
+                var identity = context.User.Identities.FirstOrDefault();
+                if (identity is not null && identity.Name is not null) {
+                    username = identity.Name;
+                    authenticated = identity.IsAuthenticated;
+                }
+                var user = (await _userManager.GetUserAsync(context.User));
+                if (user != null) {
+                    roles.AddRange((await _userRoleStore.GetRolesAsync(user, CancellationToken.None)).Select(x => x.ToLowerInvariant()));
+                }
+            }
+
+            // Just double checking for public to set not authenticated, roles may still apply if there is customization to set roles on the public user i suppose
+            if (username.Equals("public", StringComparison.OrdinalIgnoreCase)) {
+                authenticated = false;
+            }
+            return string.Empty;
+        }
 
 
         [ControllerActionAuthorization(AuthorizationType.ByAuthenticated)]
-        public async Task<string> Index()
+        public async Task<string> MemberRoleTest()
         {
+
             var testMember = await _userStore.FindByNameAsync("TestMember", CancellationToken.None);
             var roles = await _userRoleStore.GetRolesAsync(testMember, CancellationToken.None);
             var studentRoleStatus = await _roleStore.CreateAsync(new TagApplicationUserRole() {
@@ -43,9 +72,9 @@ namespace MVC.Features.Testing
                 NormalizedName = "testnewrole"
             }, CancellationToken.None);
 
-            if(studentRoleStatus.Succeeded) {
+            if (studentRoleStatus.Succeeded) {
                 var newRole = await _roleStore.FindByNameAsync("TestNewRole", CancellationToken.None);
-                if(newRole != null) {
+                if (newRole != null) {
                     await _userRoleStore.AddToRoleAsync(testMember, "students", CancellationToken.None);
                 }
             } else {
@@ -74,7 +103,7 @@ namespace MVC.Features.Testing
                 // Important to use the _ContentQueryResultMapper to map your items so the IMemberAuthorizationFilter.RemoveUnauthorizedItems can do type checking
                 if (selector.ContentTypeName.Equals(BasicPage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
                     return _contentQueryResultMapper.Map<BasicPage>(selector);
-                } else if(selector.ContentTypeName.Equals(WebPage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
+                } else if (selector.ContentTypeName.Equals(WebPage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
                     return _contentQueryResultMapper.Map<WebPage>(selector);
                 }
                 return selector as IContentItemFieldsSource;

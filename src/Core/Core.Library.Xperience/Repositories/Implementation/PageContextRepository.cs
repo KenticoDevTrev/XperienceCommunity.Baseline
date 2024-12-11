@@ -1,4 +1,5 @@
-﻿using Kentico.Content.Web.Mvc;
+﻿using CMS.Websites.Routing;
+using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
 using System.Data;
@@ -13,7 +14,8 @@ namespace Core.Repositories.Implementation
         IUrlResolver urlResolver,
         IIdentityService identityService,
         ILanguageFallbackRepository languageFallbackRepository,
-        IPreferredLanguageRetriever preferredLanguageRetriever
+        IPreferredLanguageRetriever preferredLanguageRetriever,
+        IWebsiteChannelContext websiteChannelContext
         ) : IPageContextRepository
     {
         private readonly IWebPageDataContextRetriever _webPageDataContextRetriever = webPageDataContextRetriever;
@@ -25,6 +27,7 @@ namespace Core.Repositories.Implementation
         private readonly IIdentityService _identityService = identityService;
         private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
+        private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
 
         public async Task<Result<PageIdentity>> GetCurrentPageAsync() => _webPageDataContextRetriever.TryRetrieve(out var data) ? await GetPageInternal(data.WebPage.WebPageItemID, data.WebPage.LanguageName) : Result.Failure<PageIdentity>("There is no current webpage context");
 
@@ -46,6 +49,8 @@ namespace Core.Repositories.Implementation
         }
 
         public Task<bool> IsEditModeAsync() => Task.FromResult(_pageBuilderDataContextRetriever.Retrieve().EditMode);
+
+        public Task<bool> IsPreviewModeAsync() => Task.FromResult(_websiteChannelContext.IsPreview);
 
         private async Task<Result<PageIdentity>> GetPageInternal(int webPageItemID, string? language = null)
         {

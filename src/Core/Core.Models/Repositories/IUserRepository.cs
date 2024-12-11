@@ -36,41 +36,4 @@
         /// <returns></returns>
         Task<Result<User>> GetUserAsync(Guid userGuid);
     }
-
-    public interface IUserRepository<TGenericUser> where TGenericUser : User, new()
-    {
-        /// <summary>
-        /// Gets the current User (Public if not found)
-        /// </summary>
-        /// <returns></returns>
-        Task<TGenericUser> GetCurrentUserAsync();
-
-        /// <summary>
-        /// Gets the given user by user ID
-        /// </summary>
-        /// <param name="userID"></param>
-        /// <returns></returns>
-        Task<Result<TGenericUser>> GetUserAsync(int userID);
-
-        /// <summary>
-        /// Gets the given user by username
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <returns></returns>
-        Task<Result<TGenericUser>> GetUserAsync(string userName);
-
-        /// <summary>
-        /// Gets the given user by email
-        /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
-        Task<Result<TGenericUser>> GetUserByEmailAsync(string email);
-
-        /// <summary>
-        /// Gets the given user by user GUID
-        /// </summary>
-        /// <param name="userGuid"></param>
-        /// <returns></returns>
-        Task<Result<TGenericUser>> GetUserAsync(Guid userGuid);
-    }
 }

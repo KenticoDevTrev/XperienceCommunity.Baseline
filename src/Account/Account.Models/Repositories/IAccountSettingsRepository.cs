@@ -39,6 +39,13 @@
         Task<string> GetAccountLoginUrlAsync(string fallBackUrl);
 
         /// <summary>
+        /// Get Two Form Authentication
+        /// </summary>
+        /// <param name="fallBackUrl"></param>
+        /// <returns></returns>
+        Task<string> GetAccountTwoFormAuthenticationUrlAsync(string fallBackUrl);
+
+        /// <summary>
         /// Get Account Log out Url
         /// </summary>
         /// <param name="fallBackUrl"></param>

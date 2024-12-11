@@ -3,8 +3,10 @@ using Core.KX13.Repositories.Implementation;
 using Core.Repositories.Implementation;
 using Core.Services.Implementations;
 using Kentico.Membership;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using MVC.NewFolder;
 using Logger = Core.Services.Implementation.Logger;
 
 namespace Core
@@ -17,9 +19,21 @@ namespace Core
             return services.AddCoreBaseline<ApplicationUser, User>();
         }
 
+        /// <summary>
+        /// Configures the Core Baseline
+        /// </summary>
+        /// <typeparam name="TUser">The User object used to identify the application's site user, usually ApplicationUser unless you extend it</typeparam>
+        /// <typeparam name="TGenericUser">The generic User object used to identify the Application's site user, usually User unless you extend it</typeparam>
+        /// <param name="services">The service collection</param>
+        /// <param name="persistantStorageConfiguration">Configures the cookies for either TempData, Session, or neither.
+        /// 
+        /// Should specify this if you plan on using the IModelStateService for Post-Redirect-Get or anything regarding TempData or Session.
+        /// 
+        /// If using session, make sure define and pick your Session Storage mechanism (ex Memory, SQL, Redis Cache, etc) and Add it, and call the app.UseSession() to enable.
+        /// </param>
+        /// <returns></returns>
         public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services,
-            Action<CookieTempDataProviderOptions>? tempDataCookieConfigurations = null,
-            string tempDataCookieName = "TEMPDATA"
+            IPersistantStorageConfiguration? persistantStorageConfiguration = null
             ) where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
             // Add MVC Caching which Core depends on
@@ -38,34 +52,58 @@ namespace Core
 
                 // Some internal APIs
                 .AddScoped<IPageContextRepository, PageContextRepository>()
+                .AddScoped<IMetaDataRepository, MetaDataRepository>()
+
 
                 // User Customization Points
-                .AddScoped<IBaselineUserMapper<TUser, TGenericUser>, BaselineUserMapper<TUser, TGenericUser>>()
+                .AddScoped<IBaselineUserMapper<TUser>, BaselineUserMapper<TUser>>()
                 .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>()
+                .AddScoped<IMetaDataRepository, MetaDataRepository>()
 
                 // Main item retrieval that depends on baseline apis and user customizations
-                .AddScoped<IUserRepository<TGenericUser>, UserRepository<TUser, TGenericUser>>()
+                .AddScoped<IUserRepository, UserRepository<TUser>>()
                 .AddScoped<IMediaRepository, MediaRepository>()
-                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>()
+                .AddScoped<IContentCategoryRepository, ContentCategoryRepository>();
 
                 // Add fallback untyped versions for existing code
-                .AddScoped<IBaselineUserMapper<TUser, User>, BaselineUserMapper<TUser, User>>()
-                .AddScoped<IUserRepository<User>, UserRepository<TUser, User>>()
-                .AddScoped<IUserRepository, UserRepository>()
-                .AddScoped<IMetaDataRepository, MetaDataRepository>();
 
 #pragma warning disable CS0618 // Type or member is obsolete
             services.AddScoped<IPageCategoryRepository, PageCategoryRepository>();
 #pragma warning restore CS0618 // Type or member is obsolete
 
-            // Temp Data Cookie necessary for the TempData to persis with the ModelState logic
-            services.Configure<CookieTempDataProviderOptions>(options => {
-                options.Cookie.Name = tempDataCookieName;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                tempDataCookieConfigurations?.Invoke(options);
-            });
+            if (persistantStorageConfiguration != null) {
+                if (persistantStorageConfiguration is TempDataCookiePersistantStorageConfiguration tempDataConfiguration) {
+                    // Needed for the TempData persistance without session
+                    services.Configure<CookieTempDataProviderOptions>(options => {
+                        options.Cookie = new CookieBuilder() {
+                            Name = tempDataConfiguration.TempDataCookieName,
+                            HttpOnly = true,
+                            SameSite = SameSiteMode.Strict,
+                            SecurePolicy = CookieSecurePolicy.Always,
+                            Expiration = TimeSpan.FromDays(1),
+                            IsEssential = true
+                        };
+                        tempDataConfiguration.TempDataCookieConfigurations?.Invoke(options);
+                    });
+                    CookieHelper.RegisterCookie(tempDataConfiguration.TempDataCookieName, CookieLevel.Essential);
+                }
+                if (persistantStorageConfiguration is SessionPersistantStorageConfiguration sessionPersistantStorageConfiguration) {
+                    services.AddSession(options => {
+                        options.Cookie = new CookieBuilder() {
+                            Name = sessionPersistantStorageConfiguration.SessionCookieName,
+                            HttpOnly = true,
+                            SameSite = SameSiteMode.Strict,
+                            SecurePolicy = CookieSecurePolicy.Always,
+                            Expiration = TimeSpan.FromDays(1),
+                            IsEssential = true
+                        };
+                        options.IdleTimeout = TimeSpan.FromMinutes(60);
+                        sessionPersistantStorageConfiguration.SessionOptionsConfigurations?.Invoke(options);
+                    });
+                    CookieHelper.RegisterCookie(sessionPersistantStorageConfiguration.SessionCookieName, CookieLevel.Essential);
 
-            CookieHelper.RegisterCookie(tempDataCookieName, CookieLevel.Essential);
+                }
+            }
 
             return services;
 
@@ -93,6 +131,16 @@ namespace Core
             .AddSignInManager<SignInManager<ApplicationUser>>();
 
             return services;
+        }
+
+        /// <summary>
+        /// Registers Core Baseline Middleware
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseCoreBaseline(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<PageBuilderModelStateClearer>();
         }
     }
 }

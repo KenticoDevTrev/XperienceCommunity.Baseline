@@ -8,50 +8,18 @@ using System.Web;
 namespace Account.Services.Implementation
 {
     public class UserService<TUser>(
-        IUserService<User> userService) : IUserService where TUser : ApplicationUser, new()
-    {
-        private readonly IUserService<User> _userService = userService;
-
-        public Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(User user, string token) => _userService.ConfirmRegistrationConfirmationTokenAsync(user, token);
-
-        public Task<Result<User>> CreateExternalUser(User user) => _userService.CreateExternalUser(user);
-
-        [Obsolete]
-        public Task CreateExternalUserAsync(User user) => _userService.CreateExternalUserAsync(user);
-
-        public Task<Result<User>> CreateUser(User user, string password, bool enabled = false) => _userService.CreateUser(user, password, enabled);
-
-        [Obsolete]
-        public Task<User> CreateUserAsync(User user, string password, bool enabled = false) => _userService.CreateUserAsync(user, password, enabled);
-
-        public Task ResetPasswordAsync(User user, string password) => _userService.ResetPasswordAsync(user, password);
-
-        public Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string token, string newPassword) => _userService.ResetPasswordFromTokenAsync(user, token, newPassword);
-
-        public Task SendPasswordResetEmailAsync(User user, string confirmationLink) => _userService.SendPasswordResetEmailAsync(user, confirmationLink);
-
-        public Task SendRegistrationConfirmationEmailAsync(User user, string confirmationLink) => _userService.SendRegistrationConfirmationEmailAsync(user, confirmationLink);
-
-        public Task SendVerificationCodeEmailAsync(User actualUser, string token) => _userService.SendVerificationCodeEmailAsync(actualUser, token);
-
-        public Task<bool> ValidatePasswordPolicyAsync(string password) => _userService.ValidatePasswordPolicyAsync(password);
-
-        public Task<bool> ValidateUserPasswordAsync(User user, string password) => _userService.ValidateUserPasswordAsync(user, password);
-    }
-
-    public class UserService<TUser, TGenericUser>(
         IUserInfoProvider _userInfoProvider,
         ApplicationUserManager<ApplicationUser> _userManager,
         IMessageService _emailService,
         IProgressiveCache _progressiveCache,
         ISiteRepository _siteRepository,
         IEventLogService _eventLogService,
-        IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper) : IUserService<TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
+        IBaselineUserMapper<TUser> _baselineUserMapper) : IUserService where TUser : ApplicationUser, new()
     {
 
-        public async Task<TGenericUser> CreateUserAsync(TGenericUser user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).Value;
+        public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).Value;
 
-        public async Task SendRegistrationConfirmationEmailAsync(TGenericUser user, string confirmationUrl)
+        public async Task SendRegistrationConfirmationEmailAsync(User user, string confirmationUrl)
         {
             var appUser = await _userManager.FindByNameAsync(user.UserName);
             if(appUser == null)
@@ -66,7 +34,7 @@ namespace Account.Services.Implementation
                 string.Format($"Please confirm your new account by clicking <a href=\"{confirmationUrl}?userId={user.UserGUID}&token={HttpUtility.UrlEncode(token)}\">here</a>"));
         }
 
-        public async Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(TGenericUser user, string token)
+        public async Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(User user, string token)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null)
@@ -77,7 +45,7 @@ namespace Account.Services.Implementation
             return await _userManager.ConfirmEmailAsync(appUser, token);
         }
 
-        public async Task SendPasswordResetEmailAsync(TGenericUser user, string confirmationLink)
+        public async Task SendPasswordResetEmailAsync(User user, string confirmationLink)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null)
@@ -92,7 +60,7 @@ namespace Account.Services.Implementation
                 $"A Password reset request has been generated for your account.  If you have generated this request, you may reset your password by clicking <a href=\"{confirmationLink}?userId={user.UserGUID}&token={HttpUtility.UrlEncode(token)}\">here</a>.");
         }
 
-        public async Task<IdentityResult> ResetPasswordFromTokenAsync(TGenericUser user, string token, string newPassword)
+        public async Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string token, string newPassword)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null)
@@ -103,13 +71,13 @@ namespace Account.Services.Implementation
             return await _userManager.ResetPasswordAsync(appUser, token, newPassword);
         }
 
-        public async Task<bool> ValidateUserPasswordAsync(TGenericUser user, string password)
+        public async Task<bool> ValidateUserPasswordAsync(User user, string password)
         {
             var userInfoObj = await GetUserInfoAsync(user.UserName);
             return UserInfoProvider.ValidateUserPassword(userInfoObj, password);
         }
 
-        public Task ResetPasswordAsync(TGenericUser user, string password)
+        public Task ResetPasswordAsync(User user, string password)
         {
             UserInfoProvider.SetPassword(user.UserName, password, true);
             return Task.CompletedTask;
@@ -132,16 +100,16 @@ namespace Account.Services.Implementation
             }, new CacheSettings(15, "GetUserInfoAsync", userName));
         }
 
-        public Task CreateExternalUserAsync(TGenericUser user) => CreateExternalUser(user);
+        public Task CreateExternalUserAsync(User user) => CreateExternalUser(user);
 
-        public async Task SendVerificationCodeEmailAsync(TGenericUser user, string token)
+        public async Task SendVerificationCodeEmailAsync(User user, string token)
         {
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmailAsync(user.Email, "Verification Code",
                 $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>");
         }
 
-        public async Task<Result<TGenericUser>> CreateUser(TGenericUser user, string password, bool enabled = false)
+        public async Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
         {
             // Create basic user
             var newUser = new UserInfo() {
@@ -160,7 +128,7 @@ namespace Account.Services.Implementation
             return Result.Success(await _baselineUserMapper.ToUser(newUser));
         }
 
-        public async Task<Result<TGenericUser>> CreateExternalUser(TGenericUser user)
+        public async Task<Result<User>> CreateExternalUser(User user)
         {
             // Create basic user
             var newUser = new UserInfo() {

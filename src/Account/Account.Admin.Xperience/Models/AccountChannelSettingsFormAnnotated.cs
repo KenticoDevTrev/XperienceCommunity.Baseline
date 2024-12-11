@@ -44,22 +44,25 @@ namespace Account.Admin.Xperience.Models
         [TextInputComponent(Label = "Log in Url", Order = 4, ExplanationText = "Url to the Account page with \"Log In\" template, if not provided will use the default /Account/LogIn")]
         public override string AccountLoginUrl { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "My Account Url", Order = 5, ExplanationText = "Url to the Account page with \"My Account\" template, if not provided will use the default /Account/MyAccount")]
+        [TextInputComponent(Label = "Two Form Authentication Url", Order = 5, ExplanationText = "Url to the Account page with \"Two Form Authentication\" template, if not provided will use the default /Account/TwoFormAuthentication")]
+        public override string AccountTwoFormAuthenticationUrl { get; set; } = string.Empty;
+
+        [TextInputComponent(Label = "My Account Url", Order = 6, ExplanationText = "Url to the Account page with \"My Account\" template, if not provided will use the default /Account/MyAccount")]
         public override string AccountMyAccountUrl { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "Reset Password Url", Order = 6, ExplanationText = "Url to the Account page with \"Reset Password\" template, if not provided will use the default /Account/ResetPassword")]
+        [TextInputComponent(Label = "Reset Password Url", Order = 7, ExplanationText = "Url to the Account page with \"Reset Password\" template, if not provided will use the default /Account/ResetPassword")]
         public override string AccountResetPassword { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "Log Out Url", Order = 7, ExplanationText = "Url to the Account page with \"Log Out\" template, if not provided will use the default /Account/LogOut")]
+        [TextInputComponent(Label = "Log Out Url", Order = 8, ExplanationText = "Url to the Account page with \"Log Out\" template, if not provided will use the default /Account/LogOut")]
         public override string AccountLogOutUrl { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "Forgot Password Url", Order = 8, ExplanationText = "Url to the Account page with \"Forgot Password\" template, if not provided will use the default /Account/ForgotPassword")]
+        [TextInputComponent(Label = "Forgot Password Url", Order = 9, ExplanationText = "Url to the Account page with \"Forgot Password\" template, if not provided will use the default /Account/ForgotPassword")]
         public override string AccountForgotPasswordUrl { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "Forgotten Password Reset Url", Order = 9, ExplanationText = "Url to the Account page with \"Forgotten Password Reset\" template, if not provided will use the default /Account/ForgottenPasswordReset")]
+        [TextInputComponent(Label = "Forgotten Password Reset Url", Order = 10, ExplanationText = "Url to the Account page with \"Forgotten Password Reset\" template, if not provided will use the default /Account/ForgottenPasswordReset")]
         public override string AccountForgottenPasswordResetUrl { get; set; } = string.Empty;
 
-        [TextInputComponent(Label = "Access Denied Url", Order = 10, ExplanationText = "Url when someone is logged in but is denied access to the page. If not provided will use the default /error/403 (or whatever your 403 error handling page is)")]
+        [TextInputComponent(Label = "Access Denied Url", Order = 11, ExplanationText = "Url when someone is logged in but is denied access to the page. If not provided will use the default /error/403 (or whatever your 403 error handling page is)")]
         public override string AccessDeniedUrl { get; set; } = string.Empty;
 
     }

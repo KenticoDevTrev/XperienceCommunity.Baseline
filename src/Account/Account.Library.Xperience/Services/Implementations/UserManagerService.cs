@@ -90,5 +90,15 @@ namespace Account.Services.Implementations
             }
             return updateUser;
         }
+
+        public async Task<string> GetSecurityStampAsync(string userName)
+        {
+            var applicationUser = await _userManager.FindByNameAsync(userName);
+            if(applicationUser != null) {
+                return await _userManager.GetSecurityStampAsync(applicationUser);
+            }
+            // fake one
+            return Guid.NewGuid().ToString().Replace("-","");
+        }
     }
 }

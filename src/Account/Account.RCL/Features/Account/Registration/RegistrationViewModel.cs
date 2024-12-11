@@ -28,9 +28,17 @@ namespace Account.Features.Account.Registration
             User = new BasicUser();
         }
     }
-    public class RegistrationViewModelValidator<TGenericUser> : AbstractValidator<RegistrationViewModel> where TGenericUser : User, new()
+
+    [Serializable]
+    public class ResendConfirmationViewModel
     {
-        public RegistrationViewModelValidator(IAccountSettingsRepository _accountSettingsRepository, IUserRepository<TGenericUser> userRepository)
+        public string UserName { get; set; } = string.Empty;
+        public string VerificationCheck { get; set; } = string.Empty;
+    }
+
+    public class RegistrationViewModelValidator : AbstractValidator<RegistrationViewModel>
+    {
+        public RegistrationViewModelValidator(IAccountSettingsRepository _accountSettingsRepository, IUserRepository userRepository)
         {
             var passwordSettings = _accountSettingsRepository.GetPasswordPolicy();
 

@@ -43,7 +43,12 @@ namespace MVC
             });
 
             // Baseline services
-            services.UseCoreBaseline();
+            services.UseCoreBaseline(
+                // TODO: Add once nuget package updated
+                /*persistantStorageConfiguration: new TempDataCookiePersistantStorageConfiguration("TEMPDATA", (configurations) => {
+                    // Configure TempData Cookie
+                }*/
+                );
 
             // Relationships Extended
             services.AddSingleton<IRelationshipExtendedHelper, RelationshipsExtendedHelper>();
@@ -253,6 +258,11 @@ namespace MVC
             // Adds the Site and Culture to the httpContext, can use by calling CustomVaryByHeaders._____() for <cache> tag vary-by-header
             app.UseCustomVaryByHeaders();
 
+        }
+
+        public static void RegisterBaselineCoreMiddleware(IApplicationBuilder app)
+        {
+            app.UseCoreBaseline();
         }
     }
 }

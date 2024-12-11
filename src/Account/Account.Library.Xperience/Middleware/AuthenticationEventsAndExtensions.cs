@@ -8,6 +8,7 @@ using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace Microsoft.AspNetCore.Builder
             });
         }
 
-        public static WebApplicationBuilder AddBaselineAccountAuthentication<TUser, TRole, TGenericUser>(
+        public static WebApplicationBuilder AddBaselineAccountAuthentication<TUser, TRole>(
             this WebApplicationBuilder builder,
             Action<IdentityOptions>? identityOptions = null,
             Action<AuthenticationConfigurations>? authenticationConfigurations = null,
@@ -42,21 +43,13 @@ namespace Microsoft.AspNetCore.Builder
             string defaultAccessDeniedPath = "/Error/403") 
             where TUser : ApplicationUser, new() 
             where TRole : TagApplicationUserRole, new() 
-            where TGenericUser : User, new()
         {
-            // Register IUserService Fallback with normal User
-            builder.Services.AddScoped<IUserService<User>, UserService<TUser, User>>()
-                .AddScoped<IUserService, UserService<TUser>>();
-
             // Register DI
             builder.Services.AddScoped<IAccountSettingsRepository, AccountSettingsRepository>()
                 .AddScoped<IRoleRepository, RoleRepository<TUser, TRole>>()
                 .AddScoped<IRoleService, RoleService<TUser, TRole>>()
                 .AddScoped<ISignInManagerService, SignInManagerService<TUser>>()
                 .AddScoped<IUserManagerService, UserManagerService<TUser>>()
-                .AddScoped<IUserService<TGenericUser>, UserService<TUser, TGenericUser>>()
-
-                // Add Generic Fallback
                 .AddScoped<IUserService, UserService<TUser>>();
 
             // Baseline Configuration of External Authentication
@@ -223,7 +216,7 @@ namespace Microsoft.AspNetCore.Builder
 
     }
 
-    public class SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : OAuthEvents
+    public class SiteSettingsTwitterOauthAuthenticationEvents(IAccountSettingsRepository _accountSiteSettingsRepository) : TwitterEvents
     {
         public override async Task AccessDenied(AccessDeniedContext context)
         {

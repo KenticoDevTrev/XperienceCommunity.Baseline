@@ -50,6 +50,8 @@ namespace MVC
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            StartupConfig.RegisterBaselineCoreMiddleware(app);
+
             StartupConfig.RegisterDotNetCoreConfigurationsAndKentico(app, Environment, Configuration);
 
             RouteConfig.RegisterRoutes(app, Environment, Configuration);

@@ -12,8 +12,38 @@ namespace Core.Repositories.Implementation
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IUrlResolver _urlResolver,
         IPageUrlRetriever _pageUrlRetriever,
-        IUrlHelper _urlHelper) : IMetaDataRepository
+        IUrlHelper _urlHelper,
+        IIdentityService identityService) : IMetaDataRepository
     {
+        private readonly IIdentityService _identityService = identityService;
+
+        public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
+        {
+            if(!(await treeCultureIdentity.GetOrRetrievePageID(_identityService)).TryGetValue(out var nodeId)) {
+                return Result.Failure<PageMetaData>("No page found by that Tree Culture Identity");
+            }
+
+            var builder = _cacheDependencyBuilderFactory.Create()
+               .Node(nodeId);
+
+            var page = await _pageRetriever.RetrieveAsync<TreeNode>(
+            query => query
+                    .WhereEquals(nameof(TreeNode.NodeID), nodeId)
+                    .Culture(treeCultureIdentity.Culture)
+                    .CombineWithDefaultCulture()
+                    .CombineWithAnyCulture()
+                    .ColumnsSafe(nameof(TreeNode.DocumentCustomData), nameof(TreeNode.DocumentPageTitle), nameof(TreeNode.DocumentPageDescription), nameof(TreeNode.DocumentPageKeyWords))
+                    .TopN(1),
+                cacheSettings => cacheSettings
+                .Configure(builder, CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", nodeId, treeCultureIdentity.Culture)
+            );
+            if (page.Any()) {
+                return await GetMetaDataInternalAsync(page.First(), thumbnail);
+            } else {
+                return Result.Failure<PageMetaData>("No page found by that documentID");
+            }
+        }
+
         public async Task<Result<PageMetaData>> GetMetaDataAsync(int contentCultureId, string? thumbnail = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
@@ -178,5 +208,6 @@ namespace Core.Repositories.Implementation
             }
         }
 
+        
     }
 }

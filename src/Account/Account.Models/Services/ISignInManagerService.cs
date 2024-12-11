@@ -10,6 +10,13 @@ namespace Account.Services
         Task<bool> IsTwoFactorClientRememberedByIdAsync(string userName);
         Task<bool> IsTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey);
 
+        Task RememberTwoFactorClientRememberedByNameAsync(string userName);
+        Task RememberTwoFactorClientRememberedByEmailAsync(string userName);
+        Task RememberTwoFactorClientRememberedByIdAsync(string userName);
+        Task RememberTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey);
+
+
+
         Task SignInByNameAsync(string userName, bool stayLoggedIn);
         Task SignInByEmailAsync(string email, bool stayLoggedIn);
         Task SignInByIdAsync(string userId, bool stayLoggedIn);

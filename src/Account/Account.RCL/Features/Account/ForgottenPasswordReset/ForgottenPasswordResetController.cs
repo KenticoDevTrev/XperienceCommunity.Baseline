@@ -1,4 +1,5 @@
-﻿using Account.Features.Account.LogIn;
+﻿using Account.Features.Account.ForgotPassword;
+using Account.Features.Account.LogIn;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,11 +10,12 @@ namespace Account.Features.Account.ForgottenPasswordReset
         IAccountSettingsRepository _accountSettingsRepository,
         IUserService _userService,
         ILogger _logger,
-        IModelStateService _modelStateService,
-        IValidator<ForgottenPasswordResetViewModel> validator) : Controller
+        IValidator<ForgottenPasswordResetViewModel> validator,
+        IModelStateService modelStateService) : Controller
     {
         public const string _routeUrl = "Account/ForgottenPasswordReset";
         private readonly IValidator<ForgottenPasswordResetViewModel> _validator = validator;
+        private readonly IModelStateService _modelStateService = modelStateService;
 
         /// <summary>
         /// Retrieves the UserGUID and the Token and presents the password reset.
@@ -43,31 +45,34 @@ namespace Account.Features.Account.ForgottenPasswordReset
             {
                 return Redirect(forgottenPasswordResetUrl);
             }
-
             try
             {
-                model.Result = IdentityResult.Failed();
+                model.ResultIdentity = IdentityResult.Failed();
                 var userResult = await _userRepository.GetUserAsync(model.UserID);
                 if (userResult.IsFailure)
                 {
-                    model.Result = IdentityResult.Failed(new IdentityError() { Code = "NoUser", Description = userResult.Error });
+                    model.ResultIdentity = IdentityResult.Failed(new IdentityError() { Code = "NoUser", Description = userResult.Error });
                 }
                 else
                 {
-                    model.Result = await _userService.ResetPasswordFromTokenAsync(userResult.Value, model.Token, model.Password);
+                    model.ResultIdentity = await _userService.ResetPasswordFromTokenAsync(userResult.Value, model.Token, model.Password);
                     model.LoginUrl = await _accountSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl());
                 }
             }
             catch (Exception ex)
             {
-                model.Result = IdentityResult.Failed(new IdentityError() { Code = "Unknown", Description = "An error occurred." });
+                model.ResultIdentity = IdentityResult.Failed(new IdentityError() { Code = "Unknown", Description = "An error occurred." });
                 _logger.LogException(ex, nameof(ForgottenPasswordResetController), "ForgottenPasswordReset", Description: $"For userid {model.UserID}");
             }
 
             // Set this property as the View uses it instead of the IdentityResult, which doesn't serialize/deserialize properly and doesn't make it through the StoreViewModel/GetViewModel
-            model.Succeeded = model.Result.Succeeded;
-            _modelStateService.StoreViewModel(TempData, model);
+            model.Succeeded = model.ResultIdentity.Succeeded;
 
+            // Don't store passwords in TempPassword
+            model.Password = string.Empty;
+            model.PasswordConfirm = string.Empty;
+
+            _modelStateService.StoreViewModel(TempData, model);
             return Redirect(forgottenPasswordResetUrl);
         }
 

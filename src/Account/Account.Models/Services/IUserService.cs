@@ -68,9 +68,10 @@ namespace Account.Services
         /// <summary>
         /// Resets the password of the given user
         /// </summary>
-        /// <param name="userName">The Username</param>
-        /// <param name="password">The password to reset it to</param>
-        Task ResetPasswordAsync(User user, string password);
+        /// <param name="user">The Username</param>
+        /// <param name="newPassword">The password to reset it to</param>
+        /// <param name="currentPassword">the current password, must match</param>
+        Task ResetPasswordAsync(User user, string newPassword, string currentPassword);
 
         /// <summary>
         /// Validates that the given password passes the site's Password Policy
@@ -101,106 +102,5 @@ namespace Account.Services
         /// <param name="token"></param>
         /// <returns></returns>
         Task SendVerificationCodeEmailAsync(User actualUser, string token);
-    }
-
-    public interface IUserService<TGenericUser> where TGenericUser : User, new()
-    {
-        /// <summary>
-        /// Creates a user on the website.
-        /// </summary>
-        /// <param name="user">The User information</param>
-        /// <param name="password">The Password</param>
-        /// <param name="enabled">If they should be enabled right away</param>
-        /// <returns>The UserInfo Object</returns>
-        [Obsolete("Use CreateUser")]
-        Task<TGenericUser> CreateUserAsync(TGenericUser user, string password, bool enabled = false);
-
-        /// <summary>
-        /// Creates a user on the website.
-        /// </summary>
-        /// <param name="user">The User information</param>
-        /// <param name="password">The Password</param>
-        /// <param name="enabled">If they should be enabled right away</param>
-        /// <returns>The UserInfo Object</returns>
-        Task<Result<TGenericUser>> CreateUser(TGenericUser user, string password, bool enabled = false);
-
-
-        /// <summary>
-        /// Sends a Registration Confirmation Email Asyncly to the given User, with the Confirmation link provided
-        /// </summary>
-        /// <param name="user">The User object</param>
-        /// <param name="confirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
-        /// <returns></returns>
-        Task SendRegistrationConfirmationEmailAsync(TGenericUser user, string confirmationLink);
-
-        /// <summary>
-        /// Validates the Token request for the given User
-        /// </summary>
-        /// <param name="UserID">The User's ID</param>
-        /// <param name="token">The Token</param>
-        /// <returns>If the token is valid</returns>
-        Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(TGenericUser user, string token);
-
-        /// <summary>
-        /// Sends a password reset email for the given user
-        /// </summary>
-        /// <param name="user">The User object</param>
-        /// <param name="confirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
-        /// <returns></returns>
-        Task SendPasswordResetEmailAsync(TGenericUser user, string confirmationLink);
-
-        /// <summary>
-        /// Validates and resets the password for the given user and token
-        /// </summary>
-        /// <param name="user">The User's ID</param>
-        /// <param name="token">The Token</param>
-        /// <param name="newPassword">The new password</param>
-        /// <returns>If the operation was successful</returns>
-        Task<IdentityResult> ResetPasswordFromTokenAsync(TGenericUser user, string token, string newPassword);
-
-        /// <summary>
-        /// Validates if the password is valid for the given user
-        /// </summary>
-        /// <param name="user">The user</param>
-        /// <param name="password">the password</param>
-        /// <returns>If it's the correct password</returns>
-        Task<bool> ValidateUserPasswordAsync(TGenericUser user, string password);
-
-        /// <summary>
-        /// Resets the password of the given user
-        /// </summary>
-        /// <param name="userName">The Username</param>
-        /// <param name="password">The password to reset it to</param>
-        Task ResetPasswordAsync(TGenericUser user, string password);
-
-        /// <summary>
-        /// Validates that the given password passes the site's Password Policy
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        Task<bool> ValidatePasswordPolicyAsync(string password);
-
-        /// <summary>
-        /// Creates an external user
-        /// </summary>
-        /// <param name="user">The user</param>
-        /// <returns></returns>
-        [Obsolete("Use CreateExternalUser")]
-        Task CreateExternalUserAsync(TGenericUser user);
-
-        /// <summary>
-        /// Creates an external user
-        /// </summary>
-        /// <param name="user">The user</param>
-        /// <returns></returns>
-        Task<Result<TGenericUser>> CreateExternalUser(TGenericUser user);
-
-        /// <summary>
-        /// Sends the verification token to the given user.
-        /// </summary>
-        /// <param name="actualUser"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        Task SendVerificationCodeEmailAsync(TGenericUser actualUser, string token);
     }
 }

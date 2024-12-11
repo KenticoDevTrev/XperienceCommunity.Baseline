@@ -23,6 +23,18 @@ namespace Account.Services.Implementations
             return await _signInManager.IsTwoFactorClientRememberedAsync(applicationUser);
         }
 
+        public async Task RememberTwoFactorClientRememberedByNameAsync(string userName) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByNameAsync(userName));
+        public async Task RememberTwoFactorClientRememberedByEmailAsync(string email) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByEmailAsync(email));
+        public async Task RememberTwoFactorClientRememberedByIdAsync(string userId) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByIdAsync(userId));
+        public async Task RememberTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey) => await RememberTwoFactorClientRememberedAsync(await _userManager.FindByLoginAsync(loginProvider, providerKey));
+        private async Task RememberTwoFactorClientRememberedAsync(TUser? applicationUser)
+        {
+            if (applicationUser == null) {
+                return;
+            }
+            await _signInManager.RememberTwoFactorClientAsync(applicationUser);
+        }
+
         public async Task SignInByNameAsync(string userName, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByNameAsync(userName), stayLoggedIn);
         public async Task SignInByEmailAsync(string email, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByEmailAsync(email), stayLoggedIn);
         public async Task SignInByIdAsync(string userId, bool stayLoggedIn) => await SignInAsync(await _userManager.FindByIdAsync(userId), stayLoggedIn);

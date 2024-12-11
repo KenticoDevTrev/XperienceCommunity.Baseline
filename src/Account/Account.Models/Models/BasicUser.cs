@@ -28,9 +28,9 @@ namespace Account.Models
         /// Converts a basic user to a user object
         /// </summary>
         /// <returns></returns>
-        public TGenericUser GetUser<TGenericUser>() where TGenericUser : User, new()
+        public User GetUser()
         {
-            return new TGenericUser() {
+            return new User() {
                 UserName = UserName,
                 FirstName = FirstName,
                 LastName = LastName,
@@ -42,10 +42,9 @@ namespace Account.Models
         }
     }
 
-    // TODO: Test if this works...
-    public class BasicUserValidator<TGenericUser> : AbstractValidator<BasicUser> where TGenericUser : User, new()
+    public class BasicUserValidator : AbstractValidator<BasicUser>
     {
-        public BasicUserValidator(IUserRepository<TGenericUser> _userRepository)
+        public BasicUserValidator(IUserRepository _userRepository)
         {
             RuleFor(model => model.UserEmail)
                 .EmailAddress()

@@ -13,9 +13,7 @@ namespace Account.Features.Account.ForgottenPasswordReset
         /// <returns></returns>
         public IViewComponentResult Invoke()
         {
-            // Merge Model State
-            _modelStateService.MergeModelState(ModelState, TempData);
-
+            
             // Get values from Query String
             Maybe<Guid> userId = Maybe.None;
             Maybe<string> token = Maybe.None;
@@ -36,12 +34,16 @@ namespace Account.Features.Account.ForgottenPasswordReset
                 }
             }
 
-            var model = _modelStateService.GetViewModel<ForgottenPasswordResetViewModel>(TempData).GetValueOrDefault(new ForgottenPasswordResetViewModel()
-            {
-                UserID = userId.GetValueOrDefault(Guid.Empty),
-                Token = token.GetValueOrDefault(string.Empty)
-            });
+            // Merge Model State
+            _modelStateService.MergeModelState(ModelState, TempData);
 
+            // Hydrate model State
+            var model = _modelStateService.GetViewModel<ForgottenPasswordResetViewModel>(TempData).GetValueOrDefault(new ForgottenPasswordResetViewModel());
+            model.UserID = userId.GetValueOrDefault(Guid.Empty);
+            model.Token = token.GetValueOrDefault(string.Empty);
+
+            // Clear afterwards
+            _modelStateService.ClearViewModelAfterRequest<ForgottenPasswordResetViewModel>(TempData, _httpContextAccessor);
             return View("/Features/Account/ForgottenPasswordReset/ForgottenPasswordReset.cshtml", model);
         }
     }

@@ -10,7 +10,7 @@ namespace Account.Features.Account.Confirmation
             IsEditMode = isEditMode;
         }
 
-        public Maybe<string> LoginUrl { get; init; }
+        public Maybe<string> LoginUrlMaybe { get; init; }
         public IdentityResult Result { get; init; }
         public bool IsEditMode { get; init; }
     }

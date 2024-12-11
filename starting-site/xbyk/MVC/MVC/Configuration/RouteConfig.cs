@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Kentico.Web.Mvc;
 
 namespace MVC
 {
     public class RouteConfig
     {
+        /// <summary>
+        /// BASELINE CUSTOMIZATION: Starting Site - Adjust Routes below if you want custom routes
+        /// </summary>
+        /// <param name="app"></param>
         public static void RegisterRoutes(WebApplication app)
         {
             // Adds system routes such as HTTP handlers and feature-specific routes

@@ -78,7 +78,7 @@ namespace Navigation.Repositories.Implementations
             {
                 if (cs.Cached)
                 {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(builder.GetKeys().ToArray());
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([.. builder.GetKeys()]);
                 }
                 return new Breadcrumb(linkText: _stringLocalizer.GetString("generic.default.breadcrumbtext"),
                     linkUrl: _stringLocalizer.GetString("generic.default.breadcrumburl")
@@ -91,7 +91,7 @@ namespace Navigation.Repositories.Implementations
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.Object(SettingsKeyInfo.OBJECT_TYPE, "BreadcrumbPageTypes");
 
-            string[] validClassNames = SettingsKeyInfoProvider.GetValue(new SettingsKeyName("BreadcrumbPageTypes", _siteRepository.CurrentSiteID())).ToLower().Split(";,|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] validClassNames = SettingsKeyInfoProvider.GetValue(new SettingsKeyName("BreadcrumbPageTypes", _siteRepository.CurrentChannelID().GetValueOrDefault(0))).ToLower().Split(";,|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             
             // Cache dependency should not extend to the CacheDependenciesStore as only the matching breadcrumbs should apply.

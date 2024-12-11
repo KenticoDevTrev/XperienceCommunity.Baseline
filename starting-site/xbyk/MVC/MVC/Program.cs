@@ -11,6 +11,8 @@ StartupConfigs.RegisterKenticoServices(builder);
 //     options.UseDefaultSystemResponseForPreload = true;
 // });
 
+// BASELINECONFIGURATION: Starting Site - If you want to use Session, also enable below (and configure)
+// StartupConfigs.AddSession(builder);
 
 // Baseline.Core
 StartupConfigs.AddBaselineCore(builder);
@@ -18,21 +20,20 @@ StartupConfigs.AddBaselineCore(builder);
 // Register other interfaces
 StartupConfigs.RegisterInterfaces(builder);
 
-// Optional - If you want Session
-// StartupConfigs.AddSession(builder);
-
-// --- CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH ---- //
+// BASELINECONFIGURATION: Account - CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH
 // Standard Kentico Account / Authorization
-//StartupConfigs.AddStandardKenticoAuthenticationAndControllerViews(builder);
+// StartupConfigs.AddStandardKenticoAuthenticationAndControllerViews(builder);
 // OR
 // Baseline Account / Authorization
 StartupConfigs.AddBaselineAccountAuthenticationAndControllerViews(builder);
 
 var app = builder.Build();
 
+StartupConfigs.RegisterBaselineCoreMiddleware(app);
+
 StartupConfigs.RegisterDotNetCoreConfigurationsAndKentico(app, builder);
 
-// Optional - If you want Session
+// BASELINECONFIGURATION: Starting Site - If you want to use Session, also enable below
 // StartupConfigs.UseSession(app);
 
 RouteConfig.RegisterRoutes(app);

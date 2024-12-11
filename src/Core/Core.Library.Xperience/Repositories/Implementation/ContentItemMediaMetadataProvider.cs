@@ -1,4 +1,5 @@
 ﻿using AngleSharp.Text;
+using CMS.ContentEngine;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -16,7 +17,7 @@ namespace Core.Repositories.Implementation
             /*
             // Can clone and use DI to replace this to do customizations, including doing type casts.  This is often coupled with a custom IContentItemMediaMetadataQueryEditor implementation
             if (contentQueryDataContainer.ContentTypeName.Equals(Generic.File.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
-                Custom.PdfFile file = ContentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
+                Custom.PdfFile file = _contentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
                 // access to data directly with cast.  Can also GetValue without this though.
                 return mediaItem with { MediaTitle = file.FileName };
             }
@@ -30,7 +31,7 @@ namespace Core.Repositories.Implementation
             /*
             // Can clone and use DI to replace this to do customizations, including doing type casts.  This is often coupled with a custom IContentItemMediaMetadataQueryEditor implementation
             if (contentQueryDataContainer.ContentTypeName.Equals(Generic.File.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
-                Custom.PdfFile file = ContentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
+                Custom.PdfFile file = _contentQueryResultMapper.Map<Generic.PdfFile>(contentQueryDataContainer);
                 // access to data directly with cast.  Can also GetValue without this though.
                 return new PdfMediaMetadata(Owner: file.PdfOwner);
             }

@@ -4,33 +4,36 @@ using Kentico.Membership;
 namespace Core.Services.Implementations
 {
     // Base implementation, you can easily implement your own though to extend both the ApplicationUser and the Generic Model to add properties
-    public class BaselineUserMapper<TUser, TGenericUser> : IBaselineUserMapper<TUser, TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
+    public class BaselineUserMapper<TUser> : IBaselineUserMapper<TUser> where TUser : ApplicationUser, new()
     {
-        public Task<TUser> ToApplicationUser(TGenericUser user)
+        public Task<TUser> ToApplicationUser(User userInfo)
         {
             var appUser = new TUser() {
-                UserName = user.UserName,
-                Enabled = user.Enabled,
-                Email = user.Email,
-                IsExternal = user.IsExternal,
-                FirstName = user.FirstName.GetValueOrDefault(string.Empty),
-                LastName = user.LastName.GetValueOrDefault(string.Empty)
+                UserName = userInfo.UserName,
+                Enabled = userInfo.Enabled,
+                Email = userInfo.Email,
+                IsExternal = userInfo.IsExternal,
+                FirstName = userInfo.FirstName.GetValueOrDefault(string.Empty),
+                LastName = userInfo.LastName.GetValueOrDefault(string.Empty)
             };
-            if (user.UserID.TryGetValue(out var userId)) {
-                appUser.Id = userId;
+            if(userInfo.UserID.TryGetValue(out var id)) { 
+                appUser.Id = id;
             }
 
             return Task.FromResult(appUser);
         }
 
-        public Task<TGenericUser> ToUser(UserInfo memberInfo) => Task.FromResult(new TGenericUser() {
-            UserID = memberInfo.UserID,
-            UserName = memberInfo.UserName,
-            UserGUID = memberInfo.UserGUID,
-            Email = memberInfo.Email,
-            Enabled = memberInfo.Enabled,
-            IsExternal = memberInfo.IsExternal,
-            IsPublic = memberInfo.UserName.Equals("public", StringComparison.OrdinalIgnoreCase)
+        public Task<User> ToUser(UserInfo userInfo) => Task.FromResult(new User() {
+            UserID = userInfo.UserID,
+            UserName = userInfo.UserName,
+            UserGUID = userInfo.UserGUID,
+            Email = userInfo.Email,
+            Enabled = userInfo.Enabled,
+            IsExternal = userInfo.IsExternal,
+            IsPublic = userInfo.UserName.Equals("public", StringComparison.OrdinalIgnoreCase),
+            FirstName = userInfo.FirstName.AsNullOrWhitespaceMaybe(),
+            MiddleName = userInfo.MiddleName.AsNullOrWhitespaceMaybe(),
+            LastName = userInfo.LastName.AsNullOrWhitespaceMaybe()
         });
     }
 }

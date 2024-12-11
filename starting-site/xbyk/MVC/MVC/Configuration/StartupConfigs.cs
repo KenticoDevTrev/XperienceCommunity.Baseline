@@ -12,13 +12,20 @@ using Testing;
 using Core;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Identity;
-using Account.Admin.Xperience.Models;
 using Kentico.Xperience.Admin.Base;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Core.Middleware;
-using XperienceModels.Classes.Membership;
 using XperienceCommunity.MemberRoles.Models;
+
+// BASELINE CUSTOMIZATION: Account Module - Added Usings
+using Account.Models;
+using Account.Admin.Xperience.Models;
+using Core.Repositories;
+using Site.Repositories.Implementations;
+using MVC.NewFolder;
+
+// BASELINE CUSTOMIZATION: Account Module - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
                 slug: "member-password-channel-custom-settings",
                 uiPageType: typeof(MemberPasswordChannelSettingsExtender),
@@ -30,6 +37,10 @@ namespace MVC.Configuration
 {
     public static class StartupConfigs
     {
+        /// <summary>
+        /// BASELINE CUSTOMIZATION: Starting Site - Adjust your Kentico features to your site
+        /// </summary>
+        /// <param name="builder"></param>
         public static void RegisterKenticoServices(WebApplicationBuilder builder)
         {
             // Enable desired Kentico Xperience features
@@ -38,8 +49,16 @@ namespace MVC.Configuration
                     ContentTypeNames =
                     [
                         // Enables Page Builder for content types using their generated classes
+
+                        // BASELINE CUSTOMIZATION: Starting Site - If you wish to use the Home and Basic Pages, MUST add it here
                         Home.CONTENT_TYPE_NAME,
-                        BasicPage.CONTENT_TYPE_NAME
+                        BasicPage.CONTENT_TYPE_NAME,
+
+                        // BASELINE CUSTOMIZATION: Navigation - If using Navigation content type, MUST add it here
+                        Generic.Navigation.CONTENT_TYPE_NAME,
+
+                        // BASELINE CUSTOMIZATION: Account - If using Accounts with Account Type, MUST add it here
+                        Generic.Account.CONTENT_TYPE_NAME,
                     ],
                     // Specifies a default section for the page builder feature
                     // If you install BootstrapLayoutTool.PageBuilderContainered.Kentico.MVC.Core package on MVC, you can use below for bootstrap layout tool
@@ -63,6 +82,56 @@ namespace MVC.Configuration
             });
         }
 
+        /// <summary>
+        /// BASELINE CUSTOMIZATION: Core - Configure the below to your site specifications
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddBaselineCore(WebApplicationBuilder builder)
+        {
+            // Modify as needed
+            // NOTE: While you create your own ApplicationUser variant, if you use a Generic User Model other than Core.Model.User as your User type,
+            // then you will NOT be able to leverage the Baseline.Account.RCL, and will need to clone that project, as you have to inject the
+            // IUserService<User> and IUserRepository<User> of the same type you define here, it won't work if the types miss-matched
+            // Additionally, if you use a model other than ApplicationUserWithNames, you'll want to implement and register your own 
+            builder.Services.AddCoreBaseline<ApplicationUserBaseline>(
+                contentItemAssetOptionsConfiguration: (options) => {
+
+                },
+                mediaFileOptionsConfiguration: (options) => {
+
+                },
+                contentItemTaxonomyOptionsConfiguration: (options) => {
+
+                },
+                relationshipsExtendedOptionsConfiguration: (options) => {
+                    options.AllowLanguageSyncConfiguration = true;
+
+                    var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
+                        new (WebPage.CONTENT_TYPE_NAME, [
+                            nameof(WebPage.TestLanguageAgnosticValue),
+                            nameof(WebPage.TestObjectNames)
+                            ])
+                    };
+                    options.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
+                },
+                metaDataOptionsConfiguration: (options) => {
+
+                },
+                persistantStorageConfiguration: new TempDataCookiePersistantStorageConfiguration("TEMPDATA", (configurations) => {
+                    // Configure TempData Cookie
+                })
+            );
+
+            /// BASELINE CUSTOMIZATION: Starting Site - Add your own Page metadata Converter here
+            builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
+        }
+
+        
+        /// <summary>
+        /// BASELINE CONFIGURATION: Starting Site - Add any interfaces and other services here
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
         public static void RegisterInterfaces(WebApplicationBuilder builder)
         {
 
@@ -88,7 +157,7 @@ namespace MVC.Configuration
             // Widget Filters
             //builder.Services.AddWidgetFilter();
 
-            // Override Baseline customization points if wanted
+            // BASELINE CONFIGURATION: Core - Override Baseline customization points if wanted
             /*
             builder.Services.AddScoped<IUserMetadataProvider, CustomUserMetadataProvider>();
             builder.Services.AddScoped<IMediaFileMediaMetadataProvider, CustomMediaFileMediaMetadataProvider>();
@@ -148,15 +217,21 @@ namespace MVC.Configuration
         }
 
         /// <summary>
+        /// BASELINE CUSTOMIZATION: Account - Configure this method for your own uses
         /// Use this if using the Baseline Account Module to hook up Member Roles, Authorization, and Logins
         /// </summary>
         /// <param name="builder"></param>
         public static void AddBaselineAccountAuthenticationAndControllerViews(WebApplicationBuilder builder)
         {
+            
+
             // If you wish to hook up the various Microsoft.AspNetCore.Authentication types (Facebook, Google, MicrosoftAccount, Twitter),
             // please see this documentation https://learn.microsoft.com/en-us/aspnet/core/security/authentication/social/?view=aspnetcore-8.0&tabs=visual-studio and update your AppSettings.json with the IDs
 
-            builder.AddBaselineAccountAuthentication<ApplicationUserWithNames, TagApplicationUserRole, UserExtended>(
+            // NOTE: While you create your own ApplicationUser variant, if you use a Generic User Model other than Core.Model.User as your User type,
+            // then you will NOT be able to leverage the Baseline.Account.RCL, and will need to clone that project, as you have to inject the
+            // IUserService<User> and IUserRepository<User> of the same type you define here, it won't work if the types miss-matched
+            builder.AddBaselineAccountAuthentication<ApplicationUserBaseline, TagApplicationUserRole>(
             identityOptions => {
                 // Customize IdentityOptions, including Password Settings (fall back if no ChannelSettings is defined
                 identityOptions.Password.RequireDigit = false;
@@ -174,6 +249,7 @@ namespace MVC.Configuration
                 // Note that the LoginPath/LogoutPath/AccessDeniedPath are handled in SiteSettingsCookieAuthenticationEvents
             }
             );
+
             /* To define Channel Specific Password Settings, add the below assembly tag somewhere, then in Xperience Admin select your Channel, the side menu will show these settings configurations */
             /*
              [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
@@ -195,8 +271,8 @@ namespace MVC.Configuration
                         };
                     });
 
-            // If you are leveraging the Account.RCL controllers and such, use this to hook up the validation.  If you are using your own, then disregard.
-            builder.AddBaselineAccountRcl<UserExtended>();
+            // If you are leveraging the Account.RCL controllers and such, use this to hook up the validation, and optionally installs the Generic.Account WebPage (will still need to add the RegisterPageTemplates, see AssemblyTags.md)
+            builder.AddBaselineAccountRcl(new BaselineAccountOptions(UseAccountWebpageType: true));
         }
 
         public static void RegisterStaticFileHandlingGzipAndCacheControls(WebApplicationBuilder builder)
@@ -227,6 +303,11 @@ namespace MVC.Configuration
             builder.WebHost.UseStaticWebAssets();
         }
 
+        /// <summary>
+        /// BASELINE CUSTOMIZATION - Starting Site - Configure Middleware to your liking
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="builder"></param>
         public static void RegisterDotNetCoreConfigurationsAndKentico(IApplicationBuilder app, WebApplicationBuilder builder)
         {
             // Must be first!
@@ -300,86 +381,54 @@ namespace MVC.Configuration
             //////////////////////////////
             //////// ERROR HANDLING //////
             //////////////////////////////
-
         }
 
         /// <summary>
-        /// Sample on how to enable Session State
+        /// BASELINE CUSTOMIZATION: Starting Site - If you want to use Session, set your own Session storage method below
+        /// BASELINE CUSTOMIZATION: Core - Make sure if using Session, add the appropriate IPersistantStorageConfiguration to use Session to the AddCoreBaseline extension.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="builder"></param>
         public static void AddSession(WebApplicationBuilder builder)
         {
-
+            // You can use whichever storage method you desire
+            // https://learn.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-8.0
             builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options => {
-                options.Cookie = new CookieBuilder() {
-                    Name = "SessionId",
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                    SecurePolicy = CookieSecurePolicy.Always,
-                    Expiration = TimeSpan.FromDays(1),
-                    IsEssential = true
-                };
-                options.IdleTimeout = TimeSpan.FromMinutes(20);
-            });
 
+            // builder.Services.AddSession Configuration should be configured by passing the IPersistantStorageConfiguration to the AddCoreBaseline extension.
+            // Below is what the Core Baseline will ultimately do:
+            /* FOR REFERENCE ONLY, DON'T COMMENT OUT
+             services.AddSession(options => {
+                        options.Cookie = new CookieBuilder() {
+                            Name = sessionPersistantStorageConfiguration.SessionCookieName,
+                            HttpOnly = true,
+                            SameSite = SameSiteMode.Strict,
+                            SecurePolicy = CookieSecurePolicy.Always,
+                            Expiration = TimeSpan.FromDays(1),
+                            IsEssential = true
+                        };
+                        options.IdleTimeout = TimeSpan.FromMinutes(60);
+                        sessionPersistantStorageConfiguration.SessionOptionsConfigurations?.Invoke(options);
+                    });
+                    services.Configure<CookieLevelOptions>(options => {
+                        options.CookieConfigurations.Add(sessionPersistantStorageConfiguration.SessionCookieName, CookieLevel.Essential);
+                    });
+             */
         }
 
         /// <summary>
-        /// Sample on how to enable Session State
+        /// BASELINE CUSTOMIZATION: Starting Site - If you want to use Session, call this extension
         /// </summary>
         /// <param name="app"></param>
         /// <param name="builder"></param>
         public static void UseSession(IApplicationBuilder app)
         {
-            // Enables session - Needed for Account Post-Redirect-Get Export Model State Logic
             app.UseSession();
         }
 
-       
-
-        public static void AddBaselineCore(WebApplicationBuilder builder)
+        public static void RegisterBaselineCoreMiddleware(WebApplication app)
         {
-            // Modify as needed
-            builder.Services.AddCoreBaseline<ApplicationUserWithNames, UserExtended>(relationshipsExtendedOptions: (configuration) => {
-                configuration.AllowLanguageSyncConfiguration = true;
-
-                var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
-                    new (WebPage.CONTENT_TYPE_NAME, [
-                        nameof(WebPage.TestLanguageAgnosticValue),
-                        nameof(WebPage.TestObjectNames)
-                        ])
-                };
-                configuration.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
-            });
-        }
-    }
-
-    public record UserExtended : User
-    {
-        public UserExtended()
-        {
-        }
-
-        public UserExtended(string userName, string email, bool enabled, bool isExternal, bool isPublic) : base(userName, email, enabled, isExternal, isPublic)
-        {
-        }
-
-        public UserExtended(string userName, string firstName, string lastName, string email, bool enabled, bool isExternal, bool isPublic) : base(userName, firstName, lastName, email, enabled, isExternal, isPublic)
-        {
-        }
-
-        public UserExtended(int userID, string userName, Guid userGUID, string email, bool enabled, bool isExternal, bool isPublic = false) : base(userID, userName, userGUID, email, enabled, isExternal, isPublic)
-        {
-        }
-
-        public UserExtended(int userID, string userName, Guid userGUID, string email, string firstName, string middleName, string lastName, bool enabled, bool isExternal, bool isPublic = false) : base(userID, userName, userGUID, email, firstName, middleName, lastName, enabled, isExternal, isPublic)
-        {
-        }
-
-        protected UserExtended(User original) : base(original)
-        {
+            app.UseCoreBaseline();
         }
     }
 }

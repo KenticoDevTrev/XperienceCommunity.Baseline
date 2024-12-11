@@ -6,10 +6,12 @@
         IHttpContextAccessor _httpContextAccessor) : ViewComponent
     {
         /// <summary>
-        /// Uses the current page context to render meta data
+        /// Uses the current page context to render meta data.
+        /// 
+        /// the xContentCultureId is only in there for reverse compatability, it's obsoleted now.
         /// </summary>
         /// <returns></returns>
-        public async Task<IViewComponentResult> InvokeAsync(int xContentCultureId = -1)
+        public async Task<IViewComponentResult> InvokeAsync(TreeCultureIdentity? xTreeCultureIdentity = null, int xContentCultureId = -1)
         {
             if (_httpContextAccessor.HttpContext.AsMaybe().TryGetValue(out var httpContext) && httpContext.Items.TryGetValue("ManualMetaDataAdded", out _))
             {
@@ -17,7 +19,14 @@
                 return Content(string.Empty);
             }
 
-            var metaData = xContentCultureId > 0 ? await _metaDataRepository.GetMetaDataAsync(xContentCultureId) : await _metaDataRepository.GetMetaDataAsync();
+#pragma warning disable CS0618 // Type or member is obsolete - Keeping in for now for reverse compatability
+            var metaData =
+                xTreeCultureIdentity != null ? await _metaDataRepository.GetMetaDataAsync(xTreeCultureIdentity) : (
+                    xContentCultureId > 0 ? await _metaDataRepository.GetMetaDataAsync(xContentCultureId) : 
+                    await _metaDataRepository.GetMetaDataAsync()
+                );
+#pragma warning restore CS0618 // Type or member is obsolete
+
             if (metaData.TryGetValue(out var metaDataVal))
             {
                 var model = new PageMetaDataViewModel()

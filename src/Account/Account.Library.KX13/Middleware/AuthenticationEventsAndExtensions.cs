@@ -28,10 +28,10 @@ namespace Account
         [Obsolete("Use AddBaselineAccountAuthentication")]
         public static IServiceCollection AddKenticoAuthentication(this IServiceCollection services, IConfiguration configuration, string AUTHENTICATION_COOKIE_NAME = "identity.authentication")
         {
-            return services.AddBaselineAccountAuthentication<ApplicationUser, ApplicationRole, User>(configuration, AUTHENTICATION_COOKIE_NAME: AUTHENTICATION_COOKIE_NAME);
+            return services.AddBaselineAccountAuthentication<ApplicationUser, ApplicationRole>(configuration, AUTHENTICATION_COOKIE_NAME: AUTHENTICATION_COOKIE_NAME);
         }
 
-        public static IServiceCollection AddBaselineAccountAuthentication<TUser, TRole, TGenericUser>(
+        public static IServiceCollection AddBaselineAccountAuthentication<TUser, TRole>(
             this IServiceCollection services,
             IConfiguration configuration,
             Action<IdentityOptions>? identityOptions = null,
@@ -43,12 +43,7 @@ namespace Account
             string defaultAccessDeniedPath = "/Error/403")
             where TUser : ApplicationUser, new()
             where TRole : ApplicationRole, new()
-            where TGenericUser : User, new()
         {
-            // Register IUserService Fallback with normal User
-            services.AddScoped<IUserService<User>, UserService<TUser, User>>()
-                .AddScoped<IUserService, UserService<TUser>>();
-
             var defaultObj = new AuthenticationConfiguration() {
                 // default here
                 AllExternalUserRoles = ["external-user"]

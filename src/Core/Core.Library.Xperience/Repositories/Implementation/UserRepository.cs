@@ -1,40 +1,26 @@
 ﻿using CMS.Membership;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core.Repositories.Implementation
 {
-    public class UserRepository(IUserRepository<User> userRepository) : IUserRepository
-    {
-        private readonly IUserRepository<User> _userRepository = userRepository;
-
-        public Task<User> GetCurrentUserAsync() => _userRepository.GetCurrentUserAsync();
-
-        public Task<Result<User>> GetUserAsync(int userID) => _userRepository.GetUserAsync(userID);
-
-        public Task<Result<User>> GetUserAsync(string userName) => _userRepository.GetUserAsync(userName);
-
-        public Task<Result<User>> GetUserAsync(Guid userGuid) => _userRepository.GetUserAsync(userGuid);
-
-        public Task<Result<User>> GetUserByEmailAsync(string email) => _userRepository.GetUserByEmailAsync(email);
-    }
-
-    public class UserRepository<TUser, TGenericUser>(IHttpContextAccessor httpContextAccessor,
+    public class UserRepository<TUser>(IHttpContextAccessor httpContextAccessor,
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IProgressiveCache _progressiveCache,
         IInfoProvider<MemberInfo> memberInfoProvider,
-        IUserMetadataProvider userMetadataProvider,
         ICacheDependenciesScope cacheDependenciesScope,
-        IBaselineUserMapper<TUser, TGenericUser> baselineUserMapper) : IUserRepository<TGenericUser> where TUser : ApplicationUser, new() where TGenericUser : User, new()
+        IBaselineUserMapper<TUser> baselineUserMapper,
+        UserManager<TUser> userManager) : IUserRepository where TUser : ApplicationUser, new()
     {
         private const string _userName = "Public";
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
-        private readonly IUserMetadataProvider _userMetadataProvider = userMetadataProvider;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
-        private readonly IBaselineUserMapper<TUser, TGenericUser> _baselineUserMapper = baselineUserMapper;
+        private readonly IBaselineUserMapper<TUser> _baselineUserMapper = baselineUserMapper;
+        private readonly UserManager<TUser> _userManager = userManager;
 
-        public async Task<TGenericUser> GetCurrentUserAsync()
+        public async Task<User> GetCurrentUserAsync()
         {
             var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "public";
             var user = await GetUserInternal(
@@ -43,7 +29,7 @@ namespace Core.Repositories.Implementation
                 guid: Maybe.None,
                 id: Maybe.None
                 );
-            return user.TryGetValue(out var foundUser) ? foundUser : new TGenericUser() {
+            return user.TryGetValue(out var foundUser) ? foundUser : new User() {
                 UserName = _userName,
                 FirstName = "Public",
                 LastName = "User",
@@ -54,35 +40,36 @@ namespace Core.Repositories.Implementation
             };
         }
 
-        public Task<Result<TGenericUser>> GetUserAsync(int userID) => GetUserInternal(
+        public Task<Result<User>> GetUserAsync(int userID) => GetUserInternal(
                 username: Maybe.None,
                 email: Maybe.None,
                 guid: Maybe.None,
                 id: userID);
 
-        public Task<Result<TGenericUser>> GetUserAsync(string userName) => GetUserInternal(
+        public Task<Result<User>> GetUserAsync(string userName) => GetUserInternal(
                 username: userName.AsNullOrWhitespaceMaybe(),
                 email: Maybe.None,
                 guid: Maybe.None,
                 id: Maybe.None);
 
-        public Task<Result<TGenericUser>> GetUserAsync(Guid userGuid) => GetUserInternal(
+        public Task<Result<User>> GetUserAsync(Guid userGuid) => GetUserInternal(
                 username: Maybe.None,
                 email: Maybe.None,
                 guid: userGuid,
                 id: Maybe.None);
 
-        public Task<Result<TGenericUser>> GetUserByEmailAsync(string email) => GetUserInternal(
+        public Task<Result<User>> GetUserByEmailAsync(string email) => GetUserInternal(
                 username: Maybe.None,
                 email: email.AsNullOrWhitespaceMaybe(),
                 guid: Maybe.None,
                 id: Maybe.None);
 
-        private async Task<Result<TGenericUser>> GetUserInternal(Maybe<string> username, Maybe<string> email, Maybe<Guid> guid, Maybe<int> id)
+        private async Task<Result<User>> GetUserInternal(Maybe<string> username, Maybe<string> email, Maybe<Guid> guid, Maybe<int> id)
         {
             var result = await _progressiveCache.LoadAsync(async cs => {
                 var userquery = _memberInfoProvider.Get()
-                .TopN(1);
+                                    .Columns(nameof(MemberInfo.MemberName))
+                                    .TopN(1);
 
                 var internalBuilder = _cacheDependencyBuilderFactory.Create(false);
 
@@ -100,37 +87,41 @@ namespace Core.Repositories.Implementation
 
                 var user = (await userquery.GetEnumerableTypedResultAsync()).FirstOrMaybe();
 
-                if (user.TryGetValue(out var userInfo)) {
-                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userInfo.MemberID);
+                if (user.TryGetValue(out var userMember)) {
+                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userMember.MemberName);
+
+                    // In case in converting MemberInfo to the object type, there are other dependencies added to scope
+                    _cacheDependenciesScope.Begin();
+                    var applicationUser = await _userManager.FindByNameAsync(userMember.MemberName);
+                    internalBuilder.AddKeys(_cacheDependenciesScope.End());
+
                     if (cs.Cached) {
                         cs.CacheDependency = internalBuilder.GetCMSCacheDependency();
                     }
-                    return new DTOWithDependencies<Result<MemberInfo>>(Result.Success(userInfo), internalBuilder.GetKeys().ToList());
+
+                    if (applicationUser != null) { 
+                        return new DTOWithDependencies<Result<TUser>>(Result.Success(applicationUser), internalBuilder.GetKeys().ToList());
+                    }
                 }
                 // Not found
                 internalBuilder.ObjectType(MemberInfo.OBJECT_TYPE);
                 if (cs.Cached) {
                     cs.CacheDependency = internalBuilder.GetCMSCacheDependency();
                 }
-                return new DTOWithDependencies<Result<MemberInfo>>(Result.Failure<MemberInfo>("Could not find member by identifiers"), internalBuilder.GetKeys().ToList());
-            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetUserInternal", email));
+                return new DTOWithDependencies<Result<TUser>>(Result.Failure<TUser>("Could not find member by identifiers"), internalBuilder.GetKeys().ToList());
+            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetUserInternal", username.GetValueOrDefault(string.Empty), email.GetValueOrDefault(string.Empty), guid.GetValueOrDefault(Guid.Empty), id.GetValueOrDefault(0)));
 
             // Add Keys to global scope now
             var builder = _cacheDependencyBuilderFactory.Create()
                 .AddKeys(result.AdditionalDependencies);
 
-            if (result.Result.TryGetValue(out var memberInfo, out var error)) {
-                var user = await _baselineUserMapper.ToUser(memberInfo);
+            if (result.Result.TryGetValue(out var appUser, out var error)) {
                 _cacheDependenciesScope.Begin();
-
-                if ((await _userMetadataProvider.GetUserMetadata(memberInfo, user)).TryGetValue(out var metaData)) {
-                    user = user with { MetaData = metaData.AsMaybe() };
-                };
+                var user = await _baselineUserMapper.ToUser(appUser);
                 builder.AddKeys(_cacheDependenciesScope.End());
-
                 return user;
             }
-            return Result.Failure<TGenericUser>(error);
+            return Result.Failure<User>(error);
         }
     }
 }

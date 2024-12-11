@@ -74,7 +74,7 @@ namespace Core.Repositories.Implementation
                 if (cs.Cached) {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
-                var mediaFile = await _mediaFileInfoProvider.GetAsync(fileGuid, await _siteRepository.GetSiteIDAsync());
+                var mediaFile = await _mediaFileInfoProvider.GetAsync(fileGuid, _siteRepository.GetChannelID().GetValueOrDefault(0));
                 if(mediaFile.AsMaybe().TryGetValue(out var mediaFileVal)) {
                     var mediaItem = MediaFileInfoToMediaItem(mediaFileVal);
                     if((await _mediaFileMediaMetadataProvider.GetMediaMetadata(mediaFileVal, mediaItem)).TryGetValue(out var metaData)) {
@@ -170,7 +170,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(CacheMinuteTypes.Long.ToDouble(), "GetAttachmentMediaGuidToSiteID"));
 
             if (guidToSiteID.GetValueOrMaybe(mediaOrAttachmentGuid).TryGetValue(out var siteID)) {
-                string siteName = _siteRepository.SiteNameById(siteID);
+                string siteName = _siteRepository.ChannelNameById(siteID);
                 return siteName;
             }
             return Result.Failure<string>("Could not find attachment or media item by that Guid");

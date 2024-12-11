@@ -1,6 +1,6 @@
-﻿namespace Account.Features.Account.LogOut
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace Account.Features.Account.LogOut
 {
-    public record LogOutViewModel
-    {
-    }
+    public record LogOutViewModel(bool IsSignedIn);
 }
