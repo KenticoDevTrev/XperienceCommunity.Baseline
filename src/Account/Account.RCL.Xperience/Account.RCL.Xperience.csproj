@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.7.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
   </ItemGroup>
 
   <ItemGroup>

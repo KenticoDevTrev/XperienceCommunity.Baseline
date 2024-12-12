@@ -9,12 +9,14 @@ namespace Core.Installers
     public class BaselineModuleInstaller(BaselineCoreInstallerOptions baselineCoreInstallerOptions,
         IEventLogService eventLogService,
         IInfoProvider<ContentTypeChannelInfo> contentTypeChannelInfoProvider,
-        IInfoProvider<ChannelInfo> channelInfoProvider)
+        IInfoProvider<ChannelInfo> channelInfoProvider,
+        IInfoProvider<SettingsKeyInfo> settingsKeyInfoProvider)
     {
         private readonly BaselineCoreInstallerOptions _baselineCoreInstallerOptions = baselineCoreInstallerOptions;
         private readonly IEventLogService _eventLogService = eventLogService;
         private readonly IInfoProvider<ContentTypeChannelInfo> _contentTypeChannelInfoProvider = contentTypeChannelInfoProvider;
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
+        private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
 
         public bool InstallationRan { get; set; } = false;
 
@@ -35,9 +37,30 @@ namespace Core.Installers
                 CreateBasicWebpage();
             }
 
+            // Ensure Media types are allowed in assets
+            EnsureMediaTypesAllowed();
+
             InstallationRan = true;
 
             return Task.CompletedTask;
+        }
+
+        private void EnsureMediaTypesAllowed()
+        {
+            var key = _settingsKeyInfoProvider.Get("CMSMediaFileAllowedExtensions");
+            if(key != null) {
+                var allowedExtensions = key.KeyValue?.ToLower().Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) ?? [];
+                var mediaExtensions = _baselineCoreInstallerOptions.ImageFormatsSupported.ToLower().Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Union(
+                     _baselineCoreInstallerOptions.VideoFormatsSupported.ToLower().Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Union(
+                     _baselineCoreInstallerOptions.AudioFormatsSupported.ToLower().Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Union(
+                     _baselineCoreInstallerOptions.NonMediaFileFormatsSupported.ToLower().Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
+
+                var itemsMissing = mediaExtensions.Except(allowedExtensions);
+                if(itemsMissing.Any()) {
+                    key.KeyValue = string.Join(";", allowedExtensions.Union(itemsMissing).Distinct());
+                    _settingsKeyInfoProvider.Set(key);
+                }
+            }
         }
 
         private void CreateBasicWebpage()

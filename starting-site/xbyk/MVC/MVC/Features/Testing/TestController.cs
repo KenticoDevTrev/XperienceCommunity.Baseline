@@ -1,8 +1,7 @@
-﻿using Account.Services;
-using CMS.ContentEngine;
-using CMS.DataEngine;
+﻿using CMS.ContentEngine;
 using CMS.Websites;
 using Generic;
+using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
 using Testing;
@@ -32,10 +31,14 @@ namespace MVC.Features.Testing
         private readonly IUserRoleStore<ApplicationUserBaseline> _userRoleStore = userRoleStore;
         private readonly IUserStore<ApplicationUserBaseline> _userStore = userStore;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        
         private readonly UserManager<ApplicationUserBaseline> _userManager = userManager;
 
+        
         public async Task<string> Index()
         {
+
+            
             var username = "public";
             var authenticated = false;
             var roles = new List<string>();

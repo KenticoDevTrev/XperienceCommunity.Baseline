@@ -20,7 +20,7 @@
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Core" Version="29.7.0" />
+    <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />

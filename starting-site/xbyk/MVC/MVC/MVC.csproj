@@ -3,9 +3,9 @@
     <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="kentico.xperience.azurestorage" Version="29.7.0" />
-    <PackageReference Include="kentico.xperience.imageprocessing" Version="29.7.0" />
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="29.7.0" />
+    <PackageReference Include="kentico.xperience.azurestorage" Version="30.0.0" />
+    <PackageReference Include="kentico.xperience.imageprocessing" Version="30.0.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />

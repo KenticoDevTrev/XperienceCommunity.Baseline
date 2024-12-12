@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" Version="29.7.0" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
   </ItemGroup>
 
   <ItemGroup>

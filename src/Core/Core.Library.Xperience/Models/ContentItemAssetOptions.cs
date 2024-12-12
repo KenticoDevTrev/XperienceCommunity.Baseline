@@ -30,9 +30,10 @@
             /// <param name="assetFieldName">The Field Name (Column Name) for the Content Item Asset field</param>
             /// <param name="titleFieldName">The Field Name (Column Name) for the title value of the Media Item, if not provided will default to the ContentItemLanguageMetadataDisplayName</param>
             /// <param name="descriptionFieldName">The Field Name (Column Name) for the description value of the Media Item, optional as description isn't required.</param>
-            public AssetFieldIdentifierConfiguration(string assetFieldName, string? titleFieldName = null, string? descriptionFieldName = null)
+            public AssetFieldIdentifierConfiguration(string assetFieldName, ContentItemAssetMediaType mediaType, string? titleFieldName = null, string? descriptionFieldName = null)
             {
                 AssetFieldName = assetFieldName;
+                MediaType = mediaType;
                 TitleFieldName = titleFieldName.AsNullOrWhitespaceMaybe();
                 DescriptionFieldName = descriptionFieldName.AsNullOrWhitespaceMaybe();
             }
@@ -40,6 +41,7 @@
             public string AssetFieldName { get; }
             public Maybe<string> TitleFieldName { get; }
             public Maybe<string> DescriptionFieldName { get; }
+            public ContentItemAssetMediaType MediaType { get; }
         }
     }
 }

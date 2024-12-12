@@ -15,7 +15,7 @@
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
 		<PackageReference Include="MVCCaching.Base.Core" Version="4.5.0" />
 		<PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.3" />
-		<PackageReference Include="XperienceCommunity.MemberRoles.Core" Version="1.0.5" />
+		<PackageReference Include="XperienceCommunity.MemberRoles.Core" Version="2.0.1" />
 	</ItemGroup>
 
 </Project>
