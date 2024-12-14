@@ -305,5 +305,10 @@ namespace Core.Repositories.Implementation
         {
             return Task.FromResult(_httpContextAccessor.HttpContext.Kentico().PageBuilder().EditMode);
         }
+
+        public Task<bool> IsPreviewModeAsync()
+        {
+            return Task.FromResult(_httpContextAccessor.HttpContext.Kentico().Preview().Enabled);
+        }
     }
 }

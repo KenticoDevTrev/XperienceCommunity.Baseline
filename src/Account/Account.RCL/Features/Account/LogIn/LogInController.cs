@@ -257,8 +257,8 @@ namespace Account.Features.Account.LogIn
 
             int userId = await _userManagerService.GetUserIDByEmailAsync(email);
             foreach (string role in externalUserRoles) {
-                await _roleService.CreateRoleIfNotExisting(role, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty));
-                await _roleService.SetUserRole(userId, role, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty), true);
+                await _roleService.CreateRoleIfNotExisting(role, _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
+                await _roleService.SetUserRole(userId, role, _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty), true);
             }
             return await LoggedInRedirectAndHandleModelStateStorage(returnUrl);
         }

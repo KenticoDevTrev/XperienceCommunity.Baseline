@@ -5,12 +5,13 @@ using Generic;
 
 namespace Site.Repositories.Implementations
 {
-    public class CustomWebPageToPageMetadataConverter(IContentQueryResultMapper contentQueryResultMapper) : IWebPageToPageMetadataConverter
+    public class CustomWebPageToPageMetadataConverter(IContentQueryResultMapper contentQueryResultMapper, IMediaRepository mediaRepository) : IWebPageToPageMetadataConverter
     {
         private readonly IContentQueryResultMapper _contentQueryResultMapper = contentQueryResultMapper;
+        private readonly IMediaRepository _mediaRepository = mediaRepository;
 
         // BASELINE CUSTOMIZATION: Start Site - Any Web Pages should have logic here to parse the metadata.
-        public Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer)
+        public async Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer)
         {
             // I'm only doing the IBaseMetadata logic, but if you have custom content types you could adjust this method to do whatever you wish.
             Result<IBaseMetadata> metadata = webPageContentQueryDataContainer.ContentTypeName switch {
@@ -19,11 +20,26 @@ namespace Site.Repositories.Implementations
                 Generic.Account.CONTENT_TYPE_NAME => Result.Success<IBaseMetadata>(_contentQueryResultMapper.Map<Generic.Account>(webPageContentQueryDataContainer)),
                 _ => Result.Failure<IBaseMetadata>("This class doesn't inherit the base.")
             };
-
             
             // Using custom parsing, of course you can use your own logic with each page type if you wish
             if(metadata.TryGetValue(out var metadataObject)) {
-                return Task.FromResult(Result.Success(new PageMetaData() {
+                var thumbnailSmall = string.Empty;
+                var thumbnailLarge = string.Empty;
+
+                if (metadataObject.MetaData_ThumbnailSmall.FirstOrMaybe().TryGetValue(out var smallThumbIdentity)) {
+                    var medias = await _mediaRepository.GetContentItemAssets(smallThumbIdentity.Identifier.ToContentIdentity());
+                    if(medias.FirstOrMaybe().TryGetValue(out var media)) {
+                        thumbnailSmall = media.MediaPermanentUrl;
+                    }
+                }
+                if (metadataObject.MetaData_ThumbnailLarge.FirstOrMaybe().TryGetValue(out var largeThumbIdentity)) {
+                    var medias = await _mediaRepository.GetContentItemAssets(largeThumbIdentity.Identifier.ToContentIdentity());
+                    if (medias.FirstOrMaybe().TryGetValue(out var media)) {
+                        thumbnailLarge = media.MediaPermanentUrl;
+                    }
+                }
+
+                return Result.Success(new PageMetaData() {
                     CanonicalUrl = webPageContentQueryDataContainer.WebPageUrlPath.AsNullOrWhitespaceMaybe(),
                     Title = metadataObject.MetaData_Title.AsNullOrWhitespaceMaybe().GetValueOrDefault(
                         webPageContentQueryDataContainer.GetValue<string>("ContentItemLanguageMetadataDisplayName") ?? ""
@@ -31,13 +47,13 @@ namespace Site.Repositories.Implementations
                     Description = metadataObject.MetaData_Description.AsNullOrWhitespaceMaybe(),
                     Keywords = metadataObject.MetaData_Keywords.AsNullOrWhitespaceMaybe(),
                     NoIndex = metadataObject.MetaData_NoIndex,
-                    Thumbnail = metadataObject.MetaData_ThumbnailSmall.FirstOrMaybe().TryGetValue(out var thumbnail) ? $"/getmedia/{thumbnail.Identifier}/{thumbnail.Name}" : Maybe.None,
-                    ThumbnailLarge = metadataObject.MetaData_ThumbnailSmall.FirstOrMaybe().TryGetValue(out var thumbnailLarge) ? $"/getmedia/{thumbnailLarge.Identifier}/{thumbnailLarge.Name}" : Maybe.None
-                }));
+                    Thumbnail = thumbnailSmall.AsNullOrWhitespaceMaybe(),
+                    ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe()
+                });
             }
 
             // A result failure will kick in the default 'logic' in the IMetaDataRepository, trying to get the title and URL only.
-            return Task.FromResult(Result.Failure<PageMetaData>("Not defined"));
+            return Result.Failure<PageMetaData>("Not defined");
         }
     }
 }

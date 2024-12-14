@@ -18,6 +18,8 @@ namespace Core.Installers
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
         private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
 
+        private const string _hasImageSchemaGuid = "03dda2f6-b776-48b2-92d7-c110682febe0";
+
         public bool InstallationRan { get; set; } = false;
 
         public Task Install()
@@ -28,6 +30,7 @@ namespace Core.Installers
 
             CreateMetadataReusableSchema();
             CreateRedirectReusableSchema();
+            CreateMediaFilterReusableSchema();
 
             if(_baselineCoreInstallerOptions.AddHomePageType) {
                 CreateHomeWebpage();
@@ -43,6 +46,68 @@ namespace Core.Installers
             InstallationRan = true;
 
             return Task.CompletedTask;
+        }
+
+        private static void CreateMediaFilterReusableSchema()
+        {
+            var contentItemCommonDataForm = FormHelper.GetFormInfo(ContentItemCommonDataInfo.OBJECT_TYPE, false);
+
+            // Add Audio Schema
+            var audioSchemaGuid = Guid.Parse("ac28f6ed-68b3-4ba9-8bb3-abf92ad7f79c");
+            var audioSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasAudio");
+            if (audioSchema == null) {
+                contentItemCommonDataForm.ItemsList.Add(new FormSchemaInfo() {
+                    Name = "Generic.HasAudio",
+                    Description = @"Place this Reusable Schema for any Content Type that has at least 1 audio field (for filtering).
+
+Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
+                    Caption = "Has Audio",
+                    Guid = audioSchemaGuid
+                });
+            }
+
+            // Add Video Schema
+            var videoSchemaGuid = Guid.Parse("39e55864-5ae7-4d22-8bcd-6da595592455");
+            var videoSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasVideo");
+            if (videoSchema == null) {
+                contentItemCommonDataForm.ItemsList.Add(new FormSchemaInfo() {
+                    Name = "Generic.HasVideo",
+                    Description = @"Place this Reusable Schema for any Content Type that has at least 1 video field (for filtering).
+
+Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
+                    Caption = "Has Video",
+                    Guid = videoSchemaGuid
+                });
+            }
+
+            // Add Image Schema
+            var imageSchemaGuid = Guid.Parse(_hasImageSchemaGuid);
+            var imageSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasImage");
+            if (imageSchema == null) {
+                contentItemCommonDataForm.ItemsList.Add(new FormSchemaInfo() {
+                    Name = "Generic.HasImage",
+                    Description = @"Place this Reusable Schema for any Content Type that has at least 1 image field (for filtering).
+
+Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
+                    Caption = "Has Image",
+                    Guid = imageSchemaGuid
+                });
+            }
+
+            // Add File Schema
+            var fileSchemaGuid = Guid.Parse("d2b606bd-b127-434e-a04b-03fd323397cb");
+            var fileSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasFile");
+            if (fileSchema == null) {
+                contentItemCommonDataForm.ItemsList.Add(new FormSchemaInfo() {
+                    Name = "Generic.HasFile",
+                    Description = @"Place this Reusable Schema for any Content Type that has at least 1 file field (for filtering).
+
+Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
+                    Caption = "Has File",
+                    Guid = fileSchemaGuid
+                });
+            }
+
         }
 
         private void EnsureMediaTypesAllowed()
@@ -425,13 +490,15 @@ Generic.BaseInheritedPage",
             thumbnailSmallField.Name = nameof(IBaseMetadata.MetaData_ThumbnailSmall);
             thumbnailSmallField.AllowEmpty = true;
             thumbnailSmallField.Precision = 0;
-            thumbnailSmallField.DataType = "assets";
+            thumbnailSmallField.DataType = "contentitemreference";
             thumbnailSmallField.Enabled = true;
             thumbnailSmallField.Visible = true;
             thumbnailSmallField.Guid = Guid.Parse("03eb66ce-235e-48ac-a488-73b08d222ff1");
-            thumbnailSmallField.SetComponentName("Kentico.Administration.AssetSelector");
-            thumbnailSmallField.Settings["AllowedExtensions"] = "jpg;jpeg;png;webp";
+            thumbnailSmallField.SetComponentName("Kentico.Administration.ContentItemSelector");
             thumbnailSmallField.Settings["MaximumAssets"] = "1";
+            thumbnailSmallField.Settings["MinimumItems"] = "0";
+            thumbnailSmallField.Settings["SelectionType"] = "reusableFieldSchemas";
+            thumbnailSmallField.Settings["AllowedSchemaIdentifiers"] = $"[\"{_hasImageSchemaGuid}\"]";
 
             thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Thumbnail");
             thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Should be 1280×720, JPEG PNG or WebP.");
@@ -451,13 +518,15 @@ Generic.BaseInheritedPage",
             thumbnailLargeField.Name = nameof(IBaseMetadata.MetaData_ThumbnailLarge);
             thumbnailLargeField.AllowEmpty = true;
             thumbnailLargeField.Precision = 0;
-            thumbnailLargeField.DataType = "assets";
+            thumbnailLargeField.DataType = "contentitemreference";
             thumbnailLargeField.Enabled = true;
             thumbnailLargeField.Visible = true;
             thumbnailLargeField.Guid = Guid.Parse("08739bde-d768-4259-ab08-9e86ec46ddae");
-            thumbnailLargeField.SetComponentName("Kentico.Administration.AssetSelector");
-            thumbnailLargeField.Settings["AllowedExtensions"] = "jpg;jpeg;png;webp";
+            thumbnailLargeField.SetComponentName("Kentico.Administration.ContentItemSelector");
             thumbnailLargeField.Settings["MaximumAssets"] = "1";
+            thumbnailLargeField.Settings["MinimumItems"] = "0";
+            thumbnailLargeField.Settings["SelectionType"] = "reusableFieldSchemas";
+            thumbnailSmallField.Settings["AllowedSchemaIdentifiers"] = $"[\"{_hasImageSchemaGuid}\"]";
 
             thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Thumbnail (Large)");
             thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "This is not used currently for SEO meta tags, but can be useful for other things within your site such as navigation thumbnails.");

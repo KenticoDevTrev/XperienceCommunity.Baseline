@@ -25,7 +25,6 @@ namespace Core
         /// Configures the Core Baseline
         /// </summary>
         /// <typeparam name="TUser">The User object used to identify the application's site user, usually ApplicationUser unless you extend it</typeparam>
-        /// <typeparam name="User">The generic User object used to identify the Application's site user, usually User unless you extend it</typeparam>
         /// <param name="services">The service collection</param>
         /// <param name="contentItemAssetOptionsConfiguration">Configures the Content Item Assets (for media retrieval), needed for custom Title and Description retrieval.</param>
         /// <param name="mediaFileOptionsConfiguration">Configuration of the Media File Options (for media retrieval), needed for Media Library configurations</param>
@@ -40,6 +39,7 @@ namespace Core
         /// </param>
         /// <returns></returns>
         public static IServiceCollection AddCoreBaseline<TUser>(this IServiceCollection services,
+            BaselineCoreInstallerOptions installerOptions,
             Action<ContentItemAssetOptions>? contentItemAssetOptionsConfiguration = null,
             Action<MediaFileOptions>? mediaFileOptionsConfiguration = null,
             Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptionsConfiguration = null,
@@ -82,13 +82,15 @@ namespace Core
                 // Largely Only dependent upon Kentico's APIs
                 .AddScoped<ILogger, Logger>()
                 .AddScoped<ISiteRepository, SiteRepository>()
-                .AddScoped<ILanguageFallbackRepository, LanguageFallbackRepository>()
+                .AddScoped<ILanguageRepository, LanguageRepository>()
                 .AddScoped<IUrlResolver, UrlResolver>()
                 .AddScoped<IBaselinePageBuilderContext, BaselinePageBuilderContext>()
                 .AddScoped<IPageIdentityFactory, PageIdentityFactory>()
                 .AddScoped<IIdentityService, IdentityService>()
                 .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
                 .AddScoped<IModelStateService, ModelStateService>()
+                .AddScoped<IContentItemLanguageMetadataRepository, ContentItemLanguageMetadataRepository>()
+                .AddScoped<IContentTranslationInformationRepository, ContentTranslationInformationRepository>()
 
                 // Some internal APIs
                 .AddScoped<IPageContextRepository, PageContextRepository>()
@@ -149,10 +151,10 @@ namespace Core
                 }
             }
 
-            // If the type inherits from ApplicationUserBaseline, then set in the options to make sure those fields exist on the Member object
-            var installerOptions = new BaselineCoreInstallerOptions(
-                AddMemberFields: (typeof(TUser).IsSubclassOf(typeof(ApplicationUserBaseline)) || typeof(TUser) == typeof(ApplicationUserBaseline))
-            );
+            // Force the member fields if the type is or inherits from ApplicationUserBaseline
+            if (!installerOptions.AddMemberFields && (typeof(TUser).IsSubclassOf(typeof(ApplicationUserBaseline)) || typeof(TUser) == typeof(ApplicationUserBaseline))) {
+                installerOptions = installerOptions with { AddMemberFields = true };
+            }
             services.AddSingleton(installerOptions);
             services.AddSingleton<BaselineModuleInstaller>();
 

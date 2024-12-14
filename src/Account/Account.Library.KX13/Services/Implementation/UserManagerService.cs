@@ -96,5 +96,11 @@ namespace Account.KX13.Services.Implementation
             }
             return updateUser;
         }
+
+        public Task<string> GetSecurityStampAsync(string userName)
+        {
+            // Not implemented in KX13, so just returning a string value, only used in verification anyways from the hash.
+            return Task.FromResult("NotImplementedInKX13");
+        }
     }
 }

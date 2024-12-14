@@ -1,4 +1,5 @@
 ﻿using CMS.Base;
+using CMS.DataEngine;
 using CMS.SiteProvider;
 
 namespace Core.Repositories.Implementation
@@ -9,13 +10,13 @@ namespace Core.Repositories.Implementation
         ISiteInfoProvider _siteInfoProvider,
         IProgressiveCache _progressiveCache) : ISiteRepository
     {
-        public string CurrentSiteName() => CurrentChannelName().Value;
+        public string CurrentSiteName() => CurrentWebsiteChannelName().Value;
 
-        public string CurrentSiteDisplayName() => CurrentChannelDisplayName().Value;
+        public string CurrentSiteDisplayName() => CurrentWebsiteChannelDisplayName().Value;
 
-        public int CurrentSiteID() => CurrentChannelID().Value;
+        public int CurrentSiteID() => CurrentWebsiteChannelID().Value;
 
-        public Task<string> CurrentSiteNameAsync() => Task.FromResult(CurrentChannelName().Value);
+        public Task<string> CurrentSiteNameAsync() => Task.FromResult(CurrentWebsiteChannelName().Value);
 
         public Task<int> GetSiteIDAsync(string? siteName = null) => Task.FromResult(GetChannelID(siteName).GetValueOrDefault(0));
 
@@ -38,11 +39,11 @@ namespace Core.Repositories.Implementation
             }
         }
 
-        public Maybe<string> CurrentChannelName() => _siteService.CurrentSite.SiteName;
+        public Maybe<string> CurrentWebsiteChannelName() => _siteService.CurrentSite.SiteName;
 
-        public Maybe<string> CurrentChannelDisplayName() => _siteService.CurrentSite.DisplayName;
+        public Maybe<string> CurrentWebsiteChannelDisplayName() => _siteService.CurrentSite.DisplayName;
 
-        public Maybe<int> CurrentChannelID() => _siteService.CurrentSite.SiteID;
+        public Maybe<int> CurrentWebsiteChannelID() => _siteService.CurrentSite.SiteID;
 
         public string ChannelNameById(int channelID)
         {
@@ -58,6 +59,15 @@ namespace Core.Repositories.Implementation
 
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "SiteNameByID"));
             return siteIdToName.GetValueOrMaybe(channelID).GetValueOrDefault(string.Empty);
+        }
+
+        public ObjectIdentity WebsiteChannelDefaultLanguage(int? websiteChannelID = null)
+        {
+            var defaultCulture = SettingsKeyInfoProvider.GetValue("CMSDefaultCultureCode", _siteService.CurrentSite.SiteID);
+            return new ObjectIdentity() {
+                CodeName = defaultCulture
+            };
+
         }
     }
 }

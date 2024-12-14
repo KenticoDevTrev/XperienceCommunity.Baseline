@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
   </ItemGroup>
 

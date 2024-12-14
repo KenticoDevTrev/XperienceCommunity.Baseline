@@ -7,17 +7,17 @@ using Account.Installers;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Installers;
 
-[assembly: RegisterModule(typeof(BaselineCoreAccountModule))]
+[assembly: RegisterModule(typeof(BaselineAccountModule))]
 
 namespace Account
 {
-    public class BaselineCoreAccountModule : Module
+    public class BaselineAccountModule : Module
     {
         private IServiceProvider? _services = null;
         private BaselineAccountModuleInstaller? _installer = null;
         private BaselineModuleInstaller? _installerCore = null;
 
-        public BaselineCoreAccountModule() : base("BaselineCoreAccountModule")
+        public BaselineAccountModule() : base("BaselineAccountModule")
         {
 
         }

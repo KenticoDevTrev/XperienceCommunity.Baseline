@@ -1,4 +1,5 @@
 ﻿// These are the page template registrations
+/*
 using Account.Features.Account.Confirmation;
 using Account.Features.Account.ForgotPassword;
 using Account.Features.Account.ForgottenPasswordReset;
@@ -75,3 +76,4 @@ using XperienceCommunity.Authorization;
     customViewName: "/Features/Account/ResetPassword/ResetPasswordPageTemplate.cshtml",
     ContentTypeNames = ["Generic.Account"])]
 [assembly: RegisterPageBuilderAuthorization(pageTemplateIdentifiers: ["Generic.Account_ResetPassword"], userAuthenticationRequired: true)]
+*/

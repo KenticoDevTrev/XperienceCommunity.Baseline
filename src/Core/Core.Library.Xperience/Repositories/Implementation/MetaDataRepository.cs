@@ -7,25 +7,23 @@ namespace Core.Repositories.Implementation
     public class MetaDataRepository(
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IUrlResolver _urlResolver,
-        IWebPageUrlRetriever webPageUrlRetriever,
         IPageContextRepository pageContextRepository,
         IWebPageToPageMetadataConverter webPageToPageMetadataConverter,
         IIdentityService identityService,
         IContentQueryExecutor contentQueryExecutor,
         ICacheRepositoryContext cacheRepositoryContext,
-        ICacheReferenceService cacheReferenceService,
         IProgressiveCache progressiveCache,
-        MetadataOptions metadataOptions) : IMetaDataRepository
+        MetadataOptions metadataOptions,
+        ILanguageRepository languageRepository) : IMetaDataRepository
     {
-        private readonly IWebPageUrlRetriever _webPageUrlRetriever = webPageUrlRetriever;
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
         private readonly IIdentityService _identityService = identityService;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
-        private readonly ICacheReferenceService _cacheReferenceService = cacheReferenceService;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly MetadataOptions _metadataOptions = metadataOptions;
+        private readonly ILanguageRepository _languageRepository = languageRepository;
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
@@ -88,7 +86,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                 var idToTree = new Dictionary<int, TreeCultureIdentity>();
                 var guidToTree = new Dictionary<Guid, TreeCultureIdentity>();
                 foreach (var row in results.Tables[0].Rows.Cast<DataRow>()) {
-                    var identity = new TreeCultureIdentity(_cacheReferenceService.GetLanguageNameById((int)row["ContentItemLanguageMetadataContentLanguageID"])) {
+                    var identity = new TreeCultureIdentity(_languageRepository.LanguageIdToName((int)row["ContentItemLanguageMetadataContentLanguageID"])) {
                         PageID = (int)row[nameof(WebPageFields.WebPageItemID)]
                     };
                     idToTree.TryAdd((int)row["ContentItemLanguageMetadataID"], identity);
@@ -122,11 +120,11 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             var metaDataResults = await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node);
 
             if(metaDataResults.TryGetValue(out var metadataFromPage)) {
-                thumbnail = thumbnail ?? metadataFromPage.Thumbnail.AsNullableValue();
-                thumbnailLarge = thumbnailLarge ?? metadataFromPage.ThumbnailLarge.AsNullableValue();
-                keywords = keywords ?? metadataFromPage.Keywords.AsNullableValue();
-                description = description ?? metadataFromPage.Description.AsNullableValue();
-                title = title ?? metadataFromPage.Title.GetValueOrDefault(node.GetValue<string>("ContentItemLanguageMetadataDisplayName")).AsNullOrWhitespaceMaybe().AsNullableValue();
+                thumbnail ??= metadataFromPage.Thumbnail.AsNullableValue();
+                thumbnailLarge ??= metadataFromPage.ThumbnailLarge.AsNullableValue();
+                keywords ??= metadataFromPage.Keywords.AsNullableValue();
+                description ??= metadataFromPage.Description.AsNullableValue();
+                title ??= metadataFromPage.Title.GetValueOrDefault(node.GetValue<string>("ContentItemLanguageMetadataDisplayName")).AsNullOrWhitespaceMaybe().AsNullableValue();
                 noIndex = metadataFromPage.NoIndex;
                 canonicalUrlValue = metadataFromPage.CanonicalUrl.AsNullableValue();
             }

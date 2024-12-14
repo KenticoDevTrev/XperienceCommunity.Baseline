@@ -17,15 +17,16 @@
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
     <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.3" />
-    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.10" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,7 +17,7 @@ namespace Core.Repositories.Implementation
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
         ICacheDependenciesScope cacheDependenciesScope,
         IContentQueryExecutor contentQueryExecutor,
-        ICacheReferenceService cacheReferenceService,
+        ILanguageRepository languageRepository,
         ICacheRepositoryContext cacheRepositoryContext,
         IInfoProvider<TagInfo> tagInfoProvider,
         IInfoProvider<TaxonomyInfo> taxonomyInfoProvider,
@@ -25,7 +25,7 @@ namespace Core.Repositories.Implementation
         ICategoryCachedRepository categoryCachedRepository,
         IInfoProvider<ContentItemCategoryInfo> contentItemCategoryInfoProvider,
         IPreferredLanguageRetriever preferredLanguageRetriever,
-        ILanguageFallbackRepository languageFallbackRepository,
+        ILanguageRepository languageFallbackRepository,
         ICustomTaxonomyFieldParser customTaxonomyFieldParser
         ) : IContentCategoryRepository
     {
@@ -35,14 +35,14 @@ namespace Core.Repositories.Implementation
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
-        private readonly ICacheReferenceService _cacheReferenceService = cacheReferenceService;
+        private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
         private readonly RelationshipsExtendedOptions _relationshipsExtendedOptions = relationshipsExtendedOptions;
         private readonly ICategoryCachedRepository _categoryCachedRepository = categoryCachedRepository;
         private readonly IInfoProvider<ContentItemCategoryInfo> _contentItemCategoryInfoProvider = contentItemCategoryInfoProvider;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
-        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
+        private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly ICustomTaxonomyFieldParser _customTaxonomyFieldParser = customTaxonomyFieldParser;
 
         public async Task<IEnumerable<CategoryItem>> GetCategoriesByContentCultureIdentities(IEnumerable<ContentCultureIdentity> identities, IEnumerable<ObjectIdentity>? taxonomyTypes = null)
@@ -188,7 +188,7 @@ namespace Core.Repositories.Implementation
                         compiledDictionary.Add(contentItemDataContainer.ContentItemID, contentItemDictionary);
                     }
 
-                    var language = _cacheReferenceService.GetLanguageNameById(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
+                    var language = _languageRepository.LanguageIdToName(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
 
                     // Make language area of it
                     if (!contentItemDictionary.TryGetValue(language, out List<int>? tagIds)) {
@@ -240,7 +240,7 @@ namespace Core.Repositories.Implementation
                     resultDictionary.Add(contentId, langToTagIds);
                 }
                 foreach (var dataItem in contentItemIdToField[contentId]) {
-                    var lang = _cacheReferenceService.GetLanguageNameById(dataItem.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
+                    var lang = _languageRepository.LanguageIdToName(dataItem.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
                     if (!langToTagIds.ContainsKey(lang)) {
                         langToTagIds.Add(lang, (await GetTagsFromCategoryFields(dataItem, configuration, lookupDictionaries)).ToList());
                     }
@@ -468,7 +468,7 @@ namespace Core.Repositories.Implementation
                         query += $" and ContentItemCommonDataGUID in ('{string.Join("','", byGuid)}')";
                     }
                     var items = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>()
-                            .GroupBy(x => _cacheReferenceService.GetLanguageNameById((int)x["ContentItemCommonDataContentLanguageID"]).ToLowerInvariant())
+                            .GroupBy(x => _languageRepository.LanguageIdToName((int)x["ContentItemCommonDataContentLanguageID"]).ToLowerInvariant())
                             .ToDictionary(key => key.Key, value => value.Select(x => (int)x[nameof(ContentItemFields.ContentItemID)]));
 
                     foreach (var key in items.Keys) {

@@ -10,7 +10,7 @@ namespace Core.Services.Implementation
         IContentLanguageRetriever contentLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext,
         ICacheReferenceService cacheReferenceService,
-        ILanguageFallbackRepository languageFallbackRepository) : IIdentityService
+        ILanguageRepository languageFallbackRepository) : IIdentityService
     {
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
@@ -18,7 +18,7 @@ namespace Core.Services.Implementation
         private readonly IContentLanguageRetriever _contentLanguageRetriever = contentLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly ICacheReferenceService _cacheReferenceService = cacheReferenceService;
-        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
+        private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
 
         #region "Content Hydration"
 
@@ -750,7 +750,7 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
                 {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
                 }
-                var query = $"select {nameof(ContentItemInfo.ContentItemID)}, {nameof(ContentItemInfo.ContentItemGUID)}, {nameof(ContentItemInfo.ContentItemName)}, {nameof(ContentItemInfo.ContentItemContentTypeID)} from CMS_ContentItem";
+                var query = $"select {nameof(ContentItemInfo.ContentItemID)}, {nameof(ContentItemInfo.ContentItemGUID)}, {nameof(ContentItemInfo.ContentItemName)}, {nameof(ContentItemInfo.ContentItemContentTypeID)} from CMS_ContentItem where {nameof(ContentItemInfo.ContentItemContentTypeID)} is not null";
                 var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
                 var byId = new Dictionary<int, int>();
                 var byGuid = new Dictionary<Guid, int>();

@@ -24,6 +24,7 @@ using Account.Admin.Xperience.Models;
 using Core.Repositories;
 using Site.Repositories.Implementations;
 using MVC.NewFolder;
+using Navigation.Extensions;
 
 // BASELINE CUSTOMIZATION: Account Module - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
@@ -93,9 +94,35 @@ namespace MVC.Configuration
             // then you will NOT be able to leverage the Baseline.Account.RCL, and will need to clone that project, as you have to inject the
             // IUserService<User> and IUserRepository<User> of the same type you define here, it won't work if the types miss-matched
             // Additionally, if you use a model other than ApplicationUserWithNames, you'll want to implement and register your own 
-            builder.Services.AddCoreBaseline<ApplicationUserBaseline>(
-                contentItemAssetOptionsConfiguration: (options) => {
+            var baselineInstallerOptions = new BaselineCoreInstallerOptions(
+                AddMemberFields: true,
+                AddHomePageType: true,
+                AddBasicPageType: true,
+                AddMediaPageTypes: true,
+                ImageFormatsSupported: "jpg;jpeg;webp;gif;png;apng;bmp;ico;avif", // svg excluded by default due to security, you can add in: https://docs.kentico.com/developers-and-admins/configuration/content-hub-configuration#support-for-svg-images
+                VideoFormatsSupported: "mp4;webm;ogg;ogv;avi;wmv",
+                AudioFormatsSupported: "txt;pdf;docx;pptx;xlsx;zip"
+                );
 
+            builder.Services.AddCoreBaseline<ApplicationUserBaseline>(
+                installerOptions: baselineInstallerOptions,
+                contentItemAssetOptionsConfiguration: (options) => {
+                    // If AddMediaPageTypes is true on installer, have these configurations set
+                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Image", [
+                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("ImageFile", Core.Enums.ContentItemAssetMediaType.Image, "ImageTitle", "ImageDescription")
+                    ], preCache: true));
+
+                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Audio", [
+                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("AudioFile", Core.Enums.ContentItemAssetMediaType.Audio, "AudioTitle", "AudioDescription")
+                    ], preCache: true));
+
+                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Video", [
+                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("VideoFile", Core.Enums.ContentItemAssetMediaType.Video, "VideoTitle", "VideoDescription")
+                    ], preCache: true));
+
+                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.File", [
+                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("FileFile", Core.Enums.ContentItemAssetMediaType.File, "FileTitle", "FileDescription")
+                    ], preCache: true));
                 },
                 mediaFileOptionsConfiguration: (options) => {
 
@@ -126,7 +153,6 @@ namespace MVC.Configuration
             builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
         }
 
-        
         /// <summary>
         /// BASELINE CONFIGURATION: Starting Site - Add any interfaces and other services here
         /// 
@@ -429,6 +455,13 @@ namespace MVC.Configuration
         public static void RegisterBaselineCoreMiddleware(WebApplication app)
         {
             app.UseCoreBaseline();
+        }
+
+        public static void AddBaselineNavigation(WebApplicationBuilder builder)
+        {
+            builder.Services.AddBaselineNavigation(new Navigation.Models.BaselineNavigationOptions() {
+                ShowPagesNotTranslatedInSitemapUrlSet = false
+            });
         }
     }
 }

@@ -15,8 +15,10 @@ namespace Navigation.Repositories.Implementations
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         ILogger _logger,
         IStringLocalizer<SharedResources> _stringLocalizer,
-        IProgressiveCache _progressiveCache) : INavigationRepository
+        IProgressiveCache _progressiveCache,
+        IIdentityService _identityService) : INavigationRepository
     {
+
         public async Task<IEnumerable<NavigationItem>> GetNavItemsAsync(Maybe<string> navPath, IEnumerable<string>? navTypes = null)
         {
             var navigationItems = await GetNavigationItemsAsync(navPath, navTypes ?? []);
@@ -143,7 +145,7 @@ namespace Navigation.Repositories.Implementations
                     .ColumnsSafe(nameof(TreeNode.NodeAliasPath))
                     , cacheSettings =>
                         cacheSettings
-                        .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentChannelName()}|{nodeGuid}"))
+                        .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentWebsiteChannelName()}|{nodeGuid}"))
                         .Key($"GetAncestorPathAsync|{nodeGuid}")
                         .Expiration(TimeSpan.FromMinutes(15))
                         );
@@ -151,16 +153,22 @@ namespace Navigation.Repositories.Implementations
             return await GetAncestorPathAsync(result.FirstOrDefault()?.NodeAliasPath ?? "/", levels, levelIsRelative);
         }
 
-        public async Task<string> GetAncestorPathAsync(int nodeID, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
+        public Task<string> GetAncestorPathAsync(int nodeID, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2) => GetAncestorPathAsync(nodeID.ToTreeIdentity(), levels, levelIsRelative, minAbsoluteLevel);
+
+        public async Task<string> GetAncestorPathAsync(TreeIdentity treeIdentity, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
+            var nodeIdResult = await treeIdentity.GetOrRetrievePageID(_identityService);
+            if(!nodeIdResult.TryGetValue(out var nodeId)) {
+                return "/";
+            }
             // Do not need to include in global cache, just a lookup for the path
             var result = await _pageRetriever.RetrieveAsync<TreeNode>(query =>
-                    query.WhereEquals(nameof(TreeNode.NodeID), nodeID)
+                    query.WhereEquals(nameof(TreeNode.NodeID), nodeId)
                     .ColumnsSafe(nameof(TreeNode.NodeAliasPath))
                     , cacheSettings =>
                         cacheSettings
-                        .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentChannelName()}|{nodeID}"))
-                        .Key($"GetAncestorPathAsync|{nodeID}")
+                        .Dependencies((items, csbuilder) => csbuilder.Custom($"nodeguid|{_siteRepository.CurrentWebsiteChannelName()}|{nodeId}"))
+                        .Key($"GetAncestorPathAsync|{nodeId}")
                         .Expiration(TimeSpan.FromMinutes(15))
                         );
 

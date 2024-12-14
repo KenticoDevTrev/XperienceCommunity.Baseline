@@ -1,14 +1,17 @@
 ﻿using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using Generic;
-using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Navigation.Models;
+using Navigation.Repositories;
 using System.Data;
 using Testing;
 using XperienceCommunity.Authorization;
 using XperienceCommunity.MemberRoles;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.MemberRoles.Repositories;
+
 namespace MVC.Features.Testing
 {
     public class TestController(
@@ -20,7 +23,11 @@ namespace MVC.Features.Testing
         IUserRoleStore<ApplicationUserBaseline> userRoleStore,
         IUserStore<ApplicationUserBaseline> userStore,
         IHttpContextAccessor httpContextAccessor,
-        UserManager<ApplicationUserBaseline> userManager
+        UserManager<ApplicationUserBaseline> userManager,
+        INavigationRepository navigationRepository,
+        IBreadcrumbRepository breadcrumbRepository,
+        IInfoProvider<TagInfo> tagInfoProvider,
+        ISiteMapRepository siteMapRepository
         ) : Controller
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
@@ -33,34 +40,25 @@ namespace MVC.Features.Testing
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         
         private readonly UserManager<ApplicationUserBaseline> _userManager = userManager;
+        private readonly INavigationRepository _navigationRepository = navigationRepository;
+        private readonly IBreadcrumbRepository _breadcrumbRepository = breadcrumbRepository;
+        private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
+        private readonly ISiteMapRepository _siteMapRepository = siteMapRepository;
 
-        
         public async Task<string> Index()
         {
+            // test secondary navigation
+            //var test = await _navigationRepository.GetSecondaryNavItemsAsync("/MPTest-FullAccess/MPTest-BreakInheritance", Navigation.Enums.PathSelectionEnum.ParentAndChildren);
 
-            
-            var username = "public";
-            var authenticated = false;
-            var roles = new List<string>();
+            var test = await _breadcrumbRepository.GetBreadcrumbsAsync(13.ToTreeIdentity(), true);
+            var jsonLd = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(test);
 
-            var context = _httpContextAccessor.HttpContext;
-            if (context is not null) {
-                var identity = context.User.Identities.FirstOrDefault();
-                if (identity is not null && identity.Name is not null) {
-                    username = identity.Name;
-                    authenticated = identity.IsAuthenticated;
-                }
-                var user = (await _userManager.GetUserAsync(context.User));
-                if (user != null) {
-                    roles.AddRange((await _userRoleStore.GetRolesAsync(user, CancellationToken.None)).Select(x => x.ToLowerInvariant()));
-                }
-            }
+            var sitemap = await _siteMapRepository.GetSiteMapUrlSetAsync();
 
-            // Just double checking for public to set not authenticated, roles may still apply if there is customization to set roles on the public user i suppose
-            if (username.Equals("public", StringComparison.OrdinalIgnoreCase)) {
-                authenticated = false;
-            }
-            return string.Empty;
+
+            // TODO: Maybe type is not serialzing, i know i needed something for this...
+            var sitemapText = SitemapNode.GetSitemap(sitemap);
+            return sitemapText;
         }
 
 
@@ -99,7 +97,7 @@ namespace MVC.Features.Testing
             // For Multi Type Querys, the Reusable Field Schema is usually returned in the data anyway
             var multiTypeQuery = new ContentItemQueryBuilder().ForContentTypes(parameters =>
                 parameters
-                    .OfContentType(BasicPage.CONTENT_TYPE_NAME, WebPage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME)
+                    .OfContentType(BasicPage.CONTENT_TYPE_NAME, WebPage.CONTENT_TYPE_NAME, Generic.Navigation.CONTENT_TYPE_NAME)
                     .WithContentTypeFields()
                 );
             var itemsMultiType = await _contentQueryExecutor.GetResult<object>(multiTypeQuery, (selector) => {

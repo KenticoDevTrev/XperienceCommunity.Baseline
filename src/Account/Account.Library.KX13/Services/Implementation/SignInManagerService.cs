@@ -72,5 +72,29 @@ namespace Account.KX13.Services.Implementation
         {
             await _signInManager.SignOutAsync();
         }
+
+        public Task RememberTwoFactorClientRememberedByNameAsync(string userName)
+        {
+            // This didn't work in KX13
+            return Task.CompletedTask;
+        }
+
+        public Task RememberTwoFactorClientRememberedByEmailAsync(string userName)
+        {
+            // This didn't work in KX13
+            return Task.CompletedTask;
+        }
+
+        public Task RememberTwoFactorClientRememberedByIdAsync(string userName)
+        {
+            // This didn't work in KX13
+            return Task.CompletedTask;
+        }
+
+        public Task RememberTwoFactorClientRememberedByLoginAsync(string loginProvider, string providerKey)
+        {
+            // This didn't work in KX13
+            return Task.CompletedTask;
+        }
     }
 }

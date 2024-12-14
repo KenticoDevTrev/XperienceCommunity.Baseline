@@ -27,6 +27,8 @@ StartupConfigs.RegisterInterfaces(builder);
 // Baseline Account / Authorization
 StartupConfigs.AddBaselineAccountAuthenticationAndControllerViews(builder);
 
+StartupConfigs.AddBaselineNavigation(builder);
+
 var app = builder.Build();
 
 StartupConfigs.RegisterBaselineCoreMiddleware(app);

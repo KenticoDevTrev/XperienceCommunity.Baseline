@@ -10,12 +10,6 @@ using XperienceCommunity.Authorization;
 
 namespace BaselineSiteElements.Features.Home
 {
-    /* TODO: Rebuild this for Sean
-     * public class HomePageTemplateFilter : PageTypePageTemplateFilter
-    {
-        public override string PageTypeClassName => "Generic.Home";
-    }*/
-
     public class HomePageTemplateProperties : IPageTemplateProperties
     {
         // Custom Properties here

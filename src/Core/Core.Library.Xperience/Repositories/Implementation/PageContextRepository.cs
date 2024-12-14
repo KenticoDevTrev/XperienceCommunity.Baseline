@@ -13,7 +13,7 @@ namespace Core.Repositories.Implementation
         ICacheRepositoryContext cacheRepositoryContext,
         IUrlResolver urlResolver,
         IIdentityService identityService,
-        ILanguageFallbackRepository languageFallbackRepository,
+        ILanguageRepository languageFallbackRepository,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext
         ) : IPageContextRepository
@@ -25,7 +25,7 @@ namespace Core.Repositories.Implementation
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly IIdentityService _identityService = identityService;
-        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
+        private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
 

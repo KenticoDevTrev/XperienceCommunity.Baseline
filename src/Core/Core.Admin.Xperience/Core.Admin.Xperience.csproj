@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
     <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.2" />
     <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="2.0.1" />

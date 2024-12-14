@@ -6,14 +6,20 @@ using MVCCaching;
 using Navigation.Enums;
 using Navigation.Models;
 using CMS.Websites.Routing;
-using XperienceCommunity.MVCCaching.Implementations;
 using NavigationPageType = Generic.Navigation;
 using RelationshipsExtended;
 using XperienceCommunity.QueryExtensions.ContentItems;
 using Kentico.Content.Web.Mvc;
 using Core.Enums;
-
-
+using XperienceCommunity.RelationshipsExtended.Extensions;
+using XperienceCommunity.RelationshipsExtended.Services;
+using XperienceCommunity.MemberRoles.Repositories;
+using XperienceCommunity.MemberRoles;
+using Navigation.XbyK.Models;
+using CMS.DataEngine;
+using Core.Models;
+using Core.Services;
+using Navigation.Services;
 
 namespace Navigation.Repositories.Implementations
 {
@@ -21,44 +27,214 @@ namespace Navigation.Repositories.Implementations
                                       ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
                                       IProgressiveCache progressiveCache,
                                       ICacheRepositoryContext cacheRepositoryContext,
-                                      ILinkedItemsDependencyAsyncRetriever linkedItemsDependencyAsyncRetriever,
-                                      IWebsiteChannelContext websiteChannelContext) : INavigationRepository
+                                      IWebsiteChannelContext websiteChannelContext,
+                                      IRelationshipExtendedHelper relationshipExtendedHelper,
+                                      IMemberAuthorizationFilter memberAuthorizationFilter,
+                                      IDynamicNavigationRepository dynamicNavigationRepository,
+                                      IIdentityService identityService) : INavigationRepository, ISecondaryNavigationService
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
-        private readonly ILinkedItemsDependencyAsyncRetriever _linkedItemsDependencyAsyncRetriever = linkedItemsDependencyAsyncRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
+        private readonly IRelationshipExtendedHelper _relationshipExtendedHelper = relationshipExtendedHelper;
+        private readonly IMemberAuthorizationFilter _memberAuthorizationFilter = memberAuthorizationFilter;
+        private readonly IDynamicNavigationRepository _dynamicNavigationRepository = dynamicNavigationRepository;
+        private readonly IIdentityService _identityService = identityService;
 
         public Task<string> GetAncestorPathAsync(string path, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
-            throw new NotImplementedException();
+            string[] pathParts = EnsureSinglePath(path).Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            if (levelIsRelative) {
+                // Handle minimum absolute level
+                if ((pathParts.Length - levels + 1) < minAbsoluteLevel) {
+                    levels -= minAbsoluteLevel - (pathParts.Length - levels + 1);
+                }
+                return Task.FromResult(GetParentPath(EnsureSinglePath(path), levels));
+            }
+
+            // Since first 'item' in path is actually level 2, reduce level by 1 to match counts
+            levels--;
+            if (pathParts.Length > levels) {
+                return Task.FromResult("/" + string.Join("/", pathParts.Take(levels)));
+            } else {
+                return Task.FromResult(EnsureSinglePath(path));
+            }
         }
 
-        public Task<string> GetAncestorPathAsync(Guid nodeGuid, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
+        public Task<string> GetAncestorPathAsync(Guid nodeGuid, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2) => GetAncestorPathAsync(nodeGuid.ToTreeIdentity(), levels, levelIsRelative, minAbsoluteLevel);
+
+        public Task<string> GetAncestorPathAsync(int nodeID, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2) => GetAncestorPathAsync(nodeID.ToTreeIdentity(), levels, levelIsRelative, minAbsoluteLevel);
+
+        public async Task<string> GetAncestorPathAsync(TreeIdentity treeIdentity, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
-            throw new NotImplementedException();
+            if((await treeIdentity.GetOrRetrievePathChannelLookup(_identityService)).TryGetValue(out var pathChannel)) {
+                return await GetAncestorPathAsync(pathChannel.Path, levels, levelIsRelative, minAbsoluteLevel);
+            }
+            return "/";
         }
 
-        public Task<string> GetAncestorPathAsync(int nodeID, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
+        public async Task<IEnumerable<NavigationItem>> FilterAndConvertIWebPageContentQueryDataContainerItems(IEnumerable<IWebPageContentQueryDataContainer> webPageContentQueryDataContainers)
         {
-            throw new NotImplementedException();
+            var filteredPageItems = await _memberAuthorizationFilter.RemoveUnauthorizedItems(webPageContentQueryDataContainers);
+
+            var hierarchy = WebPageListToHierarchyWebPagesAsync(filteredPageItems);
+
+            var navigation = HierarchyToNavigationItems(hierarchy, [], []);
+
+            return navigation;
         }
 
-        public Task<IEnumerable<NavigationItem>> GetNavItemsAsync(Maybe<string> navPath, IEnumerable<string>? navTypes = null)
+        public async Task<IEnumerable<NavigationItem>> GetNavItemsAsync(Maybe<string> navPath, IEnumerable<string>? navTypes = null)
         {
-            throw new NotImplementedException();
+            var navPageItems = await GetNavigationItemsAsync(navPath, navTypes ?? []);
+
+            var filteredPageItems = await _memberAuthorizationFilter.RemoveUnauthorizedItems(navPageItems.NavItems);
+
+            // Filter automatic items
+            var automaticItemContentIdsAllowed = (await _memberAuthorizationFilter.RemoveUnauthorizedItems(navPageItems.LinkedPagesByGuid.Select(x => x.Value))).Select(x => x.ContentItemID);
+            var filteredAutomaticItems = navPageItems.LinkedPagesByGuid.Where(x => automaticItemContentIdsAllowed.Contains(x.Value.ContentItemID)).ToDictionary();
+
+            var hierarchy = NavigationPageListToHierarchyWebPagesAsync(filteredPageItems);
+
+            // Convert to NavigationItems and handle Dynamic calls
+            var navigation = HierarchyToNavigationItems(hierarchy, filteredAutomaticItems, navPageItems.WebPageItemIDToDynamicChildren);
+
+            return navigation;
         }
 
-        public Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly, IEnumerable<string>? pageTypes = null, string? orderBy = null, string? whereCondition = null, int? maxLevel = -1, int? topNumber = -1)
+        public async Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly, IEnumerable<string>? pageTypes = null, string? orderBy = null, string? whereCondition = null, int? maxLevel = -1, int? topNumber = -1)
         {
-            throw new NotImplementedException();
+            if(!string.IsNullOrWhiteSpace(whereCondition) || !string.IsNullOrWhiteSpace(orderBy)) {
+                throw new NotImplementedException("No longer can use the OrderBy or WhereCondition, please retrieve your own list of IWebPageContentQueryDataContainers and then leverage the ISecondaryNavigationRepository to parse to NavItems. Default order is WebPageItemOrder");
+            }
+
+            var navItems = await GetSecondaryNavigationItemsAsync(startingPath, pathType, pageTypes, maxLevel, topNumber);
+
+            return await FilterAndConvertIWebPageContentQueryDataContainerItems(navItems);
+        }
+
+        private static List<NavigationItem> HierarchyToNavigationItems(IEnumerable<HierarchyWebPage> navigationItems, Dictionary<int, IWebPageContentQueryDataContainer> filteredAutomaticItems, Dictionary<int, IEnumerable<NavigationItem>> webPageItemIDToDynamicChildren)
+        {
+            var items = new List<NavigationItem>();
+            foreach (var navigationItem in navigationItems) {
+
+                // Get children so can add
+                var children = HierarchyToNavigationItems(navigationItem.Children, filteredAutomaticItems, webPageItemIDToDynamicChildren);
+
+                if (navigationItem.NavPage.TryGetValue(out var navPage)) {
+                    // check if automatic or not
+                    var dynamicItems = navPage.IsDynamic && webPageItemIDToDynamicChildren.TryGetValue(navPage.SystemFields.WebPageItemID, out var dynamicChildren) ? dynamicChildren : [];
+                    if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase)) {
+                        if (filteredAutomaticItems.TryGetValue(navPage.SystemFields.WebPageItemID, out var automaticItem)) {
+                            // TODO: Test  below
+                            // otherPage.GetValue("ContentItemLanguageMetadataDisplayName");
+                            items.Add(new NavigationItem(automaticItem.ContentItemName) {
+                                LinkHref = $"/{automaticItem.WebPageUrlPath}",
+                                LinkContentCultureGuid = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataGUID") 
+                                LinkContentCultureID = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataID")
+                                LinkPageID = automaticItem.WebPageItemID,
+                                LinkPageGuid = automaticItem.WebPageItemGUID,
+                                LinkPagePath = automaticItem.WebPageItemTreePath,
+                                Children = children.Union(dynamicItems)
+                            });
+                        } else {
+                            // Automatic item not found or filtered out, skip
+                            continue;
+                        }
+                    } else {
+                        items.Add(new NavigationItem(navPage.NavigationLinkText) {
+                            LinkHref = navPage.NavigationLinkUrl,
+                            LinkContentCultureGuid = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataGUID") 
+                            LinkContentCultureID = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataID")
+                            LinkPageID = navPage.SystemFields.WebPageItemID,
+                            LinkPageGuid = navPage.SystemFields.WebPageItemGUID,
+                            LinkPagePath = navPage.SystemFields.WebPageItemTreePath,
+                            LinkAlt = navPage.NavigationLinkAlt,
+                            LinkTarget = navPage.NavigationLinkTarget,
+                            LinkCSSClass = navPage.NavigationLinkCSS,
+                            LinkOnClick = navPage.NavigationLinkOnClick,
+                            Children = children.Union(dynamicItems)
+                        });
+                    }
+
+                } else if (navigationItem.OtherPage.TryGetValue(out var otherPage)) {
+                    // TODO: Test  below
+                    // otherPage.GetValue("ContentItemLanguageMetadataDisplayName");
+                    items.Add(new NavigationItem(otherPage.ContentItemName) {
+                        LinkHref = $"/{otherPage.WebPageUrlPath}",
+                        LinkContentCultureGuid = Maybe.None, // test otherPage.GetValue("ContentItemLanguageMetadataGUID") 
+                        LinkContentCultureID = Maybe.None, // test otherPage.GetValue("ContentItemLanguageMetadataID")
+                        LinkPageID = otherPage.WebPageItemID,
+                        LinkPageGuid = otherPage.WebPageItemGUID,
+                        LinkPagePath = otherPage.WebPageItemTreePath,
+                        Children = children
+                    });
+                }
+            }
+            return items;
         }
 
         #region "Helpers"
 
-        private async Task<IEnumerable<NavigationPageType>> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
+        private async Task<IEnumerable<IWebPageContentQueryDataContainer>> GetSecondaryNavigationItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly, IEnumerable<string>? pageTypes = null, int? maxLevel = -1, int? topNumber = -1)
+        {
+            var topN = topNumber ?? -1;
+            var nestingLevel = maxLevel ?? -1;
+            startingPath = $"/{startingPath.Trim('%').Trim('/')}";
+            var pageTypeEnum = pathType switch {
+                PathSelectionEnum.ParentOnly => PathTypeEnum.Explicit,
+                PathSelectionEnum.ParentAndChildren => PathTypeEnum.Section,
+                PathSelectionEnum.ChildrenOnly => PathTypeEnum.Children,
+                _ => PathTypeEnum.Children
+            };
+
+            var pathMatch = pathType switch {
+                PathSelectionEnum.ParentOnly => PathMatch.Single(startingPath),
+                PathSelectionEnum.ParentAndChildren => PathMatch.Section(startingPath, nestingLevel),
+                PathSelectionEnum.ChildrenOnly => PathMatch.Children(startingPath, nestingLevel),
+                _ => PathMatch.Children(startingPath, nestingLevel)
+            };
+            var builder = _cacheDependencyBuilderFactory.Create()
+                .WebPagePath(startingPath, pageTypeEnum);
+
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = builder.GetCMSCacheDependency();
+                }
+
+                var contentTypeIds = new List<int>();
+                if(pageTypes != null && pageTypes.Any()) {
+                    contentTypeIds = (await DataClassInfoProvider.GetClasses()
+                    .WhereIn(nameof(DataClassInfo.ClassName), pageTypes.ToArray())
+                    .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
+                    .Columns(nameof(DataClassInfo.ClassID))
+                    .GetEnumerableTypedResultAsync())
+                    .Select(x => x.ClassID).ToList();
+                }
+
+                // Include content type fields if there is an order or where condition as it may be part of it.
+                var navQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
+                            .ForWebsite(_websiteChannelContext.WebsiteChannelName, pathMatch, true)
+                            //.WithWebPageData(includeUrlPath: true)
+                        )
+                        .Parameters(query => {
+                        query.Where(where =>
+                            where.If(contentTypeIds.Count != 0, where => where.WhereIn(nameof(ContentItemFields.ContentItemContentTypeID), contentTypeIds))
+                        );
+                        if (topN > 0) {
+                            query.TopN(topN);
+                        }
+                        query.OrderBy(nameof(WebPageFields.WebPageItemOrder));
+                    })
+                    .WithCultureContext(_cacheRepositoryContext);
+                return await _contentQueryExecutor.GetWebPageResult(navQueryBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetSecondaryNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), startingPath, pathType.ToString(), _websiteChannelContext.WebsiteChannelName, string.Join(",", pageTypes.GetValueOrDefault([])), nestingLevel, topN));
+        }
+
+        private async Task<NavItemsAndJoinedDocs> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
 
@@ -69,89 +245,135 @@ namespace Navigation.Repositories.Implementations
                 builder.ObjectType(ContentItemCategoryInfo.OBJECT_TYPE);
             }
 
-            return await _progressiveCache.LoadAsync(async cs => {
-                var queryBuilder = new ContentItemQueryBuilder().ForContentType(NavigationPageType.CONTENT_TYPE_NAME, query => query.OrderBy(new string[] { nameof(WebPageFields.WebPageItemOrder) })
-                        .Columns(new string[] {
-                        "WebPageItemParentID", "WebPageItemID", nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(ContentItemFields.ContentItemID), nameof(ContentItemFields.ContentItemGUID),
-                        nameof(NavigationPageType.NavigationType), nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(NavigationPageType.NavigationLinkText), nameof(NavigationPageType.NavigationLinkTarget), nameof(NavigationPageType.NavigationLinkUrl),
-                        nameof(NavigationPageType.NavigationLinkCSS), nameof(NavigationPageType.NavigationLinkOnClick), nameof(NavigationPageType.NavigationLinkAlt), nameof(WebPageFields.WebPageItemTreePath),
-                        nameof(NavigationPageType.IsDynamic), nameof(NavigationPageType.DynamicCodeName), nameof(ContentItemFields.ContentItemCommonDataContentLanguageID), "ContentItemLanguageMetadataGUID"
-                       })
+            var results = await _progressiveCache.LoadAsync(async cs => {
+                var additionalDependencies = _cacheDependencyBuilderFactory.Create(false);
+
+                // Get NavigationPageType Items
+                var queryBuilder = new ContentItemQueryBuilder().ForContentType(NavigationPageType.CONTENT_TYPE_NAME, query => query
+                        .OrderBy(new string[] { nameof(WebPageFields.WebPageItemOrder) })
+                       /*.Columns(new string[] {
+                           "WebPageItemParentID", "WebPageItemID", nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(ContentItemFields.ContentItemID), nameof(ContentItemFields.ContentItemGUID),
+                           nameof(NavigationPageType.NavigationType), nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(NavigationPageType.NavigationLinkText), nameof(NavigationPageType.NavigationLinkTarget), nameof(NavigationPageType.NavigationLinkUrl),
+                           nameof(NavigationPageType.NavigationLinkCSS), nameof(NavigationPageType.NavigationLinkOnClick), nameof(NavigationPageType.NavigationLinkAlt), nameof(WebPageFields.WebPageItemTreePath),
+                           nameof(NavigationPageType.IsDynamic), nameof(NavigationPageType.DynamicCodeName), nameof(ContentItemFields.ContentItemCommonDataContentLanguageID), "ContentItemLanguageMetadataGUID"
+                       })*/
+                       .IncludeMemberAuthorization()
                        .If(navPath.TryGetValueNonEmpty(out var navPathVal), query => query.Path(navPathVal, PathTypeEnum.Section))
-                       );
-                // TODO: Re-enable once set
-                // .If(navTypes.Any(), query => query.TreeCategoryCondition(navTypes)));
+                       .If(navTypes.Any(), query => query.ContentItemCategoryCondition(_relationshipExtendedHelper, navTypes.Select(x => (object)x)))
+                       .OrderByWebpageItemOrder()
+                       )
+                       .WithCultureContext(_cacheRepositoryContext);
 
-                return await _contentQueryExecutor.GetMappedWebPageResult<NavigationPageType>(queryBuilder, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), navPath.GetValueOrDefault(string.Empty), string.Join(",", navTypes.GetValueOrDefault(Array.Empty<string>()))));
-        }
+                var navItems = await _contentQueryExecutor.GetMappedWebPageResult<NavigationPageType>(queryBuilder, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
 
-        #endregion
-
-        /*
-        public Task<IEnumerable<BlogItem>> GetBlogs(string path)
-        {
-            
-            // Create the Cache Dependency Builder and set the dependencies
-            var builder = CacheDependencyBuilderFactory.Create()
-                .WebPagePath(path, PathTypeEnum.Children);
-
-            var results = ProgressiveCache.LoadAsync(async cs => {
-
-                var nestedLevel = 2;
-
-                // Build Query with Linked Items
-                var queryBuilder = new ContentItemQueryBuilder()
-                    .WithCultureContext(CacheRepositoryContext) // Applys Language Context;
-                    // Main item we are calling
-                    .ForContentType("Sample.Blog", subqueryParameters => 
-                        subqueryParameters.ForWebsite(
-                            websiteChannelName: WebsiteChannelContext.WebsiteChannelName,
-                            pathMatch: PathMatch.Children(path),
-                            includeUrlPath: true
-                            )
-                            .Columns(nameof(Blog.BlogTitle), nameof(Blog.BlogSummary))
-                        // Include linked items to 2 nested levels, which will grab our Author and Address
-                        .WithLinkedItems(nestedLevel)
-                    )
-                    // Good practice to apply columns even to sub items
-                    .ForContentType("Sample.Author", subqueryParameters => 
-                        subqueryParameters.Columns(nameof(Author.AuthorName))
-                    )
-                    .ForContentType("Sample.AuthorAddress", subqueryParameters => 
-                        subqueryParameters.Columns(nameof(AuthorAddress.AuthorAddressState), nameof(AuthorAddress.AuthorAddressCity))
-                    );
-
-
-                // Apply Preview Mode Context
-                var queryOptions = new ContentQueryExecutionOptions()
-                    .WithPreviewModeContext(CacheRepositoryContext);
-
-                // Get Items
-                var items = await ContentQueryExecutor.GetMappedResult<Blog>(queryBuilder, queryOptions);
-
-                // Get Linked Item Dependencies
-                var linkedDependencies = await LinkedItemsDependencyAsyncRetriever.Get(items.Select(x => x.ContentItemID), nestedLevel);
-
-                // Apply cache dependencies, including the additional linked dependencies
-                if(cs.Cached) {
-                    cs.CacheDependency = builder.GetCMSCacheDependency(additionalDependencies: linkedDependencies);
+                // Retrieve related items
+                var automaticNavWebPageGuids = navItems.Where(x => x.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase)).SelectMany(x => x.NavigationWebPageItemGuid?.Select(x => x.WebPageGuid) ?? []);
+                var additionalItemDictionary = new Dictionary<int, IWebPageContentQueryDataContainer>();
+                additionalDependencies.WebPages(automaticNavWebPageGuids);
+                if (automaticNavWebPageGuids.Any()) {
+                    var automaticItemsQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
+                            .ForWebsite(includeUrlPath: true)
+                            .WithWebPageData(includeUrlPath: true)
+                        )
+                        .Parameters(query => query
+                            .Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), automaticNavWebPageGuids))
+                        )
+                        .WithCultureContext(_cacheRepositoryContext);
+                    var relatedNavItems = await _contentQueryExecutor.GetWebPageResult(automaticItemsQueryBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
+                    additionalItemDictionary = relatedNavItems.ToDictionary(key => key.WebPageItemID, value => value);
                 }
 
-                // Optional convert items into a lightweight DTO to be returned
-                var blogItems = items.Select(x => x.ToBlogItemDTO()); // ToBlogItemDTO is just an extension method that converts the Xperience Webpage Blog to the generic BlogItem DTO
+                if (cs.Cached) {
+                    cs.CacheDependency = builder.AddKeys(additionalDependencies.GetKeys()).GetCMSCacheDependency();
+                }
 
-                // Return the results with a wrapper
-                return new DTOWithDependencies<IEnumerable<BlogItem>>(blogItems, linkedDependencies);
-            }, new CacheSettings(60, "GetBlogs", path, CacheRepositoryContext.ToCacheNameIdentifier()));
+                return new DTOWithDependencies<NavItemsAndJoinedDocs>(new NavItemsAndJoinedDocs(navItems, additionalItemDictionary, []), additionalDependencies.GetKeys().ToList());
 
-            // Append added dependencies
-            builder.AppendDTOWithDependencies(results);
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), navPath.GetValueOrDefault(string.Empty), string.Join(",", navTypes.GetValueOrDefault([]))));
 
-            // Return actual results
-            return results.Result;
+            // Add any dependencies found during retrieval.
+            builder.AddKeys(results.AdditionalDependencies);
+
+            // Next handle Dynamic Nav Items
+            var webPageItemIDToDynamicNavItems = new Dictionary<int, IEnumerable<NavigationItem>>();
+            var dynamicNavs = results.Result.NavItems.Where(x => x.IsDynamic && !string.IsNullOrWhiteSpace(x.DynamicCodeName)).Select(x => x);
+            foreach (var dynamicNav in dynamicNavs) {
+                var dynamicNavItems = await _dynamicNavigationRepository.GetDynamicNavication(dynamicNav.DynamicCodeName);
+                webPageItemIDToDynamicNavItems.Add(dynamicNav.SystemFields.WebPageItemID, dynamicNavItems);
+            }
+
+            return results.Result with { WebPageItemIDToDynamicChildren = webPageItemIDToDynamicNavItems };
         }
-        */
 
+
+        private static List<HierarchyWebPage> NavigationPageListToHierarchyWebPagesAsync(IEnumerable<NavigationPageType> filteredPageItems)
+        {
+            var webPageItemIDToHierarchyWebPage = new Dictionary<int, HierarchyWebPage>();
+
+            // populate ParentNodeIDToTreeNode
+            foreach (var webPageItem in filteredPageItems) {
+                webPageItemIDToHierarchyWebPage.Add(webPageItem.SystemFields.WebPageItemID, new HierarchyWebPage(webPageItem));
+            }
+            return SetHierarchy(webPageItemIDToHierarchyWebPage);
+        }
+
+        private static List<HierarchyWebPage> WebPageListToHierarchyWebPagesAsync(IEnumerable<IWebPageContentQueryDataContainer> filteredPageItems)
+        {
+            var webPageItemIDToHierarchyWebPage = new Dictionary<int, HierarchyWebPage>();
+
+            // populate ParentNodeIDToTreeNode
+            foreach (var webPageItem in filteredPageItems) {
+                webPageItemIDToHierarchyWebPage.Add(webPageItem.WebPageItemID, new HierarchyWebPage(webPageItem));
+            }
+            return SetHierarchy(webPageItemIDToHierarchyWebPage);
+        }
+
+        private static List<HierarchyWebPage> SetHierarchy(Dictionary<int, HierarchyWebPage> webPageItemIDToHierarchyWebPage)
+        {
+            var hierarchyWebPages = new List<HierarchyWebPage>();
+
+            // Populate the Children of the TypedResults
+            foreach (var webPageItemKey in webPageItemIDToHierarchyWebPage.Keys) {
+                var webPageItem = webPageItemIDToHierarchyWebPage[webPageItemKey];
+                var parentWebPageItemID = webPageItem.NavPage.AsNullableValue()?.SystemFields.WebPageItemParentID ?? webPageItem.OtherPage.AsNullableValue()?.WebPageItemParentID ?? 0;
+                // If parent exists, add as child, otherwise add to top level
+                if (webPageItemIDToHierarchyWebPage.ContainsKey(parentWebPageItemID)) {
+                    webPageItemIDToHierarchyWebPage[parentWebPageItemID].Children.Add(webPageItem);
+                } else {
+                    hierarchyWebPages.Add(webPageItem);
+                }
+            }
+            return hierarchyWebPages;
+        }
+
+
+        public static string EnsureSinglePath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) {
+                return path;
+            }
+
+            path = path.TrimEnd(['%']);
+            if (path != "/") {
+                path = "/" + path.Trim(['/']);
+            }
+
+            return path;
+        }
+
+        public static string GetParentPath(string path, int parentLevel)
+        {
+            while (parentLevel > 0 && path != "/") {
+                path = DataHelper.GetParentPath(path);
+                parentLevel--;
+            }
+
+            return path;
+        }
+        private record NavItemsAndJoinedDocs(IEnumerable<NavigationPageType> NavItems, Dictionary<int, IWebPageContentQueryDataContainer> LinkedPagesByGuid, Dictionary<int, IEnumerable<NavigationItem>> WebPageItemIDToDynamicChildren);
+
+
+
+        #endregion
     }
 }

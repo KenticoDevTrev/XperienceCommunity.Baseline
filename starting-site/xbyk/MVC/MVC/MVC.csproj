@@ -15,6 +15,7 @@
     <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\..\..\..\src\Account\Account.RCL.Xperience\Account.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL.Xperience\Navigation.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>
