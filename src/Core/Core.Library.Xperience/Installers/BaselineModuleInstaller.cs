@@ -414,6 +414,29 @@ Generic.BaseInheritedPage",
                 });
             }
 
+            // Add or Update MenuName Field
+            var existingFieldMenuName = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_MenuName));
+            var fieldMenuName = existingFieldMenuName ?? new FormFieldInfo();
+            fieldMenuName.Name = nameof(IBaseMetadata.MetaData_MenuName);
+            fieldMenuName.AllowEmpty = true;
+            fieldMenuName.Precision = 0;
+            fieldMenuName.DataType = "text";
+            fieldMenuName.Enabled = true;
+            fieldMenuName.Visible = true;
+            fieldMenuName.Size = 100;
+            fieldMenuName.Guid = Guid.Parse("70dfb72a-d2a2-49df-84dc-61c0068163f9");
+            fieldMenuName.SetComponentName("Kentico.Administration.TextInput");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Menu Name");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "What gets displayed on Menus, Breadcrumbs, etc.");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
+            fieldMenuName.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+
+            if (existingFieldMenuName != null) {
+                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_MenuName), fieldMenuName);
+            } else {
+                contentItemCommonDataForm.AddFormItem(fieldMenuName);
+            }
+
             // Add or Update Title Field
             var existingTitleField = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_Title));
             var titleField = existingTitleField ?? new FormFieldInfo();

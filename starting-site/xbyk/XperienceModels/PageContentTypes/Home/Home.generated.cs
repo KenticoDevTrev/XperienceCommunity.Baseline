@@ -42,10 +42,16 @@ namespace Generic
 		public string PageName { get; set; }
 
 
-		/// <summary>
-		/// MetaData_Title.
-		/// </summary>
-		public string MetaData_Title { get; set; }
+        /// <summary>
+        /// MetaData_MenuName.
+        /// </summary>
+        public string MetaData_MenuName { get; set; }
+
+
+        /// <summary>
+        /// MetaData_Title.
+        /// </summary>
+        public string MetaData_Title { get; set; }
 
 
 		/// <summary>

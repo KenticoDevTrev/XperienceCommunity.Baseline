@@ -5,10 +5,12 @@ using Generic;
 
 namespace Site.Repositories.Implementations
 {
-    public class CustomWebPageToPageMetadataConverter(IContentQueryResultMapper contentQueryResultMapper, IMediaRepository mediaRepository) : IWebPageToPageMetadataConverter
+    public class CustomWebPageToPageMetadataConverter(IContentQueryResultMapper contentQueryResultMapper, IMediaRepository mediaRepository,
+        IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository) : IWebPageToPageMetadataConverter
     {
         private readonly IContentQueryResultMapper _contentQueryResultMapper = contentQueryResultMapper;
         private readonly IMediaRepository _mediaRepository = mediaRepository;
+        private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
 
         // BASELINE CUSTOMIZATION: Start Site - Any Web Pages should have logic here to parse the metadata.
         public async Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer)
@@ -39,11 +41,16 @@ namespace Site.Repositories.Implementations
                     }
                 }
 
+                // Title should be the Title, followed by MenuName, followed by the Content Item Language Metadata Display Name
+                var title = metadataObject.MetaData_Title.AsNullOrWhitespaceMaybe().GetValueOrDefault(
+                        metadataObject.MetaData_MenuName.AsNullOrWhitespaceMaybe().GetValueOrDefault("")).AsNullOrWhitespaceMaybe();
+                if(title.HasNoValue && (await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(webPageContentQueryDataContainer, true, true)).TryGetValue(out var langMetadata)) {
+                    title = langMetadata.ContentItemLanguageMetadataDisplayName;
+                }
+
                 return Result.Success(new PageMetaData() {
                     CanonicalUrl = webPageContentQueryDataContainer.WebPageUrlPath.AsNullOrWhitespaceMaybe(),
-                    Title = metadataObject.MetaData_Title.AsNullOrWhitespaceMaybe().GetValueOrDefault(
-                        webPageContentQueryDataContainer.GetValue<string>("ContentItemLanguageMetadataDisplayName") ?? ""
-                        ).AsNullOrWhitespaceMaybe(),
+                    Title = title,
                     Description = metadataObject.MetaData_Description.AsNullOrWhitespaceMaybe(),
                     Keywords = metadataObject.MetaData_Keywords.AsNullOrWhitespaceMaybe(),
                     NoIndex = metadataObject.MetaData_NoIndex,

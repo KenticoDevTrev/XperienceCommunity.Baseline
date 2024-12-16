@@ -6,7 +6,9 @@ using CMS.Websites;
 using CMS.Websites.Routing;
 using Core.Enums;
 using Core.Models;
+using Core.Repositories;
 using Core.Services;
+using Generic;
 using Kentico.Content.Web.Mvc;
 using Microsoft.Extensions.Localization;
 using MVCCaching;
@@ -23,7 +25,8 @@ namespace Navigation.Repositories.Implementations
         IProgressiveCache progressiveCache,
         IWebsiteChannelContext websiteChannelContext,
         ICacheRepositoryContext cacheRepositoryContext,
-        IContentQueryExecutor contentQueryExecutor
+        IContentQueryExecutor contentQueryExecutor,
+        IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository
         ) : IBreadcrumbRepository
     {
         private readonly IUrlResolver _urlResolver = urlResolver;
@@ -35,6 +38,7 @@ namespace Navigation.Repositories.Implementations
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
+        private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
 
         public Task<BreadcrumbJsonLD> BreadcrumbsToJsonLDAsync(IEnumerable<Breadcrumb> breadcrumbs, bool excludeFirst = true)
         {
@@ -127,18 +131,34 @@ namespace Navigation.Repositories.Implementations
                 .WithCultureContext(_cacheRepositoryContext);
 
                 var results = await _contentQueryExecutor.GetWebPageResult(itemBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
-                return results.GroupBy(x => x.WebPageItemID)
-                .ToDictionary(key => key.Key, value => value.Select(x => {
+
+                var webPageItemIDToBreadcrumbWithParent = new Dictionary<int, Tuple<Breadcrumb, int>>();
+
+                var groupedResults = results.GroupBy(x => x.WebPageItemID);
+                foreach (var item in groupedResults) {
+
+                    var x = item.First();
                     // Getting WebPageItemID blew up for items without a parent...
                     // TODO: Undo this insane hackery when they fix the null exception...
                     int parentId = 0;
-                    if(x.TryGetValue(nameof(WebPageFields.WebPageItemParentID), out int? parentIdVal) && parentIdVal.HasValue) {
+                    if (x.TryGetValue(nameof(WebPageFields.WebPageItemParentID), out int? parentIdVal) && parentIdVal.HasValue) {
                         parentId = parentIdVal.Value;
                     }
-                    
-                    string linkText = x.GetValue<string>("ContentItemLanguageMetadataDisplayName").AsNullOrWhitespaceMaybe().GetValueOrDefault(x.WebPageItemName);
-                    return new Tuple<Breadcrumb, int>(new Breadcrumb(linkText: linkText, linkUrl: $"/{x.WebPageUrlPath}"), parentId);
-                }).First());
+
+                    var linkText = "";
+                    try {
+                        linkText = x.TryGetValue(nameof(IBaseMetadata.MetaData_MenuName), out string menuName) ? menuName : "";
+                    } catch (Exception) {
+                        // if try get value throws an exception (page doesn't inherit the BaseMetadata i suppose)
+                    }
+                    if (linkText.AsNullOrWhitespaceMaybe().HasNoValue
+                        && (await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(x, true, true)).TryGetValue(out var languageMetadata)) {
+                        linkText = languageMetadata.ContentItemLanguageMetadataDisplayName;
+                    }
+
+                    webPageItemIDToBreadcrumbWithParent.Add(item.Key, new Tuple<Breadcrumb, int>(new Breadcrumb(linkText: linkText.AsNullOrWhitespaceMaybe().GetValueOrDefault(x.WebPageItemName), linkUrl: $"/{x.WebPageUrlPath}"), parentId));
+                }
+                return webPageItemIDToBreadcrumbWithParent;
 
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetWebPageItemIDToBreadcrumbAndParent", string.Join(",", validClassNames), channelName, _cacheRepositoryContext.ToCacheNameIdentifier()));
         }

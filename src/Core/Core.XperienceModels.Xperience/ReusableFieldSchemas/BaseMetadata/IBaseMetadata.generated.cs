@@ -25,11 +25,15 @@ namespace Generic
 		/// </summary>
 		public const string REUSABLE_FIELD_SCHEMA_NAME = "Base.Metadata";
 
+        /// <summary>
+        /// MetaData_MenuName.
+        /// </summary>
+        public string MetaData_MenuName { get; set; }
 
-		/// <summary>
-		/// MetaData_Title.
-		/// </summary>
-		public string MetaData_Title { get; set; }
+        /// <summary>
+        /// MetaData_Title.
+        /// </summary>
+        public string MetaData_Title { get; set; }
 
 
 		/// <summary>
