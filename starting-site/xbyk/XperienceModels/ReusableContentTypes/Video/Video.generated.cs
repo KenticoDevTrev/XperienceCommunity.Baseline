@@ -13,18 +13,18 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 
-namespace TEST
+namespace Generic
 {
 	/// <summary>
-	/// Represents a content item of type <see cref="Testing"/>.
+	/// Represents a content item of type <see cref="Video"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Testing : IContentItemFieldsSource
+	public partial class Video : IContentItemFieldsSource
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "TEST.Testing";
+		public const string CONTENT_TYPE_NAME = "Generic.Video";
 
 
 		/// <summary>
@@ -35,14 +35,20 @@ namespace TEST
 
 
 		/// <summary>
-		/// TestAssetField.
+		/// VideoTitle.
 		/// </summary>
-		public ContentItemAsset TestAssetField { get; set; }
+		public string VideoTitle { get; set; }
 
 
 		/// <summary>
-		/// RelatedImages.
+		/// VideoDescription.
 		/// </summary>
-		public IEnumerable<IGenericHasImage> RelatedImages { get; set; }
+		public string VideoDescription { get; set; }
+
+
+		/// <summary>
+		/// VideoFile.
+		/// </summary>
+		public ContentItemAsset VideoFile { get; set; }
 	}
 }

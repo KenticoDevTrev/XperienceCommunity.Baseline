@@ -38,6 +38,6 @@ namespace Testing
 		/// <summary>
 		/// TestAssetReferences.
 		/// </summary>
-		public IEnumerable<IContentItemFieldsSource> TestAssetReferences { get; set; }
+		public IEnumerable<Image> TestAssetReferences { get; set; }
 	}
 }

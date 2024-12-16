@@ -16,112 +16,106 @@ using CMS.Websites;
 
 namespace Generic
 {
-    /// <summary>
-    /// Represents a page of type <see cref="Home"/>.
-    /// </summary>
-    [RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-    public partial class Home : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect, IXperienceCommunityMemberPermissionConfiguration
-    {
-        /// <summary>
-        /// Code name of the content type.
-        /// </summary>
-        public const string CONTENT_TYPE_NAME = "Generic.Home";
+	/// <summary>
+	/// Represents a page of type <see cref="Home"/>.
+	/// </summary>
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class Home : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect, IXperienceCommunityMemberPermissionConfiguration
+	{
+		/// <summary>
+		/// Code name of the content type.
+		/// </summary>
+		public const string CONTENT_TYPE_NAME = "Generic.Home";
 
 
-        /// <summary>
-        /// Represents system properties for a web page item.
-        /// </summary>
-        [SystemField]
-        public WebPageFields SystemFields { get; set; }
+		/// <summary>
+		/// Represents system properties for a web page item.
+		/// </summary>
+		[SystemField]
+		public WebPageFields SystemFields { get; set; }
 
 
-        /// <summary>
-        /// MetaData_PageName.
-        /// </summary>
-        public string MetaData_PageName { get; set; }
+		/// <summary>
+		/// MetaData_PageName.
+		/// </summary>
+		public string MetaData_PageName { get; set; }
 
 
-        /// <summary>
-        /// MetaData_Title.
-        /// </summary>
-        public string MetaData_Title { get; set; }
+		/// <summary>
+		/// MetaData_Title.
+		/// </summary>
+		public string MetaData_Title { get; set; }
 
 
-        /// <summary>
-        /// MetaData_Description.
-        /// </summary>
-        public string MetaData_Description { get; set; }
+		/// <summary>
+		/// MetaData_Description.
+		/// </summary>
+		public string MetaData_Description { get; set; }
 
 
-        /// <summary>
-        /// MetaData_Keywords.
-        /// </summary>
-        public string MetaData_Keywords { get; set; }
+		/// <summary>
+		/// MetaData_Keywords.
+		/// </summary>
+		public string MetaData_Keywords { get; set; }
 
 
-        /// <summary>
-        /// MetaData_ThumbnailSmall.
-        /// </summary>
-        public IEnumerable<IGenericHasImage> MetaData_ThumbnailSmall { get; set; }
+		/// <summary>
+		/// MetaData_NoIndex.
+		/// </summary>
+		public bool MetaData_NoIndex { get; set; }
 
 
-        /// <summary>
-        /// MetaData_ThumbnailLarge.
-        /// </summary>
-        public IEnumerable<IGenericHasImage> MetaData_ThumbnailLarge { get; set; }
+		/// <summary>
+		/// MetaData_OGImage.
+		/// </summary>
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
 
 
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
+		/// <summary>
+		/// PageRedirectionType.
+		/// </summary>
+		public string PageRedirectionType { get; set; }
 
 
-        /// <summary>
-        /// PageRedirectionType.
-        /// </summary>
-        public string PageRedirectionType { get; set; }
+		/// <summary>
+		/// PageInternalRedirectPage.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> PageInternalRedirectPage { get; set; }
 
 
-        /// <summary>
-        /// PageInternalRedirectPage.
-        /// </summary>
-        public IEnumerable<WebPageRelatedItem> PageInternalRedirectPage { get; set; }
+		/// <summary>
+		/// PageExternalRedirectURL.
+		/// </summary>
+		public string PageExternalRedirectURL { get; set; }
 
 
-        /// <summary>
-        /// PageExternalRedirectURL.
-        /// </summary>
-        public string PageExternalRedirectURL { get; set; }
+		/// <summary>
+		/// PageFirstChildClassName.
+		/// </summary>
+		public string PageFirstChildClassName { get; set; }
 
 
-        /// <summary>
-        /// PageFirstChildClassName.
-        /// </summary>
-        public string PageFirstChildClassName { get; set; }
+		/// <summary>
+		/// PageUsePermanentRedirects.
+		/// </summary>
+		public bool PageUsePermanentRedirects { get; set; }
 
 
-        /// <summary>
-        /// PageUsePermanentRedirects.
-        /// </summary>
-        public bool PageUsePermanentRedirects { get; set; }
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
 
 
-        /// <summary>
-        /// MemberPermissionOverride.
-        /// </summary>
-        public bool MemberPermissionOverride { get; set; }
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
 
 
-        /// <summary>
-        /// MemberPermissionIsSecure.
-        /// </summary>
-        public bool MemberPermissionIsSecure { get; set; }
-
-
-        /// <summary>
-        /// MemberPermissionRoleTags.
-        /// </summary>
-        public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
-    }
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
+	}
 }

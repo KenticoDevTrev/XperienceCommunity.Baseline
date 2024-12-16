@@ -13,34 +13,42 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 
-namespace Testing
+namespace Generic
 {
 	/// <summary>
-	/// Defines a contract for content types with the <see cref="IXperienceCommunityMemberPermissionConfiguration"/> reusable schema assigned.
+	/// Represents a content item of type <see cref="Image"/>.
 	/// </summary>
-	public interface IXperienceCommunityMemberPermissionConfiguration
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class Image : IContentItemFieldsSource, IGenericHasImage
 	{
 		/// <summary>
-		/// Code name of the reusable field schema.
+		/// Code name of the content type.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "XperienceCommunityMemberPermissionConfiguration";
+		public const string CONTENT_TYPE_NAME = "Generic.Image";
 
 
 		/// <summary>
-		/// MemberPermissionOverride.
+		/// Represents system properties for a content item.
 		/// </summary>
-		public bool MemberPermissionOverride { get; set; }
+		[SystemField]
+		public ContentItemFields SystemFields { get; set; }
 
 
 		/// <summary>
-		/// MemberPermissionIsSecure.
+		/// ImageTitle.
 		/// </summary>
-		public bool MemberPermissionIsSecure { get; set; }
+		public string ImageTitle { get; set; }
 
 
 		/// <summary>
-		/// MemberPermissionRoleTags.
+		/// ImageDescription.
 		/// </summary>
-		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
+		public string ImageDescription { get; set; }
+
+
+		/// <summary>
+		/// ImageFile.
+		/// </summary>
+		public ContentItemAsset ImageFile { get; set; }
 	}
 }

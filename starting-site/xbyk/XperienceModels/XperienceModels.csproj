@@ -16,6 +16,12 @@
     <NoWarn>NU1603</NoWarn>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="ReusableFieldSchemas\BaseMetadata\**" />
+    <EmbeddedResource Remove="ReusableFieldSchemas\BaseMetadata\**" />
+    <None Remove="ReusableFieldSchemas\BaseMetadata\**" />
+  </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
@@ -30,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Membership\" />
+    <Folder Include="ReusableFieldSchemas\" />
   </ItemGroup>
 
 </Project>

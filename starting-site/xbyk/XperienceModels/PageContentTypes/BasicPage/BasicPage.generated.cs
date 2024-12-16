@@ -60,21 +60,15 @@ namespace Generic
 
 
 		/// <summary>
-		/// MetaData_ThumbnailSmall.
-		/// </summary>
-		public IEnumerable<IGenericHasImage> MetaData_ThumbnailSmall { get; set; }
-
-
-		/// <summary>
-		/// MetaData_ThumbnailLarge.
-		/// </summary>
-		public IEnumerable<IGenericHasImage> MetaData_ThumbnailLarge { get; set; }
-
-
-		/// <summary>
 		/// MetaData_NoIndex.
 		/// </summary>
 		public bool MetaData_NoIndex { get; set; }
+
+
+		/// <summary>
+		/// MetaData_OGImage.
+		/// </summary>
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
 
 
 		/// <summary>

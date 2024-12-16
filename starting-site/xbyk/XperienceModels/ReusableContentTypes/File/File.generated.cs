@@ -19,7 +19,7 @@ namespace Generic
 	/// Represents a content item of type <see cref="File"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class File : IContentItemFieldsSource
+	public partial class File : IContentItemFieldsSource, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -35,9 +35,9 @@ namespace Generic
 
 
 		/// <summary>
-		/// FileName.
+		/// FileTitle.
 		/// </summary>
-		public string FileName { get; set; }
+		public string FileTitle { get; set; }
 
 
 		/// <summary>
@@ -47,8 +47,26 @@ namespace Generic
 
 
 		/// <summary>
-		/// FileAttachment.
+		/// FileFile.
 		/// </summary>
-		public ContentItemAsset FileAttachment { get; set; }
+		public ContentItemAsset FileFile { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

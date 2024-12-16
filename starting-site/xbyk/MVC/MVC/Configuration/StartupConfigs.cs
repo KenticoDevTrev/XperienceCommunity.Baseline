@@ -52,8 +52,8 @@ namespace MVC.Configuration
                         // Enables Page Builder for content types using their generated classes
 
                         // BASELINE CUSTOMIZATION: Starting Site - If you wish to use the Home and Basic Pages, MUST add it here
-                        Home.CONTENT_TYPE_NAME,
-                        BasicPage.CONTENT_TYPE_NAME,
+                        Generic.Home.CONTENT_TYPE_NAME,
+                        Generic.BasicPage.CONTENT_TYPE_NAME,
 
                         // BASELINE CUSTOMIZATION: Navigation - If using Navigation content type, MUST add it here
                         Generic.Navigation.CONTENT_TYPE_NAME,

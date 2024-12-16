@@ -23,7 +23,7 @@ namespace Generic
 		/// <summary>
 		/// Code name of the reusable field schema.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "Base.Redirect";
+		public const string REUSABLE_FIELD_SCHEMA_NAME = "BaseRedirect";
 
 
 		/// <summary>

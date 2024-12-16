@@ -11,7 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.MediaLibrary;
 
 namespace Generic
 {
@@ -23,17 +22,19 @@ namespace Generic
 		/// <summary>
 		/// Code name of the reusable field schema.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "Base.Metadata";
+		public const string REUSABLE_FIELD_SCHEMA_NAME = "BaseMetadata";
 
-        /// <summary>
-        /// MetaData_PageName.
-        /// </summary>
-        public string MetaData_PageName { get; set; }
 
-        /// <summary>
-        /// MetaData_Title.
-        /// </summary>
-        public string MetaData_Title { get; set; }
+		/// <summary>
+		/// MetaData_PageName.
+		/// </summary>
+		public string MetaData_PageName { get; set; }
+
+
+		/// <summary>
+		/// MetaData_Title.
+		/// </summary>
+		public string MetaData_Title { get; set; }
 
 
 		/// <summary>
@@ -48,31 +49,15 @@ namespace Generic
 		public string MetaData_Keywords { get; set; }
 
 
-        /// <summary>
-        /// MetaData_ThumbnailSmall.  NOTE: This won't actually contain anything even if the data exists.
-        /// 
-        /// Use the IMetaDataRepository.GetMetaDataAsync(TreeCultureIdentity) to retrieve the metadata based on this page and then check for the thumbnail small/large if you need it personally.
-        /// This will use the IContentItemReferenceService to read the raw JSON Data and return the reference GUIDs, which you can then use with the IMediaRepository to get any assets configured.
-        /// 
-        /// Because of this limitation, for your own content types, you may want to specify your actual Image Content Types for the selector, instead of this filter.
-        /// </summary>
-        public IEnumerable<IGenericHasImage> MetaData_ThumbnailSmall { get; set; }
+		/// <summary>
+		/// MetaData_NoIndex.
+		/// </summary>
+		public bool MetaData_NoIndex { get; set; }
 
 
-        /// <summary>
-        /// MetaData_ThumbnailLarge.  NOTE: This won't actually contain anything even if the data exists.
-        /// 
-        /// Use the IMetaDataRepository.GetMetaDataAsync(TreeCultureIdentity) to retrieve the metadata based on this page and then check for the thumbnail small/large if you need it personally.
-        /// This will use the IContentItemReferenceService to read the raw JSON Data and return the reference GUIDs, which you can then use with the IMediaRepository to get any assets configured.
-        /// 
-        /// Because of this limitation, for your own content types, you may want to specify your actual Image Content Types for the selector, instead of this filter.
-        /// </summary>
-        public IEnumerable<IGenericHasImage> MetaData_ThumbnailLarge { get; set; }
-
-
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
-    }
+		/// <summary>
+		/// MetaData_OGImage.
+		/// </summary>
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
+	}
 }

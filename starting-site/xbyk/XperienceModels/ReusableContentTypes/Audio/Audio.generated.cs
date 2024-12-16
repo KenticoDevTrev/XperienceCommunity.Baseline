@@ -11,48 +11,50 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.Websites;
+using CMS.ContentEngine;
 
-namespace Testing
+namespace Generic
 {
 	/// <summary>
-	/// Defines a contract for content types with the <see cref="IBaseRedirect"/> reusable schema assigned.
+	/// Represents a content item of type <see cref="Audio"/>.
 	/// </summary>
-	public interface IBaseRedirect
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class Audio : IContentItemFieldsSource
 	{
 		/// <summary>
-		/// Code name of the reusable field schema.
+		/// Code name of the content type.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "BaseRedirect";
+		public const string CONTENT_TYPE_NAME = "Generic.Audio";
 
 
 		/// <summary>
-		/// PageRedirectionType.
+		/// Represents system properties for a content item.
 		/// </summary>
-		public string PageRedirectionType { get; set; }
+		[SystemField]
+		public ContentItemFields SystemFields { get; set; }
 
 
 		/// <summary>
-		/// PageInternalRedirectPage.
+		/// AudioTitle.
 		/// </summary>
-		public IEnumerable<WebPageRelatedItem> PageInternalRedirectPage { get; set; }
+		public string AudioTitle { get; set; }
 
 
 		/// <summary>
-		/// PageExternalRedirectURL.
+		/// AudioDescription.
 		/// </summary>
-		public string PageExternalRedirectURL { get; set; }
+		public string AudioDescription { get; set; }
 
 
 		/// <summary>
-		/// PageFirstChildClassName.
+		/// AudioFile.
 		/// </summary>
-		public string PageFirstChildClassName { get; set; }
+		public ContentItemAsset AudioFile { get; set; }
 
 
 		/// <summary>
-		/// PageUsePermanentRedirects.
+		/// AudioTranscript.
 		/// </summary>
-		public bool PageUsePermanentRedirects { get; set; }
+		public string AudioTranscript { get; set; }
 	}
 }

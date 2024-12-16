@@ -121,13 +121,11 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             Maybe<string> title = Maybe.None;
             Maybe<bool> noIndex = Maybe.None;
             Maybe<string> canonicalUrlValue = Maybe.None;
-            Maybe<string> thumbnailSmall = thumbnail.AsNullOrWhitespaceMaybe();
-            Maybe<string> thumbnailLarge = Maybe.None;
+            Maybe<string> ogImage = thumbnail.AsNullOrWhitespaceMaybe();
 
             // Generate Base PageMetaData
             if ((await GetDefaultMetadataLogic(node)).TryGetValue(out var metaDataFromBase)) {
-                thumbnailSmall = thumbnailSmall.GetValueOrDefault(metaDataFromBase.Thumbnail);
-                thumbnailLarge = metaDataFromBase.ThumbnailLarge;
+                ogImage = ogImage.GetValueOrDefault(metaDataFromBase.Thumbnail);
                 keywords = metaDataFromBase.Keywords;
                 description = metaDataFromBase.Description;
                 title = metaDataFromBase.Title;
@@ -158,8 +156,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                 Title = title,
                 Keywords = keywords,
                 Description = description,
-                Thumbnail = thumbnailSmall.TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
-                ThumbnailLarge = thumbnailLarge.TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
+                Thumbnail = ogImage.TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
                 NoIndex = noIndex,
                 CanonicalUrl = canonicalUrlValue.TryGetValue(out var url) ? _urlResolver.GetAbsoluteUrl(url) : Maybe.None
             };
@@ -177,8 +174,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             string? description = null;
             string? title = null;
             bool? noIndex = null;
-            string? thumbnailSmall = null;
-            string? thumbnailLarge = null;
+            string? ogImage = null;
             var dataFound = false;
 
             try {
@@ -194,16 +190,10 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                     keywords = metaDataKeywords;
                     dataFound = true;
                 }
-                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_ThumbnailSmall)).FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
+                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_OGImage)).FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
                     var medias = await _mediaRepository.GetContentItemAssets(metaDataSmall.Identifier.ToContentIdentity());
                     if (medias.FirstOrMaybe().TryGetValue(out var media)) {
-                        thumbnailSmall = media.MediaPermanentUrl;
-                    }
-                }
-                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_ThumbnailLarge)).FirstOrMaybe().TryGetValue(out var metaDataLarge)) {
-                    var medias = await _mediaRepository.GetContentItemAssets(metaDataLarge.Identifier.ToContentIdentity());
-                    if (medias.FirstOrMaybe().TryGetValue(out var media)) {
-                        thumbnailSmall = media.MediaPermanentUrl;
+                        ogImage = media.MediaPermanentUrl;
                     }
                 }
                 if (node.TryGetValue(nameof(IBaseMetadata.MetaData_NoIndex), out bool? metaDataNoIndex) && metaDataNoIndex.HasValue) {
@@ -218,8 +208,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                 Description = description.AsMaybe(),
                 Keywords = keywords.AsMaybe(),
                 NoIndex = noIndex.AsMaybe(),
-                Thumbnail = thumbnailSmall.AsNullOrWhitespaceMaybe(),
-                ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe()
+                Thumbnail = ogImage.AsNullOrWhitespaceMaybe(),
             }, "Does not have any MetaData values");
 
         }
