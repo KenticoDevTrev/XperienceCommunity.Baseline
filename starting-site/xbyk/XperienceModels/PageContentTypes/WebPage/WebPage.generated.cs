@@ -13,8 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using XperienceCommunity;
-using XperienceCommunity.MemberRoles;
 
 namespace Testing
 {
@@ -73,10 +71,10 @@ namespace Testing
 		public string TestLanguageAgnosticValue { get; set; }
 
 
-        /// <summary>
-        /// MemberPermissionOverride.
-        /// </summary>
-        public bool MemberPermissionOverride { get; set; }
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
 
 
 		/// <summary>

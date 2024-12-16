@@ -1,6 +1,8 @@
 ﻿using CMS.Websites;
+using Generic;
 using Kentico.Content.Web.Mvc;
 using System.Data;
+using System.Text.Json;
 
 namespace Core.Repositories.Implementation
 {
@@ -14,7 +16,10 @@ namespace Core.Repositories.Implementation
         ICacheRepositoryContext cacheRepositoryContext,
         IProgressiveCache progressiveCache,
         MetadataOptions metadataOptions,
-        ILanguageRepository languageRepository) : IMetaDataRepository
+        ILanguageRepository languageRepository,
+        IContentTranslationInformationRepository contentTranslationInformationRepository,
+        IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
+        IMediaRepository mediaRepository) : IMetaDataRepository
     {
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
@@ -24,13 +29,16 @@ namespace Core.Repositories.Implementation
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly MetadataOptions _metadataOptions = metadataOptions;
         private readonly ILanguageRepository _languageRepository = languageRepository;
+        private readonly IContentTranslationInformationRepository _contentTranslationInformationRepository = contentTranslationInformationRepository;
+        private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
+        private readonly IMediaRepository _mediaRepository = mediaRepository;
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
-            if(!(await treeCultureIdentity.GetOrRetrievePageID(_identityService)).TryGetValue(out var pageId)) {
+            if (!(await treeCultureIdentity.GetOrRetrievePageID(_identityService)).TryGetValue(out var pageId)) {
                 return Result.Failure<PageMetaData>("No page found by that PageID");
             }
-            
+
             var builder = _cacheDependencyBuilderFactory.Create()
                .WebPageOnLanguage(pageId, treeCultureIdentity.Culture);
 
@@ -48,7 +56,7 @@ namespace Core.Repositories.Implementation
                 }, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
             }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", treeCultureIdentity.GetCacheKey(), _metadataOptions.MaxLinkedLevelsRetrievedForMetadata));
 
-            if(results.FirstOrMaybe().TryGetValue(out var webPageResult)) {
+            if (results.FirstOrMaybe().TryGetValue(out var webPageResult)) {
                 return await GetMetaDataInternalAsync(webPageResult, thumbnail);
             }
             return Result.Failure<PageMetaData>("No webpage found by that tree culture identity");
@@ -64,7 +72,7 @@ namespace Core.Repositories.Implementation
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(Guid contentCultureGuid, string? thumbnail = null)
         {
-            if((await GetTranslationDictionary()).ContentCultureGuidToIdentity.TryGetValue(contentCultureGuid, out var identity)) {
+            if ((await GetTranslationDictionary()).ContentCultureGuidToIdentity.TryGetValue(contentCultureGuid, out var identity)) {
                 return await GetMetaDataAsync(identity, thumbnail);
             }
             return Result.Failure<PageMetaData>("Could not find page by that content culture GUID (make sure it's the ContentItemLanguageMetadataGUID)");
@@ -74,7 +82,7 @@ namespace Core.Repositories.Implementation
         {
             return await _progressiveCache.LoadAsync(async cs => {
 
-                if(cs.Cached) {
+                if (cs.Cached) {
                     cs.CacheDependency = CacheHelper.GetCacheDependency("webpageitem|all");
                 }
 
@@ -98,58 +106,130 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(string? thumbnail = null)
         {
-            if ((await _pageContextRepository.GetCurrentPageAsync()).TryGetValue(out var page))
-            {       
+            if ((await _pageContextRepository.GetCurrentPageAsync()).TryGetValue(out var page)) {
                 return await GetMetaDataAsync(page.TreeCultureIdentity, thumbnail);
-            }
-            else
-            {
+            } else {
                 return Result.Failure<PageMetaData>("No page in the current context");
             }
         }
 
         private async Task<PageMetaData> GetMetaDataInternalAsync(IWebPageContentQueryDataContainer node, string? thumbnail = null)
         {
-            string? keywords = null;
-            string? description = null;
-            string? title = null;
+            Maybe<string> keywords = Maybe.None;
+            Maybe<string> description = Maybe.None;
+            Maybe<string> title = Maybe.None;
             Maybe<bool> noIndex = Maybe.None;
-            string? canonicalUrlValue = null;
-            string? thumbnailLarge = null;
+            Maybe<string> canonicalUrlValue = Maybe.None;
+            Maybe<string> thumbnailSmall = thumbnail.AsNullOrWhitespaceMaybe();
+            Maybe<string> thumbnailLarge = Maybe.None;
 
-            var metaDataResults = await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node);
-
-            if(metaDataResults.TryGetValue(out var metadataFromPage)) {
-                thumbnail ??= metadataFromPage.Thumbnail.AsNullableValue();
-                thumbnailLarge ??= metadataFromPage.ThumbnailLarge.AsNullableValue();
-                keywords ??= metadataFromPage.Keywords.AsNullableValue();
-                description ??= metadataFromPage.Description.AsNullableValue();
-                title ??= metadataFromPage.Title.GetValueOrDefault(node.GetValue<string>("ContentItemLanguageMetadataDisplayName")).AsNullOrWhitespaceMaybe().AsNullableValue();
-                noIndex = metadataFromPage.NoIndex;
-                canonicalUrlValue = metadataFromPage.CanonicalUrl.AsNullableValue();
+            // Generate Base PageMetaData
+            if ((await GetDefaultMetadataLogic(node)).TryGetValue(out var metaDataFromBase)) {
+                thumbnailSmall = thumbnailSmall.GetValueOrDefault(metaDataFromBase.Thumbnail);
+                thumbnailLarge = metaDataFromBase.ThumbnailLarge;
+                keywords = metaDataFromBase.Keywords;
+                description = metaDataFromBase.Description;
+                title = metaDataFromBase.Title;
+                noIndex = metaDataFromBase.NoIndex;
+                canonicalUrlValue = metaDataFromBase.CanonicalUrl;
             }
 
             // Handle canonical url
-            if (string.IsNullOrWhiteSpace(canonicalUrlValue))
-            {
-                canonicalUrlValue = node.WebPageUrlPath;
+            if (canonicalUrlValue.GetValueOrDefault(string.Empty).AsNullOrWhitespaceMaybe().HasNoValue) {
+                var translations = await _contentTranslationInformationRepository.GetWebpageTranslationSummaries(node.WebPageItemID, node.WebPageItemWebsiteChannelID);
+                if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageRepository.LanguageIdToName(node.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).FirstOrMaybe().TryGetValue(out var properItem)) {
+                    canonicalUrlValue = properItem.Url;
+                } else {
+                    canonicalUrlValue = $"/{node.WebPageUrlPath}";
+                }
             }
 
-            var metaData = new PageMetaData()
-            {
-                Title = title.AsNullOrWhitespaceMaybe(),
-                Keywords = keywords.AsNullOrWhitespaceMaybe(),
-                Description = description.AsNullOrWhitespaceMaybe(),
-                Thumbnail = thumbnail.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
-                ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe().TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
+            // Use fallback of display name
+            if (title.GetValueOrDefault("").AsNullOrWhitespaceMaybe().HasNoValue) {
+                if ((await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(node, true, true)).TryGetValue(out var langMetadata)) {
+                    title = langMetadata.ContentItemLanguageMetadataDisplayName;
+                } else {
+                    title = node.ContentItemName;
+                }
+            }
+
+            var basePageMetadata = new PageMetaData() {
+                Title = title,
+                Keywords = keywords,
+                Description = description,
+                Thumbnail = thumbnailSmall.TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
+                ThumbnailLarge = thumbnailLarge.TryGetValue(out var thumbLargeUrl) ? _urlResolver.GetAbsoluteUrl(thumbLargeUrl) : Maybe.None,
                 NoIndex = noIndex,
-                CanonicalUrl = canonicalUrlValue.AsNullOrWhitespaceMaybe().TryGetValue(out var url) ? _urlResolver.ResolveUrl(url) : Maybe.None
+                CanonicalUrl = canonicalUrlValue.TryGetValue(out var url) ? _urlResolver.GetAbsoluteUrl(url) : Maybe.None
             };
 
-            return metaData;
+            // Allow customizations
+            if((await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node, basePageMetadata)).TryGetValue(out var metaData)) {
+                return metaData;
+            };
+            return basePageMetadata;
+        }
+
+        private async Task<Result<PageMetaData>> GetDefaultMetadataLogic(IWebPageContentQueryDataContainer node)
+        {
+            string? keywords = null;
+            string? description = null;
+            string? title = null;
+            bool? noIndex = null;
+            string? thumbnailSmall = null;
+            string? thumbnailLarge = null;
+            var dataFound = false;
+
+            try {
+                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Title)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataTitle)) {
+                    title = metaDataTitle;
+                    dataFound = true;
+                }
+                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Description)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataDescription)) {
+                    description = metaDataDescription;
+                    dataFound = true;
+                }
+                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Keywords)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataKeywords)) {
+                    keywords = metaDataKeywords;
+                    dataFound = true;
+                }
+                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_ThumbnailSmall)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataSmall)) {
+                    var references = JsonSerializer.Deserialize<ContentItemReference[]>(metaDataSmall);
+                    if(references != null && references.Length > 0) {
+                        var medias = await _mediaRepository.GetContentItemAssets(references[0].Identifier.ToContentIdentity());
+                        if (medias.FirstOrMaybe().TryGetValue(out var media)) {
+                            thumbnailSmall = media.MediaPermanentUrl;
+                        }
+                    }
+                }
+                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_ThumbnailLarge)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataLarge)) {
+                    var references = JsonSerializer.Deserialize<ContentItemReference[]>(metaDataLarge);
+                    if (references != null && references.Length > 0) {
+                        var medias = await _mediaRepository.GetContentItemAssets(references[0].Identifier.ToContentIdentity());
+                        if (medias.FirstOrMaybe().TryGetValue(out var media)) {
+                            thumbnailSmall = media.MediaPermanentUrl;
+                        }
+                    }
+                }
+                if (node.TryGetValue(nameof(IBaseMetadata.MetaData_NoIndex), out bool? metaDataNoIndex) && metaDataNoIndex.HasValue) {
+                    noIndex = metaDataNoIndex.Value;
+                    dataFound = true;
+                }
+            } catch (Exception) {
+
+            }
+            return Result.SuccessIf(dataFound, new PageMetaData() {
+                Title = title.AsMaybe(),
+                Description = description.AsMaybe(),
+                Keywords = keywords.AsMaybe(),
+                NoIndex = noIndex.AsMaybe(),
+                Thumbnail = thumbnailSmall.AsNullOrWhitespaceMaybe(),
+                ThumbnailLarge = thumbnailLarge.AsNullOrWhitespaceMaybe()
+            }, "Does not have any MetaData values");
+
         }
 
         private record ContentCultureLookup(Dictionary<int, TreeCultureIdentity> ContentCultureIdToIdentity, Dictionary<Guid, TreeCultureIdentity> ContentCultureGuidToIdentity);
-       
+
     }
 }

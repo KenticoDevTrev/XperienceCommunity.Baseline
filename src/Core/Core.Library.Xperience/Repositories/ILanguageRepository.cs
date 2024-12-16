@@ -25,5 +25,13 @@ namespace Core.Repositories
         ObjectIdentity GetInstanceDefaultLanguage();
 
         ObjectIdentity DefaultLanguageForWebsiteChannel(int? websiteChannelID = null);
+
+        /// <summary>
+        /// Returns an empty string if it's the site's default language, or /[ContentLanguageName] if it's not.
+        /// </summary>
+        /// <param name="websiteChannelID">the website channel id</param>
+        /// <param name="contenLanguageID">Your item's language ID</param>
+        /// <returns></returns>
+        string GetLanguageUrlPrefix(int websiteChannelID, int contenLanguageID);
     }
 }

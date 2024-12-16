@@ -22,7 +22,6 @@ namespace MVC.Features.Testing
         IRoleStore<TagApplicationUserRole> roleStore,
         IUserRoleStore<ApplicationUserBaseline> userRoleStore,
         IUserStore<ApplicationUserBaseline> userStore,
-        IHttpContextAccessor httpContextAccessor,
         UserManager<ApplicationUserBaseline> userManager,
         INavigationRepository navigationRepository,
         IBreadcrumbRepository breadcrumbRepository,
@@ -37,7 +36,6 @@ namespace MVC.Features.Testing
         private readonly IRoleStore<TagApplicationUserRole> _roleStore = roleStore;
         private readonly IUserRoleStore<ApplicationUserBaseline> _userRoleStore = userRoleStore;
         private readonly IUserStore<ApplicationUserBaseline> _userStore = userStore;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         
         private readonly UserManager<ApplicationUserBaseline> _userManager = userManager;
         private readonly INavigationRepository _navigationRepository = navigationRepository;
@@ -48,15 +46,13 @@ namespace MVC.Features.Testing
         public async Task<string> Index()
         {
             // test secondary navigation
-            //var test = await _navigationRepository.GetSecondaryNavItemsAsync("/MPTest-FullAccess/MPTest-BreakInheritance", Navigation.Enums.PathSelectionEnum.ParentAndChildren);
+            var test = await _navigationRepository.GetSecondaryNavItemsAsync("/MPTest-FullAccess/MPTest-BreakInheritance", Navigation.Enums.PathSelectionEnum.ParentAndChildren);
 
-            var test = await _breadcrumbRepository.GetBreadcrumbsAsync(13.ToTreeIdentity(), true);
-            var jsonLd = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(test);
+            var test2 = await _breadcrumbRepository.GetBreadcrumbsAsync(13.ToTreeIdentity(), true);
+            var jsonLd = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(test2);
 
             var sitemap = await _siteMapRepository.GetSiteMapUrlSetAsync();
 
-
-            // TODO: Maybe type is not serialzing, i know i needed something for this...
             var sitemapText = SitemapNode.GetSitemap(sitemap);
             return sitemapText;
         }
@@ -88,7 +84,7 @@ namespace MVC.Features.Testing
             var currentUser = await _memberAuthenticationContext.GetAuthenticationContext();
 
             // For single type query, use the .IncludeMemberAuthorization() to ensure the columns are returned that are needed for parsing.
-            var singleTypeQuery = new ContentItemQueryBuilder().ForContentType(BasicPage.CONTENT_TYPE_NAME, query => query.Columns(nameof(BasicPage.PageName))
+            var singleTypeQuery = new ContentItemQueryBuilder().ForContentType(BasicPage.CONTENT_TYPE_NAME, query => query.Columns(nameof(BasicPage.MetaData_PageName))
             .IncludeMemberAuthorization()
             );
             var itemsSingle = await _contentQueryExecutor.GetMappedWebPageResult<BasicPage>(singleTypeQuery);
@@ -110,9 +106,9 @@ namespace MVC.Features.Testing
                 return selector as IContentItemFieldsSource;
             });
 
-            var result = $"Before Filter: \n\r\n\r   -{string.Join("\n\r   -", itemsSingle.Select(x => x.PageName))}\n\r";
+            var result = $"Before Filter: \n\r\n\r   -{string.Join("\n\r   -", itemsSingle.Select(x => x.MetaData_PageName))}\n\r";
             var filteredItemsSingle = await _memberAuthorizationFilter.RemoveUnauthorizedItems(itemsSingle, true, ["teachers"]);
-            result += $"\n\r\n\rAfter Filter: \n\r\n\r   -{string.Join("\n\r   -", filteredItemsSingle.Select(x => x.PageName))}\n\r";
+            result += $"\n\r\n\rAfter Filter: \n\r\n\r   -{string.Join("\n\r   -", filteredItemsSingle.Select(x => x.MetaData_PageName))}\n\r";
 
             result += $"\n\r\n\rBefore Filter Multi: \n\r\n\r   -{string.Join("\n\r   -", itemsMultiType.Select(x => ((IContentItemFieldsSource)x).SystemFields.ContentItemName))}\n\r";
             var filteredItemsMulti = await _memberAuthorizationFilter.RemoveUnauthorizedItems(itemsMultiType, true, ["teachers"]);

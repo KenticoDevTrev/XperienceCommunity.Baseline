@@ -13,9 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.MediaLibrary;
-using XperienceCommunity.MemberRoles;
-using XperienceCommunity;
 
 namespace Generic
 {
@@ -39,21 +36,15 @@ namespace Generic
 
 
 		/// <summary>
-		/// PageName.
+		/// MetaData_PageName.
 		/// </summary>
-		public string PageName { get; set; }
+		public string MetaData_PageName { get; set; }
 
 
-        /// <summary>
-        /// MetaData_MenuName.
-        /// </summary>
-        public string MetaData_MenuName { get; set; }
-
-
-        /// <summary>
-        /// MetaData_Title.
-        /// </summary>
-        public string MetaData_Title { get; set; }
+		/// <summary>
+		/// MetaData_Title.
+		/// </summary>
+		public string MetaData_Title { get; set; }
 
 
 		/// <summary>
@@ -71,23 +62,25 @@ namespace Generic
 		/// <summary>
 		/// MetaData_ThumbnailSmall.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailSmall { get; set; }
+		public IEnumerable<IGenericHasImage> MetaData_ThumbnailSmall { get; set; }
 
 
 		/// <summary>
 		/// MetaData_ThumbnailLarge.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
+		public IEnumerable<IGenericHasImage> MetaData_ThumbnailLarge { get; set; }
 
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
 
-        /// <summary>
-        /// PageRedirectionType.
-        /// </summary>
-        public string PageRedirectionType { get; set; }
+		/// <summary>
+		/// MetaData_NoIndex.
+		/// </summary>
+		public bool MetaData_NoIndex { get; set; }
+
+
+		/// <summary>
+		/// PageRedirectionType.
+		/// </summary>
+		public string PageRedirectionType { get; set; }
 
 
 		/// <summary>
@@ -114,10 +107,10 @@ namespace Generic
 		public bool PageUsePermanentRedirects { get; set; }
 
 
-        /// <summary>
-        /// MemberPermissionOverride.
-        /// </summary>
-        public bool MemberPermissionOverride { get; set; }
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
 
 
 		/// <summary>

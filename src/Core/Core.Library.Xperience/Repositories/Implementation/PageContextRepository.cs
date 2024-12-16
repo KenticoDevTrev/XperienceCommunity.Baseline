@@ -113,11 +113,10 @@ namespace Core.Repositories.Implementation
                     );
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetPageIdentityByWebpageIdAndLanguage"));
         }
-        // TODO: have 2 queries, if the Metadata_MenuName exists, one if that doesn't exist.
         private string _baseQuery = @"
 select 
 ContentItemLanguageMetadataDisplayName,
-MetaData_MenuName,
+MetaData_PageName,
 WebPageItemName, 
 WebPageItemID,
 WebPageItemGUID,
@@ -129,7 +128,7 @@ ContentItemLanguageMetadataGUID,
 WebPageItemTreePath,
 ContentLanguageName,
 WebPageUrlPath,
-WebsiteChannelChannelID
+WebsiteChannelChannelID,
 ClassName
 from CMS_WebPageItem
 inner join CMS_ContentItem on WebPageItemContentItemID = ContentItemID
@@ -143,7 +142,7 @@ where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
 ";
 
         private PageIdentity DataRowToPageIdentity(DataRow value) => new (
-                            name: value.Field<string?>("MetaData_MenuName").GetValueOrDefault((string)value["ContentItemLanguageMetadataDisplayName"]),
+                            name: value.Field<string?>("MetaData_PageName").GetValueOrDefault((string)value["ContentItemLanguageMetadataDisplayName"]),
                             alias: (string)value["WebPageItemName"],
                             pageID: (int)value["WebPageItemID"],
                             pageGuid: (Guid)value["WebPageItemGUID"],

@@ -38,9 +38,9 @@ namespace Generic
 
 
         /// <summary>
-        /// MetaData_MenuName.
+        /// MetaData_PageName.
         /// </summary>
-        public string MetaData_MenuName { get; set; }
+        public string MetaData_PageName { get; set; }
 
 
         /// <summary>
@@ -61,16 +61,16 @@ namespace Generic
 		public string MetaData_Keywords { get; set; }
 
 
-		/// <summary>
-		/// MetaData_ThumbnailSmall.
-		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailSmall { get; set; }
+        /// <summary>
+        /// MetaData_ThumbnailSmall.
+        /// </summary>
+        public IEnumerable<IGenericHasImage> MetaData_ThumbnailSmall { get; set; }
 
 
-		/// <summary>
-		/// MetaData_ThumbnailLarge.
-		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
+        /// <summary>
+        /// MetaData_ThumbnailLarge.
+        /// </summary>
+        public IEnumerable<IGenericHasImage> MetaData_ThumbnailLarge { get; set; }
 
 
         /// <summary>

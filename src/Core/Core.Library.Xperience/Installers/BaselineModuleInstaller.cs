@@ -204,29 +204,6 @@ Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
                 formInfo.AddFormItem(fieldContentItemDataGUID);
             }
 
-            // Add or Update PageName Field
-            var fieldExistingPageName = contentItemCommonDataForm.GetFormField("PageName");
-            var fieldPageName = fieldExistingPageName ?? new FormFieldInfo();
-            fieldPageName.Name = "PageName";
-            fieldPageName.AllowEmpty = false;
-            fieldPageName.Precision = 0;
-            fieldPageName.Size = 200;
-            fieldPageName.DataType = "text";
-            fieldPageName.Enabled = true;
-            fieldPageName.Visible = true;
-            fieldPageName.Guid = Guid.Parse("a9262728-d387-4042-ac6e-a82bea438f23");
-            fieldPageName.SetComponentName("Kentico.Administration.TextInput");
-
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-
-            if (fieldExistingPageName != null) {
-                contentItemCommonDataForm.UpdateFormField("PageName", fieldPageName);
-            } else {
-                contentItemCommonDataForm.AddFormItem(fieldPageName);
-            }
-
             // Add the 3 schemas
             if (formInfo.GetFormSchema(baseMetaDataSchema.Guid.ToString().ToLower()) == null) {
                 var baseMetaDataSchemaReference = new FormSchemaInfo() {
@@ -340,29 +317,6 @@ Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
                 formInfo.AddFormItem(fieldContentItemDataGUID);
             }
 
-            // Add or Update PageName Field
-            var fieldExistingPageName = contentItemCommonDataForm.GetFormField("PageName");
-            var fieldPageName = fieldExistingPageName ?? new FormFieldInfo();
-            fieldPageName.Name = "PageName";
-            fieldPageName.AllowEmpty = false;
-            fieldPageName.Precision = 0;
-            fieldPageName.Size = 100;
-            fieldPageName.DataType = "text";
-            fieldPageName.Enabled = true;
-            fieldPageName.Visible = true;
-            fieldPageName.Guid = Guid.Parse("01c23e63-273b-48cf-95f9-521c368f1c24");
-            fieldPageName.SetComponentName("Kentico.Administration.TextInput");
-
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-
-            if (fieldExistingPageName != null) {
-                contentItemCommonDataForm.UpdateFormField("PageName", fieldPageName);
-            } else {
-                contentItemCommonDataForm.AddFormItem(fieldPageName);
-            }
-
             // Add the 2 schemas
             if (formInfo.GetFormSchema(baseMetaDataSchema.Guid.ToString().ToLower()) == null) {
                 var baseMetaDataSchemaReference = new FormSchemaInfo() {
@@ -415,24 +369,24 @@ Generic.BaseInheritedPage",
             }
 
             // Add or Update MenuName Field
-            var existingFieldMenuName = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_MenuName));
+            var existingFieldMenuName = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_PageName));
             var fieldMenuName = existingFieldMenuName ?? new FormFieldInfo();
-            fieldMenuName.Name = nameof(IBaseMetadata.MetaData_MenuName);
+            fieldMenuName.Name = nameof(IBaseMetadata.MetaData_PageName);
             fieldMenuName.AllowEmpty = true;
             fieldMenuName.Precision = 0;
             fieldMenuName.DataType = "text";
             fieldMenuName.Enabled = true;
             fieldMenuName.Visible = true;
-            fieldMenuName.Size = 100;
+            fieldMenuName.Size = 200;
             fieldMenuName.Guid = Guid.Parse("70dfb72a-d2a2-49df-84dc-61c0068163f9");
             fieldMenuName.SetComponentName("Kentico.Administration.TextInput");
-            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Menu Name");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
             fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "What gets displayed on Menus, Breadcrumbs, etc.");
             fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldMenuName.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
 
             if (existingFieldMenuName != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_MenuName), fieldMenuName);
+                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_PageName), fieldMenuName);
             } else {
                 contentItemCommonDataForm.AddFormItem(fieldMenuName);
             }
@@ -449,7 +403,7 @@ Generic.BaseInheritedPage",
             titleField.Guid = Guid.Parse("1e716d33-9f3c-42b4-aa99-330f44976058");
             titleField.SetComponentName("Kentico.Administration.TextInput");
             titleField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Title");
-            titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "If empty, will default to the Name");
+            titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "If empty, will default to the Page Name");
             titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             titleField.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
 

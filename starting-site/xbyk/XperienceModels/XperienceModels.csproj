@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Membership\" />
-    <Folder Include="PageContentTypes\Navigation\" />
   </ItemGroup>
 
 </Project>

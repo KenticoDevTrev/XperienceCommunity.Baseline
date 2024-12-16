@@ -189,6 +189,14 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetWebsiteChannelById_LanguageRepository"));
         }
 
+        public string GetLanguageUrlPrefix(int websiteChannelID, int contenLanguageID)
+        {
+            var defaultLanguageID = DefaultLanguageForWebsiteChannel(websiteChannelID);
+            if (defaultLanguageID.Id.Value.Equals(contenLanguageID)) {
+                return string.Empty;
+            }
+            return $"/{LanguageIdToName(contenLanguageID)}";
+        }
 
         private record CultureMappingDictionaries(Dictionary<string, int> NameToId, Dictionary<int, string> IdToName, int DefaultLanguageId, Dictionary<int, int> SiteToDefaultLanguageID);
     }

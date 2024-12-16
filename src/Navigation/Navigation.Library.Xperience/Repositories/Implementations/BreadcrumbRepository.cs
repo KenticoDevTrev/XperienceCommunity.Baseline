@@ -147,7 +147,7 @@ namespace Navigation.Repositories.Implementations
 
                     var linkText = "";
                     try {
-                        linkText = x.TryGetValue(nameof(IBaseMetadata.MetaData_MenuName), out string menuName) ? menuName : "";
+                        linkText = x.TryGetValue(nameof(IBaseMetadata.MetaData_PageName), out string menuName) ? menuName : "";
                     } catch (Exception) {
                         // if try get value throws an exception (page doesn't inherit the BaseMetadata i suppose)
                     }

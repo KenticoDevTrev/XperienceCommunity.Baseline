@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Core.Installers;
 using Microsoft.AspNetCore.Builder;
 using MVC.NewFolder;
+using CMS.ContentEngine;
 
 namespace Core
 {
@@ -91,6 +92,7 @@ namespace Core
                 .AddScoped<IModelStateService, ModelStateService>()
                 .AddScoped<IContentItemLanguageMetadataRepository, ContentItemLanguageMetadataRepository>()
                 .AddScoped<IContentTranslationInformationRepository, ContentTranslationInformationRepository>()
+                .AddScoped<IContentItemReferenceService, ContentItemReferenceService>()
 
                 // Some internal APIs
                 .AddScoped<IPageContextRepository, PageContextRepository>()

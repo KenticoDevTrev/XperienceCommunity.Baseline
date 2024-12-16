@@ -20,6 +20,8 @@ using CMS.DataEngine;
 using Core.Models;
 using Core.Services;
 using Navigation.Services;
+using Generic;
+using Core.Repositories;
 
 namespace Navigation.Repositories.Implementations
 {
@@ -31,7 +33,8 @@ namespace Navigation.Repositories.Implementations
                                       IRelationshipExtendedHelper relationshipExtendedHelper,
                                       IMemberAuthorizationFilter memberAuthorizationFilter,
                                       IDynamicNavigationRepository dynamicNavigationRepository,
-                                      IIdentityService identityService) : INavigationRepository, ISecondaryNavigationService
+                                      IIdentityService identityService,
+                                      IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository) : INavigationRepository, ISecondaryNavigationService
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
@@ -42,6 +45,7 @@ namespace Navigation.Repositories.Implementations
         private readonly IMemberAuthorizationFilter _memberAuthorizationFilter = memberAuthorizationFilter;
         private readonly IDynamicNavigationRepository _dynamicNavigationRepository = dynamicNavigationRepository;
         private readonly IIdentityService _identityService = identityService;
+        private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
 
         public Task<string> GetAncestorPathAsync(string path, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
@@ -70,7 +74,7 @@ namespace Navigation.Repositories.Implementations
 
         public async Task<string> GetAncestorPathAsync(TreeIdentity treeIdentity, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
-            if((await treeIdentity.GetOrRetrievePathChannelLookup(_identityService)).TryGetValue(out var pathChannel)) {
+            if ((await treeIdentity.GetOrRetrievePathChannelLookup(_identityService)).TryGetValue(out var pathChannel)) {
                 return await GetAncestorPathAsync(pathChannel.Path, levels, levelIsRelative, minAbsoluteLevel);
             }
             return "/";
@@ -82,7 +86,7 @@ namespace Navigation.Repositories.Implementations
 
             var hierarchy = WebPageListToHierarchyWebPagesAsync(filteredPageItems);
 
-            var navigation = HierarchyToNavigationItems(hierarchy, [], []);
+            var navigation = await HierarchyToNavigationItems(hierarchy, [], []);
 
             return navigation;
         }
@@ -100,14 +104,14 @@ namespace Navigation.Repositories.Implementations
             var hierarchy = NavigationPageListToHierarchyWebPagesAsync(filteredPageItems);
 
             // Convert to NavigationItems and handle Dynamic calls
-            var navigation = HierarchyToNavigationItems(hierarchy, filteredAutomaticItems, navPageItems.WebPageItemIDToDynamicChildren);
+            var navigation = await HierarchyToNavigationItems(hierarchy, filteredAutomaticItems, navPageItems.WebPageItemIDToDynamicChildren);
 
             return navigation;
         }
 
         public async Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly, IEnumerable<string>? pageTypes = null, string? orderBy = null, string? whereCondition = null, int? maxLevel = -1, int? topNumber = -1)
         {
-            if(!string.IsNullOrWhiteSpace(whereCondition) || !string.IsNullOrWhiteSpace(orderBy)) {
+            if (!string.IsNullOrWhiteSpace(whereCondition) || !string.IsNullOrWhiteSpace(orderBy)) {
                 throw new NotImplementedException("No longer can use the OrderBy or WhereCondition, please retrieve your own list of IWebPageContentQueryDataContainers and then leverage the ISecondaryNavigationRepository to parse to NavItems. Default order is WebPageItemOrder");
             }
 
@@ -116,25 +120,40 @@ namespace Navigation.Repositories.Implementations
             return await FilterAndConvertIWebPageContentQueryDataContainerItems(navItems);
         }
 
-        private static List<NavigationItem> HierarchyToNavigationItems(IEnumerable<HierarchyWebPage> navigationItems, Dictionary<int, IWebPageContentQueryDataContainer> filteredAutomaticItems, Dictionary<int, IEnumerable<NavigationItem>> webPageItemIDToDynamicChildren)
+        private async Task<List<NavigationItem>> HierarchyToNavigationItems(IEnumerable<HierarchyWebPage> navigationItems, Dictionary<int, IWebPageContentQueryDataContainer> filteredAutomaticItems, Dictionary<int, IEnumerable<NavigationItem>> webPageItemIDToDynamicChildren)
         {
             var items = new List<NavigationItem>();
             foreach (var navigationItem in navigationItems) {
 
                 // Get children so can add
-                var children = HierarchyToNavigationItems(navigationItem.Children, filteredAutomaticItems, webPageItemIDToDynamicChildren);
+                var children = await HierarchyToNavigationItems(navigationItem.Children, filteredAutomaticItems, webPageItemIDToDynamicChildren);
+
+                // check if automatic or not
+                var cultureGuid = Maybe<Guid>.None;
+                var cultureId = Maybe<int>.None;
+                var linkText = Maybe<string>.None;
 
                 if (navigationItem.NavPage.TryGetValue(out var navPage)) {
-                    // check if automatic or not
                     var dynamicItems = navPage.IsDynamic && webPageItemIDToDynamicChildren.TryGetValue(navPage.SystemFields.WebPageItemID, out var dynamicChildren) ? dynamicChildren : [];
                     if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase)) {
                         if (filteredAutomaticItems.TryGetValue(navPage.SystemFields.WebPageItemID, out var automaticItem)) {
-                            // TODO: Test  below
-                            // otherPage.GetValue("ContentItemLanguageMetadataDisplayName");
-                            items.Add(new NavigationItem(automaticItem.ContentItemName) {
+                            try {
+                                linkText = automaticItem.GetValue<string>(nameof(IBaseMetadata.MetaData_PageName));
+                            } catch (Exception) {
+
+                            }
+                            if ((await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(automaticItem, true, true)).TryGetValue(out var langMetadata)) {
+                                cultureGuid = langMetadata.ContentItemLanguageMetadataGUID;
+                                cultureId = langMetadata.ContentItemLanguageMetadataID;
+                                if (linkText.HasNoValue) {
+                                    linkText = langMetadata.ContentItemLanguageMetadataDisplayName;
+                                }
+                            }
+
+                            items.Add(new NavigationItem(linkText.GetValueOrDefault(automaticItem.ContentItemName)) {
                                 LinkHref = $"/{automaticItem.WebPageUrlPath}",
-                                LinkContentCultureGuid = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataGUID") 
-                                LinkContentCultureID = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataID")
+                                LinkContentCultureGuid = cultureGuid,
+                                LinkContentCultureID = cultureId,
                                 LinkPageID = automaticItem.WebPageItemID,
                                 LinkPageGuid = automaticItem.WebPageItemGUID,
                                 LinkPagePath = automaticItem.WebPageItemTreePath,
@@ -147,8 +166,8 @@ namespace Navigation.Repositories.Implementations
                     } else {
                         items.Add(new NavigationItem(navPage.NavigationLinkText) {
                             LinkHref = navPage.NavigationLinkUrl,
-                            LinkContentCultureGuid = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataGUID") 
-                            LinkContentCultureID = Maybe.None, // test automaticItem.GetValue("ContentItemLanguageMetadataID")
+                            LinkContentCultureGuid = cultureGuid,
+                            LinkContentCultureID = cultureId,
                             LinkPageID = navPage.SystemFields.WebPageItemID,
                             LinkPageGuid = navPage.SystemFields.WebPageItemGUID,
                             LinkPagePath = navPage.SystemFields.WebPageItemTreePath,
@@ -161,12 +180,24 @@ namespace Navigation.Repositories.Implementations
                     }
 
                 } else if (navigationItem.OtherPage.TryGetValue(out var otherPage)) {
-                    // TODO: Test  below
-                    // otherPage.GetValue("ContentItemLanguageMetadataDisplayName");
-                    items.Add(new NavigationItem(otherPage.ContentItemName) {
+
+                    try {
+                        linkText = otherPage.GetValue<string>(nameof(IBaseMetadata.MetaData_PageName));
+                    } catch (Exception) {
+
+                    }
+                    if ((await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(otherPage, true, true)).TryGetValue(out var langMetadata)) {
+                        cultureGuid = langMetadata.ContentItemLanguageMetadataGUID;
+                        cultureId = langMetadata.ContentItemLanguageMetadataID;
+                        if (linkText.HasNoValue) {
+                            linkText = langMetadata.ContentItemLanguageMetadataDisplayName;
+                        }
+                    }
+
+                    items.Add(new NavigationItem(linkText.GetValueOrDefault(otherPage.ContentItemName)) {
                         LinkHref = $"/{otherPage.WebPageUrlPath}",
-                        LinkContentCultureGuid = Maybe.None, // test otherPage.GetValue("ContentItemLanguageMetadataGUID") 
-                        LinkContentCultureID = Maybe.None, // test otherPage.GetValue("ContentItemLanguageMetadataID")
+                        LinkContentCultureGuid = cultureGuid,
+                        LinkContentCultureID = cultureId,
                         LinkPageID = otherPage.WebPageItemID,
                         LinkPageGuid = otherPage.WebPageItemGUID,
                         LinkPagePath = otherPage.WebPageItemTreePath,
@@ -206,7 +237,7 @@ namespace Navigation.Repositories.Implementations
                 }
 
                 var contentTypeIds = new List<int>();
-                if(pageTypes != null && pageTypes.Any()) {
+                if (pageTypes != null && pageTypes.Any()) {
                     contentTypeIds = (await DataClassInfoProvider.GetClasses()
                     .WhereIn(nameof(DataClassInfo.ClassName), pageTypes.ToArray())
                     .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
@@ -218,17 +249,17 @@ namespace Navigation.Repositories.Implementations
                 // Include content type fields if there is an order or where condition as it may be part of it.
                 var navQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
                             .ForWebsite(_websiteChannelContext.WebsiteChannelName, pathMatch, true)
-                            //.WithWebPageData(includeUrlPath: true)
+                        //.WithWebPageData(includeUrlPath: true)
                         )
                         .Parameters(query => {
-                        query.Where(where =>
-                            where.If(contentTypeIds.Count != 0, where => where.WhereIn(nameof(ContentItemFields.ContentItemContentTypeID), contentTypeIds))
-                        );
-                        if (topN > 0) {
-                            query.TopN(topN);
-                        }
-                        query.OrderBy(nameof(WebPageFields.WebPageItemOrder));
-                    })
+                            query.Where(where =>
+                                where.If(contentTypeIds.Count != 0, where => where.WhereIn(nameof(ContentItemFields.ContentItemContentTypeID), contentTypeIds))
+                            );
+                            if (topN > 0) {
+                                query.TopN(topN);
+                            }
+                            query.OrderBy(nameof(WebPageFields.WebPageItemOrder));
+                        })
                     .WithCultureContext(_cacheRepositoryContext);
                 return await _contentQueryExecutor.GetWebPageResult(navQueryBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetSecondaryNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), startingPath, pathType.ToString(), _websiteChannelContext.WebsiteChannelName, string.Join(",", pageTypes.GetValueOrDefault([])), nestingLevel, topN));
@@ -251,12 +282,6 @@ namespace Navigation.Repositories.Implementations
                 // Get NavigationPageType Items
                 var queryBuilder = new ContentItemQueryBuilder().ForContentType(NavigationPageType.CONTENT_TYPE_NAME, query => query
                         .OrderBy(new string[] { nameof(WebPageFields.WebPageItemOrder) })
-                       /*.Columns(new string[] {
-                           "WebPageItemParentID", "WebPageItemID", nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(ContentItemFields.ContentItemID), nameof(ContentItemFields.ContentItemGUID),
-                           nameof(NavigationPageType.NavigationType), nameof(NavigationPageType.NavigationWebPageItemGuid), nameof(NavigationPageType.NavigationLinkText), nameof(NavigationPageType.NavigationLinkTarget), nameof(NavigationPageType.NavigationLinkUrl),
-                           nameof(NavigationPageType.NavigationLinkCSS), nameof(NavigationPageType.NavigationLinkOnClick), nameof(NavigationPageType.NavigationLinkAlt), nameof(WebPageFields.WebPageItemTreePath),
-                           nameof(NavigationPageType.IsDynamic), nameof(NavigationPageType.DynamicCodeName), nameof(ContentItemFields.ContentItemCommonDataContentLanguageID), "ContentItemLanguageMetadataGUID"
-                       })*/
                        .IncludeMemberAuthorization()
                        .If(navPath.TryGetValueNonEmpty(out var navPathVal), query => query.Path(navPathVal, PathTypeEnum.Section))
                        .If(navTypes.Any(), query => query.ContentItemCategoryCondition(_relationshipExtendedHelper, navTypes.Select(x => (object)x)))
