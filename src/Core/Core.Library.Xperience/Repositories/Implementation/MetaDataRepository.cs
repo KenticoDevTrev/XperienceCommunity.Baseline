@@ -2,7 +2,6 @@
 using Generic;
 using Kentico.Content.Web.Mvc;
 using System.Data;
-using System.Text.Json;
 
 namespace Core.Repositories.Implementation
 {
@@ -19,7 +18,8 @@ namespace Core.Repositories.Implementation
         ILanguageRepository languageRepository,
         IContentTranslationInformationRepository contentTranslationInformationRepository,
         IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
-        IMediaRepository mediaRepository) : IMetaDataRepository
+        IMediaRepository mediaRepository,
+        IContentItemReferenceService contentItemReferenceService) : IMetaDataRepository
     {
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
@@ -32,6 +32,7 @@ namespace Core.Repositories.Implementation
         private readonly IContentTranslationInformationRepository _contentTranslationInformationRepository = contentTranslationInformationRepository;
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
         private readonly IMediaRepository _mediaRepository = mediaRepository;
+        private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
@@ -164,7 +165,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             };
 
             // Allow customizations
-            if((await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node, basePageMetadata)).TryGetValue(out var metaData)) {
+            if ((await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node, basePageMetadata)).TryGetValue(out var metaData)) {
                 return metaData;
             };
             return basePageMetadata;
@@ -193,22 +194,16 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                     keywords = metaDataKeywords;
                     dataFound = true;
                 }
-                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_ThumbnailSmall)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataSmall)) {
-                    var references = JsonSerializer.Deserialize<ContentItemReference[]>(metaDataSmall);
-                    if(references != null && references.Length > 0) {
-                        var medias = await _mediaRepository.GetContentItemAssets(references[0].Identifier.ToContentIdentity());
-                        if (medias.FirstOrMaybe().TryGetValue(out var media)) {
-                            thumbnailSmall = media.MediaPermanentUrl;
-                        }
+                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_ThumbnailSmall)).FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
+                    var medias = await _mediaRepository.GetContentItemAssets(metaDataSmall.Identifier.ToContentIdentity());
+                    if (medias.FirstOrMaybe().TryGetValue(out var media)) {
+                        thumbnailSmall = media.MediaPermanentUrl;
                     }
                 }
-                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_ThumbnailLarge)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataLarge)) {
-                    var references = JsonSerializer.Deserialize<ContentItemReference[]>(metaDataLarge);
-                    if (references != null && references.Length > 0) {
-                        var medias = await _mediaRepository.GetContentItemAssets(references[0].Identifier.ToContentIdentity());
-                        if (medias.FirstOrMaybe().TryGetValue(out var media)) {
-                            thumbnailSmall = media.MediaPermanentUrl;
-                        }
+                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_ThumbnailLarge)).FirstOrMaybe().TryGetValue(out var metaDataLarge)) {
+                    var medias = await _mediaRepository.GetContentItemAssets(metaDataLarge.Identifier.ToContentIdentity());
+                    if (medias.FirstOrMaybe().TryGetValue(out var media)) {
+                        thumbnailSmall = media.MediaPermanentUrl;
                     }
                 }
                 if (node.TryGetValue(nameof(IBaseMetadata.MetaData_NoIndex), out bool? metaDataNoIndex) && metaDataNoIndex.HasValue) {
