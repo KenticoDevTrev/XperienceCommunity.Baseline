@@ -41,7 +41,7 @@
             }
             var model = new BreadcrumbsViewModel()
             {
-                Breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId, xIncludeDefaultBreadcrumb)
+                Breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId.ToTreeIdentity(), xIncludeDefaultBreadcrumb)
             };
             return View("/Components/Navigation/Breadcrumbs/Breadcrumbs.cshtml", model);
         }

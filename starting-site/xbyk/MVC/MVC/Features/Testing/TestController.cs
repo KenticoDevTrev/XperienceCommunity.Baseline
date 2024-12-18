@@ -3,6 +3,7 @@ using CMS.DataEngine;
 using CMS.Websites;
 using Generic;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Navigation.Models;
 using Navigation.Repositories;
 using System.Data;
@@ -26,7 +27,8 @@ namespace MVC.Features.Testing
         INavigationRepository navigationRepository,
         IBreadcrumbRepository breadcrumbRepository,
         IInfoProvider<TagInfo> tagInfoProvider,
-        ISiteMapRepository siteMapRepository
+        ISiteMapRepository siteMapRepository,
+        IStringLocalizer<SharedResources> stringLocalizer
         ) : Controller
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
@@ -42,9 +44,12 @@ namespace MVC.Features.Testing
         private readonly IBreadcrumbRepository _breadcrumbRepository = breadcrumbRepository;
         private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
         private readonly ISiteMapRepository _siteMapRepository = siteMapRepository;
+        private readonly IStringLocalizer<SharedResources> _stringLocalizer = stringLocalizer;
 
         public async Task<string> Index()
         {
+            var translated = _stringLocalizer.GetString("test.localize");
+
             // test secondary navigation
             var test = await _navigationRepository.GetSecondaryNavItemsAsync("/MPTest-FullAccess/MPTest-BreakInheritance", Navigation.Enums.PathSelectionEnum.ParentAndChildren);
 

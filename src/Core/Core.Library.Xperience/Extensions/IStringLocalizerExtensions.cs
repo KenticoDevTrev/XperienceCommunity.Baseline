@@ -9,7 +9,7 @@
         /// <param name="name">The Key Name</param>
         /// <param name="defaultValue">The Default Value</param>
         /// <returns>The value</returns>
-        public static string GetStringOrDefault(this IStringLocalizer<SharedResources> stringLocalizer, string name, string defaultValue)
+        public static string GetStringOrDefault<T>(this IStringLocalizer<T> stringLocalizer, string name, string defaultValue)
         {
             var value = stringLocalizer.GetString(name);
             if(value == null || value.ResourceNotFound || string.IsNullOrWhiteSpace(value.Value) || value.Value.Equals(name))

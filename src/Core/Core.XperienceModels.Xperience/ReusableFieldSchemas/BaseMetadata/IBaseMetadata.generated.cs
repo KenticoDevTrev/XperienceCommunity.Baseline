@@ -22,7 +22,7 @@ namespace Generic
 		/// <summary>
 		/// Code name of the reusable field schema.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "BaseMetadata";
+		public const string REUSABLE_FIELD_SCHEMA_NAME = "Base.Metadata";
 
 
 		/// <summary>

@@ -29,7 +29,7 @@ namespace Navigation.Components.Navigation.BreadcrumbsJson
             {
                 return Content(string.Empty);
             }
-            var breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId, xIncludeDefaultBreadcrumb);
+            var breadcrumbs = await _breadcrumbRepository.GetBreadcrumbsAsync(xPageId.ToTreeIdentity(), xIncludeDefaultBreadcrumb);
             var breadcrumbsJson = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(breadcrumbs, !xIncludeDefaultBreadcrumb);
             // Serialize into the raw JSON data
             var model = new BreadcrumbsJsonViewModel(

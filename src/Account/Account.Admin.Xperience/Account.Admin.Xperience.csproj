@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.2" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.4" />
     <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="2.0.0" />
   </ItemGroup>
 

@@ -25,9 +25,9 @@ namespace Core
         {
             ApplicationEvents.Initialized.Execute += Initialized_Execute;
             _services = parameters.Services;
-            _installerMemberRoles = _services.GetRequiredService<MemberRolesInstaller>();
+            _installerMemberRoles = _services.GetService<MemberRolesInstaller>();
 
-            _installer = _services.GetRequiredService<BaselineModuleInstaller>();
+            _installer = _services.GetService<BaselineModuleInstaller>();
 
             base.OnInit();
         }

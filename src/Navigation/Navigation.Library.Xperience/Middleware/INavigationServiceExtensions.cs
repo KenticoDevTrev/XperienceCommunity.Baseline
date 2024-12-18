@@ -1,12 +1,11 @@
 ﻿using Account.Installers;
-using Microsoft.Extensions.DependencyInjection;
 using Navigation.Models;
 using Navigation.Repositories;
 using Navigation.Repositories.Implementations;
 using Navigation.Services;
 using Navigation.Services.Implementations;
 
-namespace Navigation.Extensions
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class INavigationServiceExtensions
     {

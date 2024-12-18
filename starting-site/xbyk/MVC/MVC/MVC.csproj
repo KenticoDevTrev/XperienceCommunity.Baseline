@@ -6,11 +6,14 @@
     <PackageReference Include="kentico.xperience.azurestorage" Version="30.0.0" />
     <PackageReference Include="kentico.xperience.imageprocessing" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.DevTools.PageBuilderTagHelpers" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization.Base\XperienceCommunity.Localization.Base.csproj" />
+    <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization\XperienceCommunity.Localization.csproj" />
     <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Admin\XperienceCommunity.RelationshipsExtended.Web.Admin.csproj" />
     <ProjectReference Include="..\..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\..\..\..\src\Account\Account.RCL.Xperience\Account.RCL.Xperience.csproj" />

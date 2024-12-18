@@ -26,8 +26,8 @@ namespace Navigation
         {
             ApplicationEvents.Initialized.Execute += Initialized_Execute;
             _services = parameters.Services;
-            _installerCore = _services.GetRequiredService<BaselineModuleInstaller>();
-            _installer = _services.GetRequiredService<BaselineNavigationModuleInstaller>();
+            _installerCore = _services.GetService<BaselineModuleInstaller>();
+            _installer = _services.GetService<BaselineNavigationModuleInstaller>();
             base.OnInit();
         }
 

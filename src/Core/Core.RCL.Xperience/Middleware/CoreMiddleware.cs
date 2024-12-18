@@ -17,6 +17,7 @@ using Core.Installers;
 using Microsoft.AspNetCore.Builder;
 using MVC.NewFolder;
 using CMS.ContentEngine;
+using PartialWidgetPage;
 
 namespace Core
 {
@@ -79,6 +80,9 @@ namespace Core
             // Enables Channel Custom Settings which some modules leverage.
             services.AddChannelCustomSettings();
 
+            // Used by Tabs and Navigation modules
+            services.AddPartialWidgetPage();
+
             services
                 // Largely Only dependent upon Kentico's APIs
                 .AddScoped<ILogger, Logger>()
@@ -93,6 +97,7 @@ namespace Core
                 .AddScoped<IContentItemLanguageMetadataRepository, ContentItemLanguageMetadataRepository>()
                 .AddScoped<IContentTranslationInformationRepository, ContentTranslationInformationRepository>()
                 .AddScoped<IContentItemReferenceService, ContentItemReferenceService>()
+                
 
                 // Some internal APIs
                 .AddScoped<IPageContextRepository, PageContextRepository>()

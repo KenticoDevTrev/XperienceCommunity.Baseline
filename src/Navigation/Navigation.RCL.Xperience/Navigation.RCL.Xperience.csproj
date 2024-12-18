@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
     <ProjectReference Include="..\Navigation.Library.Xperience\Navigation.Library.Xperience.csproj" />
     <ProjectReference Include="..\Navigation.RCL\Navigation.RCL.csproj" />
   </ItemGroup>

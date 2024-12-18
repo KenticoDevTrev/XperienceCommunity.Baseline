@@ -98,8 +98,8 @@ namespace Navigation.Repositories.Implementations
             var filteredPageItems = await _memberAuthorizationFilter.RemoveUnauthorizedItems(navPageItems.NavItems);
 
             // Filter automatic items
-            var automaticItemContentIdsAllowed = (await _memberAuthorizationFilter.RemoveUnauthorizedItems(navPageItems.LinkedPagesByGuid.Select(x => x.Value))).Select(x => x.ContentItemID);
-            var filteredAutomaticItems = navPageItems.LinkedPagesByGuid.Where(x => automaticItemContentIdsAllowed.Contains(x.Value.ContentItemID)).ToDictionary();
+            var automaticItemContentWebPageGuidsAllowed = (await _memberAuthorizationFilter.RemoveUnauthorizedItems(navPageItems.LinkedPagesByWebpageGuid.Select(x => x.Value))).Select(x => x.WebPageItemGUID);
+            var filteredAutomaticItems = navPageItems.LinkedPagesByWebpageGuid.Where(x => automaticItemContentWebPageGuidsAllowed.Contains(x.Value.WebPageItemGUID)).ToDictionary();
 
             var hierarchy = NavigationPageListToHierarchyWebPagesAsync(filteredPageItems);
 
@@ -120,7 +120,7 @@ namespace Navigation.Repositories.Implementations
             return await FilterAndConvertIWebPageContentQueryDataContainerItems(navItems);
         }
 
-        private async Task<List<NavigationItem>> HierarchyToNavigationItems(IEnumerable<HierarchyWebPage> navigationItems, Dictionary<int, IWebPageContentQueryDataContainer> filteredAutomaticItems, Dictionary<int, IEnumerable<NavigationItem>> webPageItemIDToDynamicChildren)
+        private async Task<List<NavigationItem>> HierarchyToNavigationItems(IEnumerable<HierarchyWebPage> navigationItems, Dictionary<Guid, IWebPageContentQueryDataContainer> filteredAutomaticItems, Dictionary<int, IEnumerable<NavigationItem>> webPageItemIDToDynamicChildren)
         {
             var items = new List<NavigationItem>();
             foreach (var navigationItem in navigationItems) {
@@ -135,8 +135,8 @@ namespace Navigation.Repositories.Implementations
 
                 if (navigationItem.NavPage.TryGetValue(out var navPage)) {
                     var dynamicItems = navPage.IsDynamic && webPageItemIDToDynamicChildren.TryGetValue(navPage.SystemFields.WebPageItemID, out var dynamicChildren) ? dynamicChildren : [];
-                    if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase)) {
-                        if (filteredAutomaticItems.TryGetValue(navPage.SystemFields.WebPageItemID, out var automaticItem)) {
+                    if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase) && navPage.NavigationWebPageItemGuid.FirstOrMaybe().TryGetValue(out var automaticPageWebPageGuid)) {
+                        if (filteredAutomaticItems.TryGetValue(automaticPageWebPageGuid.WebPageGuid, out var automaticItem)) {
                             try {
                                 linkText = automaticItem.GetValue<string>(nameof(IBaseMetadata.MetaData_PageName));
                             } catch (Exception) {
@@ -175,7 +175,8 @@ namespace Navigation.Repositories.Implementations
                             LinkTarget = navPage.NavigationLinkTarget,
                             LinkCSSClass = navPage.NavigationLinkCSS,
                             LinkOnClick = navPage.NavigationLinkOnClick,
-                            Children = children.Union(dynamicItems)
+                            Children = children.Union(dynamicItems),
+                            IsMegaMenu = navPage.NavigationIsMegaMenu
                         });
                     }
 
@@ -281,9 +282,10 @@ namespace Navigation.Repositories.Implementations
 
                 // Get NavigationPageType Items
                 var queryBuilder = new ContentItemQueryBuilder().ForContentType(NavigationPageType.CONTENT_TYPE_NAME, query => query
-                        .OrderBy(new string[] { nameof(WebPageFields.WebPageItemOrder) })
-                       .IncludeMemberAuthorization()
-                       .If(navPath.TryGetValueNonEmpty(out var navPathVal), query => query.Path(navPathVal, PathTypeEnum.Section))
+                       .If(navPath.TryGetValueNonEmpty(out var navPathVal),
+                            queryForPath => queryForPath.ForWebsite(_websiteChannelContext.WebsiteChannelName, PathMatch.Section(navPathVal), includeUrlPath: true),
+                            queryWithoutPath => queryWithoutPath.ForWebsite(_websiteChannelContext.WebsiteChannelName, includeUrlPath: true)
+                       )
                        .If(navTypes.Any(), query => query.ContentItemCategoryCondition(_relationshipExtendedHelper, navTypes.Select(x => (object)x)))
                        .OrderByWebpageItemOrder()
                        )
@@ -293,19 +295,18 @@ namespace Navigation.Repositories.Implementations
 
                 // Retrieve related items
                 var automaticNavWebPageGuids = navItems.Where(x => x.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase)).SelectMany(x => x.NavigationWebPageItemGuid?.Select(x => x.WebPageGuid) ?? []);
-                var additionalItemDictionary = new Dictionary<int, IWebPageContentQueryDataContainer>();
+                var additionalItemDictionary = new Dictionary<Guid, IWebPageContentQueryDataContainer>();
                 additionalDependencies.WebPages(automaticNavWebPageGuids);
                 if (automaticNavWebPageGuids.Any()) {
                     var automaticItemsQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
-                            .ForWebsite(includeUrlPath: true)
-                            .WithWebPageData(includeUrlPath: true)
+                            .ForWebsite(_websiteChannelContext.WebsiteChannelName, includeUrlPath: true)
                         )
                         .Parameters(query => query
                             .Where(where => where.WhereIn(nameof(WebPageFields.WebPageItemGUID), automaticNavWebPageGuids))
                         )
                         .WithCultureContext(_cacheRepositoryContext);
                     var relatedNavItems = await _contentQueryExecutor.GetWebPageResult(automaticItemsQueryBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
-                    additionalItemDictionary = relatedNavItems.ToDictionary(key => key.WebPageItemID, value => value);
+                    additionalItemDictionary = relatedNavItems.ToDictionary(key => key.WebPageItemGUID, value => value);
                 }
 
                 if (cs.Cached) {
@@ -362,8 +363,8 @@ namespace Navigation.Repositories.Implementations
                 var webPageItem = webPageItemIDToHierarchyWebPage[webPageItemKey];
                 var parentWebPageItemID = webPageItem.NavPage.AsNullableValue()?.SystemFields.WebPageItemParentID ?? webPageItem.OtherPage.AsNullableValue()?.WebPageItemParentID ?? 0;
                 // If parent exists, add as child, otherwise add to top level
-                if (webPageItemIDToHierarchyWebPage.ContainsKey(parentWebPageItemID)) {
-                    webPageItemIDToHierarchyWebPage[parentWebPageItemID].Children.Add(webPageItem);
+                if (webPageItemIDToHierarchyWebPage.TryGetValue(parentWebPageItemID, out HierarchyWebPage? value)) {
+                    value.Children.Add(webPageItem);
                 } else {
                     hierarchyWebPages.Add(webPageItem);
                 }
@@ -395,7 +396,7 @@ namespace Navigation.Repositories.Implementations
 
             return path;
         }
-        private record NavItemsAndJoinedDocs(IEnumerable<NavigationPageType> NavItems, Dictionary<int, IWebPageContentQueryDataContainer> LinkedPagesByGuid, Dictionary<int, IEnumerable<NavigationItem>> WebPageItemIDToDynamicChildren);
+        private record NavItemsAndJoinedDocs(IEnumerable<NavigationPageType> NavItems, Dictionary<Guid, IWebPageContentQueryDataContainer> LinkedPagesByWebpageGuid, Dictionary<int, IEnumerable<NavigationItem>> WebPageItemIDToDynamicChildren);
 
 
 

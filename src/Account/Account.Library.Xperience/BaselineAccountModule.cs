@@ -26,8 +26,8 @@ namespace Account
         {
             ApplicationEvents.Initialized.Execute += Initialized_Execute;
             _services = parameters.Services;
-            _installerCore = _services.GetRequiredService<BaselineModuleInstaller>();
-            _installer = _services.GetRequiredService<BaselineAccountModuleInstaller>();
+            _installerCore = _services.GetService<BaselineModuleInstaller>();
+            _installer = _services.GetService<BaselineAccountModuleInstaller>();
             base.OnInit();
         }
 
