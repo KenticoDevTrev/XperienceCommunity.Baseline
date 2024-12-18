@@ -5,10 +5,11 @@ namespace Core.Repositories
     public interface IWebPageToPageMetadataConverter
     {
         /// <summary>
-        /// Sadly you'll need to implement your own of this as mapping and getting data is specific to each content type.  Use the IContentQueryResultMapper to map to your strongly typed class based on the ContentTypeName
+        /// This allows you to do custom mapping and adjustments from the base metadata.  This is useful if you want to add custom URL routing, titles, thumbnails, etc based on the type.
         /// </summary>
-        /// <param name="webPageContentQueryDataContainer"></param>
+        /// <param name="webPageContentQueryDataContainer">The raw item</param>
+        /// <param name="baseMetaData">This is the base metadata (what will be used if you do not modify and return a result). Leverages fields from the IBaseMetaData if available.</param>
         /// <returns></returns>
-        Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer);
+        Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer, PageMetaData baseMetaData);
     }
 }

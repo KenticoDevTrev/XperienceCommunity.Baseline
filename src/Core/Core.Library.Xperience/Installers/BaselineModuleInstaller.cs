@@ -18,6 +18,8 @@ namespace Core.Installers
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
         private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
 
+        private const string _hasImageSchemaGuid = "03dda2f6-b776-48b2-92d7-c110682febe0";
+
         public bool InstallationRan { get; set; } = false;
 
         public Task Install()
@@ -28,6 +30,7 @@ namespace Core.Installers
 
             CreateMetadataReusableSchema();
             CreateRedirectReusableSchema();
+            CreateHasImageReusableSchema();
 
             if(_baselineCoreInstallerOptions.AddHomePageType) {
                 CreateHomeWebpage();
@@ -43,6 +46,25 @@ namespace Core.Installers
             InstallationRan = true;
 
             return Task.CompletedTask;
+        }
+
+        private static void CreateHasImageReusableSchema()
+        {
+            var contentItemCommonDataForm = FormHelper.GetFormInfo(ContentItemCommonDataInfo.OBJECT_TYPE, false);
+
+            // Add Image Schema
+            var imageSchemaGuid = Guid.Parse(_hasImageSchemaGuid);
+            var imageSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasImage");
+            if (imageSchema == null) {
+                contentItemCommonDataForm.ItemsList.Add(new FormSchemaInfo() {
+                    Name = "Generic.HasImage",
+                    Description = @"Place this Reusable Schema on the content type you wish to be able to select from for the Base.Metadata Resuable Schema's OG Image.
+
+Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
+                    Caption = "Has Image",
+                    Guid = imageSchemaGuid
+                });
+            }
         }
 
         private void EnsureMediaTypesAllowed()
@@ -74,7 +96,6 @@ namespace Core.Installers
                 _eventLogService.LogError("BaselineModuleInstaller", "MissingSchemas", eventDescription: $"Can't create Basic page type because one of the following schemas are missing: {(baseMetaDataSchema == null ? "Base.Metadata" : "")} {(redirectMetaDataSchema == null ? "Base.Redirect" : "")} {(memberPermissionSchema == null ? "XperienceCommunity.MemberPermissionConfiguration" : "")}");
                 return;
             }
-            
 
             var existingAccountClass = DataClassInfoProvider.GetClasses().WhereEquals(nameof(DataClassInfo.ClassName), "Generic.Home")
                 .GetEnumerableTypedResult().FirstOrDefault();
@@ -137,29 +158,6 @@ namespace Core.Installers
                 formInfo.UpdateFormField("ContentItemDataGUID", fieldContentItemDataGUID);
             } else {
                 formInfo.AddFormItem(fieldContentItemDataGUID);
-            }
-
-            // Add or Update PageName Field
-            var fieldExistingPageName = contentItemCommonDataForm.GetFormField("PageName");
-            var fieldPageName = fieldExistingPageName ?? new FormFieldInfo();
-            fieldPageName.Name = "PageName";
-            fieldPageName.AllowEmpty = false;
-            fieldPageName.Precision = 0;
-            fieldPageName.Size = 200;
-            fieldPageName.DataType = "text";
-            fieldPageName.Enabled = true;
-            fieldPageName.Visible = true;
-            fieldPageName.Guid = Guid.Parse("a9262728-d387-4042-ac6e-a82bea438f23");
-            fieldPageName.SetComponentName("Kentico.Administration.TextInput");
-
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-
-            if (fieldExistingPageName != null) {
-                contentItemCommonDataForm.UpdateFormField("PageName", fieldPageName);
-            } else {
-                contentItemCommonDataForm.AddFormItem(fieldPageName);
             }
 
             // Add the 3 schemas
@@ -275,29 +273,6 @@ namespace Core.Installers
                 formInfo.AddFormItem(fieldContentItemDataGUID);
             }
 
-            // Add or Update PageName Field
-            var fieldExistingPageName = contentItemCommonDataForm.GetFormField("PageName");
-            var fieldPageName = fieldExistingPageName ?? new FormFieldInfo();
-            fieldPageName.Name = "PageName";
-            fieldPageName.AllowEmpty = false;
-            fieldPageName.Precision = 0;
-            fieldPageName.Size = 100;
-            fieldPageName.DataType = "text";
-            fieldPageName.Enabled = true;
-            fieldPageName.Visible = true;
-            fieldPageName.Guid = Guid.Parse("01c23e63-273b-48cf-95f9-521c368f1c24");
-            fieldPageName.SetComponentName("Kentico.Administration.TextInput");
-
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldPageName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-
-            if (fieldExistingPageName != null) {
-                contentItemCommonDataForm.UpdateFormField("PageName", fieldPageName);
-            } else {
-                contentItemCommonDataForm.AddFormItem(fieldPageName);
-            }
-
             // Add the 2 schemas
             if (formInfo.GetFormSchema(baseMetaDataSchema.Guid.ToString().ToLower()) == null) {
                 var baseMetaDataSchemaReference = new FormSchemaInfo() {
@@ -349,6 +324,29 @@ Generic.BaseInheritedPage",
                 });
             }
 
+            // Add or Update MenuName Field
+            var existingFieldMenuName = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_PageName));
+            var fieldMenuName = existingFieldMenuName ?? new FormFieldInfo();
+            fieldMenuName.Name = nameof(IBaseMetadata.MetaData_PageName);
+            fieldMenuName.AllowEmpty = true;
+            fieldMenuName.Precision = 0;
+            fieldMenuName.DataType = "text";
+            fieldMenuName.Enabled = true;
+            fieldMenuName.Visible = true;
+            fieldMenuName.Size = 200;
+            fieldMenuName.Guid = Guid.Parse("70dfb72a-d2a2-49df-84dc-61c0068163f9");
+            fieldMenuName.SetComponentName("Kentico.Administration.TextInput");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Name");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "What gets displayed on Menus, Breadcrumbs, etc.");
+            fieldMenuName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
+            fieldMenuName.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+
+            if (existingFieldMenuName != null) {
+                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_PageName), fieldMenuName);
+            } else {
+                contentItemCommonDataForm.AddFormItem(fieldMenuName);
+            }
+
             // Add or Update Title Field
             var existingTitleField = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_Title));
             var titleField = existingTitleField ?? new FormFieldInfo();
@@ -361,7 +359,7 @@ Generic.BaseInheritedPage",
             titleField.Guid = Guid.Parse("1e716d33-9f3c-42b4-aa99-330f44976058");
             titleField.SetComponentName("Kentico.Administration.TextInput");
             titleField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page Title");
-            titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "If empty, will default to the Name");
+            titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "If empty, will default to the Page Name");
             titleField.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             titleField.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
 
@@ -419,56 +417,32 @@ Generic.BaseInheritedPage",
                 contentItemCommonDataForm.AddFormItem(keywordsField);
             }
 
-            // Add or Thumbnail Small Field
-            var existingThumbnailSmallField = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_ThumbnailSmall));
-            var thumbnailSmallField = existingThumbnailSmallField ?? new FormFieldInfo();
-            thumbnailSmallField.Name = nameof(IBaseMetadata.MetaData_ThumbnailSmall);
-            thumbnailSmallField.AllowEmpty = true;
-            thumbnailSmallField.Precision = 0;
-            thumbnailSmallField.DataType = "assets";
-            thumbnailSmallField.Enabled = true;
-            thumbnailSmallField.Visible = true;
-            thumbnailSmallField.Guid = Guid.Parse("03eb66ce-235e-48ac-a488-73b08d222ff1");
-            thumbnailSmallField.SetComponentName("Kentico.Administration.AssetSelector");
-            thumbnailSmallField.Settings["AllowedExtensions"] = "jpg;jpeg;png;webp";
-            thumbnailSmallField.Settings["MaximumAssets"] = "1";
+            // Add or Update OG Image Field
+            var existingOGImageField = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_OGImage));
+            var ogImageField = existingOGImageField ?? new FormFieldInfo();
+            ogImageField.Name = nameof(IBaseMetadata.MetaData_OGImage);
+            ogImageField.AllowEmpty = true;
+            ogImageField.Precision = 0;
+            ogImageField.DataType = "contentitemreference";
+            ogImageField.Enabled = true;
+            ogImageField.Visible = true;
+            ogImageField.Guid = Guid.Parse("03eb66ce-235e-48ac-a488-73b08d222ff1");
+            ogImageField.SetComponentName("Kentico.Administration.ContentItemSelector");
+            ogImageField.Settings["MaximumAssets"] = "1";
+            ogImageField.Settings["MinimumItems"] = "0";
+            ogImageField.Settings["SelectionType"] = "reusableFieldSchemas";
+            ogImageField.Settings["AllowedSchemaIdentifiers"] = $"[\"{_hasImageSchemaGuid}\"]";
 
-            thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Thumbnail");
-            thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Should be 1280×720, JPEG PNG or WebP.");
-            thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            thumbnailSmallField.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-            thumbnailSmallField.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+            ogImageField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "OG Image");
+            ogImageField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "For Social Media Sharing only.  Should be 1280×720, JPEG PNG or WebP.");
+            ogImageField.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
+            ogImageField.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
+            ogImageField.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
 
-            if (existingThumbnailSmallField != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_ThumbnailSmall), thumbnailSmallField);
+            if (existingOGImageField != null) {
+                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_OGImage), ogImageField);
             } else {
-                contentItemCommonDataForm.AddFormItem(thumbnailSmallField);
-            }
-
-            // Add or Thumbnail Large Field
-            var existingThumbnailLargeField = contentItemCommonDataForm.GetFormField(nameof(IBaseMetadata.MetaData_ThumbnailLarge));
-            var thumbnailLargeField = existingThumbnailLargeField ?? new FormFieldInfo();
-            thumbnailLargeField.Name = nameof(IBaseMetadata.MetaData_ThumbnailLarge);
-            thumbnailLargeField.AllowEmpty = true;
-            thumbnailLargeField.Precision = 0;
-            thumbnailLargeField.DataType = "assets";
-            thumbnailLargeField.Enabled = true;
-            thumbnailLargeField.Visible = true;
-            thumbnailLargeField.Guid = Guid.Parse("08739bde-d768-4259-ab08-9e86ec46ddae");
-            thumbnailLargeField.SetComponentName("Kentico.Administration.AssetSelector");
-            thumbnailLargeField.Settings["AllowedExtensions"] = "jpg;jpeg;png;webp";
-            thumbnailLargeField.Settings["MaximumAssets"] = "1";
-
-            thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Thumbnail (Large)");
-            thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "This is not used currently for SEO meta tags, but can be useful for other things within your site such as navigation thumbnails.");
-            thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            thumbnailLargeField.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
-            thumbnailLargeField.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
-
-            if (existingThumbnailLargeField != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(IBaseMetadata.MetaData_ThumbnailLarge), thumbnailLargeField);
-            } else {
-                contentItemCommonDataForm.AddFormItem(thumbnailLargeField);
+                contentItemCommonDataForm.AddFormItem(ogImageField);
             }
 
             // Add or Update NoIndex Field

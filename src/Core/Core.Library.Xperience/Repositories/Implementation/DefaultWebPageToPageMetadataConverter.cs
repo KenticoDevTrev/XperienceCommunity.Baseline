@@ -3,9 +3,9 @@ namespace Core.Repositories.Implementation
 {
     public class DefaultWebPageToPageMetadataConverter : IWebPageToPageMetadataConverter
     {
-        public Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer)
+        public Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer, PageMetaData baseMetaData)
         {
-            return Task.FromResult(Result.Failure<PageMetaData>("Must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type, and "));
+            return Task.FromResult(Result.Failure<PageMetaData>("If you want to customize, must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type"));
         }
     }
 }

@@ -21,12 +21,12 @@ namespace Core.Repositories.Implementation
         ContentItemAssetOptions contentItemAssetOptions,
         MediaFileOptions mediaFileOptions,
         IContentQueryExecutor contentQueryExecutor,
-        ICacheReferenceService cacheReferenceService,
         ICacheRepositoryContext cacheRepositoryContext,
         ICacheDependenciesScope cacheDependenciesScope,
-        ILanguageFallbackRepository languageFallbackRepository,
+        ILanguageRepository languageFallbackRepository,
         IPageContextRepository pageContextRepository,
-        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider) : IMediaRepository
+        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
+        ILanguageRepository languageRepository) : IMediaRepository
     {
 
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
@@ -41,12 +41,12 @@ namespace Core.Repositories.Implementation
         private readonly ContentItemAssetOptions _contentItemAssetOptions = contentItemAssetOptions;
         private readonly MediaFileOptions _mediaFileOptions = mediaFileOptions;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
-        private readonly ICacheReferenceService _cacheReferenceService = cacheReferenceService;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
-        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
+        private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
+        private readonly ILanguageRepository _languageRepository = languageRepository;
 
         #region "Content Items"
 
@@ -342,7 +342,7 @@ namespace Core.Repositories.Implementation
                         compiledDictionary.Add(contentItemDataContainer.ContentItemGUID, contentItemDictionary);
                     }
 
-                    var language = _cacheReferenceService.GetLanguageNameById(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
+                    var language = _languageRepository.LanguageIdToName(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
 
                     foreach (var assetField in classAssetConfiguration.AssetFields) {
                         if (!contentItemDictionary.TryGetValue(assetField.FieldGuid, out Dictionary<string, MediaItem>? languageToMediaItemDictionary)) {
@@ -380,7 +380,7 @@ namespace Core.Repositories.Implementation
                 // ignore
             }
 
-            var language = _cacheReferenceService.GetLanguageNameById(fileItem.ContentItemCommonDataContentLanguageID);
+            var language = _languageRepository.LanguageIdToName(fileItem.ContentItemCommonDataContentLanguageID);
 
             var permanentUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}{metaData.Extension}?language={language}";
             var directUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}{metaData.Extension}?language={language}";

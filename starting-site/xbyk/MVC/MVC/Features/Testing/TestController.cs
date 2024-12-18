@@ -1,14 +1,18 @@
 ﻿using CMS.ContentEngine;
+using CMS.DataEngine;
 using CMS.Websites;
 using Generic;
-using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
+using Navigation.Models;
+using Navigation.Repositories;
 using System.Data;
 using Testing;
 using XperienceCommunity.Authorization;
 using XperienceCommunity.MemberRoles;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.MemberRoles.Repositories;
+
 namespace MVC.Features.Testing
 {
     public class TestController(
@@ -19,8 +23,12 @@ namespace MVC.Features.Testing
         IRoleStore<TagApplicationUserRole> roleStore,
         IUserRoleStore<ApplicationUserBaseline> userRoleStore,
         IUserStore<ApplicationUserBaseline> userStore,
-        IHttpContextAccessor httpContextAccessor,
-        UserManager<ApplicationUserBaseline> userManager
+        UserManager<ApplicationUserBaseline> userManager,
+        INavigationRepository navigationRepository,
+        IBreadcrumbRepository breadcrumbRepository,
+        IInfoProvider<TagInfo> tagInfoProvider,
+        ISiteMapRepository siteMapRepository,
+        IStringLocalizer<SharedResources> stringLocalizer
         ) : Controller
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
@@ -30,37 +38,28 @@ namespace MVC.Features.Testing
         private readonly IRoleStore<TagApplicationUserRole> _roleStore = roleStore;
         private readonly IUserRoleStore<ApplicationUserBaseline> _userRoleStore = userRoleStore;
         private readonly IUserStore<ApplicationUserBaseline> _userStore = userStore;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         
         private readonly UserManager<ApplicationUserBaseline> _userManager = userManager;
+        private readonly INavigationRepository _navigationRepository = navigationRepository;
+        private readonly IBreadcrumbRepository _breadcrumbRepository = breadcrumbRepository;
+        private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
+        private readonly ISiteMapRepository _siteMapRepository = siteMapRepository;
+        private readonly IStringLocalizer<SharedResources> _stringLocalizer = stringLocalizer;
 
-        
         public async Task<string> Index()
         {
+            var translated = _stringLocalizer.GetString("test.localize");
 
-            
-            var username = "public";
-            var authenticated = false;
-            var roles = new List<string>();
+            // test secondary navigation
+            var test = await _navigationRepository.GetSecondaryNavItemsAsync("/MPTest-FullAccess/MPTest-BreakInheritance", Navigation.Enums.PathSelectionEnum.ParentAndChildren);
 
-            var context = _httpContextAccessor.HttpContext;
-            if (context is not null) {
-                var identity = context.User.Identities.FirstOrDefault();
-                if (identity is not null && identity.Name is not null) {
-                    username = identity.Name;
-                    authenticated = identity.IsAuthenticated;
-                }
-                var user = (await _userManager.GetUserAsync(context.User));
-                if (user != null) {
-                    roles.AddRange((await _userRoleStore.GetRolesAsync(user, CancellationToken.None)).Select(x => x.ToLowerInvariant()));
-                }
-            }
+            var test2 = await _breadcrumbRepository.GetBreadcrumbsAsync(13.ToTreeIdentity(), true);
+            var jsonLd = await _breadcrumbRepository.BreadcrumbsToJsonLDAsync(test2);
 
-            // Just double checking for public to set not authenticated, roles may still apply if there is customization to set roles on the public user i suppose
-            if (username.Equals("public", StringComparison.OrdinalIgnoreCase)) {
-                authenticated = false;
-            }
-            return string.Empty;
+            var sitemap = await _siteMapRepository.GetSiteMapUrlSetAsync();
+
+            var sitemapText = SitemapNode.GetSitemap(sitemap);
+            return sitemapText;
         }
 
 
@@ -90,7 +89,7 @@ namespace MVC.Features.Testing
             var currentUser = await _memberAuthenticationContext.GetAuthenticationContext();
 
             // For single type query, use the .IncludeMemberAuthorization() to ensure the columns are returned that are needed for parsing.
-            var singleTypeQuery = new ContentItemQueryBuilder().ForContentType(BasicPage.CONTENT_TYPE_NAME, query => query.Columns(nameof(BasicPage.PageName))
+            var singleTypeQuery = new ContentItemQueryBuilder().ForContentType(BasicPage.CONTENT_TYPE_NAME, query => query.Columns(nameof(BasicPage.MetaData_PageName))
             .IncludeMemberAuthorization()
             );
             var itemsSingle = await _contentQueryExecutor.GetMappedWebPageResult<BasicPage>(singleTypeQuery);
@@ -99,7 +98,7 @@ namespace MVC.Features.Testing
             // For Multi Type Querys, the Reusable Field Schema is usually returned in the data anyway
             var multiTypeQuery = new ContentItemQueryBuilder().ForContentTypes(parameters =>
                 parameters
-                    .OfContentType(BasicPage.CONTENT_TYPE_NAME, WebPage.CONTENT_TYPE_NAME, Navigation.CONTENT_TYPE_NAME)
+                    .OfContentType(BasicPage.CONTENT_TYPE_NAME, WebPage.CONTENT_TYPE_NAME, Generic.Navigation.CONTENT_TYPE_NAME)
                     .WithContentTypeFields()
                 );
             var itemsMultiType = await _contentQueryExecutor.GetResult<object>(multiTypeQuery, (selector) => {
@@ -112,9 +111,9 @@ namespace MVC.Features.Testing
                 return selector as IContentItemFieldsSource;
             });
 
-            var result = $"Before Filter: \n\r\n\r   -{string.Join("\n\r   -", itemsSingle.Select(x => x.PageName))}\n\r";
+            var result = $"Before Filter: \n\r\n\r   -{string.Join("\n\r   -", itemsSingle.Select(x => x.MetaData_PageName))}\n\r";
             var filteredItemsSingle = await _memberAuthorizationFilter.RemoveUnauthorizedItems(itemsSingle, true, ["teachers"]);
-            result += $"\n\r\n\rAfter Filter: \n\r\n\r   -{string.Join("\n\r   -", filteredItemsSingle.Select(x => x.PageName))}\n\r";
+            result += $"\n\r\n\rAfter Filter: \n\r\n\r   -{string.Join("\n\r   -", filteredItemsSingle.Select(x => x.MetaData_PageName))}\n\r";
 
             result += $"\n\r\n\rBefore Filter Multi: \n\r\n\r   -{string.Join("\n\r   -", itemsMultiType.Select(x => ((IContentItemFieldsSource)x).SystemFields.ContentItemName))}\n\r";
             var filteredItemsMulti = await _memberAuthorizationFilter.RemoveUnauthorizedItems(itemsMultiType, true, ["teachers"]);

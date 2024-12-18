@@ -54,6 +54,7 @@
     </cache>
 
     <header data-ktc-search-exclude>
+        <vc:main-navigation x-navigation-parent-path="/navigation" x-include-screen-reader-nav="true" x-css-class="main-nav" />
     </header>
 
     @RenderSection("breadcrumb", false)
@@ -62,11 +63,13 @@
 
     <footer data-ktc-search-exclude>
     </footer>
-
+    
     <page-builder-mode include="Edit">
         <!-- Edit mode-->
-        <page-builder-scripts />
-        <script src="/js/individual/scripts/MyComponentsConfiguration.js"></script>
+        <page-data-context initialized="true">
+            <page-builder-scripts />
+        </page-data-context>
+        <!--<script src="/js/individual/scripts/MyComponentsConfiguration.js"></script>-->
     </page-builder-mode>
     <page-builder-mode exclude="Edit">
         @* These are needed for Forms, edit mode includes these as well so only need when not in edit mode *@

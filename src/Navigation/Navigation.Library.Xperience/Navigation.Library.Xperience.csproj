@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
   </ItemGroup>
@@ -22,6 +26,10 @@
     <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
     <ProjectReference Include="..\Navigation.Library\Navigation.Library.csproj" />
     <ProjectReference Include="..\Navigation.XperienceModels.Xperience\Navigation.XperienceModels.Xperience.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

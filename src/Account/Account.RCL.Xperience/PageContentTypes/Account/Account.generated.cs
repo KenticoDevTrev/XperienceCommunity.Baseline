@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.MediaLibrary;
 using XperienceCommunity;
 
 namespace Generic
@@ -38,6 +37,12 @@ namespace Generic
 
 
 		/// <summary>
+		/// MetaData_PageName.
+		/// </summary>
+		public string MetaData_PageName { get; set; }
+
+
+		/// <summary>
 		/// MetaData_Title.
 		/// </summary>
 		public string MetaData_Title { get; set; }
@@ -56,27 +61,21 @@ namespace Generic
 
 
 		/// <summary>
-		/// MetaData_ThumbnailSmall.
+		/// MetaData_NoIndex.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailSmall { get; set; }
+		public bool MetaData_NoIndex { get; set; }
 
 
 		/// <summary>
-		/// MetaData_ThumbnailLarge.
+		/// MetaData_OGImage.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
 
 
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
-
-
-        /// <summary>
-        /// PageRedirectionType.
-        /// </summary>
-        public string PageRedirectionType { get; set; }
+		/// <summary>
+		/// PageRedirectionType.
+		/// </summary>
+		public string PageRedirectionType { get; set; }
 
 
 		/// <summary>

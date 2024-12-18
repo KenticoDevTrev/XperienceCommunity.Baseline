@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
-using CMS.MediaLibrary;
 
 namespace Generic
 {
@@ -21,7 +20,7 @@ namespace Generic
 	/// Represents a page of type <see cref="Home"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Home : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect
+	public partial class Home : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -37,9 +36,9 @@ namespace Generic
 
 
 		/// <summary>
-		/// PageName.
+		/// MetaData_PageName.
 		/// </summary>
-		public string PageName { get; set; }
+		public string MetaData_PageName { get; set; }
 
 
 		/// <summary>
@@ -61,25 +60,21 @@ namespace Generic
 
 
 		/// <summary>
-		/// MetaData_ThumbnailSmall.
+		/// MetaData_NoIndex.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailSmall { get; set; }
+		public bool MetaData_NoIndex { get; set; }
 
 
 		/// <summary>
-		/// MetaData_ThumbnailLarge.
+		/// MetaData_OGImage.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
 
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
 
-        /// <summary>
-        /// PageRedirectionType.
-        /// </summary>
-        public string PageRedirectionType { get; set; }
+		/// <summary>
+		/// PageRedirectionType.
+		/// </summary>
+		public string PageRedirectionType { get; set; }
 
 
 		/// <summary>
@@ -104,5 +99,23 @@ namespace Generic
 		/// PageUsePermanentRedirects.
 		/// </summary>
 		public bool PageUsePermanentRedirects { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

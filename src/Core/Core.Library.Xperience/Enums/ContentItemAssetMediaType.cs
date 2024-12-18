@@ -2,7 +2,7 @@
 {
     public enum ContentItemAssetMediaType
     {
-        Picture,
+        Image,
         Video,
         Audio,
         File

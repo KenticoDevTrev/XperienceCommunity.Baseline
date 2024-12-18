@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CMS.Base;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MVC;
 using MVC.Configuration;
+using MVC.Resources;
+using XperienceCommunity.MemberRoles.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,21 +16,37 @@ StartupConfigs.RegisterKenticoServices(builder);
 //     options.UseDefaultSystemResponseForPreload = true;
 // });
 
-// BASELINECONFIGURATION: Starting Site - If you want to use Session, also enable below (and configure)
+// BASELINECONFIGURATION: Starting Site - If you want to use Session, enable below (and configure)
 // StartupConfigs.AddSession(builder);
 
 // Baseline.Core
-StartupConfigs.AddBaselineCore(builder);
+StartupConfigs.AddBaselineCore<ApplicationUserBaseline>(builder);
 
-// Register other interfaces
+// Register other interfaces your site will use.
 StartupConfigs.RegisterInterfaces(builder);
 
+// Register Controllers, optionally 
+StartupConfigs.AddLocalizationAndControllerViews(builder, 
+    addXperienceCommunityLocalization: true, 
+    addAuthorizationFilters: true,
+    localizationResourceType: typeof(MySiteResources)
+    );
+
 // BASELINECONFIGURATION: Account - CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH
-// Standard Kentico Account / Authorization
-// StartupConfigs.AddStandardKenticoAuthenticationAndControllerViews(builder);
+// Standard Kentico Account
+// StartupConfigs.AddStandardKenticoIdentity<ApplicationUserBaseline, TagApplicationUserRole>(builder);
 // OR
-// Baseline Account / Authorization
-StartupConfigs.AddBaselineAccountAuthenticationAndControllerViews(builder);
+// Baseline Account
+StartupConfigs.AddBaselineAccountIdentity<ApplicationUserBaseline, TagApplicationUserRole>(builder);
+
+// Baseline.Navigation
+StartupConfigs.AddBaselineNavigation(builder);
+
+if (builder.Environment.IsDevelopment()) {
+    builder.Services.Configure<UrlResolveOptions>(options => options.UseSSL = false);
+}
+
+StartupConfigs.RegisterGzipAndCacheControls(builder);
 
 var app = builder.Build();
 
@@ -33,11 +54,9 @@ StartupConfigs.RegisterBaselineCoreMiddleware(app);
 
 StartupConfigs.RegisterDotNetCoreConfigurationsAndKentico(app, builder);
 
-// BASELINECONFIGURATION: Starting Site - If you want to use Session, also enable below
+// BASELINECONFIGURATION: Starting Site - If you wish to use session, enable below
 // StartupConfigs.UseSession(app);
 
 RouteConfig.RegisterRoutes(app);
-
-StartupConfigs.RegisterStaticFileHandlingGzipAndCacheControls(builder);
 
 app.Run();

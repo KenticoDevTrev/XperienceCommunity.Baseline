@@ -32,15 +32,15 @@ namespace Core.Repositories.Implementation
         /// <returns></returns>
         public string ChannelNameById(int channelID) => GetWebsiteChannelIdToChannelContext().TryGetValue(channelID, out var channel) ? channel.ChannelName : string.Empty;
 
-        public Maybe<string> CurrentChannelDisplayName() => GetWebsiteChannelIdToChannelContext().TryGetValue(_websiteChannelContext.WebsiteChannelID, out var channel) ? channel.ChannelDisplayName : Maybe.None;
+        public Maybe<string> CurrentWebsiteChannelDisplayName() => GetWebsiteChannelIdToChannelContext().TryGetValue(_websiteChannelContext.WebsiteChannelID, out var channel) ? channel.ChannelDisplayName : Maybe.None;
 
-        public Maybe<int> CurrentChannelID() => _websiteChannelContext.WebsiteChannelID.AsMaybeIfTrue(x => x > 0);
+        public Maybe<int> CurrentWebsiteChannelID() => _websiteChannelContext.WebsiteChannelID.AsMaybeIfTrue(x => x > 0);
 
         /// <summary>
         /// The WebsiteChannelName is actually the CMS_Channel.ChannelName, confusing I know.
         /// </summary>
         /// <returns></returns>
-        public Maybe<string> CurrentChannelName() => _websiteChannelContext.WebsiteChannelID > 0 ? _websiteChannelContext.WebsiteChannelName : Maybe.None;
+        public Maybe<string> CurrentWebsiteChannelName() => _websiteChannelContext.WebsiteChannelID > 0 ? _websiteChannelContext.WebsiteChannelName : Maybe.None;
  
         public Maybe<int> GetChannelID(string? channelName = null) => GetChannelById().TryGetValue((channelName ?? _websiteChannelContext.WebsiteChannelName ?? string.Empty).ToLowerInvariant(), out var channelID) ? channelID : Maybe.None;
 
@@ -115,6 +115,7 @@ namespace Core.Repositories.Implementation
                         .ToDictionary(key => key.ChannelName.ToLowerInvariant(), value => value.ChannelID);
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetChannelById_SiteRepository"));
         }
+
 
         record WebsitesChannelContextInfo(int ChannelID, string ChannelName, string ChannelDisplayName);
     }

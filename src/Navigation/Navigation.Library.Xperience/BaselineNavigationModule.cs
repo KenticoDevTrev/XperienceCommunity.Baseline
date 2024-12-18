@@ -2,22 +2,22 @@
 using CMS.Base;
 using CMS.Core;
 using CMS.DataEngine;
-using Account;
 using Account.Installers;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Installers;
+using Navigation;
 
-[assembly: RegisterModule(typeof(BaselineCoreAccountModule))]
+[assembly: RegisterModule(typeof(BaselineNavigationModule))]
 
-namespace Account
+namespace Navigation
 {
-    public class BaselineCoreAccountModule : Module
+    public class BaselineNavigationModule : Module
     {
         private IServiceProvider? _services = null;
-        private BaselineAccountModuleInstaller? _installer = null;
+        private BaselineNavigationModuleInstaller? _installer = null;
         private BaselineModuleInstaller? _installerCore = null;
 
-        public BaselineCoreAccountModule() : base("BaselineCoreAccountModule")
+        public BaselineNavigationModule() : base("BaselineNavigationModule")
         {
 
         }
@@ -26,8 +26,8 @@ namespace Account
         {
             ApplicationEvents.Initialized.Execute += Initialized_Execute;
             _services = parameters.Services;
-            _installerCore = _services.GetRequiredService<BaselineModuleInstaller>();
-            _installer = _services.GetRequiredService<BaselineAccountModuleInstaller>();
+            _installerCore = _services.GetService<BaselineModuleInstaller>();
+            _installer = _services.GetService<BaselineNavigationModuleInstaller>();
             base.OnInit();
         }
 

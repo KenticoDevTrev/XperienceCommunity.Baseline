@@ -13,7 +13,7 @@ namespace Core.Repositories.Implementation
         ICacheRepositoryContext cacheRepositoryContext,
         IUrlResolver urlResolver,
         IIdentityService identityService,
-        ILanguageFallbackRepository languageFallbackRepository,
+        ILanguageRepository languageFallbackRepository,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext
         ) : IPageContextRepository
@@ -25,7 +25,7 @@ namespace Core.Repositories.Implementation
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly IIdentityService _identityService = identityService;
-        private readonly ILanguageFallbackRepository _languageFallbackRepository = languageFallbackRepository;
+        private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
 
@@ -113,10 +113,10 @@ namespace Core.Repositories.Implementation
                     );
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetPageIdentityByWebpageIdAndLanguage"));
         }
-
         private string _baseQuery = @"
 select 
 ContentItemLanguageMetadataDisplayName,
+MetaData_PageName,
 WebPageItemName, 
 WebPageItemID,
 WebPageItemGUID,
@@ -142,7 +142,7 @@ where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
 ";
 
         private PageIdentity DataRowToPageIdentity(DataRow value) => new (
-                            name: (string)value["ContentItemLanguageMetadataDisplayName"],
+                            name: value.Field<string?>("MetaData_PageName").GetValueOrDefault((string)value["ContentItemLanguageMetadataDisplayName"]),
                             alias: (string)value["WebPageItemName"],
                             pageID: (int)value["WebPageItemID"],
                             pageGuid: (Guid)value["WebPageItemGUID"],

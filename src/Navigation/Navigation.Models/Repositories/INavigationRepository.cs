@@ -44,6 +44,7 @@ namespace Navigation.Repositories
         /// <param name="levelIsRelative">If the Level number is relative.  If it's not, then 1 = the Root (/), 2 = Secondary Level, 3 = Third level, etc.</param>
         /// <param name="minAbsoluteLevel">If the Level is relative, the minimum level that relative level can be.  This is often helpful to prevent the sub nav from displaying the entire content tree.</param>
         /// <returns></returns>
+        [Obsolete("Use GetAncestorPathAsync(TreeIdentity) or (path)")]
         Task<string> GetAncestorPathAsync(Guid nodeGuid, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2);
 
         /// <summary>
@@ -54,9 +55,20 @@ namespace Navigation.Repositories
         /// <param name="levelIsRelative">If the Level number is relative.  If it's not, then 1 = the Root (/), 2 = Secondary Level, 3 = Third level, etc.</param>
         /// <param name="minAbsoluteLevel">If the Level is relative, the minimum level that relative level can be. 1 = the Root (/)  This is often helpful to prevent the sub nav from displaying the entire content tree.</param>
         /// <returns></returns>
+        [Obsolete("Use GetAncestorPathAsync(TreeIdentity) or (path)")]
         Task<string> GetAncestorPathAsync(int nodeID, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2);
 
 
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="treeIdentity">Tree Identity</param>
+        /// <param name="levels">How many levels up.  1 = Parent, 2 = Grandparent (if relative), the actual Node Level if not</param>
+        /// <param name="levelIsRelative">If the Level number is relative.  If it's not, then 1 = the Root (/), 2 = Secondary Level, 3 = Third level, etc.</param>
+        /// <param name="minAbsoluteLevel">If the Level is relative, the minimum level that relative level can be. 1 = the Root (/)  This is often helpful to prevent the sub nav from displaying the entire content tree.</param>
+        /// <returns></returns>
+        Task<string> GetAncestorPathAsync(TreeIdentity treeIdentity, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2);
+
+
     }
 }

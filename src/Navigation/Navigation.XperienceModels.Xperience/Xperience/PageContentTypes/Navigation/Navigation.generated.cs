@@ -20,7 +20,7 @@ namespace Generic
 	/// Represents a page of type <see cref="Navigation"/>.
 	/// </summary>
 	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class Navigation : IWebPageFieldsSource
+	public partial class Navigation : IWebPageFieldsSource, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
@@ -105,5 +105,23 @@ namespace Generic
 		/// DynamicCodeName.
 		/// </summary>
 		public string DynamicCodeName { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

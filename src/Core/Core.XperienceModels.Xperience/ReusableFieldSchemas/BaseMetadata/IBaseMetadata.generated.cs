@@ -11,7 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using CMS.MediaLibrary;
 
 namespace Generic
 {
@@ -23,7 +22,13 @@ namespace Generic
 		/// <summary>
 		/// Code name of the reusable field schema.
 		/// </summary>
-		public const string REUSABLE_FIELD_SCHEMA_NAME = "BaseMetadata";
+		public const string REUSABLE_FIELD_SCHEMA_NAME = "Base.Metadata";
+
+
+		/// <summary>
+		/// MetaData_PageName.
+		/// </summary>
+		public string MetaData_PageName { get; set; }
 
 
 		/// <summary>
@@ -45,19 +50,14 @@ namespace Generic
 
 
 		/// <summary>
-		/// MetaData_ThumbnailSmall.
+		/// MetaData_NoIndex.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailSmall { get; set; }
+		public bool MetaData_NoIndex { get; set; }
 
 
 		/// <summary>
-		/// MetaData_ThumbnailLarge.
+		/// MetaData_OGImage.
 		/// </summary>
-		public IEnumerable<AssetRelatedItem> MetaData_ThumbnailLarge { get; set; }
-
-        /// <summary>
-        /// MetaData_NoIndex.
-        /// </summary>
-        public bool MetaData_NoIndex { get; set; }
-    }
+		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
+	}
 }

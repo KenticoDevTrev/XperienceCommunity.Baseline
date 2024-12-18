@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Kentico.Web.Mvc;
+using Navigation.Middleware;
 
 namespace MVC
 {
@@ -38,9 +39,12 @@ namespace MVC
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            // BASELINE CUSTOMIZATION: Navigation - Enable Sitemap here
+            app.UseSitemapRoute(sitemapPatterns: ["sitemap.xml", "googlesitemap.xml"]);
+           
             // Only enable until home page is set
             // app.MapGet("/", () => "The MVC site has not been configured yet.");
-            
+
         }
     }
 }

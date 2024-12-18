@@ -14,20 +14,20 @@
         /// Gets the current Channel Code Name (if there is a website context, there will always be in KX13, but not always in XbyK)
         /// </summary>
         /// <returns></returns>
-        Maybe<string> CurrentChannelName();
+        Maybe<string> CurrentWebsiteChannelName();
 
         /// <summary>
         /// Gets the current Channel Display Name (if there is a website context, there will always be in KX13, but not always in XbyK)
         /// </summary>
         /// <returns>The Site Name</returns>
-        Maybe<string> CurrentChannelDisplayName();
+        Maybe<string> CurrentWebsiteChannelDisplayName();
 
 
         /// <summary>
         /// Gets the current Channel ID (if there is a website context, there will always be in KX13, but not always in XbyK)
         /// </summary>
         /// <returns></returns>
-        Maybe<int> CurrentChannelID();
+        Maybe<int> CurrentWebsiteChannelID();
 
         /// <summary>
         /// Gets the current channel name by the ChannelID (NOT WebsiteChannelID)

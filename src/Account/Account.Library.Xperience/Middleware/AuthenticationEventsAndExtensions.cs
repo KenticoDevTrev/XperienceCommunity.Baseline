@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.Builder
             builder.Services.AddSingleton<IAuthenticationConfigurations>(defaultObj);
 
             // Adds Basic Kentico Authentication, needed for user context and some tools
-            builder.Services.AddAuthentication();
+            var authBuilder = builder.Services.AddAuthentication();
 
             // Adds and configures ASP.NET Identity for the application
             builder.Services.AddIdentity<TUser, TRole>(options => {
@@ -80,8 +80,6 @@ namespace Microsoft.AspNetCore.Builder
                 .AddSignInManager<SignInManager<TUser>>();
 
             // Get default 
-            var authBuilder = builder.Services.AddAuthentication();
-
             var googleAuth = builder.Configuration.GetSection("Authentication:Google");
             if (googleAuth.Exists()) {
                 authBuilder.AddGoogle("Google", opt => {

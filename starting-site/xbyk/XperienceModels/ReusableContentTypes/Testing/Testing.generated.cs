@@ -38,5 +38,11 @@ namespace TEST
 		/// TestAssetField.
 		/// </summary>
 		public ContentItemAsset TestAssetField { get; set; }
+
+
+		/// <summary>
+		/// RelatedImages.
+		/// </summary>
+		public IEnumerable<IGenericHasImage> RelatedImages { get; set; }
 	}
 }

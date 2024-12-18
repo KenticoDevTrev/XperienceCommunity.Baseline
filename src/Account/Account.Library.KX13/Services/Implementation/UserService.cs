@@ -73,8 +73,10 @@ namespace Account.Services.Implementation
 
         public async Task<bool> ValidateUserPasswordAsync(User user, string password)
         {
-            var userInfoObj = await GetUserInfoAsync(user.UserName);
-            return UserInfoProvider.ValidateUserPassword(userInfoObj, password);
+            if((await GetUserInfoAsync(user.UserName)).TryGetValue(out var userInfo)) {
+                return UserInfoProvider.ValidateUserPassword(userInfo, password);
+            }
+            return false;
         }
 
         public Task ResetPasswordAsync(User user, string password)
@@ -85,10 +87,10 @@ namespace Account.Services.Implementation
 
         public Task<bool> ValidatePasswordPolicyAsync(string password)
         {
-            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentChannelName().GetValueOrDefault(string.Empty)));
+            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty)));
         }
 
-        private async Task<UserInfo> GetUserInfoAsync(string userName)
+        private async Task<Maybe<UserInfo>> GetUserInfoAsync(string userName)
         {
             return await _progressiveCache.LoadAsync(async cs =>
             {
@@ -96,8 +98,18 @@ namespace Account.Services.Implementation
                 {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{UserInfo.OBJECT_TYPE}|byname|{userName}");
                 }
-                return await _userInfoProvider.GetAsync(userName);
+                return (await _userInfoProvider.Get().WhereEquals(nameof(UserInfo.UserName), userName).Or().WhereEquals(nameof(UserInfo.Email), userName).GetEnumerableTypedResultAsync()).FirstOrMaybe();
             }, new CacheSettings(15, "GetUserInfoAsync", userName));
+        }
+
+        private async Task<UserInfo> GetUserInfoAsync(int userId)
+        {
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"{UserInfo.OBJECT_TYPE}|byId|{userId}");
+                }
+                return await _userInfoProvider.GetAsync(userId);
+            }, new CacheSettings(15, "GetUserInfoAsync", userId));
         }
 
         public Task CreateExternalUserAsync(User user) => CreateExternalUser(user);
@@ -144,5 +156,23 @@ namespace Account.Services.Implementation
 
             return Result.Success(await _baselineUserMapper.ToUser(newUser));
         }
+
+        public async Task ResetPasswordAsync(User user, string newPassword, string currentPassword)
+        {
+            if(user.UserID.TryGetValue(out var userId)) {
+                var userInfo = await GetUserInfoAsync(userId);
+                if (UserInfoProvider.ValidateUserPassword(userInfo, currentPassword)) {
+                    UserInfoProvider.SetPassword(userInfo, newPassword);
+                }
+
+            } else if((await GetUserInfoAsync(user.UserName)).TryGetValue(out var userInfo)) {
+                if(UserInfoProvider.ValidateUserPassword(userInfo, currentPassword)) {
+                    UserInfoProvider.SetPassword(userInfo, newPassword);
+                }
+            }
+
+            // do nothing, not validated
+        }
+
     }
 }
