@@ -18,18 +18,18 @@ namespace TabbedPages.Repositories.Implementations
                 var identityResult = await _identityService.HydrateTreeIdentity(parentIdentity);
                 if(identityResult.IsFailure)
                 {
-                    return Array.Empty<TabItem>();
+                    return [];
                 }
             }
 
             // Should never be Maybe.None but just in case...
             if(!parentIdentity.PathChannelLookup.TryGetValue(out var pathChannelLookup))
             {
-                return Array.Empty<TabItem>();
+                return [];
             }
 
             string path = pathChannelLookup.Path;
-            string siteName = _siteRepository.SiteNameById(pathChannelLookup.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID));
+            string siteName = _siteRepository.ChannelNameById(pathChannelLookup.ChannelId.GetValueOrDefault(_siteService.CurrentSite.SiteID));
 
             var builder = _cacheDependencyBuilderFactory.Create(siteName)
                 .PagePath(path, PathTypeEnum.Children);

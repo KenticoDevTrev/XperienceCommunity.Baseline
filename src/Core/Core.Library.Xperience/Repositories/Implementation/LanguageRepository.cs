@@ -21,7 +21,7 @@ namespace Core.Repositories.Implementation
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
 
-        public async Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false)
+        public async Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false, bool includeDefaultAsMatch = true)
         {
             // No available languages
             if (!availableLanguages.Any()) {
@@ -40,28 +40,31 @@ namespace Core.Repositories.Implementation
             var requestedLanguageId = fallbackLookup.NameToId.TryGetValue(requestedLanguageSafe, out var requestedLangId) ? requestedLangId : 0;
 
             // Check fallbacks
-            var requestedLanguageFallbackIdChain = await _contentLanguageFallbackChainProvider.GetLiveSiteChain(requestedLangId);
-            foreach (var requestLangId in requestedLanguageFallbackIdChain) {
-                if (availableLanguageIds.Contains(requestLangId)) {
-                    return fallbackLookup.IdToName[requestedLangId];
+            if (requestedLanguageId > 0) {
+                var requestedLanguageFallbackIdChain = await _contentLanguageFallbackChainProvider.GetLiveSiteChain(requestedLanguageId);
+                foreach (var requestLangId in requestedLanguageFallbackIdChain) {
+                    if (availableLanguageIds.Contains(requestLangId)) {
+                        return fallbackLookup.IdToName[requestedLangId];
+                    }
                 }
-            }
 
-            // Site Default with fallbacks
-            if (fallbackLookup.SiteToDefaultLanguageID.TryGetValue(_websiteChannelContext.WebsiteChannelID, out var siteDefaultLangId)) {
-                requestedLanguageFallbackIdChain = await _contentLanguageFallbackChainProvider.GetLiveSiteChain(requestedLangId);
-                if (availableLanguageIds.Contains(siteDefaultLangId)) {
-                    return fallbackLookup.IdToName[siteDefaultLangId];
+
+                // Site Default with fallbacks
+                if (fallbackLookup.SiteToDefaultLanguageID.TryGetValue(_websiteChannelContext.WebsiteChannelID, out var siteDefaultLangId)) {
+                    requestedLanguageFallbackIdChain = await _contentLanguageFallbackChainProvider.GetLiveSiteChain(requestedLanguageId);
+                    if (availableLanguageIds.Contains(siteDefaultLangId)) {
+                        return fallbackLookup.IdToName[siteDefaultLangId];
+                    }
                 }
             }
 
             // Next Content Default, there is no fallback chain for the default
-            if (availableLanguageIds.Contains(fallbackLookup.DefaultLanguageId)) {
+            if (includeDefaultAsMatch && availableLanguageIds.Contains(fallbackLookup.DefaultLanguageId)) {
                 return fallbackLookup.IdToName[fallbackLookup.DefaultLanguageId];
             }
 
             // If should return first on no other match
-            if(firstIfNoMatch) {
+            if (firstIfNoMatch) {
                 return availableLanguagesSafe.First();
             }
 
@@ -91,7 +94,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetLanguageLookups"));
         }
 
-        
+
 
         private record LangDictionaryLookups(Dictionary<int, string> IntToString, Dictionary<string, int> StringToInt);
 
@@ -161,7 +164,7 @@ namespace Core.Repositories.Implementation
                     CodeName = defaultCultureCode
                 };
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetDefaultLanguageFallback"));
-            
+
         }
 
         public ObjectIdentity DefaultLanguageForWebsiteChannel(int? websiteChannelID = null)

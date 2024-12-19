@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Account\Account.Models\Account.Models.csproj" />
     <ProjectReference Include="..\..\..\..\src\Core\Core.Models\Core.Models.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Localization\Localization.Models\Localization.Models.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Models\Navigation.Models.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
