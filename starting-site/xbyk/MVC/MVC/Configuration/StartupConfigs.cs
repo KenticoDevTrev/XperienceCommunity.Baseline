@@ -282,6 +282,15 @@ namespace MVC.Configuration
         }
 
         /// <summary>
+        /// Adds Baseline Localization.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddBaselineLocalization(WebApplicationBuilder builder)
+        {
+            builder.Services.UseBaselineLocalization();
+        }
+
+        /// <summary>
         /// Adds the standard Kentico identity (based roughly off of the Dancing Goat Sample Site)
         /// </summary>
         /// <typeparam name="TUser"></typeparam>
@@ -508,5 +517,6 @@ namespace MVC.Configuration
             app.UseSession();
         }
 
+        
     }
 }

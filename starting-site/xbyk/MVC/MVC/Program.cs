@@ -32,6 +32,9 @@ StartupConfigs.AddLocalizationAndControllerViews(builder,
     localizationResourceType: typeof(MySiteResources)
     );
 
+// Baseline.Localization (currently only contains Category Localization interface)
+StartupConfigs.AddBaselineLocalization(builder);
+
 // BASELINECONFIGURATION: Account - CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH
 // Standard Kentico Account
 // StartupConfigs.AddStandardKenticoIdentity<ApplicationUserBaseline, TagApplicationUserRole>(builder);

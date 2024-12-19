@@ -178,6 +178,7 @@ namespace Core.Repositories.Implementation
                 canonicalUrlValue = canonicalUrlFromUrl;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete - Still valid in KX13 though
             var metaData = new PageMetaData()
             {
                 Title = title.AsNullOrWhitespaceMaybe(),
@@ -188,6 +189,7 @@ namespace Core.Repositories.Implementation
                 NoIndex = noIndex,
                 CanonicalUrl = canonicalUrlValue.AsNullOrWhitespaceMaybe()
             };
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return Task.FromResult(metaData);
         }

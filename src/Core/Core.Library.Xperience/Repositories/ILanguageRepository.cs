@@ -11,8 +11,9 @@ namespace Core.Repositories
         /// <param name="availableLanguages">What Languages are available to select from (ex: what ones a Content Item is translated in)</param>
         /// <param name="requestedLanguage">The Language you hoping to find</param>
         /// <param name="firstIfNoMatch">If true, will return the first available language if no good match found, false it will return a Result Failure in that case.</param>
+        /// <param name="includeDefaultAsMatch">If true, will check for the site default language as part of it's matching, false will not.</param>
         /// <returns>The best language fit, or failure if no available languages (or no good match found)</returns>
-        Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false);
+        Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false, bool includeDefaultAsMatch = true);
 
         int LanguageNameToId(string languageName);
 

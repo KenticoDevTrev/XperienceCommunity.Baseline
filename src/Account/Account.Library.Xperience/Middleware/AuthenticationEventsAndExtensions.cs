@@ -123,7 +123,6 @@ namespace Microsoft.AspNetCore.Builder
 
             // Member Role Authorization (XperienceCommunity.Authorization)
             builder.Services.AddKenticoAuthorization();
-
             // Register authentication cookie
             // Overwrite login logout based on site settings, with fall back to the default controllers
             builder.Services.AddScoped<SiteSettingsCookieAuthenticationEvents>()

@@ -171,6 +171,10 @@ where C.CategoryDescription not like '{$%$}'";
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetCategoryLocalizedDictionary"));
         }
 
+        public Task<LocalizedCategoryItem> LocalizeCategoryItemAsync(CategoryItem categoryItem, string? cultureCode = null) => Task.FromResult(LocalizeCategoryItem(categoryItem, cultureCode ?? System.Globalization.CultureInfo.CurrentCulture.Name));
+
+        public Task<IEnumerable<LocalizedCategoryItem>> LocalizeCategoryItemsAsync(IEnumerable<CategoryItem> categories, string? cultureCode = null) => Task.FromResult(LocalizeCategoryItems(categories, cultureCode ?? System.Globalization.CultureInfo.CurrentCulture.Name));
+
         /// <summary>
         /// Temporary record used to build the dictionaries before converting to readonly
         /// </summary>
@@ -201,7 +205,8 @@ where C.CategoryDescription not like '{$%$}'";
                 categoryID: item.CategoryID,
                 categoryName: item.CategoryName,
                 categoryGuid: item.CategoryGuid,
-                categoryParentID: item.CategoryParentID.GetValueOrDefault(0),
+                categoryTypeID: item.CategoryParentID.GetValueOrDefault(0),
+                categoryParentID: item.CategoryParentID.AsNullableIntValue(),
                 categoryDisplayName: item.CategoryDisplayName)
             {
                 CategoryDescription= item.CategoryDescription
