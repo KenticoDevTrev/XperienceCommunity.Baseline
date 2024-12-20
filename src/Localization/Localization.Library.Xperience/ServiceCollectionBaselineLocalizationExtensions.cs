@@ -3,7 +3,7 @@ using Localization.Repositories;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class LocalizationStartupMiddleware
+    public static class ServiceCollectionBaselineLocalizationExtensions
     {
         /// <summary>
         /// Adds the Baseline Localization logic (was previously "UseLocalization").  Note that unlike the KX13 version (UseLocalization), this does not set up the Localization with controllers and view, that is now done separate.
@@ -14,6 +14,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection UseBaselineLocalization(this IServiceCollection services) => services.AddScoped<ILocalizedCategoryCachedRepository, LocalizedCategoryCachedRepository>();
+        public static IServiceCollection AddBaselineLocalization(this IServiceCollection services) => services.AddScoped<ILocalizedCategoryCachedRepository, LocalizedCategoryCachedRepository>();
     }
 }

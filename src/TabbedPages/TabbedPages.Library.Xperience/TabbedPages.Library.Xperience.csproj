@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
-    <RootNamespace>Localization</RootNamespace>
+    <RootNamespace>TabbedPages</RootNamespace>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
@@ -20,7 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
-    <ProjectReference Include="..\Localization.Library\Localization.Library.csproj" />
+    <ProjectReference Include="..\TabbedPages.Models\TabbedPages.Models.csproj" />
+    <ProjectReference Include="..\TabbedPages.XperienceModels.Xperience\TabbedPages.XperienceModels.Xperience.csproj" />
   </ItemGroup>
 
 </Project>

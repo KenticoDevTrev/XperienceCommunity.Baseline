@@ -32,15 +32,20 @@ using XperienceCommunity.RelationshipsExtended.Models;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.Localizer;
 
-// BASELINE CUSTOMIZATION: Account Module - Added Usings
+// BASELINE CUSTOMIZATION: Account - Added Usings
 using Account.Models;
 using Account.Admin.Xperience.Models;
 
-// BASELINE CUSTOMIZATION: Navigation Module - Added Usings
+// BASELINE CUSTOMIZATION: Navigation - Added Usings
 using Navigation.Repositories;
 using Navigation.Features.PartialNavigation;
 
-// BASELINE CUSTOMIZATION: Account Module - Add this to edit Channel Settings
+// BASELINE CUSTOMIZATION: TabbedPages - Add Using
+using TabbedPages.Features.Tab;
+using TabbedPages.Features.TabParent;
+using Generic;
+
+// BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
                 slug: "member-password-channel-custom-settings",
                 uiPageType: typeof(MemberPasswordChannelSettingsExtender),
@@ -48,13 +53,28 @@ using Navigation.Features.PartialNavigation;
                 templateName: TemplateNames.EDIT,
                 order: UIPageOrder.NoOrder)]
 
-// BASELINE CUSTOMIZATION: Navigation Module - Add this for the Navigation Mega Menu Support
+// BASELINE CUSTOMIZATION: Navigation - Add this for the Navigation Mega Menu Support
 [assembly: RegisterPageTemplate(
     "Generic.Navigation_Default",
     "Navigation",
     typeof(NavigationPageTemplateProperties),
     "/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml",
     ContentTypeNames = [Generic.Navigation.CONTENT_TYPE_NAME])]
+
+// BASELINE CUSTOMIZATION: TabbedPages - Add this for the Navigation Mega Menu Support
+[assembly: RegisterPageTemplate(
+    "Generic.Tab_Default",
+    "Tab",
+    typeof(TabPageTemplateProperties),
+    "/Features/Tab/TabPageTemplate.cshtml",
+    ContentTypeNames = [Tab.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    "Generic.TabParent_Default",
+    "Tab Parent",
+    typeof(TabParentPageTemplateProperties),
+    "/Features/TabParent/TabParentPageTemplate.cshtml",
+    ContentTypeNames = [TabParent.CONTENT_TYPE_NAME])]
 
 namespace MVC.Configuration
 {
@@ -82,6 +102,11 @@ namespace MVC.Configuration
 
                         // BASELINE CUSTOMIZATION: Account - If using Accounts with Account Type, MUST add it here
                         Generic.Account.CONTENT_TYPE_NAME,
+
+                        // BASELINE CUSTOMIZATION: TabbedPages - If using TabbedPages, MUST add it here
+                        Generic.TabParent.CONTENT_TYPE_NAME,
+                        Generic.Tab.CONTENT_TYPE_NAME
+
                     ],
                     // Specifies a default section for the page builder feature
                     // If you install BootstrapLayoutTool.PageBuilderContainered.Kentico.MVC.Core package on MVC, you can use below for bootstrap layout tool
@@ -287,8 +312,18 @@ namespace MVC.Configuration
         /// <param name="builder"></param>
         public static void AddBaselineLocalization(WebApplicationBuilder builder)
         {
-            builder.Services.UseBaselineLocalization();
+            builder.Services.AddBaselineLocalization();
         }
+
+        /// <summary>
+        /// Adds Baseline Localization.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddBaselineTabbedPages(WebApplicationBuilder builder)
+        {
+            builder.Services.AddTabbedPages();
+        }
+
 
         /// <summary>
         /// Adds the standard Kentico identity (based roughly off of the Dancing Goat Sample Site)

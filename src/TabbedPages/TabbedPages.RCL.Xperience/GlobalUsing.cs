@@ -18,4 +18,8 @@ global using Core.Attributes;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Http;
 
+// Kentico 13 MVC
+global using Kentico.PageBuilder.Web.Mvc;
+global using Kentico.PageBuilder.Web.Mvc.PageTemplates;
+
 // Feature

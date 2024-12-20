@@ -9,7 +9,7 @@
         /// <returns>The Tabs</returns>
         Task<IEnumerable<TabItem>> GetTabsAsync(TreeIdentity parentIdentity);
 
-        [Obsolete("Use GetTabsAsync(TreeIdentity)")]
+        [Obsolete("Use GetTabsAsync(TreeIdentity), will not be implemented in Xperience by Kentico")]
         Task<IEnumerable<TabItem>> GetTabsAsync(NodeIdentity parentIdentity);
     }
 }

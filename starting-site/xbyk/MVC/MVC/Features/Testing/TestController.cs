@@ -9,9 +9,9 @@ using Navigation.Repositories;
 using System.Data;
 using Testing;
 using XperienceCommunity.Authorization;
-using XperienceCommunity.MemberRoles;
 using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.MemberRoles.Repositories;
+using XperienceCommunity.MemberRoles.Services;
 
 namespace MVC.Features.Testing
 {

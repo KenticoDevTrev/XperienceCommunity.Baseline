@@ -1,7 +1,5 @@
 ﻿using CMS.ContentEngine;
-using CMS.DataEngine;
 using CMS.Headless.Internal;
-using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 using Core.Repositories;
@@ -10,7 +8,7 @@ using CSharpFunctionalExtensions;
 using Generic;
 using Navigation.Models;
 using Navigation.Services;
-using XperienceCommunity.MemberRoles.Repositories;
+using XperienceCommunity.MemberRoles.Services;
 
 namespace Navigation.Repositories.Implementations
 {

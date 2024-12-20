@@ -19,7 +19,7 @@
             @for (int T = 0; T < tabCount; T++)
             {
                 var Element = Model.Tabs.ElementAt(T);
-                <inlinewidgetpage documentid="@Element.PageID">
+                <inlinewidgetpage web-page-id="@Element.PageID">
                     <div class="tab-pane fade @(T == 0 ? "show active" : "")" id="Tab-@Element.PageID" role="tabpanel" aria-labelledby="Tab-@Element.PageID">
                         <vc:tab />
                     </div>
