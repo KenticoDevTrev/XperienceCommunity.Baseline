@@ -13,8 +13,6 @@ using Kentico.Content.Web.Mvc;
 using Core.Enums;
 using XperienceCommunity.RelationshipsExtended.Extensions;
 using XperienceCommunity.RelationshipsExtended.Services;
-using XperienceCommunity.MemberRoles.Repositories;
-using XperienceCommunity.MemberRoles;
 using Navigation.XbyK.Models;
 using CMS.DataEngine;
 using Core.Models;
@@ -22,6 +20,7 @@ using Core.Services;
 using Navigation.Services;
 using Generic;
 using Core.Repositories;
+using XperienceCommunity.MemberRoles.Services;
 
 namespace Navigation.Repositories.Implementations
 {

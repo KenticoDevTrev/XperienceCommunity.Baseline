@@ -6,7 +6,7 @@
     <PackageReference Include="kentico.xperience.azurestorage" Version="30.0.0" />
     <PackageReference Include="kentico.xperience.imageprocessing" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.DevTools.PageBuilderTagHelpers" Version="1.0.0" />
+    <PackageReference Include="XperienceCommunity.DevTools.PageBuilderTagHelpers" Version="1.0.3" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\..\..\src\Localization\Localization.Library.Xperience\Localization.Library.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Library.Xperience\Navigation.Library.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL.Xperience\Navigation.RCL.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.RCL.Xperience\TabbedPages.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>

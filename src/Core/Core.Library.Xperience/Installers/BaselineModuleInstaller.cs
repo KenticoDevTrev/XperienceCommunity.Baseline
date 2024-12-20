@@ -97,19 +97,19 @@ Should configure in the Core Baseline ContentItemAssetOptionsConfiguration.",
                 return;
             }
 
-            var existingAccountClass = DataClassInfoProvider.GetClasses().WhereEquals(nameof(DataClassInfo.ClassName), "Generic.Home")
+            var existingAccountClass = DataClassInfoProvider.GetClasses().WhereEquals(nameof(DataClassInfo.ClassName), "Generic.BasicPage")
                 .GetEnumerableTypedResult().FirstOrDefault();
-            var accountClass = existingAccountClass ?? DataClassInfo.New("Generic.Home");
-            accountClass.ClassDisplayName = "Home";
-            accountClass.ClassName = "Generic.Home";
-            accountClass.ClassTableName = "Generic_Home";
-            accountClass.ClassGUID = Guid.Parse("ABBBAB45-6764-4B61-AFF3-098531CC7565");
-            accountClass.ClassIconClass = "xp-home";
+            var accountClass = existingAccountClass ?? DataClassInfo.New("Generic.BasicPage");
+            accountClass.ClassDisplayName = "Basic Page";
+            accountClass.ClassName = "Generic.BasicPage";
+            accountClass.ClassTableName = "Generic_BasicPage";
+            accountClass.ClassGUID = Guid.Parse("9EF89D5B-C45B-4617-B16B-1BD2046F8A5E");
+            accountClass.ClassIconClass = "xp-doc-inverted";
             accountClass.ClassHasUnmanagedDbSchema = false;
             accountClass.ClassType = "Content";
             accountClass.ClassContentTypeType = "Website";
             accountClass.ClassWebPageHasUrl = true;
-            accountClass.ClassShortName = "GenericHome";
+            accountClass.ClassShortName = "GenericBasicPage";
 
             var formInfo = existingAccountClass != null ? new FormInfo(existingAccountClass.ClassFormDefinition) : FormHelper.GetBasicFormDefinition("ContentItemDataID");
 

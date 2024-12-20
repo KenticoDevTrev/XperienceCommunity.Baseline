@@ -1,11 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
-    <RootNamespace>Localization</RootNamespace>
+    <RootNamespace>TabbedPages</RootNamespace>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
@@ -19,8 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
-    <ProjectReference Include="..\Localization.Library\Localization.Library.csproj" />
+    <ProjectReference Include="..\..\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
+    <ProjectReference Include="..\TabbedPages.Library.Xperience\TabbedPages.Library.Xperience.csproj" />
+    <ProjectReference Include="..\TabbedPages.RCL\TabbedPages.RCL.csproj" />
   </ItemGroup>
 
 </Project>

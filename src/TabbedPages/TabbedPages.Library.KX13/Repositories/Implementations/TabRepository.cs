@@ -72,7 +72,7 @@ namespace CMS.DocumentEngine.Types.Generic
 
             return new TabItem(
                 name: value.TabName,
-                pageCultureID: value.DocumentID);
+                pageID: value.DocumentID);
         }
     }
 }
