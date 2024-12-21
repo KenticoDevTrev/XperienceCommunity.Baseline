@@ -10,9 +10,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// See https://github.com/KenticoDevTrev/XperienceCommunity.Baseline/blob/XbyK/starting-site/xbyk/MVC/MVC/Configuration/StartupConfigs.cs -> AddLocalizationAndControllerViews
         /// 
         /// Since Categories are now localizable objects in Xperience by Kentico, this can be added without localizing anything if you wish, just using basic Xperience functionality
-        /// 
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="localizationRedirectionOptions">Localization Redirection Options, only used if you use app.UseBaselineLocalizationFoundRedirect()</param>
         /// <returns></returns>
         public static IServiceCollection AddBaselineLocalization(this IServiceCollection services) => services.AddScoped<ILocalizedCategoryCachedRepository, LocalizedCategoryCachedRepository>();
     }

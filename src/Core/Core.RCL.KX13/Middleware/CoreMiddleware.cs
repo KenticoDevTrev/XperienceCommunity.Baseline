@@ -36,6 +36,9 @@ namespace Core
             IPersistantStorageConfiguration? persistantStorageConfiguration = null
             ) where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
+            // Add XperienceCommunity.LanguageContext minimal dependency
+            services.AddLanguageContextForDependentLibrary();
+
             // Add MVC Caching which Core depends on
             services.AddMVCCaching();
 

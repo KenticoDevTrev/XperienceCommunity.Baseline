@@ -108,7 +108,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localizatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization.Library", "..\..\src\Localization\Localization.Library\Localization.Library.csproj", "{143B2FCF-B703-4891-922B-D57B93B91CCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Library.Xperience", "..\..\src\Localization\Localization.Library.Xperience\Localization.Library.Xperience.csproj", "{42141DA3-F8D6-4A2B-9E53-A377758C4A36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization.Library.Xperience", "..\..\src\Localization\Localization.Library.Xperience\Localization.Library.Xperience.csproj", "{42141DA3-F8D6-4A2B-9E53-A377758C4A36}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization.Models", "..\..\src\Localization\Localization.Models\Localization.Models.csproj", "{606C4D38-9166-4672-B88A-CC9CB50B28E7}"
 EndProject
@@ -118,11 +118,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabbedPages.Models", "..\..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabbedPages.RCL", "..\..\src\TabbedPages\TabbedPages.RCL\TabbedPages.RCL.csproj", "{F8651A58-3496-4812-A532-504CD2A1EBB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabbedPages.XperienceModels.Xperience", "..\..\src\TabbedPages\TabbedPages.XperienceModels.Xperience\TabbedPages.XperienceModels.Xperience.csproj", "{6CB13AAD-2D13-4025-8F80-089C321457BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabbedPages.XperienceModels.Xperience", "..\..\src\TabbedPages\TabbedPages.XperienceModels.Xperience\TabbedPages.XperienceModels.Xperience.csproj", "{6CB13AAD-2D13-4025-8F80-089C321457BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabbedPages.Library.Xperience", "..\..\src\TabbedPages\TabbedPages.Library.Xperience\TabbedPages.Library.Xperience.csproj", "{F7666386-A369-41A5-8BF3-16D9E80DCACC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabbedPages.Library.Xperience", "..\..\src\TabbedPages\TabbedPages.Library.Xperience\TabbedPages.Library.Xperience.csproj", "{F7666386-A369-41A5-8BF3-16D9E80DCACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabbedPages.RCL.Xperience", "..\..\src\TabbedPages\TabbedPages.RCL.Xperience\TabbedPages.RCL.Xperience.csproj", "{1D36620B-B804-4174-B109-673B99644BD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabbedPages.RCL.Xperience", "..\..\src\TabbedPages\TabbedPages.RCL.Xperience\TabbedPages.RCL.Xperience.csproj", "{1D36620B-B804-4174-B109-673B99644BD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

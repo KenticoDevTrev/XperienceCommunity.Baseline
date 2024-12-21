@@ -246,6 +246,8 @@ namespace MVC.Configuration
             // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
 
+            
+
             // Optional - Add up IUrlHelper if you wish to use it
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             builder.Services.AddScoped(x => {
@@ -323,7 +325,6 @@ namespace MVC.Configuration
         {
             builder.Services.AddTabbedPages();
         }
-
 
         /// <summary>
         /// Adds the standard Kentico identity (based roughly off of the Dancing Goat Sample Site)
@@ -511,6 +512,9 @@ namespace MVC.Configuration
 
             // Enables Kentico middleware and configuration
             app.UseKentico();
+
+            // BASELINE CUSTOMIZATION - Localization - Optional Redirect logic that if the requested Tree-based routed page isn't the deemed proper language, and the language exists, to redirect.
+            // app.UseBaselineLocalizationFoundRedirect();
 
             // Enables Authorization, used in admin too
             app.UseAuthorization();

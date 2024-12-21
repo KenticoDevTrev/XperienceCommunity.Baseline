@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Http;
 using Core.Installers;
 using Microsoft.AspNetCore.Builder;
 using MVC.NewFolder;
-using CMS.ContentEngine;
 using PartialWidgetPage;
 
 namespace Core
@@ -72,7 +71,6 @@ namespace Core
                 configuration.AllowContentItemCategories = true;
                 relationshipsExtendedOptionsConfiguration?.Invoke(configuration);
             });
-
 
             // Add MVC Caching which Core depends on
             services.AddMVCCaching();

@@ -2,14 +2,9 @@
 
 namespace MVC.NewFolder
 {
-    public class PageBuilderModelStateClearer 
+    public class PageBuilderModelStateClearer(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public PageBuilderModelStateClearer(RequestDelegate next)
-        {
-            _next = next;
-        }
+        private readonly RequestDelegate _next = next;
 
         // IMessageWriter is injected into InvokeAsync
         public async Task InvokeAsync(HttpContext httpContext, IModelStateService modelStateService)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Kentico.Web.Mvc;
 using Navigation.Middleware;
+using Kentico.Content.Web.Mvc.Routing;
 
 namespace MVC
 {
@@ -38,6 +39,10 @@ namespace MVC
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(
+                name: "default_language",
+                pattern: "{kxpLanguage}/{controller=Home}/{action=Index}/{id?}");
 
             // BASELINE CUSTOMIZATION: Navigation - Enable Sitemap here
             app.UseSitemapRoute(sitemapPatterns: ["sitemap.xml", "googlesitemap.xml"]);
