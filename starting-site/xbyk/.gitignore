@@ -57,3 +57,5 @@ MVC/MVC/wwwroot/js/scripts/samplereact.js*
 **/FrontEndDev/**/*.map
 obj
 bin
+
+LuceneSearch

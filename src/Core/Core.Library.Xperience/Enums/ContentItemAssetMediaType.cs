@@ -5,6 +5,7 @@
         Image,
         Video,
         Audio,
-        File
+        File,
+        Unknown
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Search.Models;
 using Search.Repositories;
 using Search.Repositories.Implementations;
 
@@ -15,8 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddBaselineSearch(this IServiceCollection services)
+        public static IServiceCollection AddBaselineSearch(this IServiceCollection services, Action<BaselineSearchOptions>? options = null)
         {
+            var searchOptions = new BaselineSearchOptions();
+            options?.Invoke(searchOptions);
+            services.AddSingleton(searchOptions);
             // Since this implementation is a dummy one and will throw a not implemented, only try add, if it exists then don't overwrite.
             services.TryAddScoped<ISearchRepository, SearchRepository>();
             return services;

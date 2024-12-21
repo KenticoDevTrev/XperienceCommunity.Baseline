@@ -93,11 +93,14 @@ namespace Core
                 .AddScoped<ICategoryCachedRepository, CategoryCachedRepository>()
                 .AddScoped<IModelStateService, ModelStateService>()
                 .AddScoped<IContentItemLanguageMetadataRepository, ContentItemLanguageMetadataRepository>()
-                .AddScoped<IContentTranslationInformationRepository, ContentTranslationInformationRepository>()
-                .AddScoped<IContentItemReferenceService, ContentItemReferenceService>()
-                
 
-                // Some internal APIs
+                // Some internal APIs, some are transient so they can be used by Search Indexers concerning Metadata and the metadata thumbnail retrieval.
+                .AddTransient<IContentTypeRetriever, ContentTypeRetriever>()
+                .AddTransient<IContentTranslationInformationRepository, ContentTranslationInformationRepository>()
+                .AddTransient<ILanguageIdentifierRepository, LanguageIdentifierRepository>()
+                .AddTransient<IContentItemReferenceService, ContentItemReferenceService>()
+                .AddTransient<IClassContentTypeAssetConfigurationRepository, ClassContentTypeAssetConfigurationRepository>()
+                .AddTransient<IMetaDataWebPageDataContainerConverter, MetaDataWebPageDataContainerConverter>()
                 .AddScoped<IPageContextRepository, PageContextRepository>()
                 .AddScoped<IMetaDataRepository, MetaDataRepository>();
 

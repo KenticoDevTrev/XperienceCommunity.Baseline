@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.4" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.5" />
   </ItemGroup>
 
 </Project>

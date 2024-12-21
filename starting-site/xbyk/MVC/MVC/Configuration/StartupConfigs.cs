@@ -47,6 +47,9 @@ using Generic;
 
 // BASELINE CUSTOMIZATION: Search - Add below
 using Search.Features.Search;
+using Search.Library.Xperience.Lucene.IndexStrategies;
+using Search.Library.Xperience.Lucene.Services.Implementations;
+using Search.Library.Xperience.Lucene.Services;
 
 // BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
@@ -258,7 +261,7 @@ namespace MVC.Configuration
             // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
 
-            
+
 
             // Optional - Add up IUrlHelper if you wish to use it
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -373,8 +376,7 @@ namespace MVC.Configuration
                 options.SlidingExpiration = true;
                 options.LoginPath = new PathString("/Account/Signin");
                 options.AccessDeniedPath = new PathString("/Error/403");
-                options.Events.OnRedirectToAccessDenied = ctx =>
-                {
+                options.Events.OnRedirectToAccessDenied = ctx => {
                     var factory = ctx.HttpContext.RequestServices.GetRequiredService<IUrlHelperFactory>();
                     var urlHelper = factory.GetUrlHelper(new ActionContext(ctx.HttpContext, new RouteData(ctx.HttpContext.Request.RouteValues), new ActionDescriptor()));
                     var url = urlHelper.Action("Signin", "Account") + new Uri(ctx.RedirectUri).Query;
@@ -384,17 +386,16 @@ namespace MVC.Configuration
                     return Task.CompletedTask;
                 };
                 // These are not part of standard kentico but 
-                if(builder.Environment.IsDevelopment()) {
+                if (builder.Environment.IsDevelopment()) {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.None;
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
                 } else {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
-                } 
+                }
             });
 
-            builder.Services.Configure<AdminIdentityOptions>(options =>
-            {
+            builder.Services.Configure<AdminIdentityOptions>(options => {
                 // The expiration time span for admin. In production environment, set expiration according to best practices.
                 options.AuthenticationOptions.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             });
@@ -575,7 +576,18 @@ namespace MVC.Configuration
             // https://github.com/Kentico/xperience-by-kentico-lucene
             // https://github.com/Kentico/xperience-by-kentico-algolia
             // https://github.com/Kentico/xperience-by-kentico-azure-ai-search
-            builder.Services.AddBaselineSearch();
+            builder.Services.AddBaselineSearch(options => {
+                options.DefaultSearchIndexes = ["TestIndex"];
+            });
+
+            // Lucene Setup
+            builder.Services.AddKenticoLucene(builder =>
+                    builder
+                        .RegisterStrategy<BaselineBaseMetadataIndexingStrategy>("BaselinePagesStrategy")
+                )
+                .AddBaselineSearchLucene();
+            // Implement and add your own IBaselineSearchLuceneCustomizations which controls how Queries are parsed.
+            // builder.Services.AddScoped<IBaselineSearchLuceneCustomizations, MySearchCustomizations>();
         }
     }
 }

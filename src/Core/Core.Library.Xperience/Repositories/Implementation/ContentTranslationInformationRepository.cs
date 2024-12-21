@@ -4,10 +4,10 @@ using System.Data;
 namespace Core.Repositories.Implementation
 {
     public class ContentTranslationInformationRepository(IProgressiveCache progressiveCache,
-        ILanguageRepository languageRepository) : IContentTranslationInformationRepository
+        ILanguageIdentifierRepository languageIdentifierRepository) : IContentTranslationInformationRepository
     {
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ILanguageRepository _languageRepository = languageRepository;
+        private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
         public async Task<IEnumerable<ContentTranslationSummary>> GetContentItemTranslationSummaries(int contentItemID, int? channelID = null)
         {
@@ -45,7 +45,7 @@ namespace Core.Repositories.Implementation
                  ContentItemID: (int)x["ContentItemID"],
                  ContentItemLanguageMetadataID: x.Field<int?>("ContentItemLanguageMetadataID").AsMaybeStatic(),
                  ContentItemCommonDataID: x.Field<int?>("ContentItemCommonDataID").AsMaybeStatic(),
-                 LanguageName: _languageRepository.LanguageIdToName((int)x["ContentLanguageId"]),
+                 LanguageName: _languageIdentifierRepository.LanguageIdToName((int)x["ContentLanguageId"]),
                  TranslationExists: ((int)x["TranslationExists"]) == 1,
                  IsDefaultLanguage: ((int)x["IsDefaultLanguage"]) == 1
                 ))
@@ -100,7 +100,7 @@ namespace Core.Repositories.Implementation
                      ContentItemCommonDataID: x.Field<int?>("ContentItemCommonDataID").AsMaybeStatic(),
                      Url: $"/{(isHome && isDefaultLanguage ? "" : ((string)x["WebPageUrlPath"]))}",
                      TreePath: (string)x["WebPageItemTreePath"],
-                     LanguageName: _languageRepository.LanguageIdToName((int)x["WebPageUrlPathContentLanguageID"]),
+                     LanguageName: _languageIdentifierRepository.LanguageIdToName((int)x["WebPageUrlPathContentLanguageID"]),
                      TranslationExists: ((int)x["TranslationExists"]) == 1,
                      IsDefaultLanguage: isDefaultLanguage,
                      IsHome: isHome

@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Account</RootNamespace>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <!-- Disable stupid Result conflict with HotChocolate -->

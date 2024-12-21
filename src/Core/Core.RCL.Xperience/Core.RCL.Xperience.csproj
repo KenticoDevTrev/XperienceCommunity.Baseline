@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
-		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core</RootNamespace>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Core</RootNamespace>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	</PropertyGroup>
 
   <!-- Disable stupid Result conflict with HotChocolate -->
@@ -21,7 +21,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
-	  <PackageReference Include="XperienceCommunity.PartialWidgetPage" Version="30.0.0" />
+	  <PackageReference Include="XperienceCommunity.PartialWidgetPage" Version="30.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
