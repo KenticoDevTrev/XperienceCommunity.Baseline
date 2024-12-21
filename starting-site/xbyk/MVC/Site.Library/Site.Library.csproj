@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\..\src\Core\Core.Library\Core.Library.csproj" />
     <ProjectReference Include="..\..\..\..\src\Localization\Localization.Library\Localization.Library.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Library\Navigation.Library.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Library\Search.Library.csproj" />
     <ProjectReference Include="..\Site.Models\Site.Models.csproj" />
   </ItemGroup>
 

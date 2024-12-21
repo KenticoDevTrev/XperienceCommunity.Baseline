@@ -38,6 +38,9 @@ StartupConfigs.AddBaselineLocalization(builder);
 // Baseline.TabbedPages (currently only ITabRepository)
 StartupConfigs.AddBaselineTabbedPages(builder);
 
+// Baseline.Search
+StartupConfigs.AddBaselineSearch(builder);
+
 // BASELINECONFIGURATION: Account - CHOOSE EITHER STANDARD OR BASELINE FOR AUTHENTICATION, NOT BOTH
 // Standard Kentico Account
 // StartupConfigs.AddStandardKenticoIdentity<ApplicationUserBaseline, TagApplicationUserRole>(builder);

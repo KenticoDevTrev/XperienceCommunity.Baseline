@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\Search.Library.Xperience\Search.Library.Xperience.csproj" />
+  </ItemGroup>
+
+</Project>

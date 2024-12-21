@@ -16,6 +16,8 @@
     <ProjectReference Include="..\..\..\..\src\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Localization\Localization.RCL.Xperience\Localization.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL.Xperience\Navigation.RCL.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Library.Xperience.Lucene\Search.Library.Xperience.Lucene.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.RCL.Xperience\Search.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.RCL.Xperience\TabbedPages.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />

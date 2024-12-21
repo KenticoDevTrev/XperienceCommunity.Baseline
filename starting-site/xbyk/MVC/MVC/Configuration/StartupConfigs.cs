@@ -45,6 +45,9 @@ using TabbedPages.Features.Tab;
 using TabbedPages.Features.TabParent;
 using Generic;
 
+// BASELINE CUSTOMIZATION: Search - Add below
+using Search.Features.Search;
+
 // BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
                 slug: "member-password-channel-custom-settings",
@@ -75,6 +78,15 @@ using Generic;
     typeof(TabParentPageTemplateProperties),
     "/Features/TabParent/TabParentPageTemplate.cshtml",
     ContentTypeNames = [TabParent.CONTENT_TYPE_NAME])]
+
+// BASELINE CUSTOMIZATION: Search - Add this for the search page
+[assembly: RegisterPageTemplate(
+    "Generic.Search_Default",
+    "Search",
+    typeof(SearchPageTemplateProperties),
+    "~/Features/Search/SearchPageTemplate.cshtml",
+    ContentTypeNames = ["Generic.Search"])]
+// TODO: Replace above with generated type
 
 namespace MVC.Configuration
 {
@@ -556,6 +568,14 @@ namespace MVC.Configuration
             app.UseSession();
         }
 
-        
+        public static void AddBaselineSearch(WebApplicationBuilder builder)
+        {
+            // BASELINE CUSTOMIZATION: Search - Add your search implementation here and inject ISearchRepository implementation
+            // Note that Lucene has been done and is available through the XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene and XperienceCommunity.Baseline.Search.Library.Xperience.Lucene
+            // https://github.com/Kentico/xperience-by-kentico-lucene
+            // https://github.com/Kentico/xperience-by-kentico-algolia
+            // https://github.com/Kentico/xperience-by-kentico-azure-ai-search
+            builder.Services.AddBaselineSearch();
+        }
     }
 }
