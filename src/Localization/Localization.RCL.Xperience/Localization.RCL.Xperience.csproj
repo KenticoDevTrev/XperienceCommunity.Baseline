@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Localization</RootNamespace>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
@@ -19,9 +20,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization.Base\XperienceCommunity.Localization.Base.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
-    <ProjectReference Include="..\Localization.Library\Localization.Library.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Localization.Library.Xperience\Localization.Library.Xperience.csproj" />
+    <ProjectReference Include="..\Localization.RCL\Localization.RCL.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,11 +18,12 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.4" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.5" />
     <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Admin\XperienceCommunity.RelationshipsExtended.Web.Admin.csproj" />
     <ProjectReference Include="..\Core.Library.Xperience\Core.Library.Xperience.csproj" />
   </ItemGroup>
 

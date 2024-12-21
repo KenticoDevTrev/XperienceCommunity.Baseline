@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Localization</RootNamespace>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
+    <ProjectReference Include="..\Localization.Library\Localization.Library.csproj" />
+    <ProjectReference Include="..\Localization.Models\Localization.Models.csproj" />
+  </ItemGroup>
+</Project>

@@ -16,7 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Account\Account.RCL\Account.RCL.csproj" />
     <ProjectReference Include="..\..\..\..\src\Core\Core.RCL\Core.RCL.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Localization\Localization.RCL\Localization.RCL.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL\Navigation.RCL.csproj" />
+    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.RCL\TabbedPages.RCL.csproj" />
     <ProjectReference Include="..\Site.Library\Site.Library.csproj" />
   </ItemGroup>
 

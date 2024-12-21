@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>TabbedPages</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.Library\Core.Library.csproj" />
+    <ProjectReference Include="..\TabbedPages.Models\TabbedPages.Models.csproj" />
+  </ItemGroup>
+</Project>

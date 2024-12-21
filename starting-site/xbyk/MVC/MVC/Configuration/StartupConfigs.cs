@@ -213,7 +213,7 @@ namespace MVC.Configuration
 
                 },
                 relationshipsExtendedOptionsConfiguration: (options) => {
-                    options.AllowLanguageSyncConfiguration = true;
+                    //options.AllowLanguageSyncConfiguration = true;
 
                     var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
                         new (WebPage.CONTENT_TYPE_NAME, [
@@ -221,7 +221,7 @@ namespace MVC.Configuration
                             nameof(WebPage.TestObjectNames)
                             ])
                     };
-                    options.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
+                    //options.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
                 },
                 metaDataOptionsConfiguration: (options) => {
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
@@ -19,9 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization.Base\XperienceCommunity.Localization.Base.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
-    <ProjectReference Include="..\Localization.Library\Localization.Library.csproj" />
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization\XperienceCommunity.Localization.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
   </ItemGroup>
 
 </Project>

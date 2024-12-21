@@ -23,7 +23,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Account\Account.Admin.Xperience\Account.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Localization\Localization.Admin.Xperience\Localization.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Admin.Xperience\Navigation.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Admin.Xperience\TabbedPages.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 

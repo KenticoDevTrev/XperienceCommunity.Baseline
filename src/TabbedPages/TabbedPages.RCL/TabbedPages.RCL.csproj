@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Core\Core.RCL\Core.RCL.csproj" />
+		<ProjectReference Include="..\TabbedPages.Library\TabbedPages.Library.csproj" />
 		<ProjectReference Include="..\TabbedPages.Models\TabbedPages.Models.csproj" />
 	</ItemGroup>
 
