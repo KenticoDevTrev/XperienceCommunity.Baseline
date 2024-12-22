@@ -29,7 +29,9 @@ Later it morphed into a structure that would make it easy for Kentico Xperience 
 
 Finally, I was able to implement it in Xperience by Kentico (v2.3.0), which now provides a great turn-key solution for people looking to use Xperience by Kentico.
 
-Documentation to Come!
+### Documentation
+
+Documentation is my next goal, I'll be focusing on the Xperience by Kentico at this point as you should be building on that platform vs. KX13.
 
 **See more about the design principle in my talk ['Patterns for an easy-to-migrate and easy-to-maintain website'](https://www.kentico.com/presentation/patterns-for-an-easy-to-migrate-and-easy-to-mainta)**
 
@@ -52,8 +54,6 @@ If you are using a current version of the Baseline and wish to migrate to Versio
 Version 1 (nuget packages 1.X.X) is built on .net 6.0, and supports Kentico Xperience 13.0.5 (.net 6 support) and onwards. The starting site (starting-site/kx13) should only be used for Kentico Xperience 13.0.5 through Kentico Xperience 13.0.130, as in hotfix 131 new features were implemented and form javascript files changed.  You may continue to use version 1 at and 13.0.130 if you re-copy the [updated javascript files](https://github.com/KenticoDevTrev/XperienceCommunity.Baseline/tree/master/starting-site/kx13/MVC/FrontEndDev/js/bundles/form-bundle).
 
 If you wish to access the Version 1 starting site, or any code for version 1, or submit a bug fix for version 1, please use the [master-v1 branch](https://github.com/KenticoDevTrev/XperienceCommunity.Baseline/tree/master-v1)
-
-
 
 ## Questions
 
