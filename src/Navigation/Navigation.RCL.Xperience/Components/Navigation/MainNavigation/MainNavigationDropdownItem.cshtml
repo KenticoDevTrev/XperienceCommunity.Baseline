@@ -1,9 +1,9 @@
 ﻿@model Navigation.Models.NavigationItem
 <li bl-navitem-class bl-navitem-references bl-navigation-item="Model">
-    <a bl-navitem-link bl-navigation-item="Model">@Html.Raw(Model.LinkText)</a>
+    <a class="dropdown-item" bl-navitem-link bl-navigation-item="Model">@Html.Raw(Model.LinkText)</a>
     @if (Model.Children.Count() > 0)
     {
-        <ul>
+        <ul class="dropdown-menu">
             @foreach (var ChildItem in Model.Children)
             {
                 <partial name="~/Components/Navigation/MainNavigation/MainNavigationDropdownItem.cshtml" for="@ChildItem" />

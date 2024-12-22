@@ -2,7 +2,7 @@
 @if (Model.IsMegaMenu && Model.LinkPageID.TryGetValue(out var webPageID))
 {
     <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item dropdown mega-menu">
-        <a href="#" class="nav-link dropdown-toggle" title="@Model.LinkAlt" onclick="@Model.LinkOnClick" data-toggle="dropdown">
+        <a href="#" class="nav-link dropdown-toggle" title="@Model.LinkAlt" onclick="@Model.LinkOnClick" data-bs-toggle="dropdown" data-bs-auto-close="outside">
             @Html.Raw(Model.LinkText)
         </a>
         <div class="dropdown-menu">
@@ -21,7 +21,7 @@ else if (Model.Children.Count() == 0)
 else
 {
     <li bl-navitem-class bl-navitem-references bl-navigation-item="Model" class="nav-item dropdown">
-        <a class="nav-link  dropdown-toggle" title="@Model.LinkAlt" href="#" onclick="@Model.LinkOnClick" data-toggle="dropdown">
+        <a class="nav-link dropdown-toggle" title="@Model.LinkAlt" href="#" onclick="@Model.LinkOnClick" data-toggle="dropdown">
             @Html.Raw(Model.LinkText)
         </a>
         <ul class="dropdown-menu">

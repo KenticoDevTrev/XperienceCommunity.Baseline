@@ -10,21 +10,22 @@
 //--------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using CMS.ContentEngine;
 using CMS.Websites;
 
 namespace Generic
 {
-    /// <summary>
-    /// Used only as a "Fake" content type for use with the The IWebPageQueryResultMapper and IContentItemQueryResultMapper to be able to "map" any source that inherits these types and retrieve.
-    /// </summary>
-    [RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BaseMetadataForMapping : IWebPageFieldsSource, IBaseMetadata
+	/// <summary>
+	/// Represents a page of type <see cref="Search"/>.
+	/// </summary>
+	[RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
+	public partial class Search : IWebPageFieldsSource, IBaseMetadata, IBaseRedirect, IXperienceCommunityMemberPermissionConfiguration
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "Base.Metadata.ForMapping";
+		public const string CONTENT_TYPE_NAME = "Generic.Search";
 
 
 		/// <summary>
@@ -68,5 +69,53 @@ namespace Generic
 		/// MetaData_OGImage.
 		/// </summary>
 		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
+
+
+		/// <summary>
+		/// PageRedirectionType.
+		/// </summary>
+		public string PageRedirectionType { get; set; }
+
+
+		/// <summary>
+		/// PageInternalRedirectPage.
+		/// </summary>
+		public IEnumerable<WebPageRelatedItem> PageInternalRedirectPage { get; set; }
+
+
+		/// <summary>
+		/// PageExternalRedirectURL.
+		/// </summary>
+		public string PageExternalRedirectURL { get; set; }
+
+
+		/// <summary>
+		/// PageFirstChildClassName.
+		/// </summary>
+		public string PageFirstChildClassName { get; set; }
+
+
+		/// <summary>
+		/// PageUsePermanentRedirects.
+		/// </summary>
+		public bool PageUsePermanentRedirects { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionOverride.
+		/// </summary>
+		public bool MemberPermissionOverride { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionIsSecure.
+		/// </summary>
+		public bool MemberPermissionIsSecure { get; set; }
+
+
+		/// <summary>
+		/// MemberPermissionRoleTags.
+		/// </summary>
+		public IEnumerable<TagReference> MemberPermissionRoleTags { get; set; }
 	}
 }

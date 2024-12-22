@@ -22,7 +22,4 @@
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LuceneSearch\" />
-  </ItemGroup>
 </Project>

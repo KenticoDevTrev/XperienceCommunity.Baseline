@@ -12,6 +12,9 @@ namespace Navigation.TagHelpers
         [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
 
+        [HtmlAttributeName("bl-navitem-references")]
+        public bool UseThisThing { get; set; } = true;
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if(NavigationItem == null)
@@ -32,11 +35,13 @@ namespace Navigation.TagHelpers
     [HtmlTargetElement("li", Attributes = "[bl-navitem-class]")]
     [HtmlTargetElement("article", Attributes = "[bl-navitem-class]")]
     [HtmlTargetElement("a", Attributes = "[bl-navitem-class]")]
-
     public class NavigationItemClassTagHelper : TagHelper
     {
         [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
+
+        [HtmlAttributeName("bl-navitem-class")]
+        public bool UseThisThing { get; set; } = true;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -57,6 +62,9 @@ namespace Navigation.TagHelpers
     {
         [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
+
+        [HtmlAttributeName("bl-navitem-link")]
+        public bool UseThisThing { get; set; } = true;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {

@@ -10,6 +10,10 @@ namespace Core.TagHelpers
         private readonly string[] _optimizedImageExtensions = ["jpg", "jpeg", "png"];
         private readonly string[] _webpImageExtensions = ["jpg", "jpeg"];
 
+        [HtmlAttributeName("bl-optimize")]
+        public bool UseThisThing { get; set; } = true;
+
+
         public override int Order => 50;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)

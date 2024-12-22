@@ -1,4 +1,5 @@
-﻿using CMS.Core;
+﻿using CMS.ContentEngine;
+using CMS.Core;
 using Core.Models;
 using CSharpFunctionalExtensions;
 using Kentico.Xperience.Lucene.Core.Indexing;
@@ -9,103 +10,37 @@ using Search.Library.Xperience.Lucene.IndexStrategies;
 using Search.Library.Xperience.Lucene.Services;
 using Search.Library.Xperience.Lucene.Services.Implementations;
 using Search.Models;
+using XperienceCommunity.MemberRoles.Interfaces;
+using XperienceCommunity.MemberRoles.Services;
 
 namespace Search.Repositories.Implementations
 {
     public class LuceneSearchRepository(ILuceneIndexManager luceneIndexManager,
         ILuceneSearchService luceneSearchService,
         IBaselineSearchLuceneCustomizations baselineSearchLuceneCustomizations,
-        IEventLogService eventLogService) : ISearchRepository
+        IEventLogService eventLogService,
+        IMemberAuthorizationFilter memberAuthorizationFilter) : ISearchRepository
     {
         private readonly ILuceneIndexManager _luceneIndexManager = luceneIndexManager;
         private readonly ILuceneSearchService _luceneSearchService = luceneSearchService;
         private readonly IBaselineSearchLuceneCustomizations _baselineSearchLuceneCustomizations = baselineSearchLuceneCustomizations;
         private readonly IEventLogService _eventLogService = eventLogService;
+        private readonly IMemberAuthorizationFilter _memberAuthorizationFilter = memberAuthorizationFilter;
 
         public async Task<SearchResponse> Search(string searchValue, IEnumerable<string> indexes, int page, int pageSize)
         {
             return indexes.Count() switch {
                 0 => new SearchResponse(),
-                1 => await SearchInternalSingleIndex(searchValue, indexes.First(), page, pageSize),
                 _ => await SearchInternalMultipleIndexes(searchValue, indexes, page, pageSize),
             };
-        }
-
-        /// <summary>
-        /// Single index is much simpler as you don't need all the results parsed, only the ones you want to return.
-        /// </summary>
-        /// <param name="searchValue"></param>
-        /// <param name="indexName"></param>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        private async Task<SearchResponse> SearchInternalSingleIndex(string searchValue, string indexName, int page, int pageSize)
-        {
-            int MAX_RESULTS = 1000;
-
-            var index = _luceneIndexManager.GetIndex(indexName);
-            if (index == null) {
-                _eventLogService.LogWarning("LuceneSearchRepository", "IndexMissing", eventDescription: $"Index {indexName} requested in code but not found, please create this Lucene index!");
-                return new SearchResponse();
-            }
-            var query = await _baselineSearchLuceneCustomizations.GetTermQuery(searchValue ?? string.Empty, index);
-            return _luceneSearchService.UseSearcher(index, (searcher) => {
-                var results = searcher.Search(query, MAX_RESULTS);
-                var allScoreDocs = results.ScoreDocs.OrderByDescending(x => x.Score).ToArray();
-                var totalHits = results.TotalHits;
-
-                pageSize = Math.Max(1, pageSize);
-                page = Math.Max(1, page);
-
-                int offset = pageSize * (page - 1);
-                int limit = pageSize;
-
-                // get additional info from topDocs
-                var docsWithPosition = new List<ScoreDocWithPosition>();
-                for (var i = 0; i < allScoreDocs.Length; i++) {
-                    docsWithPosition.Add(new ScoreDocWithPosition(allScoreDocs[i], i, indexName));
-                }
-
-                var items = docsWithPosition
-                        .Skip(offset)
-                        .Take(limit)
-                        .Select(d => MapToSearchItem(d, searcher.Doc(d.ScoreDoc.Doc), indexName))
-                        .ToList();
-
-                return new SearchResponse() {
-                    Items = items,
-                    TotalPossible = totalHits,
-                    HighlightedWords = [], // not supported
-                    HighlightRegex = Maybe.None // not supported
-                };
-            });
-
-            /*
-            This is the recommended model if you are doing your own.
-            return new LuceneSearchResultModel<SearchItem> {
-                Query = searchValue ?? string.Empty,
-                Page = page,
-                PageSize = pageSize,
-                TotalPages = totalHits <= 0 ? 0 : ((totalHits - 1) / pageSize) + 1,
-                TotalHits = totalHits,
-                Hits = docsWithPosition
-                    .Skip(offset)
-                    .Take(limit)
-                    .Select(d => MapToSearchItem(d, indexToSearcher[d.IndexName].Doc(d.ScoreDoc.Doc), d.IndexName))
-                    .ToList();,
-            };
-            */
-
         }
 
         private async Task<SearchResponse> SearchInternalMultipleIndexes(string searchValue, IEnumerable<string> indexes, int page, int pageSize)
         {
             int MAX_RESULTS = 1000;
-            if (!indexes.Any()) {
-                return new SearchResponse();
-            }
-            var combinedTopDocs = new List<TopDocsListWithIndex>();
-            var indexDocIdKeyToDoc = new Dictionary<string, Document>();
+            var combinedItems = new List<DTOWithPermissions<CombinedDocWithScoreAndIndex>>();
+            var indexDocIdKeyToDoc = new Dictionary<string, DTOWithPermissions<Document>>();
+            int totalHits = 0;
             foreach (var indexName in indexes) {
                 var index = _luceneIndexManager.GetIndex(indexName);
                 if (index == null) {
@@ -113,18 +48,21 @@ namespace Search.Repositories.Implementations
                     continue;
                 }
                 var query = await _baselineSearchLuceneCustomizations.GetTermQuery(searchValue ?? string.Empty, index);
-                var results = _luceneSearchService.UseSearcher(index, (searcher) => {
+                combinedItems.AddRange( _luceneSearchService.UseSearcher(index, (searcher) => {
                     var results = searcher.Search(query, MAX_RESULTS);
-                    foreach (var doc in results.ScoreDocs) {
-                        indexDocIdKeyToDoc.Add($"{indexName}|{doc.Doc}", searcher.Doc(doc.Doc));
+                    totalHits += results.TotalHits;
+                    var items = new List<DTOWithPermissions<CombinedDocWithScoreAndIndex>>();
+                    foreach(var scoreDoc in results.ScoreDocs) {
+                        items.Add(ToCombinedDocWithScoreAndIndexWithPermissions(new CombinedDocWithScoreAndIndex(searcher.Doc(scoreDoc.Doc), scoreDoc, indexName)));
                     }
-                    return results;
-                });
-                combinedTopDocs.Add(new TopDocsListWithIndex(results, indexName));
+                    return items;
+                }));
             }
 
-            var allScoreDocs = combinedTopDocs.SelectMany(x => x.SearchTopDocs.ScoreDocs.Select(doc => new TopDocWithIndex(doc, x.IndexName))).OrderByDescending(x => x.Doc.Score).ToArray();
-            var totalHits = combinedTopDocs.Sum(x => x.SearchTopDocs.TotalHits);
+            // Filter out items not authorized.
+            var authorizedSearchItems = (await _memberAuthorizationFilter.RemoveUnauthorizedItems(combinedItems)).Select(x => x.Model);
+
+            var allScoreDocs = authorizedSearchItems.OrderByDescending(x => x.ScoreDoc.Score).ToArray();
 
             pageSize = Math.Max(1, pageSize);
             page = Math.Max(1, page);
@@ -133,15 +71,19 @@ namespace Search.Repositories.Implementations
             int limit = pageSize;
 
             // get additional info from topDocs
-            var docsWithPosition = new List<ScoreDocWithPosition>();
+            var docsWithPosition = new List<ScoreDocWithIndexAndPosition>();
             for (var i = 0; i < allScoreDocs.Length; i++) {
-                docsWithPosition.Add(new ScoreDocWithPosition(allScoreDocs[i].Doc, i, allScoreDocs[i].IndexName));
+                docsWithPosition.Add(new ScoreDocWithIndexAndPosition(
+                    ScoreDoc: allScoreDocs[i].ScoreDoc,
+                    Doc: allScoreDocs[i].Doc,
+                    Position: i,
+                    IndexName: allScoreDocs[i].IndexName));
             }
 
             var items = docsWithPosition
                     .Skip(offset)
                     .Take(limit)
-                    .Select(d => MapToSearchItem(d, indexDocIdKeyToDoc[$"{d.IndexName}|{d.ScoreDoc.Doc}"], d.IndexName))
+                    .Select(d => MapToSearchItem(d, d.Doc, d.IndexName))
                     .ToList();
 
             return new SearchResponse() {
@@ -169,11 +111,23 @@ namespace Search.Repositories.Implementations
 
         }
 
-        private record TopDocWithIndex(ScoreDoc Doc, string IndexName);
+        private static DTOWithPermissions<CombinedDocWithScoreAndIndex> ToCombinedDocWithScoreAndIndexWithPermissions(CombinedDocWithScoreAndIndex CombinedItem)
+        {
+            var Doc = CombinedItem.Doc;
+            return new DTOWithPermissions<CombinedDocWithScoreAndIndex>(
+                Model: CombinedItem,
+                MemberPermissionOverride: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionOverride)), out bool overrideValue) ? overrideValue : false,
+                ContentID: int.TryParse(Doc.Get(nameof(ContentItemFields.ContentItemID)), out var contentItemID) ? contentItemID : 0,
+                MemberPermissionIsSecure: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionIsSecure)), out bool secureValue) ? secureValue : false,
+                MemberPermissionRoleTags: (Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionRoleTags)) ?? "").Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                );
+        }
 
-        private record TopDocsListWithIndex(TopDocs SearchTopDocs, string IndexName);
+        private record ScoreDocWithIndexAndPosition(ScoreDoc ScoreDoc, Document Doc, int Position, string IndexName);
 
-        private static SearchItem MapToSearchItem(ScoreDocWithPosition scoreDoc, Document doc, string index) => new(
+        private record CombinedDocWithScoreAndIndex(Document Doc, ScoreDoc ScoreDoc, string IndexName);
+
+        private static SearchItem MapToSearchItem(ScoreDocWithIndexAndPosition scoreDoc, Document doc, string index) => new(
             documentExtensions: string.Empty,
             image: doc.Get(nameof(PageMetaData.Thumbnail)),
             content: doc.Get(BaselineBaseMetadataIndexingStrategy.CRAWLER_CONTENT_FIELD_NAME),
@@ -192,7 +146,17 @@ namespace Search.Repositories.Implementations
         };
 
 
-        public record ScoreDocWithPosition(ScoreDoc ScoreDoc, int Position, string IndexName);
+        public record ScoreDocWithPositionAndPermissions(ScoreDoc ScoreDoc, int Position, string IndexName, int ContentItemID, bool CheckPermissions, bool PermissionOverride, bool IsSecure, string[] RoleTags) : IMemberPermissionConfiguration
+        {
+            public bool GetCheckPermissions() => CheckPermissions;
 
+            public int GetContentID() => ContentItemID;
+
+            public bool GetMemberPermissionIsSecure() => IsSecure;
+
+            public bool GetMemberPermissionOverride() => PermissionOverride;
+
+            public IEnumerable<string> GetMemberPermissionRoleTags() => RoleTags;
+        }
     }
 }

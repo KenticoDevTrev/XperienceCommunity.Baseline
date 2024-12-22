@@ -9,7 +9,6 @@
 // </auto-generated>
 //--------------------------------------------------------------------------------------------------
 
-using System;
 using CMS.ContentEngine;
 using CMS.Websites;
 
@@ -19,12 +18,12 @@ namespace Generic
     /// Used only as a "Fake" content type for use with the The IWebPageQueryResultMapper and IContentItemQueryResultMapper to be able to "map" any source that inherits these types and retrieve.
     /// </summary>
     [RegisterContentTypeMapping(CONTENT_TYPE_NAME)]
-	public partial class BaseMetadataForMapping : IWebPageFieldsSource, IBaseMetadata
+	public partial class BaseRedirectForMapping : IWebPageFieldsSource, IBaseRedirect
 	{
 		/// <summary>
 		/// Code name of the content type.
 		/// </summary>
-		public const string CONTENT_TYPE_NAME = "Base.Metadata.ForMapping";
+		public const string CONTENT_TYPE_NAME = "Base.Redirect.ForMapping";
 
 
 		/// <summary>
@@ -34,39 +33,33 @@ namespace Generic
 		public WebPageFields SystemFields { get; set; }
 
 
-		/// <summary>
-		/// MetaData_PageName.
-		/// </summary>
-		public string MetaData_PageName { get; set; }
+        /// <summary>
+        /// PageRedirectionType.
+        /// </summary>
+        public string PageRedirectionType { get; set; }
 
 
-		/// <summary>
-		/// MetaData_Title.
-		/// </summary>
-		public string MetaData_Title { get; set; }
+        /// <summary>
+        /// PageInternalRedirectPage.
+        /// </summary>
+        public IEnumerable<WebPageRelatedItem> PageInternalRedirectPage { get; set; }
 
 
-		/// <summary>
-		/// MetaData_Description.
-		/// </summary>
-		public string MetaData_Description { get; set; }
+        /// <summary>
+        /// PageExternalRedirectURL.
+        /// </summary>
+        public string PageExternalRedirectURL { get; set; }
 
 
-		/// <summary>
-		/// MetaData_Keywords.
-		/// </summary>
-		public string MetaData_Keywords { get; set; }
+        /// <summary>
+        /// PageFirstChildClassName.
+        /// </summary>
+        public string PageFirstChildClassName { get; set; }
 
 
-		/// <summary>
-		/// MetaData_NoIndex.
-		/// </summary>
-		public bool MetaData_NoIndex { get; set; }
-
-
-		/// <summary>
-		/// MetaData_OGImage.
-		/// </summary>
-		public IEnumerable<IGenericHasImage> MetaData_OGImage { get; set; }
-	}
+        /// <summary>
+        /// PageUsePermanentRedirects.
+        /// </summary>
+        public bool PageUsePermanentRedirects { get; set; }
+    }
 }

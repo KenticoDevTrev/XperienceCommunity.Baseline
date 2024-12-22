@@ -16,6 +16,7 @@
 @using Kentico.PageBuilder.Web.Mvc
 @using Kentico.Content.Web.Mvc.PageBuilder
 @addTagHelper *, Kentico.Content.Web.Mvc
+@addTagHelper *, Kentico.Web.Mvc
 
 @* Baseline - Core *@
 @using Core
@@ -31,21 +32,34 @@
 @addTagHelper *, XperienceCommunity.Baseline.Core.RCL
 @addTagHelper *, XperienceCommunity.Baseline.Core.RCL.Xperience
 
-@* Baseline - Navigation *@
-@addTagHelper *, XperienceCommunity.PartialWidgetPage
+@* BASELINE CUSTOMIZATION - Navigation *@
 @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
 @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.Xperience
+
+@* BASELINE CUSTOMIZATION - Account *@
+@addTagHelper *, XperienceCommunity.Baseline.Account.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Account.RCL.Xperience
+
+@* BASELINE CUSTOMIZATION - Search *@
+@addTagHelper *, XperienceCommunity.Baseline.Search.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Search.RCL.Xperience
+
+@* BASELINE CUSTOMIZATION - TabbedPages *@
+@addTagHelper *, XperienceCommunity.Baseline.TabbedPages.RCL
+@addTagHelper *, XperienceCommunity.Baseline.TabbedPages.RCL.Xperience
 
 @* MVC Caching *@
 @using MVCCaching
 @inject ICacheDependenciesScope CacheScope
 @inject ICacheRepositoryContext CacheContext
+@addTagHelper *, MVCCaching.Base.Core.Components
+
 @* Page Builder Tag Helpers *@
 @addTagHelper *, XperienceCommunity.DevTools.PageBuilderTagHelpers
 
 @* Partial Widget Page *@
 @using PartialWidgetPage
-@addTagHelper *, XperienceCommunity.PartialWidgetPage.Core
+@addTagHelper *, XperienceCommunity.PartialWidgetPage
 
 @* Widget Filter
     @addTagHelper *, XperienceCommunity.WidgetFilter

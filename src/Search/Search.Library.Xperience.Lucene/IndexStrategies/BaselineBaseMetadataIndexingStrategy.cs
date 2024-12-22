@@ -8,9 +8,11 @@ using Core.Services;
 using Generic;
 using Kentico.Xperience.Lucene.Core.Indexing;
 using Lucene.Net.Documents;
+using Lucene.Net.Documents.Extensions;
 using MVCCaching;
 using Search.WebCrawler;
 using System.Data;
+using XperienceCommunity.MemberRoles;
 
 namespace Search.Library.Xperience.Lucene.IndexStrategies
 {
@@ -22,7 +24,8 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
         IContentItemReferenceService contentItemReferenceService,
         IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter,
         BaselineSearchLuceneWebCrawlerService baselineSearchLuceneWebCrawlerService,
-        BaselineSearchLuceneWebScraperSanitizer baselineSearchLuceneWebScraperSanitizer
+        BaselineSearchLuceneWebScraperSanitizer baselineSearchLuceneWebScraperSanitizer,
+        IInfoProvider<TagInfo> tagInfoProvider
         ) : DefaultLuceneIndexingStrategy
     {
         private readonly IWebPageQueryResultMapper _webPageMapper = webPageMapper;
@@ -33,6 +36,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
         private readonly BaselineSearchLuceneWebCrawlerService _baselineSearchLuceneWebCrawlerService = baselineSearchLuceneWebCrawlerService;
         private readonly BaselineSearchLuceneWebScraperSanitizer _baselineSearchLuceneWebScraperSanitizer = baselineSearchLuceneWebScraperSanitizer;
+        private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
         public const string CRAWLER_CONTENT_FIELD_NAME = "Content";
 
         public override async Task<Document?> MapToLuceneDocumentOrNull(IIndexEventItemModel item)
@@ -52,6 +56,20 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
                 
                 if (!(await _metaDataWebPageDataContainerConverter.GetDefaultMetadataLogic(result)).TryGetValue(out var metadata)) {
                     return null;
+                }
+
+                // Add Authorization filtering fields so can filter results.
+                document.AddStoredField(nameof(ContentItemFields.ContentItemID), result.ContentItemID);
+                try { 
+                    var permissionObject = _webPageQueryResultMapper.Map<XperienceCommunityMemberPermissionConfigurationConfigurationForMapping>(result);
+                    document.AddStoredField(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionOverride), permissionObject.MemberPermissionOverride.ToString());
+                    document.AddStoredField(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionIsSecure), permissionObject.MemberPermissionIsSecure.ToString());
+                    if(permissionObject.MemberPermissionOverride && permissionObject.MemberPermissionRoleTags.Any()) {
+                        var tagDictionary = await GetCategoryGuidToName();
+                        document.AddStoredField(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionRoleTags), permissionObject.MemberPermissionRoleTags.Where(x => tagDictionary.ContainsKey(x.Identifier)).Select(x => tagDictionary[x.Identifier]).Join(";"));
+                    }
+                } catch(Exception) {
+                    document.AddStoredField(nameof(ContentItemFields.ContentItemID), result.ContentItemID);
                 }
 
                 var additionalData = await GetAdditionalDataWebPage(indexedPage.ItemID, indexedPage.WebsiteChannelName, indexedPage.ContentTypeID, indexedPage.ContentLanguageID);
@@ -112,7 +130,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
                 var query = new ContentItemQueryBuilder().ForContentTypes(
                     config =>
                         config
-                            .OfReusableSchema([IBaseMetadata.REUSABLE_FIELD_SCHEMA_NAME])
+                            .OfReusableSchema([IBaseMetadata.REUSABLE_FIELD_SCHEMA_NAME, IXperienceCommunityMemberPermissionConfiguration.REUSABLE_FIELD_SCHEMA_NAME])
                             .ForWebsite(channelName, includeUrlPath: true)
                     )
                     .InLanguage(languageName);
@@ -150,6 +168,19 @@ where ContentItemLanguageMetadataLatestVersionStatus = 2 and ChannelName = @Chan
             }
 
             return null;
+        }
+
+        private async Task<Dictionary<Guid, string>> GetCategoryGuidToName()
+        {
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"{TagInfo.OBJECT_TYPE}|all");
+                }
+                return (await _tagInfoProvider.Get()
+                .Columns(nameof(TagInfo.TagGUID), nameof(TagInfo.TagName))
+                .GetEnumerableTypedResultAsync())
+                .ToDictionary(key => key.TagGUID, value => value.TagName);
+            }, new CacheSettings(1440, "BaselineSearch_CategoryGuidToName"));
         }
 
         private record AdditionalDataHolder(int WebPageItemID, int ContentLanguageID, string ContentItemLanguageMetadataDisplayName, DateTime ContentItemLanguageMetadataCreatedWhen);
