@@ -15,12 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Account\Account.RCL\Account.RCL.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Core\Core.RCL\Core.RCL.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Localization\Localization.RCL\Localization.RCL.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL\Navigation.RCL.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.RCL\Search.RCL.csproj" />
-    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.RCL\TabbedPages.RCL.csproj" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Site.Library\Site.Library.csproj" />
   </ItemGroup>
 

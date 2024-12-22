@@ -5,7 +5,6 @@ using Kentico.Web.Mvc;
 using Kentico.Membership;
 using Kentico.Xperience.Admin.Base;
 using XperienceCommunity.Authorization;
-using Kentico.Xperience.Admin.Base.Forms;
 
 // Microsoft
 using Microsoft.AspNetCore.Identity;
@@ -19,21 +18,15 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 
 // Your Site
-using Testing;
 using Site.Repositories.Implementations;
 using MVC.Repositories.Implementations;
-using Admin.FroalaEditorConfigurations;
 
 // Core
 using Core;
 using Core.Middleware;
-using Core.Repositories;
 
 // Core used libraries
-using MVCCaching;
-using XperienceCommunity.RelationshipsExtended.Models;
 using XperienceCommunity.MemberRoles.Models;
-using XperienceCommunity.Localizer;
 
 // BASELINE CUSTOMIZATION: Account - Added Usings
 using Account.Models;
@@ -41,7 +34,6 @@ using Account.Admin.Xperience.Models;
 
 // BASELINE CUSTOMIZATION: Navigation - Added Usings
 using Navigation.Repositories;
-using Navigation.Features.PartialNavigation;
 
 // BASELINE CUSTOMIZATION: TabbedPages - Add Using
 using TabbedPages.Features.Tab;
@@ -51,8 +43,6 @@ using Generic;
 // BASELINE CUSTOMIZATION: Search - Add below
 using Search.Features.Search;
 using Search.Library.Xperience.Lucene.IndexStrategies;
-using Search.Library.Xperience.Lucene.Services.Implementations;
-using Search.Library.Xperience.Lucene.Services;
 using Account.Features.Account.Confirmation;
 using Account.Features.Account.ForgotPassword;
 using Account.Features.Account.ForgottenPasswordReset;
@@ -61,6 +51,7 @@ using Account.Features.Account.LogOut;
 using Account.Features.Account.MyAccount;
 using Account.Features.Account.Registration;
 using Account.Features.Account.ResetPassword;
+using Navigation.Features.PartialNavigation;
 
 
 // BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
@@ -311,14 +302,9 @@ namespace MVC.Configuration
 
                 },
                 relationshipsExtendedOptionsConfiguration: (options) => {
+                    // In the future, there will probably be Language Syncing in the Relationships Extended, keep an eye out for it.
                     //options.AllowLanguageSyncConfiguration = true;
-
-                    var langSyncConfigs = new List<LanguageSyncClassConfiguration>() {
-                        new (WebPage.CONTENT_TYPE_NAME, [
-                            nameof(WebPage.TestLanguageAgnosticValue),
-                            nameof(WebPage.TestObjectNames)
-                            ])
-                    };
+                    //var langSyncConfigs = new List<LanguageSyncClassConfiguration>();
                     //options.LanguageSyncConfiguration = new LanguageSyncConfiguration(langSyncConfigs, []);
                 },
                 metaDataOptionsConfiguration: (options) => {

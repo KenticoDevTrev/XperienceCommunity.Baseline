@@ -6,19 +6,19 @@
     <PackageReference Include="kentico.xperience.azurestorage" Version="30.0.0" />
     <PackageReference Include="kentico.xperience.imageprocessing" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Library.Xperience.Lucene" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL.Xperience" Version="2.3.1" />
     <PackageReference Include="XperienceCommunity.DevTools.PageBuilderTagHelpers" Version="1.0.3" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Account\Account.RCL.Xperience\Account.RCL.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Core\Core.RCL.Xperience\Core.RCL.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Localization\Localization.RCL.Xperience\Localization.RCL.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.RCL.Xperience\Navigation.RCL.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.Library.Xperience.Lucene\Search.Library.Xperience.Lucene.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.RCL.Xperience\Search.RCL.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.RCL.Xperience\TabbedPages.RCL.Xperience.csproj" />
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>

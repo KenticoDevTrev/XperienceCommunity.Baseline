@@ -19,16 +19,16 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.Admin.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Admin.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.Admin.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Admin.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.Admin.Xperience" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Account\Account.Admin.Xperience\Account.Admin.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Localization\Localization.Admin.Xperience\Localization.Admin.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Admin.Xperience\Navigation.Admin.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience.Lucene\Search.Admin.Xperience.Lucene.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience\Search.Admin.Xperience.csproj" />
-    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Admin.Xperience\TabbedPages.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 

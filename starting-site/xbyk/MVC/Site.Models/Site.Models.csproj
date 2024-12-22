@@ -10,12 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Account\Account.Models\Account.Models.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Core\Core.Models\Core.Models.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Localization\Localization.Models\Localization.Models.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Models\Navigation.Models.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Search\Search.Models\Search.Models.csproj" />
-    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Models\TabbedPages.Models.csproj" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.Models" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Models" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.Models" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Models" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Models" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.Models" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 
