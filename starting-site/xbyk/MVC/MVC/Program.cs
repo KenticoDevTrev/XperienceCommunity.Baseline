@@ -22,6 +22,9 @@ StartupConfigs.RegisterKenticoServices(builder);
 // Baseline.Core
 StartupConfigs.AddBaselineCore<ApplicationUserBaseline>(builder);
 
+// Starting Site Content Types and Web Page Types
+StartupConfigs.AddStartingSiteElements(builder);
+
 // Register other interfaces your site will use.
 StartupConfigs.RegisterInterfaces(builder);
 

@@ -50,5 +50,11 @@ namespace Generic
 		/// VideoFile.
 		/// </summary>
 		public ContentItemAsset VideoFile { get; set; }
-	}
+
+
+        /// <summary>
+        /// VideoTranscript.
+        /// </summary>
+        public string VideoTranscript { get; set; }
+    }
 }

@@ -221,6 +221,7 @@ namespace MVC.Configuration
             });
         }
 
+
         /// <summary>
         /// BASELINE CUSTOMIZATION: Starting Site - If you want to use Session, set your own Session storage method below
         /// BASELINE CUSTOMIZATION: Core - Make sure if using Session, add the appropriate IPersistantStorageConfiguration to use Session to the AddCoreBaseline extension.
@@ -278,11 +279,18 @@ namespace MVC.Configuration
             builder.Services.AddCoreBaseline<TUser>(
                 installerOptions: baselineInstallerOptions,
                 contentItemAssetOptionsConfiguration: (options) => {
-                    // If AddMediaPageTypes is true on installer, have these configurations set
+                    // If Installing the Starting Site Media is true, these are the configurations
                     options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Image", [
                         new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("ImageFile", Core.Enums.ContentItemAssetMediaType.Image, "ImageTitle", "ImageDescription")
                     ], preCache: true));
 
+
+                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.File", [
+                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("FileFile", Core.Enums.ContentItemAssetMediaType.File, "FileTitle", "FileDescription")
+                    ], preCache: true));
+
+                    /* Less used, you can uncomment out if you wish along with the AddStartingSiteElements options */
+                    /*
                     options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Audio", [
                         new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("AudioFile", Core.Enums.ContentItemAssetMediaType.Audio, "AudioTitle", "AudioDescription")
                     ], preCache: true));
@@ -290,10 +298,7 @@ namespace MVC.Configuration
                     options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Video", [
                         new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("VideoFile", Core.Enums.ContentItemAssetMediaType.Video, "VideoTitle", "VideoDescription")
                     ], preCache: true));
-
-                    options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.File", [
-                        new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("FileFile", Core.Enums.ContentItemAssetMediaType.File, "FileTitle", "FileDescription")
-                    ], preCache: true));
+                    */
                 },
                 mediaFileOptionsConfiguration: (options) => {
 
@@ -317,6 +322,27 @@ namespace MVC.Configuration
 
             /// BASELINE CUSTOMIZATION: Starting Site - Add your own Page metadata Converter here
             builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
+        }
+
+
+        /// <summary>
+        /// BASELINE CUSTOMIZATION: Starting Site - Adjust these options to auto create various elements
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddStartingSiteElements(WebApplicationBuilder builder)
+        {
+            builder.Services.AddStartingSitePageTypes(options => {
+                options.AddBasicPageType = true;
+                options.AddHomePageType = true;
+                options.AddImageContentType = true;
+                options.AddFileContentType = true;
+                options.AddAudioContentType = false;
+                options.AddVideoContentType = false;
+                options.ImageFormatsSupported = "jpg;jpeg;webp;gif;png;apng;bmp;ico;avif";
+                options.VideoFormatsSupported = "mp4;webm;ogg;ogv;avi;wmv";
+                options.AudioFormatsSupported = "wav;mp3;mp4;aac";
+                options.NonMediaFileFormatsSupported = "txt;pdf;docx;pptx;xlsx;zip";
+            });
         }
 
         /// <summary>
@@ -667,6 +693,7 @@ namespace MVC.Configuration
         {
             app.UseSession();
         }
+
 
     }
 }
