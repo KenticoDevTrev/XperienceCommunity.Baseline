@@ -1,0 +1,19 @@
+﻿@{
+    var pageMetaData = new PageMetaData()
+    {
+        Title = StringLocalizer.GetStringOrDefault("mm.httperror.500.title", "Server Error")+ " | Movement Mortgage"
+    };
+}
+<vc:manual-page-meta-data meta-data="@pageMetaData" />
+<div class="mm-container">
+    <h1>
+        <span class="mm-text mm-text--expressive text-graphite font-ko-FullSumo -mb-20 block"
+              style="--mm-font-size: 10rem; --mm-line-height: 1; --mm-letter-spacing: 0px; --mm-text-stroke-width: undefinedpx;">
+            @StringLocalizer.GetStringOrDefault("mm.httperror.500.heading", "Server Error")
+        </span>
+        <span class="mm-text mm-text--expressive mm-text--outlined text-primary font-ko-FullSumo block"
+              style="--mm-font-size: 20rem; --mm-line-height: 1; --mm-letter-spacing: 0px; --mm-text-stroke-width: 2px; --mm-text-fill-color: transparent; font-size: calc(100vw / 6) !important;">
+            500
+        </span>
+    </h1>
+</div>

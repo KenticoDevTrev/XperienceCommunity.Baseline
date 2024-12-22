@@ -15,12 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL" Version="2.3.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL" Version="2.3.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL" Version="2.3.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL" Version="2.3.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL" Version="2.3.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL" Version="2.3.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL" Version="2.3.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL" Version="2.3.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL" Version="2.3.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL" Version="2.3.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL" Version="2.3.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL" Version="2.3.5" />
   </ItemGroup>
 
   <ItemGroup>

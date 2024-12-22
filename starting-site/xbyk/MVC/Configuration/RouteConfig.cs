@@ -36,20 +36,21 @@ namespace MVC
                 defaults: new { controller = "Sitemap", action = "Index" }
             );
 
+            // BASELINE CUSTOMIZATION - Navigation - Enable Sitemap here
+            app.UseSitemapRoute(sitemapPatterns: ["sitemap.xml", "googlesitemap.xml"]);
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            // BASELINE CUSTOMIZATION - Site - This is the language detection route constraint, currently 2 characters
+            // May need to adjust if you want to use more than 2 letter language
             app.MapControllerRoute(
                 name: "default_language",
-                pattern: "{kxpLanguage}/{controller=Home}/{action=Index}/{id?}");
+                pattern: "{kxpLanguage:regex(^[a-zA-Z]{{2}}$)}/{controller=Home}/{action=Index}/{id?}");
 
-            // BASELINE CUSTOMIZATION - Navigation - Enable Sitemap here
-            app.UseSitemapRoute(sitemapPatterns: ["sitemap.xml", "googlesitemap.xml"]);
-           
             // Only enable until home page is set
             // app.MapGet("/", () => "The MVC site has not been configured yet.");
-
         }
     }
 }

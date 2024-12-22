@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var installerOptions = new StartingSiteInstallationOptions();
             options?.Invoke(installerOptions);
             services.AddSingleton(installerOptions);
+            services.AddSingleton<StartingSiteInstallerChannels>()
             services.AddSingleton<StartingSiteInstaller>();
             return services;
         }

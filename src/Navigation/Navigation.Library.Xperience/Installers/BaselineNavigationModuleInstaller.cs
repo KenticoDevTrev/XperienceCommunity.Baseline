@@ -3,19 +3,12 @@ using CMS.ContentEngine.Internal;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.FormEngine;
-using Navigation.Models;
 using NavigationType = Generic.Navigation;
 namespace Account.Installers
 {
-    public class BaselineNavigationModuleInstaller(BaselineNavigationOptions baselineNavigationOptions,
-        IEventLogService eventLogService,
-        IInfoProvider<ContentTypeChannelInfo> contentTypeChannelInfoProvider,
-        IInfoProvider<ChannelInfo> channelInfoProvider)
+    public class BaselineNavigationModuleInstaller(IEventLogService eventLogService)
     {
-        private readonly BaselineNavigationOptions _baselineNavigationOptions = baselineNavigationOptions;
         private readonly IEventLogService _eventLogService = eventLogService;
-        private readonly IInfoProvider<ContentTypeChannelInfo> _contentTypeChannelInfoProvider = contentTypeChannelInfoProvider;
-        private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
 
         public bool InstallationRan { get; set; } = false;
 
