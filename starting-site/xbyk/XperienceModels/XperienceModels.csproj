@@ -27,12 +27,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.Xperience" Version="2.3.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.Xperience" Version="2.3.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Localization.XperienceModels.Xperience" Version="2.3.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.XperienceModels.Xperience" Version="2.3.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.XperienceModels.Xperience" Version="2.3.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.XperienceModels.Xperience" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.Xperience" Version="2.3.3" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.Xperience" Version="2.3.3" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.XperienceModels.Xperience" Version="2.3.3" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.XperienceModels.Xperience" Version="2.3.3" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.XperienceModels.Xperience" Version="2.3.3" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.XperienceModels.Xperience" Version="2.3.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />

@@ -18,7 +18,7 @@ namespace Site.Repositories.Implementations
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly ILanguageRepository _languageRepository = languageRepository;
         */
-        // BASELINE CUSTOMIZATION: Start Site - Any Web Pages should have logic here to parse the metadata.
+        // BASELINE CUSTOMIZATION - Start Site - Any Web Pages should have logic here to parse the metadata.
         public Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageContentQueryDataContainer webPageContentQueryDataContainer, PageMetaData baseMetaData)
         {
             // Just a sample, any normal WebPageItem that inherits the IBaseMetadata and uses standard routing from Kentico is handled by default.

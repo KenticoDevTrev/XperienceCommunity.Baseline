@@ -8,7 +8,7 @@ namespace MVC
     public class RouteConfig
     {
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - Adjust Routes below if you want custom routes
+        /// BASELINE CUSTOMIZATION - Starting Site - Adjust Routes below if you want custom routes
         /// </summary>
         /// <param name="app"></param>
         public static void RegisterRoutes(WebApplication app)
@@ -44,7 +44,7 @@ namespace MVC
                 name: "default_language",
                 pattern: "{kxpLanguage}/{controller=Home}/{action=Index}/{id?}");
 
-            // BASELINE CUSTOMIZATION: Navigation - Enable Sitemap here
+            // BASELINE CUSTOMIZATION - Navigation - Enable Sitemap here
             app.UseSitemapRoute(sitemapPatterns: ["sitemap.xml", "googlesitemap.xml"]);
            
             // Only enable until home page is set

@@ -28,19 +28,19 @@ using Core.Middleware;
 // Core used libraries
 using XperienceCommunity.MemberRoles.Models;
 
-// BASELINE CUSTOMIZATION: Account - Added Usings
+// BASELINE CUSTOMIZATION - Account - Added Usings
 using Account.Models;
 using Account.Admin.Xperience.Models;
 
-// BASELINE CUSTOMIZATION: Navigation - Added Usings
+// BASELINE CUSTOMIZATION - Navigation - Added Usings
 using Navigation.Repositories;
 
-// BASELINE CUSTOMIZATION: TabbedPages - Add Using
+// BASELINE CUSTOMIZATION - TabbedPages - Add Using
 using TabbedPages.Features.Tab;
 using TabbedPages.Features.TabParent;
 using Generic;
 
-// BASELINE CUSTOMIZATION: Search - Add below
+// BASELINE CUSTOMIZATION - Search - Add below
 using Search.Features.Search;
 using Search.Library.Xperience.Lucene.IndexStrategies;
 using Account.Features.Account.Confirmation;
@@ -54,7 +54,7 @@ using Account.Features.Account.ResetPassword;
 using Navigation.Features.PartialNavigation;
 
 
-// BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
+// BASELINE CUSTOMIZATION - Account - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
     slug: "member-password-channel-custom-settings",
     uiPageType: typeof(MemberPasswordChannelSettingsExtender),
@@ -62,7 +62,7 @@ using Navigation.Features.PartialNavigation;
     templateName: TemplateNames.EDIT,
     order: UIPageOrder.NoOrder)]
 
-// BASELINE CUSTOMIZATION: Account - Here are the page template registrations 
+// BASELINE CUSTOMIZATION - Account - Here are the page template registrations 
 [assembly: RegisterPageTemplate(
     identifier: "Generic.Account_Confirmation",
     name: "Registration Confirmation",
@@ -131,7 +131,7 @@ using Navigation.Features.PartialNavigation;
 [assembly: RegisterPageBuilderAuthorization(pageTemplateIdentifiers: ["Generic.Account_ResetPassword"], userAuthenticationRequired: true)]
 
 
-// BASELINE CUSTOMIZATION: Navigation - Add this for the Navigation Mega Menu Support
+// BASELINE CUSTOMIZATION - Navigation - Add this for the Navigation Mega Menu Support
 [assembly: RegisterPageTemplate(
     "Generic.Navigation_Default",
     "Navigation",
@@ -139,7 +139,7 @@ using Navigation.Features.PartialNavigation;
     "/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml",
     ContentTypeNames = [Generic.Navigation.CONTENT_TYPE_NAME])]
 
-// BASELINE CUSTOMIZATION: TabbedPages - Add this for the Navigation Mega Menu Support
+// BASELINE CUSTOMIZATION - TabbedPages - Add this for the Navigation Mega Menu Support
 [assembly: RegisterPageTemplate(
     "Generic.Tab_Default",
     "Tab",
@@ -154,7 +154,7 @@ using Navigation.Features.PartialNavigation;
     "/Features/TabParent/TabParentPageTemplate.cshtml",
     ContentTypeNames = [TabParent.CONTENT_TYPE_NAME])]
 
-// BASELINE CUSTOMIZATION: Search - Add this for the search page
+// BASELINE CUSTOMIZATION - Search - Add this for the search page
 [assembly: RegisterPageTemplate(
     "Generic.Search_Default",
     "Search",
@@ -162,7 +162,7 @@ using Navigation.Features.PartialNavigation;
     "~/Features/Search/SearchPageTemplate.cshtml",
     ContentTypeNames = [Generic.Search.CONTENT_TYPE_NAME])]
 
-// BASELINE CUSTOMIZATION: Site - You can configure and adjust the editor here: https://docs.kentico.com/developers-and-admins/configuration/rich-text-editor-configuration#define-editor-configurations
+// BASELINE CUSTOMIZATION - Site - You can configure and adjust the editor here: https://docs.kentico.com/developers-and-admins/configuration/rich-text-editor-configuration#define-editor-configurations
 // [assembly: RegisterRichTextEditorConfiguration(CustomRichTextEditorConfiguration.IDENTIFIER, typeof(CustomRichTextEditorConfiguration), CustomRichTextEditorConfiguration.DISPLAY_NAME)]
 
 namespace MVC.Configuration
@@ -170,7 +170,7 @@ namespace MVC.Configuration
     public static class StartupConfigs
     {
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - Adjust your Kentico features to your site
+        /// BASELINE CUSTOMIZATION - Starting Site - Adjust your Kentico features to your site
         /// </summary>
         /// <param name="builder"></param>
         public static void RegisterKenticoServices(WebApplicationBuilder builder)
@@ -182,17 +182,17 @@ namespace MVC.Configuration
                     [
                         // Enables Page Builder for content types using their generated classes
 
-                        // BASELINE CUSTOMIZATION: Starting Site - If you wish to use the Home and Basic Pages, MUST add it here
+                        // BASELINE CUSTOMIZATION - Starting Site - If you wish to use the Home and Basic Pages, MUST add it here
                         Generic.Home.CONTENT_TYPE_NAME,
                         Generic.BasicPage.CONTENT_TYPE_NAME,
 
-                        // BASELINE CUSTOMIZATION: Navigation - If using Navigation content type, MUST add it here
+                        // BASELINE CUSTOMIZATION - Navigation - If using Navigation content type, MUST add it here
                         Generic.Navigation.CONTENT_TYPE_NAME,
 
-                        // BASELINE CUSTOMIZATION: Account - If using Accounts with Account Type, MUST add it here
+                        // BASELINE CUSTOMIZATION - Account - If using Accounts with Account Type, MUST add it here
                         Generic.Account.CONTENT_TYPE_NAME,
 
-                        // BASELINE CUSTOMIZATION: TabbedPages - If using TabbedPages, MUST add it here
+                        // BASELINE CUSTOMIZATION - TabbedPages - If using TabbedPages, MUST add it here
                         Generic.TabParent.CONTENT_TYPE_NAME,
                         Generic.Tab.CONTENT_TYPE_NAME
 
@@ -223,8 +223,8 @@ namespace MVC.Configuration
 
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - If you want to use Session, set your own Session storage method below
-        /// BASELINE CUSTOMIZATION: Core - Make sure if using Session, add the appropriate IPersistantStorageConfiguration to use Session to the AddCoreBaseline extension.
+        /// BASELINE CUSTOMIZATION - Starting Site - If you want to use Session, set your own Session storage method below
+        /// BASELINE CUSTOMIZATION - Core - Make sure if using Session, add the appropriate IPersistantStorageConfiguration to use Session to the AddCoreBaseline extension.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="builder"></param>
@@ -256,7 +256,7 @@ namespace MVC.Configuration
         }
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Core - Configure the below to your site specifications
+        /// BASELINE CUSTOMIZATION - Core - Configure the below to your site specifications
         /// </summary>
         /// <param name="builder"></param>
         public static void AddBaselineCore<TUser>(WebApplicationBuilder builder) where TUser : ApplicationUser, new()
@@ -267,13 +267,7 @@ namespace MVC.Configuration
             // IUserService<User> and IUserRepository<User> of the same type you define here, it won't work if the types miss-matched
             // Additionally, if you use a model other than ApplicationUserWithNames, you'll want to implement and register your own 
             var baselineInstallerOptions = new BaselineCoreInstallerOptions(
-                AddMemberFields: true,
-                AddHomePageType: true,
-                AddBasicPageType: true,
-                AddMediaPageTypes: true,
-                ImageFormatsSupported: "jpg;jpeg;webp;gif;png;apng;bmp;ico;avif", // svg excluded by default due to security, you can add in: https://docs.kentico.com/developers-and-admins/configuration/content-hub-configuration#support-for-svg-images
-                VideoFormatsSupported: "mp4;webm;ogg;ogv;avi;wmv",
-                AudioFormatsSupported: "txt;pdf;docx;pptx;xlsx;zip"
+                AddMemberFields: true
                 );
 
             builder.Services.AddCoreBaseline<TUser>(
@@ -320,13 +314,13 @@ namespace MVC.Configuration
                 })
             );
 
-            /// BASELINE CUSTOMIZATION: Starting Site - Add your own Page metadata Converter here
+            /// BASELINE CUSTOMIZATION - Starting Site - Add your own Page metadata Converter here
             builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
         }
 
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - Adjust these options to auto create various elements
+        /// BASELINE CUSTOMIZATION - Starting Site - Adjust these options to auto create various elements
         /// </summary>
         /// <param name="builder"></param>
         public static void AddStartingSiteElements(WebApplicationBuilder builder)
@@ -346,7 +340,7 @@ namespace MVC.Configuration
         }
 
         /// <summary>
-        /// BASELINE CONFIGURATION: Starting Site - Add any interfaces and other services here
+        /// BASELINE CUSTOMIZATION: Starting Site - Add any interfaces and other services here
         /// 
         /// </summary>
         /// <param name="builder"></param>
@@ -376,7 +370,7 @@ namespace MVC.Configuration
             // Widget Filters
             //builder.Services.AddWidgetFilter();
 
-            // BASELINE CONFIGURATION: Core - Override Baseline customization points if wanted
+            // BASELINE CUSTOMIZATION: Core - Override Baseline customization points if wanted
             /*
             builder.Services.AddScoped<IUserMetadataProvider, CustomUserMetadataProvider>();
             builder.Services.AddScoped<IMediaFileMediaMetadataProvider, CustomMediaFileMediaMetadataProvider>();
@@ -442,7 +436,7 @@ namespace MVC.Configuration
         /// <param name="builder"></param>
         public static void AddBaselineSearch(WebApplicationBuilder builder)
         {
-            // BASELINE CUSTOMIZATION: Search - Add your search implementation here and inject ISearchRepository implementation
+            // BASELINE CUSTOMIZATION - Search - Add your search implementation here and inject ISearchRepository implementation
             // Note that Lucene has been done and is available through the XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene and XperienceCommunity.Baseline.Search.Library.Xperience.Lucene
             // https://github.com/Kentico/xperience-by-kentico-lucene
             // https://github.com/Kentico/xperience-by-kentico-algolia
@@ -529,7 +523,7 @@ namespace MVC.Configuration
         }
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Account - Configure this method for your own uses
+        /// BASELINE CUSTOMIZATION - Account - Configure this method for your own uses
         /// Use this if using the Baseline Account Module to hook up Member Roles, Authorization, and Logins
         /// </summary>
         /// <param name="builder"></param>
@@ -595,7 +589,7 @@ namespace MVC.Configuration
         /// <param name="builder"></param>
         public static void AddBaselineNavigation(WebApplicationBuilder builder)
         {
-            // BASELINE CUSTOMIZATION: Navigation - Add navigation and configure here
+            // BASELINE CUSTOMIZATION - Navigation - Add navigation and configure here
             builder.Services.AddBaselineNavigation(new Navigation.Models.BaselineNavigationOptions() {
                 ShowPagesNotTranslatedInSitemapUrlSet = false
             });
@@ -685,7 +679,7 @@ namespace MVC.Configuration
         }
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - If you want to use Session, call this extension
+        /// BASELINE CUSTOMIZATION - Starting Site - If you want to use Session, call this extension
         /// </summary>
         /// <param name="app"></param>
         /// <param name="builder"></param>
