@@ -50,8 +50,6 @@
     }
   }
   */
-/* BASELINE CUSTOMIZATION - Search (Lucene) - For Search module (Lucene implementation), needs to match your website base
+/* BASELINE CUSTOMIZATION - Search (Lucene) - For Search module (Lucene implementation), needs to match your website base */
   ,"WebCrawlerBaseUrl": "https://localhost:44373/"
- */
-
 }
