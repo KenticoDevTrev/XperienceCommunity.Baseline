@@ -36,12 +36,6 @@ namespace Generic
 
 
 		/// <summary>
-		/// NavigationName.
-		/// </summary>
-		public string NavigationName { get; set; }
-
-
-		/// <summary>
 		/// NavigationType.
 		/// </summary>
 		public string NavigationType { get; set; }

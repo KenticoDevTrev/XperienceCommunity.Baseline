@@ -2,6 +2,7 @@
 {
     public class StartingSiteInstallationOptions()
     {
+        public bool CreateWebChannelIfNone { get; set; } = true;
         public bool AddHomePageType { get; set; } = true;
         public bool AddBasicPageType { get; set; } = true;
         public bool AddImageContentType { get; set; } = true;

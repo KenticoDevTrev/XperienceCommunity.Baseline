@@ -326,6 +326,7 @@ namespace MVC.Configuration
         public static void AddStartingSiteElements(WebApplicationBuilder builder)
         {
             builder.Services.AddStartingSitePageTypes(options => {
+                options.CreateWebChannelIfNone = true;
                 options.AddBasicPageType = true;
                 options.AddHomePageType = true;
                 options.AddImageContentType = true;

@@ -99,13 +99,12 @@ namespace Navigation.Repositories.Implementations
             var builder = _cacheDependencyBuilderFactory.Create();
             var settings = await _channelCustomSettingsRepository.GetSettingsModel<NavigationChannelSettings>();
 
-            // TODO: replace with new localization string service
             builder.AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<NavigationChannelSettings>())
-                .Object("TheCustomLocalizationKey", settings.DefaultBreadcrumbText)
-                .Object("TheCustomLocalizationKey", settings.DefaultBreadcrumbUrl);
+                .Object("NittinLocalization.LocalizationTranslationItem", "generic.default.breadcrumbtext")
+                .Object("NittinLocalization.LocalizationTranslationItem", "generic.default.breadcrumburl");
 
-            return new Breadcrumb(linkText: _stringLocalizer.GetStringOrDefault(settings.DefaultBreadcrumbText, settings.DefaultBreadcrumbText),
-                linkUrl: _stringLocalizer.GetStringOrDefault(settings.DefaultBreadcrumbUrl, settings.DefaultBreadcrumbUrl));
+            return new Breadcrumb(linkText: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumbtext", settings.DefaultBreadcrumbText),
+                linkUrl: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumburl", settings.DefaultBreadcrumbUrl));
         }
 
         private async Task<Dictionary<int, Tuple<Breadcrumb, int>>> GetWebPageItemIDToBreadcrumbAndParent()

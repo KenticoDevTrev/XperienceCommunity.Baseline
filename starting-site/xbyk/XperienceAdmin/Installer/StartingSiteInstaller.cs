@@ -6,6 +6,9 @@ using CMS.FormEngine;
 using Generic;
 using Image = Generic.Image;
 using File = Generic.File;
+using CMS.Websites;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace Admin.Installer
 {
@@ -14,18 +17,27 @@ namespace Admin.Installer
         IEventLogService eventLogService,
         IInfoProvider<ContentTypeChannelInfo> contentTypeChannelInfoProvider,
         IInfoProvider<ChannelInfo> channelInfoProvider,
-        IInfoProvider<SettingsKeyInfo> settingsKeyInfoProvider)
+        IInfoProvider<SettingsKeyInfo> settingsKeyInfoProvider,
+        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
+        IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider
+        //IWebPageManager webPageManager
+        )
     {
         private readonly StartingSiteInstallationOptions _startingSiteInstallationOptions = startingSiteInstallationOptions;
         private readonly IEventLogService _eventLogService = eventLogService;
         private readonly IInfoProvider<ContentTypeChannelInfo> _contentTypeChannelInfoProvider = contentTypeChannelInfoProvider;
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
         private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
+        private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
+        //private readonly IWebPageManager _webPageManager = webPageManager;
 
         public bool InstallationRan { get; set; } = false;
-
-        public Task Install()
+        private bool CreatedChannels { get; set; } = false;
+        public async Task Install()
         {
+            if (_startingSiteInstallationOptions.CreateWebChannelIfNone) {
+                await CheckAndCreateWebChannel();
+            }
             if (_startingSiteInstallationOptions.AddHomePageType) {
                 CreateHomeWebpage();
             }
@@ -55,8 +67,46 @@ namespace Admin.Installer
             }
 
             InstallationRan = true;
+        }
 
-            return Task.CompletedTask;
+        private async Task CheckAndCreateWebChannel()
+        {
+            if ((await _channelInfoProvider.Get().GetEnumerableTypedResultAsync()).Count() == 0) {
+                CreatedChannels = true;
+                var webChannel = new ChannelInfo() {
+                    ChannelDisplayName = "Web",
+                    ChannelName = "Web",
+                    ChannelType = ChannelType.Website,
+                    ChannelSize = ChannelSize.Standard
+                };
+                _channelInfoProvider.Set(webChannel);
+
+                var languages = await _contentLanguageInfoProvider.Get().GetEnumerableTypedResultAsync();
+                ContentLanguageInfo? language = languages.FirstOrDefault();
+                if (language == null) {
+                    language = new ContentLanguageInfo() {
+                        ContentLanguageDisplayName = "English",
+                        ContentLanguageName = "en",
+                        ContentLanguageIsDefault = true,
+                        ContentLanguageCultureFormat = "en-US",
+                        ContentLanguageGUID = Guid.NewGuid()
+                    };
+                    _contentLanguageInfoProvider.Set(language);
+                }
+
+
+                var websiteChannel = new WebsiteChannelInfo() {
+                    WebsiteChannelDomain = "localhost:44373",
+                    WebsiteChannelChannelID = webChannel.ChannelID,
+                    WebsiteChannelHomePage = "/Home",
+                    WebsiteChannelPrimaryContentLanguageID = language?.ContentLanguageID ?? 1,
+                    WebsiteChannelDefaultCookieLevel = 1000,
+                    WebsiteChannelStoreFormerUrls = true
+                };
+                websiteChannelInfoProvider.Set(websiteChannel);
+
+
+            }
         }
 
         private void EnsureMediaTypesAllowed()
@@ -81,7 +131,7 @@ namespace Admin.Installer
         {
             var contentItemCommonDataForm = FormHelper.GetFormInfo(ContentItemCommonDataInfo.OBJECT_TYPE, false);
             var imageSchema = contentItemCommonDataForm.GetFormSchema("Generic.HasImage");
-           
+
             if (imageSchema == null) {
                 _eventLogService.LogError("StartingSiteInstaller", "MissingSchemas", eventDescription: $"Can't create Image page type because one of the following schemas are missing: {(imageSchema == null ? "Base.Metadata" : "")}");
                 return;
@@ -98,7 +148,7 @@ namespace Admin.Installer
             classImage.ClassHasUnmanagedDbSchema = false;
             classImage.ClassType = "Content";
             classImage.ClassContentTypeType = "Reusable";
-            classImage.ClassWebPageHasUrl = true;
+            classImage.ClassWebPageHasUrl = false;
             classImage.ClassShortName = "GenericImage";
 
             var formInfo = existingClassImage != null ? new FormInfo(existingClassImage.ClassFormDefinition) : FormHelper.GetBasicFormDefinition("ContentItemDataID");
@@ -248,7 +298,7 @@ namespace Admin.Installer
             classFile.ClassHasUnmanagedDbSchema = false;
             classFile.ClassType = "Content";
             classFile.ClassContentTypeType = "Reusable";
-            classFile.ClassWebPageHasUrl = true;
+            classFile.ClassWebPageHasUrl = false;
             classFile.ClassShortName = "GenericFile";
 
             var formInfo = existingClassFile != null ? new FormInfo(existingClassFile.ClassFormDefinition) : FormHelper.GetBasicFormDefinition("ContentItemDataID");
@@ -388,7 +438,7 @@ namespace Admin.Installer
             classAudio.ClassHasUnmanagedDbSchema = false;
             classAudio.ClassType = "Content";
             classAudio.ClassContentTypeType = "Reusable";
-            classAudio.ClassWebPageHasUrl = true;
+            classAudio.ClassWebPageHasUrl = false;
             classAudio.ClassShortName = "GenericAudio";
 
             var formInfo = existingClassAudio != null ? new FormInfo(existingClassAudio.ClassFormDefinition) : FormHelper.GetBasicFormDefinition("ContentItemDataID");
@@ -551,7 +601,7 @@ namespace Admin.Installer
             classVideo.ClassHasUnmanagedDbSchema = false;
             classVideo.ClassType = "Content";
             classVideo.ClassContentTypeType = "Reusable";
-            classVideo.ClassWebPageHasUrl = true;
+            classVideo.ClassWebPageHasUrl = false;
             classVideo.ClassShortName = "GenericVideo";
 
             var formInfo = existingClassVideo != null ? new FormInfo(existingClassVideo.ClassFormDefinition) : FormHelper.GetBasicFormDefinition("ContentItemDataID");
@@ -917,6 +967,22 @@ namespace Admin.Installer
                         ContentTypeChannelContentTypeID = accountClass.ClassID
                     });
                 }
+
+                /*if(CreatedChannels) {
+                    var language = (await _contentLanguageInfoProvider.Get().GetEnumerableTypedResultAsync()).OrderByDescending(x => x.ContentLanguageIsDefault).FirstOrDefault()?.ContentLanguageName ?? "en";
+                    // also add home page
+                    var itemData = new ContentItemData(new Dictionary<string, object>());
+                    // Creates a page metadata object
+                    var contentItemParameters = new ContentItemParameters(Home.CONTENT_TYPE_NAME, itemData);
+                    var createPageParameters = new CreateWebPageParameters("Home",
+                                                                            language,
+                                                                           contentItemParameters);
+                    // set page template
+                    createPageParameters.SetPageBuilderConfiguration(null, "{\"identifier\":\"Generic.Home_Default\",\"properties\":null,\"fieldIdentifiers\":null}");
+                    // Creates the page in the database
+                    var webPageItemID = await _webPageManager.Create(createPageParameters);
+                    _ = await _webPageManager.TryPublish(webPageItemID, language);
+                }*/
             }
         }
 
