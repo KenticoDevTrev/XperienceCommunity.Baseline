@@ -44,7 +44,7 @@ namespace Navigation.Middleware
         public static IEndpointRouteBuilder UseSitemapRoute(this IEndpointRouteBuilder endpoints, IEnumerable<string>? sitemapPatterns = null)
         {
             // Defaults
-            var urlPatterns = sitemapPatterns ?? new string[] { "sitemap.xml", "googlesitemap.xml" };
+            var urlPatterns = sitemapPatterns ?? ["sitemap.xml", "googlesitemap.xml"];
 
             foreach (string pattern in urlPatterns)
             {

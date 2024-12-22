@@ -60,14 +60,5 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "SiteNameByID"));
             return siteIdToName.GetValueOrMaybe(channelID).GetValueOrDefault(string.Empty);
         }
-
-        public ObjectIdentity WebsiteChannelDefaultLanguage(int? websiteChannelID = null)
-        {
-            var defaultCulture = SettingsKeyInfoProvider.GetValue("CMSDefaultCultureCode", _siteService.CurrentSite.SiteID);
-            return new ObjectIdentity() {
-                CodeName = defaultCulture
-            };
-
-        }
     }
 }
