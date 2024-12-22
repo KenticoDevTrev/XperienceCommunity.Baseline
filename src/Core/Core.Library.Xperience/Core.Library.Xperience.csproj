@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
     <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
   </ItemGroup>
@@ -31,6 +30,7 @@
     <PackageReference Include="XperienceCommunity.DevTools.MVCCaching" Version="2.0.0" />
     <PackageReference Include="XperienceCommunity.DevTools.QueryExtensions" Version="3.0.0" />
     <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.2" />
+    <PackageReference Include="XperienceCommunity.RelationshipsExtended.Core" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

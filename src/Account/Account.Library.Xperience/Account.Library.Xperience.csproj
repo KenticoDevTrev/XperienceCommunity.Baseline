@@ -26,11 +26,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.10" />
-    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.1" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Authorization\src\XbyK\XperienceCommunity.Authorization\XperienceCommunity.Authorization.csproj" />
     <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
     <ProjectReference Include="..\Account.Library\Account.Library.csproj" />
     <ProjectReference Include="..\Account.Models\Account.Models.csproj" />

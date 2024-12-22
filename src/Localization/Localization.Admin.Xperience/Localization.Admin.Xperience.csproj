@@ -19,7 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Localization-Nittin\src\XperienceCommunity.Localization\XperienceCommunity.Localization.csproj" />
+    <PackageReference Include="XperienceCommunity.Localization" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
   </ItemGroup>
 

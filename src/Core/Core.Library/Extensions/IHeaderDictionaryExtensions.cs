@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Http
                 dictionary[key] = value;
             } else
             {
-                dictionary.Add(key, value);
+                dictionary.Append(key, value);
             }
         }
     }

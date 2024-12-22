@@ -19,11 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="2.0.2" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Authorization\src\XbyK\XperienceCommunity.Authorization.Admin\XperienceCommunity.Authorization.Admin.csproj" />
     <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
     <ProjectReference Include="..\Account.Library.Xperience\Account.Library.Xperience.csproj" />
   </ItemGroup>
