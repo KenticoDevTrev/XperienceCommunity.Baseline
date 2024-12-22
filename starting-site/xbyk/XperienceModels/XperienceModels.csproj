@@ -27,7 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.KX13" Version="2.3.1" />
     <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.Xperience" Version="2.3.1" />
     <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.Xperience" Version="2.3.1" />
     <PackageReference Include="XperienceCommunity.Baseline.Localization.XperienceModels.Xperience" Version="2.3.1" />
