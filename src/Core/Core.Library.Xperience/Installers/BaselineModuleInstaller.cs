@@ -269,6 +269,7 @@ Generic.BaseInheritedPage and Generic.RedirectOnlyInheritedPage",
             fieldPageInternalRedirectPage.Name = nameof(IBaseRedirect.PageInternalRedirectPage);
             fieldPageInternalRedirectPage.AllowEmpty = true;
             fieldPageInternalRedirectPage.Precision = 0;
+            fieldPageInternalRedirectPage.DataType = "webpages";
             fieldPageInternalRedirectPage.Enabled = true;
             fieldPageInternalRedirectPage.Visible = true;
             fieldPageInternalRedirectPage.Guid = Guid.Parse("f47ba3f8-1625-4897-aabf-a701a639c23b");
