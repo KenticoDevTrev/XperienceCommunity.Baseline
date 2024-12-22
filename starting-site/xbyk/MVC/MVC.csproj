@@ -29,7 +29,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />
-    <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
+    <ProjectReference Include="..\XperienceAdmin\XperienceAdmin.csproj" />
+    <ProjectReference Include="..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>
 </Project>

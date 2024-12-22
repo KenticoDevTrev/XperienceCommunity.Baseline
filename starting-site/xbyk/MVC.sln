@@ -10,19 +10,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoNotes", "RepoNotes", "{
 		RepoNotes\_ViewImports.KX13.cshtml = RepoNotes\_ViewImports.KX13.cshtml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Models", "MVC\Site.Models\Site.Models.csproj", "{C327E680-D537-4F89-8174-390F365FC27B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Models", "Site.Models\Site.Models.csproj", "{C327E680-D537-4F89-8174-390F365FC27B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Library", "MVC\Site.Library\Site.Library.csproj", "{EFB2B7BF-5F6D-4539-9908-D4F6443A823C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Library", "Site.Library\Site.Library.csproj", "{EFB2B7BF-5F6D-4539-9908-D4F6443A823C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XperienceModels", "XperienceModels\XperienceModels.csproj", "{F31D040E-E214-405B-B235-0A65C485205A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Components", "MVC\Site.Components\Site.Components.csproj", "{920DB2DC-DDB2-45FD-8A02-0E0CCE94D4D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.Components", "Site.Components\Site.Components.csproj", "{920DB2DC-DDB2-45FD-8A02-0E0CCE94D4D8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site.UniversalModels", "Site.UniversalModels\Site.UniversalModels.csproj", "{08FA1FB7-EAB9-4154-B75A-6F42CF1B8D82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVC", "MVC\MVC\MVC.csproj", "{26370D58-3ECE-4D1F-9740-37AD65BB3598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVC", "MVC\MVC.csproj", "{26370D58-3ECE-4D1F-9740-37AD65BB3598}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XperienceAdmin", "Admin\XperienceAdmin\XperienceAdmin.csproj", "{A0334C0F-77B6-4137-8CD0-D919DC056D53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XperienceAdmin", "XperienceAdmin\XperienceAdmin.csproj", "{A0334C0F-77B6-4137-8CD0-D919DC056D53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

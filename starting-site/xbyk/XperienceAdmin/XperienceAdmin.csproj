@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
-    <ProjectReference Include="..\..\XperienceModels\XperienceModels.csproj" />
+    <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />
+    <ProjectReference Include="..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

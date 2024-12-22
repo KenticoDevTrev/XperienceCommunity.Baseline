@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
+    <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
 
 </Project>
