@@ -12,14 +12,16 @@ namespace Navigation.Repositories.Implementations
         IPageRetriever _pageRetriever,
         IProgressiveCache _progressiveCache,
         ICacheRepositoryContext _repoContext,
-        IStringLocalizer<SharedResources> _stringLocalizer) : IBreadcrumbRepository
+        IStringLocalizer<SharedResources> _stringLocalizer,
+        IIdentityService _identityService) : IBreadcrumbRepository
     {
+
+
         public Task<BreadcrumbJsonLD> BreadcrumbsToJsonLDAsync(IEnumerable<Breadcrumb> breadcrumbs, bool excludeFirst = true)
         {
             var itemListElement = new List<ItemListElementJsonLD>();
             int position = 0;
-            foreach (Breadcrumb breadcrumb in (excludeFirst ? breadcrumbs.Skip(1) : breadcrumbs))
-            {
+            foreach (Breadcrumb breadcrumb in (excludeFirst ? breadcrumbs.Skip(1) : breadcrumbs)) {
                 position++;
                 itemListElement.Add(new ItemListElementJsonLD(
                     position: position,
@@ -32,17 +34,19 @@ namespace Navigation.Repositories.Implementations
             return Task.FromResult(new BreadcrumbJsonLD(itemListElement));
         }
 
-        public async Task<List<Breadcrumb>> GetBreadcrumbsAsync(int nodeID, bool includeDefaultBreadcrumb = true)
+        public Task<List<Breadcrumb>> GetBreadcrumbsAsync(int nodeID, bool includeDefaultBreadcrumb = true) => GetBreadcrumbsAsync(nodeID.ToTreeIdentity(), includeDefaultBreadcrumb);
+
+
+        public async Task<List<Breadcrumb>> GetBreadcrumbsAsync(TreeIdentity treeIdentity, bool includeDefaultBreadcrumb = true)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
-
+            var nodeID = (await treeIdentity.GetOrRetrievePageID(_identityService)).GetValueOrDefault(0);
             var breadcrumbsDictionary = await GetNodeToBreadcrumbAndParent();
 
             bool isCurrentPage = true;
             List<Breadcrumb> breadcrumbs = [];
             int nextNodeID = nodeID;
-            while (breadcrumbsDictionary.ContainsKey(nextNodeID))
-            {
+            while (breadcrumbsDictionary.ContainsKey(nextNodeID)) {
                 // Add dependency
                 builder.Node(nextNodeID);
 
@@ -50,16 +54,14 @@ namespace Navigation.Repositories.Implementations
                 var breadcrumbTuple = breadcrumbsDictionary[nextNodeID];
                 var breadcrumb = !isCurrentPage ? breadcrumbTuple.Item1 : new Breadcrumb(linkText: breadcrumbTuple.Item1.LinkText, linkUrl: breadcrumbTuple.Item1.LinkUrl, true);
                 isCurrentPage = false;
-                if (!string.IsNullOrWhiteSpace(breadcrumb.LinkText))
-                {
+                if (!string.IsNullOrWhiteSpace(breadcrumb.LinkText)) {
                     breadcrumbs.Add(breadcrumb);
                 }
                 nextNodeID = breadcrumbTuple.Item2;
             }
 
             // Add given Top Level Breadcrumb if provided
-            if (includeDefaultBreadcrumb)
-            {
+            if (includeDefaultBreadcrumb) {
                 breadcrumbs.Add(await GetDefaultBreadcrumbAsync());
             }
 
@@ -74,11 +76,9 @@ namespace Navigation.Repositories.Implementations
             builder.Object(ResourceStringInfo.OBJECT_TYPE, "generic.default.breadcrumbtext")
                     .Object(ResourceStringInfo.OBJECT_TYPE, "generic.default.breadcrumburl");
 
-            return Task.FromResult(_progressiveCache.Load(cs =>
-            {
-                if (cs.Cached)
-                {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(builder.GetKeys().ToArray());
+            return Task.FromResult(_progressiveCache.Load(cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([.. builder.GetKeys()]);
                 }
                 return new Breadcrumb(linkText: _stringLocalizer.GetString("generic.default.breadcrumbtext"),
                     linkUrl: _stringLocalizer.GetString("generic.default.breadcrumburl")
@@ -91,9 +91,9 @@ namespace Navigation.Repositories.Implementations
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.Object(SettingsKeyInfo.OBJECT_TYPE, "BreadcrumbPageTypes");
 
-            string[] validClassNames = SettingsKeyInfoProvider.GetValue(new SettingsKeyName("BreadcrumbPageTypes", _siteRepository.CurrentSiteID())).ToLower().Split(";,|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] validClassNames = SettingsKeyInfoProvider.GetValue(new SettingsKeyName("BreadcrumbPageTypes", _siteRepository.CurrentWebsiteChannelID().GetValueOrDefault(0))).ToLower().Split(";,|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
-            
+
             // Cache dependency should not extend to the CacheDependenciesStore as only the matching breadcrumbs should apply.
             var results = await _pageRetriever.RetrieveAsync<TreeNode>(
                 query => query
@@ -107,8 +107,7 @@ namespace Navigation.Repositories.Implementations
                 );
 
             return results.GroupBy(x => x.NodeID)
-                .ToDictionary(key => key.Key, values => values.Select(x =>
-                {
+                .ToDictionary(key => key.Key, values => values.Select(x => {
                     string linkText = x.DocumentName;
                     return new Tuple<Breadcrumb, int>(new Breadcrumb(linkText: linkText, linkUrl: x.ToPageIdentity().RelativeUrl), x.NodeParentID);
                 }).First());

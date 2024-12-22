@@ -147,12 +147,15 @@
         {
             get
             {
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
                 return new ContentIdentity()
                 {
                     ContentID = ContentID,
                     ContentGuid = ContentGuid,
-                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID)
+                    PathChannelLookup = new PathChannel(Path: Path, ChannelId: ChannelID),
+                    ContentName = (Path.Split("/", StringSplitOptions.RemoveEmptyEntries).Last() ?? string.Empty).AsNullOrWhitespaceMaybe()
                 };
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -160,12 +163,14 @@
         {
             get
             {
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
                 return new ContentCultureIdentity()
                 {
                     ContentCultureID = ContentCultureID,
                     ContentCultureGuid = ContentCultureGuid,
                     PathCultureChannelLookup = new PathCultureChannel(Path: Path, Culture: Culture, ChannelId: ChannelID)
                 };
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 

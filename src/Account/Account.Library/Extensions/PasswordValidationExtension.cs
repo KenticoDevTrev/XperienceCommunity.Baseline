@@ -6,21 +6,37 @@ namespace Account.Extensions
     {
         public static IRuleBuilderOptions<T, string> ValidPassword<T>(this IRuleBuilder<T, string> ruleBuilder, PasswordPolicySettings settings)
         {
-            string message = !string.IsNullOrWhiteSpace(settings.ViolationMessage) ? settings.ViolationMessage : "Invalid Password";
+            string message = settings.ViolationMessage.GetValueOrDefault("Invalid Password");
             var options = ruleBuilder.NotNull();
             if (settings.UsePasswordPolicy)
             {
-                if (settings.MinLength > 0)
+                if (settings.MinLength.TryGetValue(out var minLength) && minLength > 0)
                 {
-                    options.MinimumLength(settings.MinLength).WithMessage(message);
+                    options.MinimumLength(minLength).WithMessage($"Password minimum Length is {minLength}.");
                 }
-                if (!string.IsNullOrWhiteSpace(settings.Regex))
-                {
-                    options.Matches(settings.Regex).WithMessage(message);
+                if(settings.UniqueChars.TryGetValue(out var uniqueChars) && uniqueChars > 0) {
+                    options.Must(x => x.ToCharArray().Distinct().Count() >= uniqueChars).WithMessage($"Must have at least {uniqueChars} unique characters.");
                 }
-                if (settings.NumNonAlphanumericChars > 0)
+                if (settings.Regex.TryGetValue(out var regex))
                 {
-                    options.Matches($"^(?=.{{{settings.NumNonAlphanumericChars},999}}\\W).*$").WithMessage(message);
+                    options.Matches(regex).WithMessage(message);
+
+                    // If both regex and numNon, use 'Must' in this case so HTML validation elements won't have 2 regex
+                    if (settings.NumNonAlphanumericChars.TryGetValue(out var numNonAlphaNumericaChars)) {
+                        options.Must(password => {
+                            int counter = 0;
+                            foreach (char c in password) {
+                                if (!Char.IsLetterOrDigit(c)) {
+                                    counter++;
+                                }
+                            }
+                            return counter >= numNonAlphaNumericaChars;
+                        }).WithMessage($"Must have at least {numNonAlphaNumericaChars} Non Alpha-Numeric Character{(numNonAlphaNumericaChars > 1 ? "s" : "")}.");
+                    }
+                } 
+                else if (settings.NumNonAlphanumericChars.TryGetValue(out var numNonAlphaNumericaChars))
+                {
+                    options.Matches($"^(?=.{{{numNonAlphaNumericaChars},999}}\\W).*$").WithMessage($"Must have at least {numNonAlphaNumericaChars} Non Alpha-Numeric Character{(numNonAlphaNumericaChars > 1 ? "s" : "")}.");
                 }
             }
             return options;

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Core</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.0.5" />
+    <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="2.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Admin\XperienceCommunity.RelationshipsExtended.Web.Admin.csproj" />
+    <ProjectReference Include="..\Core.Library.Xperience\Core.Library.Xperience.csproj" />
+  </ItemGroup>
+
+</Project>

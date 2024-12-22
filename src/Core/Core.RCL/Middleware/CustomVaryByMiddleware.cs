@@ -61,7 +61,7 @@ namespace Core.Middleware
 
             // Add custom headers here, then in your caching you can use <cache vary-by-header=@($"{CustomVaryByHeaders._SOMETHING},{CustomVaryByHeaders._SOMETHING_ELSE}")
             context.Request.Headers.AddOrReplace(_CULTURE, (CultureInfo.DefaultThreadCurrentCulture?.Name ?? "en-US").Split('-')[0]);
-            context.Request.Headers.AddOrReplace(_SITE, _siteRepository.CurrentSiteName());
+            context.Request.Headers.AddOrReplace(_SITE, _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
 
             // Call the next delegate/middleware in the pipeline
             await _next(context);

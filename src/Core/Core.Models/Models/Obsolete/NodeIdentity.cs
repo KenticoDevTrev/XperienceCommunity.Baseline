@@ -43,6 +43,7 @@
             return new ContentIdentity()
             {
                 ContentID = NodeId,
+                ContentName = (NodeAliasPathAndSiteId.TryGetValue(out var pathAndSite) ? pathAndSite.Item1.Split("/", StringSplitOptions.RemoveEmptyEntries).Last() ?? string.Empty : string.Empty).AsNullOrWhitespaceMaybe(),
                 PathAndChannelId = NodeAliasPathAndSiteId,
                 ContentGuid = NodeGuid
             };

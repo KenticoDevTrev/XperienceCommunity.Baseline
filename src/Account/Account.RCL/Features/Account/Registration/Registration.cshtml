@@ -1,24 +1,17 @@
 ﻿@model Account.Features.Account.Registration.RegistrationViewModel
-@if (Model.RegistrationSuccessful.HasValue)
-{
-    if (Model.RegistrationSuccessful.Value)
-    {
-        <div class="container">
-            <h1>Email Verification</h1>
-            <p>Your account has been created.  In order to activate your account, please check your email and click the account verification link.</p>
-        </div>
-    }
-    else
-    {
-        <div class="container">
+@if (Model.RegistrationSuccessful.HasValue && Model.RegistrationSuccessful.Value) {
+    <div class="container">
+        <h1>Email Verification</h1>
+        <p>Your account has been created.  In order to activate your account, please check your email and click the account verification link.</p>
+    </div>
+} else {
 
+    if (Model.RegistrationSuccessful.HasValue) {
+        <div class="container">
             <h1>Error Sending Registration Request</h1>
-            <p>The following error occurred: @Model.RegistrationFailureMessage</p>
+            <div>The following error occurred: @Html.Raw(Model.RegistrationFailureMessage)</div>
         </div>
     }
-}
-else
-{
     <div class="container">
         <form asp-controller="Registration" asp-action="Registration" method="POST" asp-antiforgery="true">
             <page-data-context initialized="false">
@@ -105,7 +98,7 @@ else
     </div>
 }
 @*
-<script src="/Scripts/jquery-1.10.2.min.js"></script>
-<script src="/Scripts/jquery.validate.min.js"></script>
-<script src="/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="/Scripts/jquery.validate.min.js"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.min.js"></script>
 *@

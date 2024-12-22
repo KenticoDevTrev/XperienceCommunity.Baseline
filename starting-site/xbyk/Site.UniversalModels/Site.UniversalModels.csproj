@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Site</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.5" />
+  </ItemGroup>
+
+</Project>

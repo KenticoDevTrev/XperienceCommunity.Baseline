@@ -34,5 +34,7 @@
         Task<bool> EnableUserByEmailAsync(string email, bool setAsExternalIfExternal);
         Task<bool> EnableUserByIdAsync(string UserId, bool setAsExternalIfExternal);
         Task<bool> EnableUserByLoginAsync(string loginProvider, string providerKey, bool setAsExternalIfExternal);
+
+        Task<string> GetSecurityStampAsync(string userName);
     }
 }

@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Admin</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Account\Account.Admin.Xperience\Account.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Localization\Localization.Admin.Xperience\Localization.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Admin.Xperience\Navigation.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience.Lucene\Search.Admin.Xperience.Lucene.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience\Search.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Admin.Xperience\TabbedPages.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="FroalaEditorConfigurations\CustomEditorConfiguration.json" />
+  </ItemGroup>
+
+</Project>

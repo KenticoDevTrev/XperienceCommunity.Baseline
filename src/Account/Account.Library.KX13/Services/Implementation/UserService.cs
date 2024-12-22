@@ -7,35 +7,17 @@ using System.Web;
 
 namespace Account.Services.Implementation
 {
-    [AutoDependencyInjection]
-    public class UserService(
+    public class UserService<TUser>(
         IUserInfoProvider _userInfoProvider,
         ApplicationUserManager<ApplicationUser> _userManager,
         IMessageService _emailService,
         IProgressiveCache _progressiveCache,
         ISiteRepository _siteRepository,
-        IEventLogService _eventLogService) : IUserService
+        IEventLogService _eventLogService,
+        IBaselineUserMapper<TUser> _baselineUserMapper) : IUserService where TUser : ApplicationUser, new()
     {
 
-        public Task<User> CreateUserAsync(User user, string password, bool enabled = false)
-        {
-            // Create basic user
-            var newUser = new UserInfo()
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
-                Enabled = enabled
-            };
-            _userInfoProvider.Set(newUser);
-
-            // Generate new password, and save any other settings
-            UserInfoProvider.SetPassword(newUser, password);
-
-            return Task.FromResult(newUser.ToUser());
-        }
+        public async Task<User> CreateUserAsync(User user, string password, bool enabled = false) => (await CreateUser(user, password, enabled)).Value;
 
         public async Task SendRegistrationConfirmationEmailAsync(User user, string confirmationUrl)
         {
@@ -91,8 +73,10 @@ namespace Account.Services.Implementation
 
         public async Task<bool> ValidateUserPasswordAsync(User user, string password)
         {
-            var userInfoObj = await GetUserInfoAsync(user.UserName);
-            return UserInfoProvider.ValidateUserPassword(userInfoObj, password);
+            if((await GetUserInfoAsync(user.UserName)).TryGetValue(out var userInfo)) {
+                return UserInfoProvider.ValidateUserPassword(userInfo, password);
+            }
+            return false;
         }
 
         public Task ResetPasswordAsync(User user, string password)
@@ -103,10 +87,10 @@ namespace Account.Services.Implementation
 
         public Task<bool> ValidatePasswordPolicyAsync(string password)
         {
-            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentSiteName()));
+            return Task.FromResult(SecurityHelper.CheckPasswordPolicy(password, _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty)));
         }
 
-        private async Task<UserInfo> GetUserInfoAsync(string userName)
+        private async Task<Maybe<UserInfo>> GetUserInfoAsync(string userName)
         {
             return await _progressiveCache.LoadAsync(async cs =>
             {
@@ -114,27 +98,21 @@ namespace Account.Services.Implementation
                 {
                     cs.CacheDependency = CacheHelper.GetCacheDependency($"{UserInfo.OBJECT_TYPE}|byname|{userName}");
                 }
-                return await _userInfoProvider.GetAsync(userName);
+                return (await _userInfoProvider.Get().WhereEquals(nameof(UserInfo.UserName), userName).Or().WhereEquals(nameof(UserInfo.Email), userName).GetEnumerableTypedResultAsync()).FirstOrMaybe();
             }, new CacheSettings(15, "GetUserInfoAsync", userName));
         }
 
-        public Task CreateExternalUserAsync(User user)
+        private async Task<UserInfo> GetUserInfoAsync(int userId)
         {
-            // Create basic user
-            var newUser = new UserInfo()
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
-                Enabled = user.Enabled,
-                IsExternal = true
-            };
-            _userInfoProvider.Set(newUser);
-
-            return Task.FromResult(newUser.ToUser());
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency($"{UserInfo.OBJECT_TYPE}|byId|{userId}");
+                }
+                return await _userInfoProvider.GetAsync(userId);
+            }, new CacheSettings(15, "GetUserInfoAsync", userId));
         }
+
+        public Task CreateExternalUserAsync(User user) => CreateExternalUser(user);
 
         public async Task SendVerificationCodeEmailAsync(User user, string token)
         {
@@ -142,5 +120,59 @@ namespace Account.Services.Implementation
             await _emailService.SendEmailAsync(user.Email, "Verification Code",
                 $"<p>Hello {user.UserName}!</p><p>When Prompted, enter the code below to finish authenticating:</p> <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td width=\"15%\"></td><td width=\"70%\" align=\"center\" bgcolor=\"#f1f3f2\" style=\"color:black;margin-bottom:10px;border-radius:10px\"><p style=\"font-size:xx-large;font-weight:bold;margin:10px 0px\">{token}</p></td></tr></tbody></table>");
         }
+
+        public async Task<Result<User>> CreateUser(User user, string password, bool enabled = false)
+        {
+            // Create basic user
+            var newUser = new UserInfo() {
+                UserName = user.UserName,
+                FirstName = user.FirstName.GetValueOrDefault(string.Empty),
+                LastName = user.LastName.GetValueOrDefault(string.Empty),
+                Email = user.Email,
+                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
+                Enabled = enabled
+            };
+            _userInfoProvider.Set(newUser);
+
+            // Generate new password, and save any other settings
+            UserInfoProvider.SetPassword(newUser, password);
+
+            return Result.Success(await _baselineUserMapper.ToUser(newUser));
+        }
+
+        public async Task<Result<User>> CreateExternalUser(User user)
+        {
+            // Create basic user
+            var newUser = new UserInfo() {
+                UserName = user.UserName,
+                FirstName = user.FirstName.GetValueOrDefault(string.Empty),
+                LastName = user.LastName.GetValueOrDefault(string.Empty),
+                Email = user.Email,
+                SiteIndependentPrivilegeLevel = UserPrivilegeLevelEnum.None,
+                Enabled = user.Enabled,
+                IsExternal = true
+            };
+            _userInfoProvider.Set(newUser);
+
+            return Result.Success(await _baselineUserMapper.ToUser(newUser));
+        }
+
+        public async Task ResetPasswordAsync(User user, string newPassword, string currentPassword)
+        {
+            if(user.UserID.TryGetValue(out var userId)) {
+                var userInfo = await GetUserInfoAsync(userId);
+                if (UserInfoProvider.ValidateUserPassword(userInfo, currentPassword)) {
+                    UserInfoProvider.SetPassword(userInfo, newPassword);
+                }
+
+            } else if((await GetUserInfoAsync(user.UserName)).TryGetValue(out var userInfo)) {
+                if(UserInfoProvider.ValidateUserPassword(userInfo, currentPassword)) {
+                    UserInfoProvider.SetPassword(userInfo, newPassword);
+                }
+            }
+
+            // do nothing, not validated
+        }
+
     }
 }

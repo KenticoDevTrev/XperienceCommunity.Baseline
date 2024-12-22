@@ -1,20 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core.Xperience</RootNamespace>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Core</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+  
   <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.RelationshipsExtended\src\XperienceCommunity.RelationshipsExtended.Core\XperienceCommunity.RelationshipsExtended.Core.csproj" />
     <ProjectReference Include="..\Core.Library\Core.Library.csproj" />
     <ProjectReference Include="..\Core.XperienceModels.Xperience\Core.XperienceModels.Xperience.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.WebApp" Version="28.0.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.5" />
+    <PackageReference Include="XperienceCommunity.DevTools.MVCCaching" Version="2.0.0" />
+    <PackageReference Include="XperienceCommunity.DevTools.QueryExtensions" Version="3.0.0" />
+    <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.2" />
+  </ItemGroup>
 
 </Project>

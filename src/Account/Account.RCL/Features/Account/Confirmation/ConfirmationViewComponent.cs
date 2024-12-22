@@ -62,7 +62,7 @@ namespace Account.Features.Account.Confirmation
                     isEditMode: isEditMode
                     )
                 {
-                    LoginUrl = results.Succeeded ? await _accountSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl()) : Maybe.None
+                    LoginUrlMaybe = results.Succeeded ? await _accountSettingsRepository.GetAccountLoginUrlAsync(LogInController.GetUrl()) : Maybe.None
                 };
                 
             }

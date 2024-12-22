@@ -5,10 +5,11 @@ namespace Search.Features.Search
     [ViewComponent]
     public class SearchViewComponent(
         ISearchRepository _searchRepository,
-        IHttpContextAccessor _httpContextAccessor) : ViewComponent
+        IHttpContextAccessor _httpContextAccessor,
+        BaselineSearchOptions _baselineSearchOptions) : ViewComponent
     {
-
-        public async Task<IViewComponentResult> InvokeAsync()
+        
+        public async Task<IViewComponentResult> InvokeAsync(string[]? xSearchIndexes = null)
         {
             // Get values from Query String
             Maybe<string> searchValue = Maybe.None;
@@ -37,7 +38,7 @@ namespace Search.Features.Search
             Maybe<SearchResponse> results = Maybe.None;
             if (searchValue.TryGetValue(out var searchVal))
             {
-                var indexes = new string[] { "SearchIndexName" };
+                var indexes = xSearchIndexes ?? _baselineSearchOptions.DefaultSearchIndexes;
 
                 // Perform search
                 results = await _searchRepository.Search(searchVal, indexes, page, pageSize);

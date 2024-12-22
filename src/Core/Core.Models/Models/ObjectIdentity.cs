@@ -3,8 +3,8 @@
     public record ObjectIdentity : ICacheKey
     {
         public Maybe<int> Id { get; init; }
-        public Maybe<string> CodeName { get; init; }
         public Maybe<Guid> Guid { get; init; }
+        public Maybe<string> CodeName { get; init; }
 
         public string GetCacheKey()
         {
@@ -15,6 +15,54 @@
         public override int GetHashCode()
         {
             return GetCacheKey().GetHashCode();
+        }
+    }
+
+    public static class ObjectIdentityExtensionMethods
+    {
+        /// <summary>
+        /// Returns the requested identity value (if not present, will retrieve it)
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="className">The Content Type Code Name</param>
+        /// <param name="identityService"></param>
+        /// <returns>The requested identity value, or Failure if it was not there and could not be retrieved by the identity service</returns>
+        public static async Task<Result<int>> GetOrRetrieveId(this ObjectIdentity identity, string className, IIdentityService identityService)
+        {
+            if (identity.Id.TryGetValue(out var value)) {
+                return value;
+            }
+            return (await identityService.HydrateObjectIdentity(identity, className)).TryGetValue(out var hydrated, out var error) && hydrated.Id.TryGetValue(out var hydratedValue) ? hydratedValue : Result.Failure<int>(error);
+        }
+
+        /// <summary>
+        /// Returns the requested identity value (if not present, will retrieve it)
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="className">The Content Type Code Name</param>
+        /// <param name="identityService"></param>
+        /// <returns>The requested identity value, or Failure if it was not there and could not be retrieved by the identity service</returns>
+        public static async Task<Result<Guid>> GetOrRetrieveGuid(this ObjectIdentity identity, string className, IIdentityService identityService)
+        {
+            if (identity.Guid.TryGetValue(out var value)) {
+                return value;
+            }
+            return (await identityService.HydrateObjectIdentity(identity, className)).TryGetValue(out var hydrated, out var error) && hydrated.Guid.TryGetValue(out var hydratedValue) ? hydratedValue : Result.Failure<Guid>(error);
+        }
+
+        /// <summary>
+        /// Returns the requested identity value (if not present, will retrieve it)
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="className">The Content Type Code Name</param>
+        /// <param name="identityService"></param>
+        /// <returns>The requested identity value, or Failure if it was not there and could not be retrieved by the identity service</returns>
+        public static async Task<Result<string>> GetOrRetrieveCodeName(this ObjectIdentity identity, string className, IIdentityService identityService)
+        {
+            if (identity.CodeName.TryGetValue(out var value)) {
+                return value;
+            }
+            return (await identityService.HydrateObjectIdentity(identity, className)).TryGetValue(out var hydrated, out var error) && hydrated.CodeName.TryGetValue(out var hydratedValue) ? hydratedValue : Result.Failure<string>(error);
         }
     }
 }

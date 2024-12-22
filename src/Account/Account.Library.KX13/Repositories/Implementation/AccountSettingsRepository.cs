@@ -10,8 +10,8 @@ namespace Account.Repositories.Implementation
         public Task<string> GetAccountConfirmationUrlAsync(string fallBackUrl)
         {
             _ = _cacheDependencyBuilderFactory.Create()
-                .Object(SettingsKeyInfo.OBJECT_TYPE, "BlogArticlesToDAccountConfirmationUrlisplay");
-            string url = SettingsKeyInfoProvider.GetValue("AccountConfirmationUrl", _siteRepository.CurrentSiteName());
+                .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountConfirmationUrl");
+            string url = SettingsKeyInfoProvider.GetValue("AccountConfirmationUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -20,7 +20,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountForgottenPasswordResetUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountForgottenPasswordResetUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountForgottenPasswordResetUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -29,7 +29,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountForgotPasswordUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountForgotPasswordUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountForgotPasswordUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -38,7 +38,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountLoginUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountLoginUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountLoginUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -47,7 +47,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountRegistrationUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountRegistrationUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountRegistrationUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -56,7 +56,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountMyAccountUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountMyAccountUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountMyAccountUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -65,14 +65,14 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountRedirectToAccountAfterLogin");
-            return Task.FromResult(SettingsKeyInfoProvider.GetBoolValue("AccountRedirectToAccountAfterLogin", _siteRepository.CurrentSiteName()));
+            return Task.FromResult(SettingsKeyInfoProvider.GetBoolValue("AccountRedirectToAccountAfterLogin", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty)));
         }
 
         public Task<string> GetAccountLogOutUrlAsync(string fallBackUrl)
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountLogOutUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccountLogOutUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountLogOutUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -81,7 +81,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccountResetPassword");
-            string url = SettingsKeyInfoProvider.GetValue("AccountResetPassword", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccountResetPassword", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -90,7 +90,7 @@ namespace Account.Repositories.Implementation
         {
             _ = _cacheDependencyBuilderFactory.Create()
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "AccessDeniedUrl");
-            string url = SettingsKeyInfoProvider.GetValue("AccessDeniedUrl", _siteRepository.CurrentSiteName());
+            string url = SettingsKeyInfoProvider.GetValue("AccessDeniedUrl", _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty));
             url = !string.IsNullOrWhiteSpace(url) ? url : fallBackUrl;
             return Task.FromResult(_urlResolver.ResolveUrl(url));
         }
@@ -109,7 +109,7 @@ namespace Account.Repositories.Implementation
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "CMSPolicyRegularExpression")
                 .Object(SettingsKeyInfo.OBJECT_TYPE, "CMSPolicyViolationMessage");
 
-            var siteName = _siteRepository.CurrentSiteName();
+            var siteName = _siteRepository.CurrentWebsiteChannelName().GetValueOrDefault(string.Empty);
 
             // Kentico has own internal caching of settings so no need to cache further.
             var passwordPolicy = new PasswordPolicySettings(
@@ -121,6 +121,12 @@ namespace Account.Repositories.Implementation
                 );
 
             return passwordPolicy;
+        }
+
+        public Task<string> GetAccountTwoFormAuthenticationUrlAsync(string fallBackUrl)
+        {
+            // Ability to have own version of this not implemented in KX13
+            return Task.FromResult("/Account/TwoFormAuthentication");
         }
     }
 }

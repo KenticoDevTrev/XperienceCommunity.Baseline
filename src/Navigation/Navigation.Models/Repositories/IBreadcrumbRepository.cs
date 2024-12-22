@@ -7,7 +7,15 @@
         /// </summary>
         /// <param name="nodeID">The Page Identifier (NodeID)</param>
         /// <returns></returns>
+        [Obsolete("Use GetBreadcrumbAsync(TreeIdentity)")]
         Task<List<Breadcrumb>> GetBreadcrumbsAsync(int nodeID, bool includeDefaultBreadcrumb = true);
+
+        /// <summary>
+        /// Gets a list of Breadcrumbs
+        /// </summary>
+        /// <param name="treeIdentity">The Tree Identifier</param>
+        /// <returns></returns>
+        Task<List<Breadcrumb>> GetBreadcrumbsAsync(TreeIdentity treeIdentity, bool includeDefaultBreadcrumb = true);
 
         /// <summary>
         /// Gets the Default Breadcrumb (built from Resource Strings)

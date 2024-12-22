@@ -44,16 +44,20 @@ namespace Core.Extensions
 
         public static ContentIdentity ToContentIdentity(this TreeNode node)
         {
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
             return new ContentIdentity()
             {
                 ContentGuid = node.NodeGUID.Equals(Guid.Empty) ? Maybe.None : node.NodeGUID,
                 ContentID = node.NodeID < 1 ? Maybe.None : node.NodeID,
+                ContentName = !string.IsNullOrWhiteSpace(node.NodeAlias) ? node.NodeAlias : Maybe.None,
                 PathChannelLookup = !string.IsNullOrWhiteSpace(node.NodeAliasPath) ? new PathChannel(Path: node.NodeAliasPath, ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None
             };
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public static ContentCultureIdentity ToContentCultureIdentity(this TreeNode node)
         {
+#pragma warning disable CS0618 // Type or member is obsolete - Fine for KX13
             return new ContentCultureIdentity()
             {
                 ContentCultureGuid = node.DocumentGUID.Equals(Guid.Empty) ? Maybe.None : node.DocumentGUID,
@@ -63,6 +67,7 @@ namespace Core.Extensions
                                                                                                                                ChannelId: node.NodeSiteID < 1 ? Maybe.None : node.NodeSiteID) : Maybe.None,
                 ContentCultureLookup = node.NodeID < 1 ? Maybe.None : new ContentCulture(ContentId: node.NodeID, Culture: string.IsNullOrWhiteSpace(node.DocumentCulture) ? Maybe.None : node.DocumentCulture)
             };
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
@@ -99,10 +104,10 @@ namespace Core.Extensions
                     {
                         if (cs.Cached)
                         {
-                            cs.CacheDependency = CacheHelper.GetCacheDependency(new string[]
-                            {
+                            cs.CacheDependency = CacheHelper.GetCacheDependency(
+                            [
                                 $"documentid{ node.DocumentID }"
-                            });
+                            ]);
                         }
                         return new DocumentQuery()
                             .WhereEquals(nameof(TreeNode.DocumentID), node.DocumentID)
@@ -166,11 +171,11 @@ namespace Core.Extensions
             {
                 if (cs.Cached)
                 {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(new string[]
-                    {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(
+                    [
                     $"{SiteInfo.OBJECT_TYPE}|all",
                     $"{SiteDomainAliasInfo.OBJECT_TYPE}|all",
-                    });
+                    ]);
                 }
                 return DocumentURLProvider.GetPresentationUrl(siteIdentifier, cultureCode);
             }, new CacheSettings(1440, "GetPresentationUrl", siteIdentifier, cultureCode));

@@ -7,19 +7,30 @@ namespace Account.Services
         /// <summary>
         /// Creates a user on the website.
         /// </summary>
-        /// <param name="User">The User information</param>
-        /// <param name="Password">The Password</param>
-        /// <param name="Enabled">If they should be enabled right away</param>
+        /// <param name="user">The User information</param>
+        /// <param name="password">The Password</param>
+        /// <param name="enabled">If they should be enabled right away</param>
         /// <returns>The UserInfo Object</returns>
-        Task<User> CreateUserAsync(User user, string Password, bool Enabled = false);
+        [Obsolete("Use CreateUser")]
+        Task<User> CreateUserAsync(User user, string password, bool enabled = false);
+
+        /// <summary>
+        /// Creates a user on the website.
+        /// </summary>
+        /// <param name="user">The User information</param>
+        /// <param name="password">The Password</param>
+        /// <param name="enabled">If they should be enabled right away</param>
+        /// <returns>The UserInfo Object</returns>
+        Task<Result<User>> CreateUser(User user, string password, bool enabled = false);
+
 
         /// <summary>
         /// Sends a Registration Confirmation Email Asyncly to the given User, with the Confirmation link provided
         /// </summary>
         /// <param name="user">The User object</param>
-        /// <param name="ConfirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
+        /// <param name="confirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
         /// <returns></returns>
-        Task SendRegistrationConfirmationEmailAsync(User user, string ConfirmationLink);
+        Task SendRegistrationConfirmationEmailAsync(User user, string confirmationLink);
 
         /// <summary>
         /// Validates the Token request for the given User
@@ -33,18 +44,18 @@ namespace Account.Services
         /// Sends a password reset email for the given user
         /// </summary>
         /// <param name="user">The User object</param>
-        /// <param name="ConfirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
+        /// <param name="confirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
         /// <returns></returns>
-        Task SendPasswordResetEmailAsync(User user, string ConfirmationLink);
+        Task SendPasswordResetEmailAsync(User user, string confirmationLink);
 
         /// <summary>
         /// Validates and resets the password for the given user and token
         /// </summary>
-        /// <param name="UserID">The User's ID</param>
-        /// <param name="Token">The Token</param>
-        /// <param name="NewPassword">The new password</param>
+        /// <param name="user">The User's ID</param>
+        /// <param name="token">The Token</param>
+        /// <param name="newPassword">The new password</param>
         /// <returns>If the operation was successful</returns>
-        Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string Token, string NewPassword);
+        Task<IdentityResult> ResetPasswordFromTokenAsync(User user, string token, string newPassword);
 
         /// <summary>
         /// Validates if the password is valid for the given user
@@ -57,9 +68,10 @@ namespace Account.Services
         /// <summary>
         /// Resets the password of the given user
         /// </summary>
-        /// <param name="userName">The Username</param>
-        /// <param name="password">The password to reset it to</param>
-        Task ResetPasswordAsync(User user, string password);
+        /// <param name="user">The Username</param>
+        /// <param name="newPassword">The password to reset it to</param>
+        /// <param name="currentPassword">the current password, must match</param>
+        Task ResetPasswordAsync(User user, string newPassword, string currentPassword);
 
         /// <summary>
         /// Validates that the given password passes the site's Password Policy
@@ -73,7 +85,15 @@ namespace Account.Services
         /// </summary>
         /// <param name="user">The user</param>
         /// <returns></returns>
+        [Obsolete("Use CreateExternalUser")]
         Task CreateExternalUserAsync(User user);
+
+        /// <summary>
+        /// Creates an external user
+        /// </summary>
+        /// <param name="user">The user</param>
+        /// <returns></returns>
+        Task<Result<User>> CreateExternalUser(User user);
 
         /// <summary>
         /// Sends the verification token to the given user.

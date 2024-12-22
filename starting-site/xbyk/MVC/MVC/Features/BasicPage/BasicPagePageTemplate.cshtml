@@ -1,0 +1,10 @@
+﻿@inject IPageContextRepository pageContextRepo
+@model ComponentViewModel<BaselineSiteElements.Features.BasicPage.BasicPagePageTemplateProperties>
+@{
+    var pageIdentityResults = await pageContextRepo.GetPageAsync(Model.Page.ToTreeCultureIdentity());
+}
+@if(pageIdentityResults.TryGetValue(out var pageIdentity)) {
+    <vc:basic-page x-page=@pageIdentity />
+} else {
+    <p>Could not derive page</p>
+}

@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Account</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+  
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.10" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Authorization\src\XbyK\XperienceCommunity.Authorization\XperienceCommunity.Authorization.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Library.Xperience\Core.Library.Xperience.csproj" />
+    <ProjectReference Include="..\Account.Library\Account.Library.csproj" />
+    <ProjectReference Include="..\Account.Models\Account.Models.csproj" />
+    <ProjectReference Include="..\Account.XperienceModels.Xperience\Account.XperienceModels.Xperience.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Account</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles.Admin" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KenticoRepositories\XperienceCommunity.Authorization\src\XbyK\XperienceCommunity.Authorization.Admin\XperienceCommunity.Authorization.Admin.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\Account.Library.Xperience\Account.Library.Xperience.csproj" />
+  </ItemGroup>
+
+</Project>
