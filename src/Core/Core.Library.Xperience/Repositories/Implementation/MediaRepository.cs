@@ -26,7 +26,8 @@ namespace Core.Repositories.Implementation
         ILanguageRepository languageFallbackRepository,
         IPageContextRepository pageContextRepository,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
-        ILanguageRepository languageRepository) : IMediaRepository
+        ILanguageRepository languageRepository,
+        IClassContentTypeAssetConfigurationRepository classContentTypeAssetConfigurationRepository) : IMediaRepository
     {
 
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
@@ -47,6 +48,7 @@ namespace Core.Repositories.Implementation
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
         private readonly ILanguageRepository _languageRepository = languageRepository;
+        private readonly IClassContentTypeAssetConfigurationRepository _classContentTypeAssetConfigurationRepository = classContentTypeAssetConfigurationRepository;
 
         #region "Content Items"
 
@@ -68,7 +70,7 @@ namespace Core.Repositories.Implementation
             var mediaItems = new List<MediaItem>();
 
             // Retrieve assets for all fields, separated by type
-            var classNameToAssetConfiguration = await GetClassNameToContentTypeAssetConfigurationDictionary();
+            var classNameToAssetConfiguration = await _classContentTypeAssetConfigurationRepository.GetClassNameToContentTypeAssetConfigurationDictionary();
             foreach (var type in contentIdentitiesByType.Keys) {
                 // Retrieve configuration
                 if (!classNameToAssetConfiguration.TryGetValue(type, out var contentAssetConfiguration)) {
@@ -165,58 +167,7 @@ namespace Core.Repositories.Implementation
 
         #region "Content Item Asset Helpers"
 
-        private async Task<Dictionary<string, ContentTypeAssetConfigurations>> GetClassNameToContentTypeAssetConfigurationDictionary()
-        {
-            return await _progressiveCache.LoadAsync(async cs => {
-
-                if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency([$"{DataClassInfo.OBJECT_TYPE}|all"]);
-                }
-
-                // Add to Cache
-                var classes = await DataClassInfoProvider.GetClasses()
-                   .Columns(nameof(DataClassInfo.ClassName), nameof(DataClassInfo.ClassFormDefinition))
-                   .WhereLike(nameof(DataClassInfo.ClassFormDefinition), "%contentitemasset%")
-                   .GetEnumerableTypedResultAsync();
-
-                var typeToFieldToGuid = classes
-                    .ToDictionary(key => key.ClassName.ToLowerInvariant(), value => {
-                        var xmlDoc = new XmlDocument();
-                        xmlDoc.LoadXml(value.ClassFormDefinition);
-                        var nodes = xmlDoc.SelectNodes("//field[@columntype='contentitemasset']")?.Cast<XmlNode>() ?? [];
-                        var nodeList = nodes.Where(x => x != null && x.Attributes != null && (x.Attributes["column"] != null && x.Attributes["guid"] != null));
-#pragma warning disable CS8602 // Dereference of a possibly null reference. - Ensured above that this will not be the case
-                        return nodeList.Select(x => new ContentItemAttachmentColumnAndGuid(x.Attributes["column"].Value.ToLowerInvariant(), Guid.Parse(x.Attributes["guid"].Value)))
-                                    .ToDictionary(key => key.AttachmentColumnName.ToLowerInvariant(), value => value.FieldGuidValue) ?? [];
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-                    });
-
-                // combine with any configurations the user has provided
-                var configuration = new Dictionary<string, ContentTypeAssetConfigurations>();
-
-                foreach (var itemConfiguration in _contentItemAssetOptions.ContentItemConfigurations) {
-                    var assetFieldIdentifiers = new List<AssetFieldIdentifier>();
-                    foreach (var config in itemConfiguration.AssetFieldIdentifierConfigurations) {
-                        // if Field guid is not found, then do not add
-                        if (typeToFieldToGuid.TryGetValue(itemConfiguration.ClassName.ToLowerInvariant(), out var foundKeyFieldDictionary)
-                            && foundKeyFieldDictionary.TryGetValue(config.AssetFieldName.ToLowerInvariant(), out var foundFieldGuid)
-                            ) {
-                            assetFieldIdentifiers.Add(
-                                new AssetFieldIdentifier(
-                                    assetFieldName: config.AssetFieldName,
-                                    fieldGuid: foundFieldGuid,
-                                    titleFieldName: config.TitleFieldName.GetValueOrDefault(nameof(ContentItemLanguageMetadataInfo.ContentItemLanguageMetadataDisplayName)),
-                                    descriptionFieldName: config.DescriptionFieldName.AsNullableValue()
-                                    )
-                                );
-                        }
-                    }
-                    configuration.TryAdd(itemConfiguration.ClassName.ToLowerInvariant(), new ContentTypeAssetConfigurations(assetFieldIdentifiers, itemConfiguration.preCache));
-                }
-
-                return configuration;
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetClassNameToFieldNameToAssetFieldIdentifierDictionary"));
-        }
+       
 
         private async Task<IEnumerable<MediaItem>> GetContentItemsOfSameTypeToMediaItem(string contentType, IEnumerable<ContentIdentity> contentItems, IEnumerable<AssetFieldIdentifier> assetFields, string language, bool useCache)
         {
@@ -311,7 +262,7 @@ namespace Core.Repositories.Implementation
                 // Will add dependency keys if user sets in their customizations
                 _cacheDependenciesScope.Begin();
 
-                var configuration = await GetClassNameToContentTypeAssetConfigurationDictionary();
+                var configuration = await _classContentTypeAssetConfigurationRepository.GetClassNameToContentTypeAssetConfigurationDictionary();
                 if (!configuration.TryGetValue(contentType.ToLowerInvariant(), out var classAssetConfiguration)) {
                     return [];
                 }
@@ -612,10 +563,6 @@ namespace Core.Repositories.Implementation
         #endregion
 
         #region "Data Holder Records"
-
-        public record ContentItemAttachmentColumnAndGuid(string AttachmentColumnName, Guid FieldGuidValue);
-
-        private record ContentTypeAssetConfigurations(List<AssetFieldIdentifier> AssetFields, bool PreCache);
 
         private record ContentIdentityAndLanguage(ContentIdentity ContentIdentity, string Language);
         private record MediaItemsAndKeys(IEnumerable<MediaItem> MediaItems, string[] Keys);

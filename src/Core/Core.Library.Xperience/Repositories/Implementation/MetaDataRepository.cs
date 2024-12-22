@@ -1,4 +1,5 @@
 ﻿using CMS.Websites;
+using Core.Services.Implementations;
 using Generic;
 using Kentico.Content.Web.Mvc;
 using System.Data;
@@ -19,7 +20,8 @@ namespace Core.Repositories.Implementation
         IContentTranslationInformationRepository contentTranslationInformationRepository,
         IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
         IMediaRepository mediaRepository,
-        IContentItemReferenceService contentItemReferenceService) : IMetaDataRepository
+        IContentItemReferenceService contentItemReferenceService,
+        IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter) : IMetaDataRepository
     {
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
@@ -33,6 +35,7 @@ namespace Core.Repositories.Implementation
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
         private readonly IMediaRepository _mediaRepository = mediaRepository;
         private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
+        private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
 
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
@@ -124,8 +127,10 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             Maybe<string> ogImage = thumbnail.AsNullOrWhitespaceMaybe();
 
             // Generate Base PageMetaData
-            if ((await GetDefaultMetadataLogic(node)).TryGetValue(out var metaDataFromBase)) {
-                ogImage = ogImage.GetValueOrDefault(metaDataFromBase.Thumbnail);
+            if ((await _metaDataWebPageDataContainerConverter.GetDefaultMetadataLogic(node)).TryGetValue(out var metaDataFromBase)) {
+                if (metaDataFromBase.Thumbnail.TryGetValue(out var foundThumbnail)) {
+                    ogImage = foundThumbnail;
+                }
                 keywords = metaDataFromBase.Keywords;
                 description = metaDataFromBase.Description;
                 title = metaDataFromBase.Title;
@@ -168,50 +173,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             return basePageMetadata;
         }
 
-        private async Task<Result<PageMetaData>> GetDefaultMetadataLogic(IWebPageContentQueryDataContainer node)
-        {
-            string? keywords = null;
-            string? description = null;
-            string? title = null;
-            bool? noIndex = null;
-            string? ogImage = null;
-            var dataFound = false;
-
-            try {
-                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Title)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataTitle)) {
-                    title = metaDataTitle;
-                    dataFound = true;
-                }
-                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Description)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataDescription)) {
-                    description = metaDataDescription;
-                    dataFound = true;
-                }
-                if (node.GetValue<string>(nameof(IBaseMetadata.MetaData_Keywords)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataKeywords)) {
-                    keywords = metaDataKeywords;
-                    dataFound = true;
-                }
-                if (_contentItemReferenceService.GetContentItemReferences(node, nameof(IBaseMetadata.MetaData_OGImage)).FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
-                    var medias = await _mediaRepository.GetContentItemAssets(metaDataSmall.Identifier.ToContentIdentity());
-                    if (medias.FirstOrMaybe().TryGetValue(out var media)) {
-                        ogImage = media.MediaPermanentUrl;
-                    }
-                }
-                if (node.TryGetValue(nameof(IBaseMetadata.MetaData_NoIndex), out bool? metaDataNoIndex) && metaDataNoIndex.HasValue) {
-                    noIndex = metaDataNoIndex.Value;
-                    dataFound = true;
-                }
-            } catch (Exception) {
-
-            }
-            return Result.SuccessIf(dataFound, new PageMetaData() {
-                Title = title.AsMaybe(),
-                Description = description.AsMaybe(),
-                Keywords = keywords.AsMaybe(),
-                NoIndex = noIndex.AsMaybe(),
-                Thumbnail = ogImage.AsNullOrWhitespaceMaybe(),
-            }, "Does not have any MetaData values");
-
-        }
+        
 
         private record ContentCultureLookup(Dictionary<int, TreeCultureIdentity> ContentCultureIdToIdentity, Dictionary<Guid, TreeCultureIdentity> ContentCultureGuidToIdentity);
 

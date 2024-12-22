@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Localization</RootNamespace>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <ItemGroup>

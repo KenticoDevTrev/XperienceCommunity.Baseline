@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Admin</RootNamespace>
   </PropertyGroup>
 
@@ -25,8 +26,14 @@
     <ProjectReference Include="..\..\..\..\src\Core\Core.Admin.Xperience\Core.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Localization\Localization.Admin.Xperience\Localization.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Admin.Xperience\Navigation.Admin.Xperience.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience.Lucene\Search.Admin.Xperience.Lucene.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Admin.Xperience\Search.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Admin.Xperience\TabbedPages.Admin.Xperience.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="FroalaEditorConfigurations\CustomEditorConfiguration.json" />
   </ItemGroup>
 
 </Project>

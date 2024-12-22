@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Site</RootNamespace>
   </PropertyGroup>
 
@@ -12,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.4" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.0.5" />
   </ItemGroup>
 
 </Project>

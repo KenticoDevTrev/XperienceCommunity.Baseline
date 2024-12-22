@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Search</RootNamespace>
+    <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Disable stupid Result conflict with HotChocolate -->
+  <PropertyGroup>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Kentico.Xperience.Lucene.Core" Version="11.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Search.Library.Xperience\Search.Library.Xperience.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+</Project>

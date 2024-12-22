@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<RootNamespace>Core</RootNamespace>
+    <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace>Core</RootNamespace>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
@@ -27,10 +27,10 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Core" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.4" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.0.5" />
     <PackageReference Include="XperienceCommunity.DevTools.MVCCaching" Version="2.0.0" />
     <PackageReference Include="XperienceCommunity.DevTools.QueryExtensions" Version="3.0.0" />
-    <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.1" />
+    <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.2" />
   </ItemGroup>
 
 </Project>

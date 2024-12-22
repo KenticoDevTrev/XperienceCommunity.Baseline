@@ -12,7 +12,8 @@ namespace Core.Repositories.Implementation
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
         IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider,
         IWebsiteChannelContext websiteChannelContext,
-        IInfoProvider<SettingsKeyInfo> settingsKeyInfoProvider) : ILanguageRepository
+        IInfoProvider<SettingsKeyInfo> settingsKeyInfoProvider,
+        ILanguageIdentifierRepository languageIdentifierRepository) : ILanguageRepository
     {
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IContentLanguageFallbackChainProvider _contentLanguageFallbackChainProvider = contentLanguageFallbackChainProvider;
@@ -20,6 +21,7 @@ namespace Core.Repositories.Implementation
         private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider = websiteChannelInfoProvider;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly IInfoProvider<SettingsKeyInfo> _settingsKeyInfoProvider = settingsKeyInfoProvider;
+        private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
         public async Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false, bool includeDefaultAsMatch = true)
         {
@@ -71,32 +73,6 @@ namespace Core.Repositories.Implementation
             return Result.Failure<string>("Could not find any good fallback language");
         }
 
-        public string LanguageIdToName(int languageId) => GetLookups().IntToString.TryGetValue(languageId, out var languageName) ? languageName : string.Empty;
-
-        public int LanguageNameToId(string languageName) => GetLookups().StringToInt.TryGetValue(languageName.ToLowerInvariant(), out var languageId) ? languageId : 0;
-
-        /// <summary>
-        /// Not caching because this is such a quick operation, will be referenced a lot, and should rarely ever change
-        /// </summary>
-        /// <returns></returns>
-        private LangDictionaryLookups GetLookups()
-        {
-            return _progressiveCache.Load(cs => {
-                if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency([
-                        $"{ContentLanguageInfo.OBJECT_TYPE}|all"
-                    ]);
-                }
-                var languages = _contentLanguageInfoProvider.Get()
-                .GetEnumerableTypedResult();
-
-                return new LangDictionaryLookups(languages.ToDictionary(key => key.ContentLanguageID, value => value.ContentLanguageName), languages.ToDictionary(key => key.ContentLanguageName.ToLower(), value => value.ContentLanguageID));
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetLanguageLookups"));
-        }
-
-
-
-        private record LangDictionaryLookups(Dictionary<int, string> IntToString, Dictionary<string, int> StringToInt);
 
         private async Task<CultureMappingDictionaries> GetMappingDictionaries()
         {
@@ -200,6 +176,10 @@ namespace Core.Repositories.Implementation
             }
             return $"/{LanguageIdToName(contenLanguageID)}";
         }
+
+        public int LanguageNameToId(string languageName) => _languageIdentifierRepository.LanguageNameToId(languageName);
+
+        public string LanguageIdToName(int languageId) => _languageIdentifierRepository.LanguageIdToName(languageId);
 
         private record CultureMappingDictionaries(Dictionary<string, int> NameToId, Dictionary<int, string> IdToName, int DefaultLanguageId, Dictionary<int, int> SiteToDefaultLanguageID);
     }

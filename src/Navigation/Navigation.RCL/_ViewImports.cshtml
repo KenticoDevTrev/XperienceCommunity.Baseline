@@ -4,15 +4,11 @@
 @using Microsoft.AspNetCore.Http;
 @using Microsoft.Extensions.Localization;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject IHtmlLocalizer<SharedResources> HtmlLocalizer
-@* Tools *@
-@addTagHelper *, XperienceCommunity.DevTools.PageBuilderTagHelpers
-@addTagHelper *, XperienceCommunity.WidgetFilter
-@addTagHelper *, MVCCaching.Base.Core.Components
 
+@* Tools *@
+@addTagHelper *, MVCCaching.Base.Core.Components
 @inject ICacheDependenciesScope CacheScope
 @inject MVCCaching.ICacheRepositoryContext CacheContext
 
 @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
 @addTagHelper *, XperienceCommunity.Baseline.Core.RCL
-@addTagHelper *, MVCCaching.Base.Core.Components

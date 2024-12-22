@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>$(NetCoreTargetVersion)</TargetFramework>
@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <RootNamespace>Navigation</RootNamespace>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>XperienceCommunity.Baseline.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 

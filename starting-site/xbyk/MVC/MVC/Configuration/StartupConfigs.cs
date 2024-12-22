@@ -4,6 +4,8 @@ using Kentico.Content.Web.Mvc.Routing;
 using Kentico.Web.Mvc;
 using Kentico.Membership;
 using Kentico.Xperience.Admin.Base;
+using XperienceCommunity.Authorization;
+using Kentico.Xperience.Admin.Base.Forms;
 
 // Microsoft
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +22,7 @@ using Microsoft.AspNetCore.Routing;
 using Testing;
 using Site.Repositories.Implementations;
 using MVC.Repositories.Implementations;
+using Admin.FroalaEditorConfigurations;
 
 // Core
 using Core;
@@ -45,13 +48,97 @@ using TabbedPages.Features.Tab;
 using TabbedPages.Features.TabParent;
 using Generic;
 
+// BASELINE CUSTOMIZATION: Search - Add below
+using Search.Features.Search;
+using Search.Library.Xperience.Lucene.IndexStrategies;
+using Search.Library.Xperience.Lucene.Services.Implementations;
+using Search.Library.Xperience.Lucene.Services;
+using Account.Features.Account.Confirmation;
+using Account.Features.Account.ForgotPassword;
+using Account.Features.Account.ForgottenPasswordReset;
+using Account.Features.Account.LogIn;
+using Account.Features.Account.LogOut;
+using Account.Features.Account.MyAccount;
+using Account.Features.Account.Registration;
+using Account.Features.Account.ResetPassword;
+
+
 // BASELINE CUSTOMIZATION: Account - Add this to edit Channel Settings
 [assembly: UIPage(parentType: typeof(Kentico.Xperience.Admin.Base.UIPages.ChannelEditSection),
-                slug: "member-password-channel-custom-settings",
-                uiPageType: typeof(MemberPasswordChannelSettingsExtender),
-                name: "Member Password Settings",
-                templateName: TemplateNames.EDIT,
-                order: UIPageOrder.NoOrder)]
+    slug: "member-password-channel-custom-settings",
+    uiPageType: typeof(MemberPasswordChannelSettingsExtender),
+    name: "Member Password Settings",
+    templateName: TemplateNames.EDIT,
+    order: UIPageOrder.NoOrder)]
+
+// BASELINE CUSTOMIZATION: Account - Here are the page template registrations 
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_Confirmation",
+    name: "Registration Confirmation",
+    propertiesType: typeof(ConfirmationPageTemplateProperties),
+    customViewName: "/Features/Account/Confirmation/ConfirmationPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_ForgotPassword",
+    name: "Forgot Password",
+    propertiesType: typeof(ForgotPasswordPageTemplateProperties),
+    customViewName: "/Features/Account/ForgotPassword/ForgotPasswordPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_ForgottenPasswordReset",
+    name: "Forgotten Password Reset",
+    propertiesType: typeof(ForgottenPasswordResetPageTemplateProperties),
+    customViewName: "/Features/Account/ForgottenPasswordReset/ForgottenPasswordResetPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_LogIn",
+    name: "Log In",
+    propertiesType: typeof(LogInPageTemplateProperties),
+    customViewName: "/Features/Account/LogIn/LogInPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_TwoFormAuthentication",
+    name: "Two Form Authentication",
+    propertiesType: typeof(TwoFormAuthenticationPageTemplateProperties),
+    customViewName: "/Features/Account/LogIn/TwoFormAuthenticationPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_LogOut",
+    name: "Log Out",
+    propertiesType: typeof(LogOutPageTemplateProperties),
+    customViewName: "/Features/Account/LogOut/LogOutPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+[assembly: RegisterPageBuilderAuthorization(pageTemplateIdentifiers: ["Generic.Account_LogOut"], userAuthenticationRequired: true)]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_MyAccount",
+    name: "My Account",
+    propertiesType: typeof(MyAccountPageTemplateProperties),
+    customViewName: "/Features/Account/MyAccount/MyAccountPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+[assembly: RegisterPageBuilderAuthorization(pageTemplateIdentifiers: ["Generic.Account_MyAccount"], userAuthenticationRequired: true)]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_Registration",
+    name: "Registration",
+    propertiesType: typeof(RegistrationPageTemplateProperties),
+    customViewName: "/Features/Account/Registration/RegistrationPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+
+[assembly: RegisterPageTemplate(
+    identifier: "Generic.Account_ResetPassword",
+    name: "Reset Password",
+    propertiesType: typeof(ResetPasswordPageTemplateProperties),
+    customViewName: "/Features/Account/ResetPassword/ResetPasswordPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Account.CONTENT_TYPE_NAME])]
+[assembly: RegisterPageBuilderAuthorization(pageTemplateIdentifiers: ["Generic.Account_ResetPassword"], userAuthenticationRequired: true)]
+
 
 // BASELINE CUSTOMIZATION: Navigation - Add this for the Navigation Mega Menu Support
 [assembly: RegisterPageTemplate(
@@ -75,6 +162,17 @@ using Generic;
     typeof(TabParentPageTemplateProperties),
     "/Features/TabParent/TabParentPageTemplate.cshtml",
     ContentTypeNames = [TabParent.CONTENT_TYPE_NAME])]
+
+// BASELINE CUSTOMIZATION: Search - Add this for the search page
+[assembly: RegisterPageTemplate(
+    "Generic.Search_Default",
+    "Search",
+    typeof(SearchPageTemplateProperties),
+    "~/Features/Search/SearchPageTemplate.cshtml",
+    ContentTypeNames = [Generic.Search.CONTENT_TYPE_NAME])]
+
+// BASELINE CUSTOMIZATION: Site - You can configure and adjust the editor here: https://docs.kentico.com/developers-and-admins/configuration/rich-text-editor-configuration#define-editor-configurations
+// [assembly: RegisterRichTextEditorConfiguration(CustomRichTextEditorConfiguration.IDENTIFIER, typeof(CustomRichTextEditorConfiguration), CustomRichTextEditorConfiguration.DISPLAY_NAME)]
 
 namespace MVC.Configuration
 {
@@ -246,7 +344,7 @@ namespace MVC.Configuration
             // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
 
-            
+
 
             // Optional - Add up IUrlHelper if you wish to use it
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -327,6 +425,36 @@ namespace MVC.Configuration
         }
 
         /// <summary>
+        /// Adds the Search Module
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddBaselineSearch(WebApplicationBuilder builder)
+        {
+            // BASELINE CUSTOMIZATION: Search - Add your search implementation here and inject ISearchRepository implementation
+            // Note that Lucene has been done and is available through the XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene and XperienceCommunity.Baseline.Search.Library.Xperience.Lucene
+            // https://github.com/Kentico/xperience-by-kentico-lucene
+            // https://github.com/Kentico/xperience-by-kentico-algolia
+            // https://github.com/Kentico/xperience-by-kentico-azure-ai-search
+            builder.Services.AddBaselineSearch(options => {
+                options.DefaultSearchIndexes = ["TestIndex"];
+            });
+
+            // If you wish to use the page type and Page Templates
+            builder.Services.AddBaselineSearchRCL(options => {
+                options.AddSearchPageType = true;
+            });
+
+            // Lucene Setup
+            builder.Services.AddKenticoLucene(builder =>
+                    builder
+                        .RegisterStrategy<BaselineBaseMetadataIndexingStrategy>("BaselinePagesStrategy")
+                )
+                .AddBaselineSearchLucene();
+            // Implement and add your own IBaselineSearchLuceneCustomizations which controls how Queries are parsed.
+            // builder.Services.AddScoped<IBaselineSearchLuceneCustomizations, MySearchCustomizations>();
+        }
+
+        /// <summary>
         /// Adds the standard Kentico identity (based roughly off of the Dancing Goat Sample Site)
         /// </summary>
         /// <typeparam name="TUser"></typeparam>
@@ -361,8 +489,7 @@ namespace MVC.Configuration
                 options.SlidingExpiration = true;
                 options.LoginPath = new PathString("/Account/Signin");
                 options.AccessDeniedPath = new PathString("/Error/403");
-                options.Events.OnRedirectToAccessDenied = ctx =>
-                {
+                options.Events.OnRedirectToAccessDenied = ctx => {
                     var factory = ctx.HttpContext.RequestServices.GetRequiredService<IUrlHelperFactory>();
                     var urlHelper = factory.GetUrlHelper(new ActionContext(ctx.HttpContext, new RouteData(ctx.HttpContext.Request.RouteValues), new ActionDescriptor()));
                     var url = urlHelper.Action("Signin", "Account") + new Uri(ctx.RedirectUri).Query;
@@ -372,17 +499,16 @@ namespace MVC.Configuration
                     return Task.CompletedTask;
                 };
                 // These are not part of standard kentico but 
-                if(builder.Environment.IsDevelopment()) {
+                if (builder.Environment.IsDevelopment()) {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.None;
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
                 } else {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
-                } 
+                }
             });
 
-            builder.Services.Configure<AdminIdentityOptions>(options =>
-            {
+            builder.Services.Configure<AdminIdentityOptions>(options => {
                 // The expiration time span for admin. In production environment, set expiration according to best practices.
                 options.AuthenticationOptions.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             });
@@ -556,6 +682,5 @@ namespace MVC.Configuration
             app.UseSession();
         }
 
-        
     }
 }

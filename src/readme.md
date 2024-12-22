@@ -18,6 +18,15 @@ In general, you'll want to include references to the following packages
   * Foo.Library
   * XperienceCommunity.Baseline.Core.Library.KX13/Xperience
   * Optional other XperienceCommunity.Baseline.XXX.Library.KX13/Xperience
+* **Foo.RCL.KX13/Xperience** (Kentico Specific RCL)
+  * Foo.RCL
+  * Foo.Library.KX13/Xperience
+  * XperienceCommunity.Baseline.Core.RCL.KX13/Xperience
+* **Foo.XperienceModels.KX13/Xperience** (Kentico Page Types)
+  * XperienceCommunity.Baseline.Core.XperienceModels.KX13/Xperience
+* **Foo.Admin.Xperience** (Xperience by Kentico Admin items)
+  * Foo.Library.Xperience
+  * Core.Admin.Xperience
 * **MVC** (Your Website, usually contains both Kentico Agnostic and Specific entities such as Widgets, Templates, etc.)
   * Foo.Library.KX13/Xperience
   * Foo.RCL

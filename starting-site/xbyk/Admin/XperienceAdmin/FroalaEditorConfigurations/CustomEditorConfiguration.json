@@ -1,0 +1,43 @@
+{
+  "imageDefaultWidth": 0,
+  "imageResize": true,
+  "imageUpload": false,
+  "imagePaste": false,
+  "imageDefaultMargin": null,
+  "imageMove": true,
+  "imageAddNewLine": false,
+  "toolbarButtons": [
+    "paragraphFormat",
+    "|",
+    "bold",
+    "italic",
+    "underline",
+    "|",
+    "align",
+    "formatOL",
+    "formatUL",
+    "|",
+    "insertAsset",
+    "insertLinkDropDown"
+  ],
+  "imageEditButtons": [ "imageReplace", "imageAlt", "imageAlign", "imageDisplay", "imageSize", "imageRemove" ],
+  "customPlugins": [
+    {
+      "pluginName": "@kentico/xperience-admin-base/Asset"
+    },
+    {
+      "pluginName": "@kentico/xperience-admin-base/Link",
+      "pluginOptions": {
+        "dropdownOptions": [
+          {
+            "linkOption": "asset",
+            "componentName": "@kentico/xperience-admin-base/AssetPanel"
+          },
+          {
+            "linkOption": "external"
+          }
+        ]
+      }
+    }
+  ]
+}

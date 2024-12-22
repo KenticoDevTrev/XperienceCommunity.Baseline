@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Site</RootNamespace>
   </PropertyGroup>
 
@@ -12,6 +14,7 @@
     <ProjectReference Include="..\..\..\..\src\Core\Core.Models\Core.Models.csproj" />
     <ProjectReference Include="..\..\..\..\src\Localization\Localization.Models\Localization.Models.csproj" />
     <ProjectReference Include="..\..\..\..\src\Navigation\Navigation.Models\Navigation.Models.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Search\Search.Models\Search.Models.csproj" />
     <ProjectReference Include="..\..\..\..\src\TabbedPages\TabbedPages.Models\TabbedPages.Models.csproj" />
     <ProjectReference Include="..\..\Site.UniversalModels\Site.UniversalModels.csproj" />
   </ItemGroup>
