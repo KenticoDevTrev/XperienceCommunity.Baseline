@@ -3,6 +3,9 @@
     <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="appsettings.json.backup" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="kentico.xperience.azurestorage" Version="30.0.0" />
     <PackageReference Include="kentico.xperience.imageprocessing" Version="30.0.0" />
     <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
@@ -17,6 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json.backup">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Admin\XperienceAdmin\XperienceAdmin.csproj" />

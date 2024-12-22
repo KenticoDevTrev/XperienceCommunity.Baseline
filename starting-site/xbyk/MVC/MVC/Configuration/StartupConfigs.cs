@@ -340,7 +340,7 @@ namespace MVC.Configuration
         }
 
         /// <summary>
-        /// BASELINE CUSTOMIZATION: Starting Site - Add any interfaces and other services here
+        /// BASELINE CUSTOMIZATION - Starting Site - Add any interfaces and other services here
         /// 
         /// </summary>
         /// <param name="builder"></param>
@@ -370,7 +370,7 @@ namespace MVC.Configuration
             // Widget Filters
             //builder.Services.AddWidgetFilter();
 
-            // BASELINE CUSTOMIZATION: Core - Override Baseline customization points if wanted
+            // BASELINE CUSTOMIZATION - Core - Override Baseline customization points if wanted
             /*
             builder.Services.AddScoped<IUserMetadataProvider, CustomUserMetadataProvider>();
             builder.Services.AddScoped<IMediaFileMediaMetadataProvider, CustomMediaFileMediaMetadataProvider>();
