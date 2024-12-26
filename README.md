@@ -9,7 +9,7 @@ Core Systems, Tools, and Structure to ensure a superior Kentico Website that's e
 
 Special thanks to my previous employer [Heartland Business Systems](https://www.hbs.net) who supported me as I created this baseline, adding things we all learned on projects into this (and other repositories) and allowing me to give them away to the Kentico Community. If you need a kentico partner to implement a Baseline project, I would definitely get in touch with them.
 
-Also thanks to my current employer [Movement Mortgage](https://www.movement.com) who shares my desire to serve and bless others, and allowed me to get the Version 2 up that got things prepared for the Xperience by Kentico implementation.
+Also thanks to my other previous employer [Movement Mortgage](https://www.movement.com) who shares my desire to serve and bless others, and allowed me to get the Version 2 up that got things prepared for the Xperience by Kentico implementation.
 
 Lastly thanks to my wife for bearing with me as I stressed and had near-nervous breakdowns creating the Xperience by Kentico Implementation by my self-imposed Christmas Deadline (12/22/2024 at 3:00 am as i write this).
 
