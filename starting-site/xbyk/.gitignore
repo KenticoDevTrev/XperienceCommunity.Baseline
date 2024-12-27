@@ -66,3 +66,6 @@ LuceneSearch
 ## Only for the Baseline Repository, remove this or us the .production.gitignore
 **/App_Data/CIRepository/**
 !**/App_Data/CIRepository/repository.config
+!**/App_Data/CIRepository/After.txt
+!**/App_Data/CIRepository/Before.txt
+!**/App_Data/CIRepository/@migrations
