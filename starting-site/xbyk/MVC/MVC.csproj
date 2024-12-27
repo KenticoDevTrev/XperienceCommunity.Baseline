@@ -39,4 +39,7 @@
     <ProjectReference Include="..\XperienceAdmin\XperienceAdmin.csproj" />
     <ProjectReference Include="..\XperienceModels\XperienceModels.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\CIRepository\" />
+  </ItemGroup>
 </Project>
