@@ -9,6 +9,7 @@
 // </auto-generated>
 //--------------------------------------------------------------------------------------------------
 
+using CMS.ContentEngine;
 using System;
 using System.Collections.Generic;
 
@@ -16,8 +17,10 @@ namespace Generic
 {
 	/// <summary>
 	/// Defines a contract for content types with the <see cref="IGenericHasImage"/> reusable schema assigned.
+	/// 
+	/// I added the inheritance of the IContentItemFieldSource manually so type-casting won't be needed
 	/// </summary>
-	public interface IGenericHasImage
+	public interface IGenericHasImage : IContentItemFieldsSource
 	{
 		/// <summary>
 		/// Code name of the reusable field schema.

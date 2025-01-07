@@ -18,7 +18,7 @@ namespace Generic
 	/// <summary>
 	/// Defines a contract for content types with the <see cref="IBaseRedirect"/> reusable schema assigned.
 	/// </summary>
-	public interface IBaseRedirect
+	public interface IBaseRedirect : IWebPageFieldsSource
 	{
 		/// <summary>
 		/// Code name of the reusable field schema.

@@ -9,6 +9,7 @@
 // </auto-generated>
 //--------------------------------------------------------------------------------------------------
 
+using CMS.Websites;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace Generic
 	/// <summary>
 	/// Defines a contract for content types with the <see cref="IBaseMetadata"/> reusable schema assigned.
 	/// </summary>
-	public interface IBaseMetadata
+	public interface IBaseMetadata : IWebPageFieldsSource
 	{
 		/// <summary>
 		/// Code name of the reusable field schema.
