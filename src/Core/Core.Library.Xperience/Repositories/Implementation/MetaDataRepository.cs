@@ -37,6 +37,9 @@ namespace Core.Repositories.Implementation
         private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
 
+        // TODO: Revamp this to use a Mapped result of IBaseMetaData using the Content Mapper, i made it more complicated not knowing
+        // that you could return a mapped Interface and get it's containing data :( 
+
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
             if (!(await treeCultureIdentity.GetOrRetrievePageID(_identityService)).TryGetValue(out var pageId)) {
