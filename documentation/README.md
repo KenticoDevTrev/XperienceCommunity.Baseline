@@ -12,7 +12,7 @@ Likewise, some features listed in this documentation are only in the Xperience b
 ## Overviews
 
 - [The Baseline Story](baseline-story.md) - It's origin and evolution
-- [Modules and Architecture Overvue](modules-architecture-overview.md) 
+- [Modules and Architecture Overview](modules-architecture-overview.md) 
 - [General Customization Points](customization-points.md)
 - [Design Patterns](design-patterns.md)
 - [Front End Development (CSS, JS, Images)](front-end-development.md)
