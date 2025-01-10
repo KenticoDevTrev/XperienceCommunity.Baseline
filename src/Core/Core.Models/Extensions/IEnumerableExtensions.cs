@@ -2,6 +2,13 @@
 {
     public static class IEnumerableExtensions
     {
+        /// <summary>
+        /// A shortcut for if(MyArray.Any()) { var first = MyArray.First(); }
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="defaultIsNone"></param>
+        /// <returns></returns>
         public static Maybe<T> FirstOrMaybe<T>(this IEnumerable<T> collection, bool defaultIsNone = true)
         {
             if (collection.Any())
@@ -20,6 +27,14 @@
             }
         }
 
+        /// <summary>
+        /// A shortcut for if(MyArray.Any(x => predicate(x))) { var first = MyArray.First(); }
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="predicate"></param>
+        /// <param name="defaultIsNone"></param>
+        /// <returns></returns>
         public static Maybe<T> FirstOrMaybe<T>(this IEnumerable<T> collection, Func<T, bool> predicate, bool defaultIsNone = true)
         {
             var items = collection.Where(predicate);
@@ -39,11 +54,23 @@
             }
         }
 
+        /// <summary>
+        /// Similar to FirstOrMaybe() but handles null arrays safetly.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Maybe<IEnumerable<T>> WithEmptyAsNone<T>(this IEnumerable<T> value) =>
             value == null || !value.Any() ?
             Maybe<IEnumerable<T>>.None :
             Maybe.From(value);
 
+        /// <summary>
+        /// Shortcut for string.Join(separator, array[string])
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
         public static string StringJoin(this IEnumerable<string> collection, string separator)
         {
             return string.Join(separator, collection.ToArray());

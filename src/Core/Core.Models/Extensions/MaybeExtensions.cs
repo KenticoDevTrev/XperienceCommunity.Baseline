@@ -59,39 +59,126 @@
         }
 
         /// <summary>
-        /// Parses a maybe as a nullable, since default AsNullable doesn't handle interfaces
+        /// Converts Maybe to a nullable value (useful in serialization)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
         public static T? AsNullableValue<T>(this Maybe<T> value) => value.HasValue ? (T?)value.Value : default;
+
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static int? AsNullableIntValue(this Maybe<int> value) => value.HasValue ? (int?)value.Value : null;
+
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double? AsNullableDoubleValue(this Maybe<double> value) => value.HasValue ? (double?)value.Value : null;
+
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static decimal? AsNullableDecimalValue(this Maybe<decimal> value) => value.HasValue ? (decimal?)value.Value : null;
+
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool? AsNullableBoolValue(this Maybe<bool> value) => value.HasValue ? (bool?)value.Value : null;
+
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static DateTime? AsNullableDateTimeValue(this Maybe<DateTime> value) => value.HasValue ? (DateTime?)value.Value : null;
+        
+        /// <summary>
+        /// Converts Maybe to a nullable value (useful in serialization)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static float? AsNullableFloatValue(this Maybe<float> value) => value.HasValue ? (float?)value.Value : null;
 
+        /// <summary>
+        /// Adds the Maybe<T>.GetValueOrDefault functionality to normal nullable values (so you don't need to parse to maybe first).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static T GetValueOrDefault<T>(this T? value, T defaultValue) => value ?? defaultValue;
 
+        /// <summary>
+        /// Returns a Maybe.None if it's null or the default value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Maybe<T> WithDefaultAsNone<T>(this T value) =>
             value == null || value.Equals(default(T))
                 ? Maybe<T>.None
                 : value;
 
-
+        /// <summary>
+        /// Returns a Maybe.None if the value is null, default, or matches the given value (Kentio often returns a '0' for integars if null, for example, so you can use this for those cases)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="noneValue"></param>
+        /// <returns></returns>
         public static Maybe<T> WithMatchAsNone<T>(this T value, T noneValue) =>
             value == null || value.Equals(default(T)) || value.Equals(noneValue)
                 ? Maybe<T>.None
                 : value;
-     
 
+
+        /// <summary>
+        /// String version of GetValueOrDefault that also accounts for an string that is empty or only contains White Spaces.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static string GetValueOrDefaultIfEmpty(this Maybe<string> value, string defaultValue) => value.HasNonEmptyValue() ? value.Value : defaultValue;
+
+        /// <summary>
+        /// Gets the value if the Array has a value and the value is not an empty array.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static IEnumerable<T> GetValueOrDefaultIfEmpty<T>(this Maybe<IEnumerable<T>> value, IEnumerable<T> defaultValue) => value.HasNonEmptyValue() ? value.Value : defaultValue;
 
+        /// <summary>
+        /// Boolean check for Maybe<string> values that may have a value that is empty or whitespace, not widely used, you in practice should never have a Maybe<string> 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool HasNonEmptyValue(this Maybe<string> value) => value.HasValue && !string.IsNullOrWhiteSpace(value.Value);
+
+        /// <summary>
+        /// Boolean check for Maybe<string> values that may have a value that is empty or whitespace, not widely used, you in practice should never have a Maybe<string> 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool HasNonEmptyValue<T>(this Maybe<IEnumerable<T>> value) => value.HasValue && value.Value.Any();
 
+        /// <summary>
+        /// IEnumerable check in case it's a null, not widely used.
+        /// </summary>
+        /// <param name="maybeValue"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool TryGetValueNonEmpty(this Maybe<string> maybeValue, out string value)
         {
             if (maybeValue.HasNonEmptyValue())
@@ -106,7 +193,13 @@
             }
         }
 
-
+        /// <summary>
+        /// IEnumerable check in case it's a null, not widely used.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="maybeValue"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool TryGetValueNonEmpty<T>(this Maybe<IEnumerable<T>> maybeValue, out IEnumerable<T> value)
         {
             if (maybeValue.HasValue && maybeValue.Value.Any())
