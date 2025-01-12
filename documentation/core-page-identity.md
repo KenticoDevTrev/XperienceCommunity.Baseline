@@ -31,4 +31,14 @@ Here's a breakdown of the methods and their uses.
 
 **GetCurrentPageAsync** / **GetPageAsync**: Gets the current / requested page (as a `PageIdentity`).
 
-**GetCurrentPageAsync T** / **GetPageAsync T**: Typed version of GetCurrentPageAsync() and GetPageAsync, can pass your Content Type or Reusable Schema type as the parameter, if and if the current page is that type (or inherits from that reusable schema), it will return the PageIdentity WITH the T Data property of the type you requested (Result.Failure if couldn't find or parse);
+**GetCurrentPageAsync T** / **GetPageAsync T**: Typed version of GetCurrentPageAsync() and GetPageAsync, can pass your Content Type or Reusable Schema type as the parameter, and if the current page is that type (or inherits from that reusable schema), it will return the PageIdentity WITH the T Data property of the type you requested (Result.Failure if couldn't find or parse);
+
+### Leveraging the Typed GetPageAsync/GetCurrentPageAsync
+The IPageContextRepository.GetCurrentPageAsync<T> or GetPageAsync<T> are very useful both for your initial Page Templates (to get the model without needing additional parsing each time), but also for "Current Page" related View Components.  For example, if you have an `IBanners` Reusable Schema that links to `Banner` Content Types.  Some pages have banners, some do not.
+
+You can now have a `BannerViewComponent` that attempts to get the `_pageContextRepository.GetCurrentPageAsync<IBanner>()`.  If it returns a Result.Success, it will have the `PageIdentity<IBanner>` which will have a `Data` property that is the `IEnumerable<Banner>`s.  If the current page doesn't inherit it, it will of course return a `Result.Failure` and you can ignore or handle.
+
+### Upgrading from Kentico Xperience 13
+In Kentico Xperience 13, the `IPageDataContextRetriever` easily gave the current `TreeNode` which you could type check.  In Xperience by Kentico, you do not have this, only the `IWebPageDataContextRetriever` which has the `WebPageDataContext` (the lookup values so you can retrieve the model yourself).  Use the `GetCurrentPageAsync<T>()` to easily get the current model.
+
+Next, if you leveraged Related Pages heavily for relationships, or even child items, these can now be represented as a `Reusable Schema` with a `Content Items` field type (where you select the content items related).  Where as before you would take the current page context to find your related items, now your content type would use the Reusable Schema to select those within the model, then use `GetCurrentPageAsync<IMyReusableSchema>` to see if the current page leverages it and if so, retrieve it.
