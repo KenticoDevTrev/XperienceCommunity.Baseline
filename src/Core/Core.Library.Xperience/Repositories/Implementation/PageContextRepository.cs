@@ -20,7 +20,8 @@ namespace Core.Repositories.Implementation
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext,
         IContentQueryExecutor contentQueryExecutor,
-        ISiteRepository siteRepository
+        ISiteRepository siteRepository,
+        IMappedContentItemRepository mappedContentItemRepository
         ) : IPageContextRepository
     {
         private readonly IWebPageDataContextRetriever _webPageDataContextRetriever = webPageDataContextRetriever;
@@ -35,6 +36,7 @@ namespace Core.Repositories.Implementation
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ISiteRepository _siteRepository = siteRepository;
+        private readonly IMappedContentItemRepository _mappedContentItemRepository = mappedContentItemRepository;
 
         public async Task<Result<PageIdentity>> GetCurrentPageAsync() => _webPageDataContextRetriever.TryRetrieve(out var data) ? await GetPageInternal(data.WebPage.WebPageItemID, data.WebPage.LanguageName) : Result.Failure<PageIdentity>("There is no current webpage context");
 
@@ -179,7 +181,7 @@ where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
                 return Result.Failure<PageIdentity<T>>(error);
             }
 
-            if (!(await GetFullPageModel(pageIdentity)).TryGetValue(out var fullPageModel, out var modelError)) {
+            if (!(await mappedContentItemRepository.GetContentItem(pageIdentity.ContentIdentity, pageIdentity.Culture)).TryGetValue(out var fullPageModel, out var modelError)) {
                 return Result.Failure<PageIdentity<T>>(modelError);
             }
 
@@ -189,71 +191,5 @@ where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
 
             return Result.Failure<PageIdentity<T>>("The original model is not of that type");
         }
-
-        private async Task<Result<object>> GetFullPageModel(PageIdentity pageIdentity) {
-
-            var builder = _cacheDependencyBuilderFactory.Create()
-                .WebPage(pageIdentity.PageGuid);
-
-            var className = pageIdentity.PageType;
-            var webChannelName = _siteRepository.ChannelNameById(pageIdentity.ChannelID);
-            if (!GetContentTypeByName().TryGetValue(className.ToLowerInvariant(), out var contentType)
-                || string.IsNullOrWhiteSpace(webChannelName)) {
-                return Result.Failure<object>($"Could not find a matching RegisterContentTypeMapping class for {className} or could not parse Website Channel Name from ID {pageIdentity.ChannelID}");
-            }
-
-            return await _progressiveCache.LoadAsync(async cs => {
-
-                if(cs.Cached) {
-                    cs.CacheDependency = builder.GetCMSCacheDependency();
-                }
-
-                if (_contentQueryExecutor is not IContentQueryModelTypeMapper typeMapper) {
-                    return Result.Failure<object>($"The IContentQueryExecutor is not of type IContentQueryModelTypeMapper, so can't map dynamically");
-                }
-                var typedMapper = typeMapper.GetType().GetMethod("Map")?.MakeGenericMethod(contentType) ?? null;
-                if (typedMapper == null) {
-                    return Result.Failure<object>($"The IContentQueryModelTypeMapper for some reason no longer has the Map<T> Method, can't proceed");
-                }
-
-                var getPageFull = new ContentItemQueryBuilder().ForContentType(pageIdentity.PageType, query => query
-                        .ForWebsite(webChannelName, includeUrlPath: true)
-                        .WithLinkedItems(100)
-                        .Where(where => where.WhereEquals(nameof(WebPageFields.WebPageItemID), pageIdentity.PageID))
-                        .TopN(1)
-                        )
-                    .InLanguage(pageIdentity.Culture);
-
-                var dataContainerResults = await _contentQueryExecutor.GetWebPageResult(getPageFull, (dataContainer) => dataContainer, new ContentQueryExecutionOptions() { ForPreview = _cacheRepositoryContext.PreviewEnabled(), IncludeSecuredItems = true });
-
-                if (!dataContainerResults.FirstOrMaybe().TryGetValue(out var firstItem)) {
-                    return Result.Failure<object>($"No Web Page Item Found!");
-                }
-
-                var result = typedMapper.Invoke(typeMapper, [firstItem]);
-                return result != null ? result : Result.Failure<object>("Mapped object was null.");
-            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "PageContextRepository_GetFullPageModel", pageIdentity.GetCacheKey(), _cacheRepositoryContext.GetCacheKey()));
-        }
-
-        private Dictionary<string, Type> GetContentTypeByName()
-        {
-            return _progressiveCache.Load(cs => {
-                var contentTypeByName = new Dictionary<string, Type>();
-                foreach (var assembly in AssemblyDiscoveryHelper.GetAssemblies(true)) {
-                    foreach (var type in assembly.GetTypes()) {
-                        var attribute = type.GetCustomAttributes(typeof(RegisterContentTypeMappingAttribute), true);
-                        if (attribute.Length > 0) {
-                            contentTypeByName.TryAdd(((RegisterContentTypeMappingAttribute)attribute[0]).ContentTypeName.ToLowerInvariant(), type);
-                        }
-                    }
-                }
-                return contentTypeByName;
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "PageContextRepository_GetContentTypeByName"));
-        }
-
-
-       
     }
-
-
 }

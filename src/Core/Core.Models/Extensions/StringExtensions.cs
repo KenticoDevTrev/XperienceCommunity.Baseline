@@ -50,15 +50,34 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Shortcut for `string.Split(delimiterArray, StringSplitOptions.RemoveEmptyEntries)`
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="delimiters"></param>
+        /// <returns></returns>
         public static IEnumerable<string> SplitAndRemoveEntries(this string value, string delimiters = "|,;")
         {
             return value.Split(delimiters.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
         }
 
+        /// <summary>
+        /// Shortcut, removes tilde if there.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string RemoveTildeFromFirstSpot(this string value) =>
             value.Length > 0 && value[0] == '~'
             ? value[1..] : value;
 
+        /// <summary>
+        /// Limits the string to the max length, adding an elipses, useful for summaries.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="elipses"></param>
+        /// <param name="keepWholeWord"></param>
+        /// <returns></returns>
         public static string MaxLength(this string value, int maxLength, string elipses = "...", bool keepWholeWord = false)
         {
             if (value.Length > maxLength)
@@ -87,6 +106,11 @@ namespace System
             return value;
         }
 
+        /// <summary>
+        /// Converts the given text to an HTML css/id safe attribute (with 'id-' prefixed), useful for client side marking and linking.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string ToAttributeId(this string text)
         {
             var clean = Regex.Replace(text.Replace(" ", "-"), "[^a-zA-Z0-9-_]", "").ToLower();

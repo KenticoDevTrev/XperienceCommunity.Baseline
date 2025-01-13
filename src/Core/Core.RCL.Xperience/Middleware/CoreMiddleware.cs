@@ -102,6 +102,7 @@ namespace Core
                 .AddTransient<IClassContentTypeAssetConfigurationRepository, ClassContentTypeAssetConfigurationRepository>()
                 .AddTransient<IMetaDataWebPageDataContainerConverter, MetaDataWebPageDataContainerConverter>()
                 .AddScoped<IPageContextRepository, PageContextRepository>()
+                .AddScoped<IMappedContentItemRepository, MappedContentItemRepository>()
                 .AddScoped<IMetaDataRepository, MetaDataRepository>();
 
             // User Customization Points, register your own versions afterwards if you wish

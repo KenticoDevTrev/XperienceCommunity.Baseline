@@ -9,6 +9,8 @@ Below are some Services and Repositories that have not already been mentioned in
 
 - [ILogger](../src/Core/Core.Models/Services/ILogger.cs): Kentico Agnostic version of it's own Logging Service
 - [IUrlResolver](../src/Core/Core.Models/Services/IUrlResolver.cs): Two methods to make Urls Absolute based on the current request, and also to ResolveUrls (remove those blasted tildes!!!)
+- [ISiteRepository](../src/Core/Core.Models/Repositories/ISiteRepository.cs): Current Channel and Website Channel retrieval, as well as ID to String and String to ID conversions (Kentico Agnostic)
+
 
 ## Other Extension Methods
 

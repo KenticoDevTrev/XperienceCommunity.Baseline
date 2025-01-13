@@ -33,6 +33,8 @@ Here's a breakdown of the methods and their uses.
 
 **GetCurrentPageAsync T** / **GetPageAsync T**: Typed version of GetCurrentPageAsync() and GetPageAsync, can pass your Content Type or Reusable Schema type as the parameter, and if the current page is that type (or inherits from that reusable schema), it will return the PageIdentity WITH the T Data property of the type you requested (Result.Failure if couldn't find or parse);
 
+This uses the `IMappedContentItemRepository`
+
 ### Leveraging the Typed GetPageAsync/GetCurrentPageAsync
 The IPageContextRepository.GetCurrentPageAsync<T> or GetPageAsync<T> are very useful both for your initial Page Templates (to get the model without needing additional parsing each time), but also for "Current Page" related View Components.  For example, if you have an `IBanners` Reusable Schema that links to `Banner` Content Types.  Some pages have banners, some do not.
 
