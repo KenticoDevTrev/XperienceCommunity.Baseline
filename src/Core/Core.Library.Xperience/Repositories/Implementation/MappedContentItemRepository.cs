@@ -79,7 +79,7 @@ namespace Core.Repositories.Implementation
                         .If(isWebsite, webQuery => webQuery.ForWebsite(websiteName, includeUrlPath: true))
                         .If(contentItemId.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemID), contentItemId.GetValueOrDefault(0))))
                         .If(contentItemGuid.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemGUID), contentItemGuid.GetValueOrDefault(Guid.Empty))))
-                        .WithLinkedItems(100)                        
+                        .WithLinkedItems(100, x => x.IncludeWebPageData(true))                        
                         .TopN(1)
                 )
                 .InLanguage(lang);

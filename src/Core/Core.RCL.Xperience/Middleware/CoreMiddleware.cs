@@ -117,6 +117,7 @@ namespace Core
                 // Main item retrieval that depends on baseline apis and user customizations
                 .AddScoped<IUserRepository, UserRepository<TUser>>()
                 .AddScoped<IMediaRepository, MediaRepository>()
+                .AddScoped<IMediaTagHelperService, MediaTagHelperService>()
                 .AddScoped<IContentCategoryRepository, ContentCategoryRepository>();
 
 #pragma warning disable CS0618 // Type or member is obsolete

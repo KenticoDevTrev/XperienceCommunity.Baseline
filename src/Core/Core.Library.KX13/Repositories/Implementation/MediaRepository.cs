@@ -284,5 +284,22 @@ namespace Core.Repositories.Implementation
             return attachmentItem;
         }
 
+        #region "Other Helpers"
+
+        public async Task<Result<MediaItem>> GetMediaItemFromUrl(string url)
+        {
+            if (url.IsMediaUrl() && url.ParseGuidFromMediaUrl().TryGetValue(out var mediaMediaGuid)
+                && (await GetMediaItemAsync(mediaMediaGuid)).TryGetValue(out var mediaMediaItem)) {
+                return mediaMediaItem;
+            }
+            if (url.IsAttachmentUrl() && url.ParseGuidFromMediaUrl().TryGetValue(out var attachmentMediaGuid)
+                && (await GetAttachmentInternal(attachmentMediaGuid)).TryGetValue(out var attachmentMediaItem)) {
+                return attachmentMediaItem;
+            }
+            return Result.Failure<MediaItem>("Url is not a /getmedia or /getattachment url.");
+        }
+
+        #endregion
+
     }
 }

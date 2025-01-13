@@ -523,6 +523,23 @@ namespace Core.Repositories.Implementation
 
         #endregion
 
+        #region "Other Helpers"
+
+        public async Task<Result<MediaItem>> GetMediaItemFromUrl(string url)
+        {
+            if (url.IsMediaUrl() && url.ParseGuidFromMediaUrl().TryGetValue(out var mediaMediaGuid)
+                && (await GetMediaItemAsync(mediaMediaGuid)).TryGetValue(out var mediaMediaItem)) {
+                return mediaMediaItem;
+            }
+            if (url.IsContentAssetUrl() && url.ParseGuidFromAssetUrl().TryGetValue(out var mediaContentAssetGuid)
+                && (await GetContentItemAsset(mediaContentAssetGuid.ContentItemGuid.ToContentIdentity(), mediaContentAssetGuid.FieldGuid, url.GetContentAssetUrlLanguage().AsNullableValue())).TryGetValue(out var contentMediaItem)) {
+                return contentMediaItem;
+            }
+            return Result.Failure<MediaItem>("Url is not a /getmedia or /getcontentasset url.");
+        }
+
+        #endregion
+
         #region "Media Helpers"
 
         private static MediaItem MediaFileInfoToMediaItemCached(MediaFileInfo mediaFile)

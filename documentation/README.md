@@ -29,5 +29,6 @@ Likewise, some features listed in this documentation are only in the Xperience b
   - [Page Identity and Context](core-page-identity.md)
   - [Categories](core-categories.md)
   - [User Context and Customization](core-user.md)
-  - Media System
+  - [Media Retrieval](core-media-retrieval.md)
+  - [Media Tag Helpers](core-media-taghelpers.md)
   - MetaData System

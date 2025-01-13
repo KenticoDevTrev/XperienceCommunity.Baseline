@@ -139,5 +139,12 @@
         /// <returns></returns>
         Task<Result<string>> GetMediaAttachmentSiteNameAsync(Guid mediaOrAttachmentGuid);
 
+        /// <summary>
+        /// Attempts to get the Media from the given Url (only works on /getattachment (KX13), /getcontentasset (XbyK), and /getmedia urls)
+        /// </summary>
+        /// <param name="url">The URL</param>
+        /// <returns>The Media Item if it is found</returns>
+        Task<Result<MediaItem>> GetMediaItemFromUrl(string url);
+
     }
 }

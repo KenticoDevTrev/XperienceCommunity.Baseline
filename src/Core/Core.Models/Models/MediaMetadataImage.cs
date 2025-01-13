@@ -2,11 +2,12 @@
 {
     public record MediaMetadataImage : IMediaMetadata
     {
-        public MediaMetadataImage(int width, int height, FocalPercents? focalPercet = null)
+        public MediaMetadataImage(int width, int height, FocalPercents? focalPercet = null, IEnumerable<ImageProfile>? imageProfiles = null)
         {
             Width = width;
             Height = height;
             FocalPercent = focalPercet.AsMaybe();
+            ImageProfiles = imageProfiles ?? [];
         }
 
         /// <summary>
@@ -23,6 +24,11 @@
         /// The Focal percentage
         /// </summary>
         public Maybe<FocalPercents> FocalPercent { get; init; }
+
+        /// <summary>
+        /// Can set Image Profiles which will allow for different profiles by different screen sizes
+        /// </summary>
+        public IEnumerable<ImageProfile> ImageProfiles { get; init; } = [];
     }
 
     /// <summary>

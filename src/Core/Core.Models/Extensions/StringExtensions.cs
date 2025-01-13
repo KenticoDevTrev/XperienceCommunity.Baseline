@@ -5,7 +5,7 @@ namespace System
     public static class StringExtensions
     {
         /// <summary>
-        /// Tries to get the Guid value from `/getMedia/GUID/etc` Urls
+        /// Tries to get the Guid value from `/getmedia/GUID/etc` or `/getattachment/GUID` Urls
         /// </summary>
         /// <param name="mediaUrl"></param>
         /// <returns></returns>
@@ -20,7 +20,7 @@ namespace System
         }
 
         /// <summary>
-        /// Tries to get the ContentItemGuid and FieldGuid value from the `/getContentAsset/ContentItemGUID/FieldGuid/etc` Urls
+        /// Tries to get the ContentItemGuid and FieldGuid value from the `/getcontentasset/ContentItemGUID/FieldGuid/etc` Urls
         /// </summary>
         /// <param name="mediaUrl"></param>
         /// <returns></returns>
@@ -31,6 +31,57 @@ namespace System
                 return new AssetUrlGuids(contentItemGuid, fieldGuid);
             }
             return Result.Failure<AssetUrlGuids>("Could not find Guid values in url");
+        }
+
+        /// <summary>
+        /// Returns true if the url has /getmedia or /getcontentasset
+        /// </summary>
+        /// <param name="mediaUrl"></param>
+        /// <returns></returns>
+        public static bool IsMediaOrContentItemUrl(this string mediaUrl)
+        {
+            var url = (mediaUrl ?? "").ToLower();
+            return url.IndexOf("/getmedia") > -1 || url.IndexOf("/getcontentasset") > -1;
+        }
+
+        /// <summary>
+        /// Returns true if the url has /getmedia
+        /// </summary>
+        /// <param name="mediaUrl"></param>
+        /// <returns></returns>
+        public static bool IsMediaUrl(this string mediaUrl)
+        {
+            return (mediaUrl ?? "").IndexOf("/getmedia", StringComparison.OrdinalIgnoreCase) > -1;
+        }
+
+        /// <summary>
+        /// Returns true if the url has /getcontentasset
+        /// </summary>
+        /// <param name="mediaUrl"></param>
+        /// <returns></returns>
+        public static bool IsContentAssetUrl(this string mediaUrl)
+        {
+            return (mediaUrl ?? "").IndexOf("/getcontentasset", StringComparison.OrdinalIgnoreCase) > -1;
+        }
+
+        /// <summary>
+        /// Returns true if the url has /getattachment
+        /// </summary>
+        /// <param name="mediaUrl"></param>
+        /// <returns></returns>
+        public static bool IsAttachmentUrl(this string mediaUrl)
+        {
+            return (mediaUrl ?? "").IndexOf("/getattachment", StringComparison.OrdinalIgnoreCase) > -1;
+        }
+
+        public static Maybe<string> GetContentAssetUrlLanguage(this string src)
+        {
+            if (!src.Contains('?')) {
+                return Maybe.None;
+            }
+            var queryItems = src.Split('?')[0].Split('&', StringSplitOptions.RemoveEmptyEntries);
+            var langItem = queryItems.Where(x => x.StartsWith("language", StringComparison.OrdinalIgnoreCase));
+            return langItem.FirstOrMaybe().TryGetValue(out var langItemVal) && langItemVal.Contains('=') ? langItemVal.Split('=')[1].AsNullOrWhitespaceMaybe() : Maybe.None;
         }
 
         /// <summary>
