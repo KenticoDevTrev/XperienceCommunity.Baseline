@@ -31,13 +31,19 @@ namespace Core
         /// 
         /// If using session, make sure define and pick your Session Storage mechanism (ex Memory, SQL, Redis Cache, etc) and Add it, and call the app.UseSession() to enable.
         /// </param>
+        /// <param name="imageTagHelperOptionsConfiguration">Configures ImageTagHelper.cs img parsing</param>
         /// <returns></returns>
         public static IServiceCollection AddCoreBaseline<TUser, TGenericUser>(this IServiceCollection services,
-            IPersistantStorageConfiguration? persistantStorageConfiguration = null
+            IPersistantStorageConfiguration? persistantStorageConfiguration = null,
+            Action<MediaTagHelperOptions>? imageTagHelperOptionsConfiguration = null
             ) where TUser : ApplicationUser, new() where TGenericUser : User, new()
         {
             // Add MVC Caching which Core depends on
             services.AddMVCCaching();
+
+            var mediaTagHelperOptions = new MediaTagHelperOptions();
+            imageTagHelperOptionsConfiguration?.Invoke(mediaTagHelperOptions);
+            services.AddSingleton(mediaTagHelperOptions);
 
             services
                 // Largely Only dependent upon Kentico's APIs

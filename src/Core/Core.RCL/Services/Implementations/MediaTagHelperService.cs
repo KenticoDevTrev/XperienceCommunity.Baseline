@@ -4,14 +4,14 @@ using System.Web;
 
 namespace Core.Services.Implementation
 {
-    public class MediaTagHelperService : IMediaTagHelperService
+    public class MediaTagHelperService(IMediaRepository mediaRepository,
+        MediaTagHelperOptions mediaTagHelperOptions) : IMediaTagHelperService
     {
-        private readonly IMediaRepository _mediaRepository;
+        private readonly IMediaRepository _mediaRepository = mediaRepository;
+        private readonly MediaTagHelperOptions _mediaTagHelperOptions = mediaTagHelperOptions;
 
-        public MediaTagHelperService(IMediaRepository mediaRepository)
-        {
-            _mediaRepository = mediaRepository;
-        }
+        // TODO: Make this an option in baseline config
+
         public async Task<Result<MediaItem>> GetMediaItemFromUrl(string url)
         {
             if (url.IsMediaUrl() && url.ParseGuidFromMediaUrl().TryGetValue(out var mediaMediaGuid)
@@ -27,15 +27,9 @@ namespace Core.Services.Implementation
 
         public void HandleBackgroundImageProfiles(TagHelperOutput output, MediaItem mediaItem, string fullUrl, IEnumerable<ImageProfile> imageProfiles)
         {
-            // We now have our value to parse
-            var getMediaUrl = Regex.Match(fullUrl, @"^url\([ '""]{0,1}((.*))['""]{0,1}\)");
-
-            if (!getMediaUrl.Success || getMediaUrl.Groups.Count < 2) {
+            if (!IsSupportedDynamicType(mediaItem.MediaExtension)) {
                 return;
             }
-
-            // Second group should be the URL
-            var src = getMediaUrl.Groups[1].Value.TrimEnd('\'').TrimEnd('"').TrimStart('~');
 
             // add random id to element
             string id = Guid.NewGuid().ToString();
@@ -43,12 +37,11 @@ namespace Core.Services.Implementation
 
             Maybe<int> widthOverride = Maybe.None;
             Maybe<int> heightOverride = Maybe.None;
-            Maybe<string> languageOverride = Maybe.None;
 
 
             // Overrides
-            if (src.Contains('?')) {
-                var splitSrc = src.Split('?')[1].Split('&');
+            if (fullUrl.Contains('?')) {
+                var splitSrc = fullUrl.Split('?')[1].Split('&');
                 if (splitSrc.FirstOrMaybe(x => x.StartsWith("width", StringComparison.OrdinalIgnoreCase)).TryGetValue(out var widthParam)
                     && widthParam.Contains('=')
                     && int.TryParse(widthParam.Split('=')[1], out var width)) {
@@ -58,10 +51,6 @@ namespace Core.Services.Implementation
                     && heightParam.Contains('=')
                     && int.TryParse(heightParam.Split('=')[1], out var height)) {
                     heightOverride = height;
-                }
-                if (splitSrc.FirstOrMaybe(x => x.StartsWith("language", StringComparison.OrdinalIgnoreCase)).TryGetValue(out var languageParam)
-                    && languageParam.Contains('=')) {
-                    languageOverride = languageParam.Split('=')[1];
                 }
             }
             int originalWidth = 0;
@@ -93,19 +82,19 @@ namespace Core.Services.Implementation
 
                 // Update source
                 var height = CalculateHeight(defaultImageProfile.ImageRenderWidth, ratio);
-                styleDictionary["background-image"] = $"url('{ReplaceWidthHeightOnSource(src, defaultImageProfile.ImageRenderWidth, height)}')";
+                styleDictionary["background-image"] = $"url('{ReplaceWidthHeightOnSource(fullUrl, defaultImageProfile.ImageRenderWidth, height)}')";
                 imageProfiles = imageProfiles.Except([defaultImageProfile]).ToList();
                 output.Attributes.AddorReplaceEmptyAttribute("style", string.Join("; ", styleDictionary.Select(elem => $"{elem.Key}: {elem.Value}")));
             }
 
-            // Handle image profiles
+            // Handle image profiles, not going to do webp format for background image since no way to fall back to original.
             if (imageProfiles.Where(x => x.MaxScreenWidth.HasValue).Any()) {
                 decimal ratio = Convert.ToDecimal(originalWidth) / Convert.ToDecimal(originalHeight);
                 output.PostContent.AppendHtml("<style>");
 
                 foreach (var imageProfile in imageProfiles.Where(x => x.MaxScreenWidth.HasValue).OrderByDescending(x => x.MaxScreenWidth.Value)) {
                     var height = CalculateHeight(imageProfile.ImageRenderWidth, ratio);
-                    output.PostContent.AppendHtml($"@media (max-width:{imageProfile.MaxScreenWidth.Value}px) {{ [data-imageprofile-id='{id}'] {{ background-image: url('{ReplaceWidthHeightOnSource(src, imageProfile.ImageRenderWidth, height)}') !important; }} }} {Environment.NewLine}");
+                    output.PostContent.AppendHtml($"@media (max-width:{imageProfile.MaxScreenWidth.Value}px) {{ [data-imageprofile-id='{id}'] {{ background-image: url('{ReplaceWidthHeightOnSource(fullUrl, imageProfile.ImageRenderWidth, height)}') !important; }} }} {Environment.NewLine}");
                 }
                 output.PostContent.AppendHtml("</style>");
             }
@@ -136,6 +125,7 @@ namespace Core.Services.Implementation
 
             Maybe<int> widthOverride = Maybe.None;
             Maybe<int> heightOverride = Maybe.None;
+
             if (src.Contains('?')) {
                 var splitSrc = src.Split('?')[1].Split('&');
                 if (splitSrc.FirstOrMaybe(x => x.StartsWith("width", StringComparison.OrdinalIgnoreCase)).TryGetValue(out var widthParam)
@@ -150,9 +140,7 @@ namespace Core.Services.Implementation
                 }
             }
 
-            var mediaItemFound = Maybe<MediaItem>.None;
-            if (mediaItemFound.TryGetValue(out var mediaItemFromFound)
-                && mediaItemFromFound.MetaData.TryGetValue(out var metaDataFromFound)
+            if (mediaItem.MetaData.TryGetValue(out var metaDataFromFound)
                 && metaDataFromFound is MediaMetadataImage imageMetadata) {
                 isGetMedia = true;
                 metaDataFound = imageMetadata with {
@@ -180,7 +168,6 @@ namespace Core.Services.Implementation
                 metaDataFound = new MediaMetadataImage(width: widthOverride.Value, height: heightOverride.Value);
             }
 
-
             if (metaDataFound.TryGetValue(out var metaData)) {
                 // Don't need to add alt on srcsets, but still need width and height
                 if (!sourceAttributeName.Equals("srcset", StringComparison.OrdinalIgnoreCase)) {
@@ -190,17 +177,43 @@ namespace Core.Services.Implementation
                 output.Attributes.AddorReplaceEmptyAttribute("height", metaData.Height.ToString());
 
                 // Handle image profiles
-                if (isGetMedia && imageProfiles.Where(x => x.MaxScreenWidth.HasValue).Any() && metaData.Width > 0 && metaData.Height > 0) {
+                if (isGetMedia 
+                    && IsSupportedDynamicType(mediaItem.MediaExtension) 
+                    && imageProfiles.Where(x => x.MaxScreenWidth.HasValue).Any() && metaData.Width > 0 && metaData.Height > 0) {
                     decimal ratio = Convert.ToDecimal(metaData.Width) / Convert.ToDecimal(metaData.Height);
                     output.PreElement.AppendHtml("<picture>");
 
                     foreach (var imageProfile in imageProfiles.Where(x => x.MaxScreenWidth.HasValue).OrderBy(x => x.MaxScreenWidth.Value)) {
                         var height = CalculateHeight(imageProfile.ImageRenderWidth, ratio);
-                        output.PreElement.AppendHtml($"<source media=\"(max-width:{imageProfile.MaxScreenWidth.Value}px)\" srcset=\"{ReplaceWidthHeightOnSource(src, imageProfile.ImageRenderWidth, height)}\" width=\"{imageProfile.ImageRenderWidth}\" height=\"{height}\" />");
+                        if (!mediaItem.MediaExtension.Equals(".webp", StringComparison.OrdinalIgnoreCase)) {
+                            output.PreElement.AppendHtml($"<source media=\"(max-width:{imageProfile.MaxScreenWidth.Value}px)\" srcset=\"{ReplaceWidthHeightOnSource(src, imageProfile.ImageRenderWidth, height)}&format=webp\" type=\"image/webp\" width=\"{imageProfile.ImageRenderWidth}\" height=\"{height}\" />");
+                        } else { 
+                            output.PreElement.AppendHtml($"<source media=\"(max-width:{imageProfile.MaxScreenWidth.Value}px)\" srcset=\"{ReplaceWidthHeightOnSource(src, imageProfile.ImageRenderWidth, height)}\" type=\"{GetMimeType(mediaItem.MediaExtension)}\" width=\"{imageProfile.ImageRenderWidth}\" height=\"{height}\" />");
+                        }
+
                     }
                     output.PostElement.AppendHtml("</picture>");
                 }
             }
+        }
+
+        private string GetMimeType(string extension)
+        {
+            return extension.ToLower().Trim('.') switch {
+                "png" => "image/png",
+                "jpg" or "jpeg" => "image/jpeg",
+                "gif" => "image/gif",
+                "apng" => "image/apng",
+                "svg" => "image/svg+xml",
+                "webp" => "image/webp",
+                "avif" => "image/avif",
+                _ => $"image/{extension.Trim('.').ToLower()}"
+            };
+        }
+
+        private bool IsSupportedDynamicType(string extenstion)
+        {
+            return _mediaTagHelperOptions.SupportedDynamicResizingExtensions.Contains(extenstion.ToLower().Trim('.'));
         }
 
         public int CalculateHeight(int width, decimal widthToHeightRatio)
@@ -211,8 +224,8 @@ namespace Core.Services.Implementation
         public string ReplaceWidthHeightOnSource(string url, int width, int height)
         {
             // Add 1.5 scale factor
-            width = Convert.ToInt32(Math.Round(Convert.ToDecimal(width) * 1.5m));
-            height = Convert.ToInt32(Math.Round(Convert.ToDecimal(height) * 1.5m));
+            width = Convert.ToInt32(Math.Round(Convert.ToDecimal(width) * _mediaTagHelperOptions.ImageResolutionScaleFactor));
+            height = Convert.ToInt32(Math.Round(Convert.ToDecimal(height) * _mediaTagHelperOptions.ImageResolutionScaleFactor));
 
             if (!url.Contains('?')) {
                 return $"{url}?width={width}&height={height}";
@@ -228,6 +241,19 @@ namespace Core.Services.Implementation
             queryParams.Add($"height={height}");
 
             return $"{url.Split('?')[0]}?{string.Join("&", queryParams)}";
+        }
+
+        public Result<string> GetImageUrlFromBackgroundStyle(string backgroundStyleValue)
+        {
+            // We now have our value to parse
+            var getMediaUrl = Regex.Match(backgroundStyleValue, @"^url\([ '""]{0,1}((.*))['""]{0,1}\)");
+
+            if (!getMediaUrl.Success || getMediaUrl.Groups.Count < 2) {
+                return Result.Failure<string>("Url not proper or found");
+            }
+
+            // Second group should be the URL
+            return getMediaUrl.Groups[1].Value.TrimEnd('\'').TrimEnd('"').TrimStart('~');
         }
     }
 }

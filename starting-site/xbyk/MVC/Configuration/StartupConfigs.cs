@@ -52,6 +52,7 @@ using Account.Features.Account.MyAccount;
 using Account.Features.Account.Registration;
 using Account.Features.Account.ResetPassword;
 using Navigation.Features.PartialNavigation;
+using XperienceCommunity.ImageProcessing;
 
 
 // BASELINE CUSTOMIZATION - Account - Add this to edit Channel Settings
@@ -308,6 +309,9 @@ namespace MVC.Configuration
                 },
                 metaDataOptionsConfiguration: (options) => {
 
+                },
+                imageProcessingOptionsConfiguration: (options) => {
+                    // XperienceCommunity.ImageProcessing configuration  
                 },
                 persistantStorageConfiguration: new TempDataCookiePersistantStorageConfiguration("TEMPDATA", (configurations) => {
                     // Configure TempData Cookie
@@ -613,7 +617,7 @@ namespace MVC.Configuration
         /// Registers Baseline Core middleware, which is only one item that can go at the beginning/end of the pipeline.
         /// </summary>
         /// <param name="app"></param>
-        public static void RegisterBaselineCoreMiddleware(WebApplication app)
+        public static void RegisterBaselineCoreMiddlewareStart(WebApplication app)
         {
             app.UseCoreBaseline();
         }
@@ -689,6 +693,9 @@ namespace MVC.Configuration
             app.UseSession();
         }
 
-
+        public static void RegisterBaselineCoreMiddlewareEnd(WebApplication app)
+        {
+            app.UseXperienceCommunityImageProcessing();
+        }
     }
 }

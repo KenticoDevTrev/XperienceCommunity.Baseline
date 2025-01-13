@@ -15,31 +15,36 @@ namespace Core.TagHelpers
         public override int Order => -2;
         public MediaItem? blMedia { get; set; }
 
+        [HtmlAttributeName("bl-image-profiles")]
+        public IEnumerable<ImageProfile> ImageProfiles { get; set; } = [];
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             base.Process(context, output);
             if (blMedia.TryGetValue(out var mediaItem)) {
                 output.Attributes.SetAttribute("src", mediaItem.MediaPermanentUrl);
-                output.Attributes.AddorReplaceEmptyAttribute("alt", mediaItem.MediaDescription.GetValueOrDefault(string.Empty));
-
+                output.Attributes.AddorReplaceEmptyAttribute("alt", mediaItem.MediaDescription.GetValueOrDefault(mediaItem.MediaTitle));
+                output.Attributes.Add("data-media-item", mediaItem);
                 if (
                     mediaItem.MediaPermanentUrl.IsMediaOrContentItemUrl()
                         && mediaItem.MetaData.TryGetValue(out var metaData) && metaData is MediaMetadataImage imageMetadata
-                        && imageMetadata.ImageProfiles.Any()) {
+                        && (ImageProfiles.Any() || imageMetadata.ImageProfiles.Any())) {
                     // Add data-attribute for ImageMediaMetadataTagHelper to handle
-                    output.Attributes.Add("data-image-profiles", imageMetadata.ImageProfiles);
+                    output.Attributes.Add("data-image-profiles", ImageProfiles.Any() ? ImageProfiles : imageMetadata.ImageProfiles);
                 }
             }
         }
     }
 
 
-    [HtmlTargetElement("img", Attributes = "src")]
+    [HtmlTargetElement("img")]
     public class ImageMediaMetadataTagHelper(IMediaRepository mediaRepository,
-        IMediaTagHelperService mediaTagHelperService) : TagHelper
+        IMediaTagHelperService mediaTagHelperService,
+        MediaTagHelperOptions mediaTagHelperOptions) : TagHelper
     {
         private readonly IMediaRepository _mediaRepository = mediaRepository;
         private readonly IMediaTagHelperService _mediaTagHelperService = mediaTagHelperService;
+        private readonly MediaTagHelperOptions _mediaTagHelperOptions = mediaTagHelperOptions;
 
         [HtmlAttributeName("bl-image-profiles")]
         public IEnumerable<ImageProfile> ImageProfiles { get; set; } = [];
@@ -48,18 +53,27 @@ namespace Core.TagHelpers
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             await base.ProcessAsync(context, output);
+            if (!_mediaTagHelperOptions.UseMediaTagHelper) {
+                return;
+            }
 
             if (output.Attributes.ContainsName("data-image-profiles")) {
                 try {
                     ImageProfiles = (ImageProfile[])output.Attributes["data-image-profiles"].Value;
+                    output.Attributes.Remove(output.Attributes["data-image-profiles"]);
                 } catch (Exception) {
                     // Ignore
                 }
             }
-            if(output.Attributes.TryGetAttribute("src", out var srcAttribute) 
-                && !string.IsNullOrWhiteSpace(srcAttribute.Value?.ToString() ?? string.Empty)
-                && (await _mediaRepository.GetMediaItemFromUrl(srcAttribute.Value?.ToString() ?? string.Empty)).TryGetValue(out var mediaItem)) { 
-                _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, mediaItem, "src", ImageProfiles);
+
+            if (output.Attributes.TryGetAttribute("src", out var srcAttribute)) {
+                if (output.Attributes.ContainsName("data-media-item") && output.Attributes["data-media-item"].Value is MediaItem attributeMediaItem) {
+                    output.Attributes.Remove(output.Attributes["data-media-item"]);
+                    _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, attributeMediaItem, "src", ImageProfiles);
+                } else if (!string.IsNullOrWhiteSpace(srcAttribute.Value?.ToString() ?? string.Empty)
+                    && (await _mediaRepository.GetMediaItemFromUrl(srcAttribute.Value?.ToString() ?? string.Empty)).TryGetValue(out var mediaItem)) {
+                    _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, mediaItem, "src", ImageProfiles);
+                }
             }
         }
     }
@@ -86,10 +100,10 @@ namespace Core.TagHelpers
 
             var styleDictionary = _mediaTagHelperService.GetStyleDictionary(output);
             if (
-                styleDictionary.TryGetValue("background-image", out var bgImage) 
-                && (bgImage ?? "").IsMediaOrContentItemUrl()
-                && (await _mediaRepository.GetMediaItemFromUrl(bgImage ?? "")).TryGetValue(out var mediaItem)) {
-                _mediaTagHelperService.HandleBackgroundImageProfiles(output, mediaItem, bgImage ?? "", ImageProfiles);
+                styleDictionary.TryGetValue("background-image", out var bgImage)
+                && _mediaTagHelperService.GetImageUrlFromBackgroundStyle(bgImage?.ToString() ?? "").TryGetValue(out var url)
+                && (await _mediaRepository.GetMediaItemFromUrl(url)).TryGetValue(out var mediaItem)) {
+                _mediaTagHelperService.HandleBackgroundImageProfiles(output, mediaItem, url, ImageProfiles);
             }
         }
     }
@@ -105,12 +119,12 @@ namespace Core.TagHelpers
         {
             base.Process(context, output);
 
-            if(output.Attributes.TryGetAttribute("srcset", out var attribute) &&
+            if (output.Attributes.TryGetAttribute("srcset", out var attribute) &&
                 (await _mediaRepository.GetMediaItemFromUrl(attribute.Value?.ToString() ?? string.Empty)).TryGetValue(out var mediaItem)) {
                 _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, mediaItem, "srcset", Array.Empty<ImageProfile>());
             }
         }
     }
 
-    
+
 }

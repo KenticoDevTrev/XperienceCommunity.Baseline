@@ -62,9 +62,11 @@ StartupConfigs.RegisterGzipAndCacheControls(builder);
 
 var app = builder.Build();
 
-StartupConfigs.RegisterBaselineCoreMiddleware(app);
+StartupConfigs.RegisterBaselineCoreMiddlewareStart(app);
 
 StartupConfigs.RegisterDotNetCoreConfigurationsAndKentico(app, builder);
+
+StartupConfigs.RegisterBaselineCoreMiddlewareEnd(app);
 
 // BASELINE CUSTOMIZATION - Starting Site - If you wish to use session, enable below
 // StartupConfigs.UseSession(app);

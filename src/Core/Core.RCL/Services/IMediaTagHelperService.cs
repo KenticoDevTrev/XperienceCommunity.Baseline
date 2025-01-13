@@ -49,5 +49,12 @@ namespace Core.Services
         /// <param name="height"></param>
         /// <returns></returns>
         string ReplaceWidthHeightOnSource(string url, int width, int height);
+
+        /// <summary>
+        /// Gets the value in the url('') of a background tag
+        /// </summary>
+        /// <param name="backgroundStyleValue"></param>
+        /// <returns></returns>
+        Result<string> GetImageUrlFromBackgroundStyle(string backgroundStyleValue);
     }
 }

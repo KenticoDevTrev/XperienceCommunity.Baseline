@@ -17,6 +17,7 @@ using Core.Installers;
 using Microsoft.AspNetCore.Builder;
 using MVC.NewFolder;
 using PartialWidgetPage;
+using XperienceCommunity.ImageProcessing;
 
 namespace Core
 {
@@ -32,6 +33,8 @@ namespace Core
         /// <param name="contentItemTaxonomyOptionsConfiguration">Configures what Taxonomy fields exist by content type, needed for the various Page Category retrieval and parsing</param>
         /// <param name="relationshipsExtendedOptionsConfiguration">Configures the Relationships Extended tool that is used by the Baseline</param>
         /// <param name="metaDataOptionsConfiguration">Configures the Metadata retrieval logic that is used by the Baseline</param>
+        /// <param name="imageProcessingOptionsConfiguration">Configures XperienceCommunity.ImageProcessing</param>
+        /// <param name="imageTagHelperOptionsConfiguration">Configures ImageTagHelper.cs img parsing</param>
         /// <param name="persistantStorageConfiguration">Configures the cookies for either TempData, Session, or neither.
         /// 
         /// Should specify this if you plan on using the IModelStateService for Post-Redirect-Get or anything regarding TempData or Session.
@@ -46,6 +49,8 @@ namespace Core
             Action<ContentItemTaxonomyOptions>? contentItemTaxonomyOptionsConfiguration = null,
             Action<RelationshipsExtendedOptions>? relationshipsExtendedOptionsConfiguration = null,
             Action<MetadataOptions>? metaDataOptionsConfiguration = null,
+            Action<ImageProcessingOptions>? imageProcessingOptionsConfiguration = null,
+            Action<MediaTagHelperOptions>? imageTagHelperOptionsConfiguration = null,
             IPersistantStorageConfiguration? persistantStorageConfiguration = null
             ) where TUser : ApplicationUser, new()
         {
@@ -66,6 +71,10 @@ namespace Core
             metaDataOptionsConfiguration?.Invoke(metadataOptions);
             services.AddSingleton(metadataOptions);
 
+            var mediaTagHelperOptions = new MediaTagHelperOptions();
+            imageTagHelperOptionsConfiguration?.Invoke(mediaTagHelperOptions);
+            services.AddSingleton(mediaTagHelperOptions);
+
             // XperienceCommunity.DevTools.RelationshipsExtended
             services.AddRelationshipsExtended((configuration) => {
                 configuration.AllowContentItemCategories = true;
@@ -80,6 +89,11 @@ namespace Core
 
             // Used by Tabs and Navigation modules
             services.AddPartialWidgetPage();
+
+            // XperienceCommunity.ImageProcessing
+            var imageProcessingOptions = new ImageProcessingOptions() { ProcessContentItemAssets = true, ProcessMediaLibrary = true };
+            imageProcessingOptionsConfiguration?.Invoke(imageProcessingOptions);
+            services.AddSingleton(imageProcessingOptions);
 
             services
                 // Largely Only dependent upon Kentico's APIs

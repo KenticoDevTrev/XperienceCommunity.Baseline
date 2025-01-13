@@ -333,11 +333,11 @@ namespace Core.Repositories.Implementation
 
             var language = _languageRepository.LanguageIdToName(fileItem.ContentItemCommonDataContentLanguageID);
 
-            var permanentUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}{metaData.Extension}?language={language}";
-            var directUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}{metaData.Extension}?language={language}";
+            var permanentUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}?language={language}";
+            var directUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}?language={language}";
             //var directUrl = $"/assets/contentitems/{fileItem.ContentItemGUID.ToString()[..2]}/{attachmentFieldGuid}/{metaData.Identifier}{metaData.Extension}".ToLower();
 
-            var mediaItem = new MediaItem(fileItem.ContentItemGUID, metaData.Name, title, metaData.Extension, directUrl, permanentUrl) {
+            var mediaItem = new MediaItem(new ContentItemMediaIdentifiers(fileItem.ContentItemGUID, assetField.FieldGuid, assetField.AssetFieldName, metaData.Identifier, language), metaData.Name, title, metaData.Extension, directUrl, permanentUrl) {
                 MediaDescription = description
             };
 

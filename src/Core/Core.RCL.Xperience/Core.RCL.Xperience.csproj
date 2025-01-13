@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+	  <PackageReference Include="XperienceCommunity.ImageProcessing" Version="1.1.1" />
 	  <PackageReference Include="XperienceCommunity.PartialWidgetPage" Version="30.0.2" />
 	</ItemGroup>
 

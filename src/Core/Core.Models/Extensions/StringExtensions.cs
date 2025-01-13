@@ -11,7 +11,7 @@ namespace System
         /// <returns></returns>
         public static Result<Guid> ParseGuidFromMediaUrl(this string mediaUrl)
         {
-            var splitMedia = mediaUrl.Trim('~').Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            var splitMedia = mediaUrl.Trim('~').Split('?')[0].Split('#')[0].Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             if (splitMedia.Length >= 2 && Guid.TryParse(splitMedia[1], out var mediaGuid))
             {
                 return mediaGuid;
@@ -26,7 +26,7 @@ namespace System
         /// <returns></returns>
         public static Result<AssetUrlGuids> ParseGuidFromAssetUrl(this string mediaUrl)
         {
-            var splitMedia = mediaUrl.Trim('~').Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            var splitMedia = mediaUrl.Trim('~').Split('?')[0].Split('#')[0].Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             if (splitMedia.Length >= 3 && Guid.TryParse(splitMedia[1], out var contentItemGuid) && Guid.TryParse(splitMedia[2], out var fieldGuid)) {
                 return new AssetUrlGuids(contentItemGuid, fieldGuid);
             }
