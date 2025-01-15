@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace MVC.NewFolder
+namespace MVC.Middleware
 {
     public class PageBuilderModelStateClearer(RequestDelegate next)
     {

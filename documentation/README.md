@@ -31,5 +31,6 @@ Likewise, some features listed in this documentation are only in the Xperience b
   - [User Context and Customization](core-user.md)
   - [Media Retrieval](core-media-retrieval.md)
   - [Media Tag Helpers](core-media-taghelpers.md)
-  - MetaData System
+  - [MetaData System](core-metadata.md)
   - [Link Accessibility](core-link-accessibility.md)
+  - [Url Redirect](core-redirect.md)

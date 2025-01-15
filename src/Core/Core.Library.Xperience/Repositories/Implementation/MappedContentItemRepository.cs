@@ -24,6 +24,7 @@ namespace Core.Repositories.Implementation
         {
             var lookups = await LookupToContentType();
             var classToLookup = await ClassIDToLookupInfo();
+            var webIdLookup = await GetContentToWebpageLookups();
             var lookupInfo = Maybe<ContentItemLookupInfo>.None;
             var websiteChannelID = Maybe<int>.None;
             var contentItemId = Maybe<int>.None;
@@ -40,6 +41,9 @@ namespace Core.Repositories.Implementation
                 contentItemGuid = guid;
                 websiteChannelID = classByGuid.WebsiteChannelID;
                 builder.ContentItem(guid);
+                if(webIdLookup.ContentItemGuidToWebPageGuid.TryGetValue(guid, out var webpageGuid)) {
+                    builder.WebPage(webpageGuid);
+                }
             } else if (
                   (identity.ContentID.TryGetValue(out var id) || (await identity.GetOrRetrieveContentID(_identityService)).TryGetValue(out id))
                 && lookups.ByContentId.TryGetValue(id, out var classById)
@@ -48,6 +52,9 @@ namespace Core.Repositories.Implementation
                 contentItemId = id;
                 websiteChannelID = classById.WebsiteChannelID;
                 builder.ContentItem(id);
+                if (webIdLookup.ContentItemIDToWebPageID.TryGetValue(id, out var webpageId)) {
+                    builder.WebPage(webpageId);
+                }
             }
 
             if (!lookupInfo.TryGetValue(out var lookupInfoVal)) {
@@ -113,7 +120,7 @@ namespace Core.Repositories.Implementation
         {
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(["contentitem|all"]);
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(["contentitem|all", "webpageitem|all"]);
                 }
                 var contentItemToClassIDQuery = @$"select ContentItemID, ContentItemGUID, ContentItemContentTypeID, WebPageItemWebsiteChannelID from CMS_ContentItem 
 left join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID
@@ -152,6 +159,25 @@ where ContentItemContentTypeID is not null";
                 return classLookup;
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "ContentItemRepository_ClassIDToLookupInfo"));
         }
+
+        private async Task<ContentToWebpageIdentifiers> GetContentToWebpageLookups()
+        {
+            return await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = CacheHelper.GetCacheDependency("webpageitem|all");
+                }
+
+                var results = await (new DataQuery() { CustomQueryText = @"select ContentItemID, ContentItemGUID, WebPageItemID, WebPageItemGUID from CMS_WebPageItem
+ inner join CMS_ContentItem on ContentItemID = WebPageItemContentItemID" }).GetDataContainerResultAsync();
+
+                return new ContentToWebpageIdentifiers(
+                    ContentItemIDToWebPageID: results.ToDictionary(key => (int)key.GetValue(nameof(ContentItemFields.ContentItemID)), value => (int)value.GetValue(nameof(WebPageFields.WebPageItemID))),
+                    ContentItemGuidToWebPageGuid: results.ToDictionary(key => (Guid)key.GetValue(nameof(ContentItemFields.ContentItemGUID)), value => (Guid)value.GetValue(nameof(WebPageFields.WebPageItemGUID)))
+                );
+            }, new CacheSettings(CacheMinuteTypes.Long.ToDouble(), "GetContentToWebpageLookups"));
+        }
+
+        private record ContentToWebpageIdentifiers(Dictionary<int, int> ContentItemIDToWebPageID, Dictionary<Guid, Guid> ContentItemGuidToWebPageGuid);
 
         private record ContentItemDictionaryHolder(Dictionary<int, ClassAndWebsiteChannel> ByContentId, Dictionary<Guid, ClassAndWebsiteChannel> ByContentGuid);
 

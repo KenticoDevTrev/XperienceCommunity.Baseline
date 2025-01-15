@@ -78,7 +78,7 @@ namespace Core.Repositories.Implementation
         {
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([$"contentitem|all", "webpageitem|all"]);
                 }
                 var query = $"select {nameof(ContentItemInfo.ContentItemID)}, {nameof(ContentItemInfo.ContentItemGUID)}, {nameof(ContentItemInfo.ContentItemName)}, {nameof(ContentItemInfo.ContentItemContentTypeID)} from CMS_ContentItem where {nameof(ContentItemInfo.ContentItemContentTypeID)} is not null";
                 var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
@@ -99,7 +99,7 @@ namespace Core.Repositories.Implementation
         {
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([$"contentitem|all", "webpageitem|all"]);
                 }
                 var query = $"select {nameof(ContentItemCommonDataInfo.ContentItemCommonDataID)}, {nameof(ContentItemCommonDataInfo.ContentItemCommonDataGUID)}, {nameof(ContentItemCommonDataInfo.ContentItemCommonDataContentItemID)} from CMS_ContentItemCommonData";
                 var results = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();

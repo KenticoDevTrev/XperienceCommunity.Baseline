@@ -615,7 +615,7 @@ namespace Core.Repositories.Implementation
             // not going to add to global scope as this is only for translating existing data.
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(["contentitem|all"]);
+                    cs.CacheDependency = CacheHelper.GetCacheDependency(["contentitem|all", "webpageitem|all"]);
                 }
                 var query = @$"SELECT {nameof(WebPageFields.WebPageItemID)},{nameof(WebPageFields.WebPageItemGUID)},{nameof(WebPageFields.WebPageItemName)},{nameof(WebPageFields.WebPageItemTreePath)},WebPageItemWebsiteChannelID,WebPageItemContentItemID FROM CMS_WebPageItem
             inner join CMS_ContentItem on ContentItemID = WebPageItemContentItemID";

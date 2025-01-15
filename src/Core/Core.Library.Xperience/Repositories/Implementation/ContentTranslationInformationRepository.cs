@@ -20,6 +20,7 @@ namespace Core.Repositories.Implementation
                 if (cs.Cached) {
                     cs.CacheDependency = CacheHelper.GetCacheDependency([
                         $"contentitem|all",
+                        $"webpageitem|all",
                         $"{ContentLanguageInfo.OBJECT_TYPE}|all"
                         ]);
                 }

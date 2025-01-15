@@ -4,7 +4,7 @@ using System.Web;
 
 namespace Core.Services.Implementation
 {
-    public class MediaTagHelperService(IMediaRepository mediaRepository,
+    public partial class MediaTagHelperService(IMediaRepository mediaRepository,
         MediaTagHelperOptions mediaTagHelperOptions) : IMediaTagHelperService
     {
         private readonly IMediaRepository _mediaRepository = mediaRepository;
@@ -197,19 +197,16 @@ namespace Core.Services.Implementation
             }
         }
 
-        private string GetMimeType(string extension)
-        {
-            return extension.ToLower().Trim('.') switch {
-                "png" => "image/png",
-                "jpg" or "jpeg" => "image/jpeg",
-                "gif" => "image/gif",
-                "apng" => "image/apng",
-                "svg" => "image/svg+xml",
-                "webp" => "image/webp",
-                "avif" => "image/avif",
-                _ => $"image/{extension.Trim('.').ToLower()}"
-            };
-        }
+        private static string GetMimeType(string extension) => extension.ToLower().Trim('.') switch {
+            "png" => "image/png",
+            "jpg" or "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
+            "apng" => "image/apng",
+            "svg" => "image/svg+xml",
+            "webp" => "image/webp",
+            "avif" => "image/avif",
+            _ => $"image/{extension.Trim('.').ToLower()}"
+        };
 
         private bool IsSupportedDynamicType(string extenstion)
         {
@@ -246,7 +243,7 @@ namespace Core.Services.Implementation
         public Result<string> GetImageUrlFromBackgroundStyle(string backgroundStyleValue)
         {
             // We now have our value to parse
-            var getMediaUrl = Regex.Match(backgroundStyleValue, @"^url\([ '""]{0,1}((.*))['""]{0,1}\)");
+            var getMediaUrl = BackgroundUrlRegex().Match(backgroundStyleValue);
 
             if (!getMediaUrl.Success || getMediaUrl.Groups.Count < 2) {
                 return Result.Failure<string>("Url not proper or found");
@@ -255,5 +252,8 @@ namespace Core.Services.Implementation
             // Second group should be the URL
             return getMediaUrl.Groups[1].Value.TrimEnd('\'').TrimEnd('"').TrimStart('~');
         }
+
+        [GeneratedRegex(@"^url\([ '""]{0,1}((.*))['""]{0,1}\)")]
+        private static partial Regex BackgroundUrlRegex();
     }
 }

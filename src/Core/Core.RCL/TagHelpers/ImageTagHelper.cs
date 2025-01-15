@@ -3,12 +3,12 @@
 namespace Core.TagHelpers
 {
     [HtmlTargetElement("img", Attributes = "bl-media")]
-    public class ImageTagHelper(IMediaRepository mediaRepository) : TagHelper
+    public class ImageTagHelper() : TagHelper
     {
-        private readonly IMediaRepository _mediaRepository = mediaRepository;
-
         public override int Order => -20;
-        public MediaItem? blMedia { get; set; }
+
+        [HtmlAttributeName("bl-media")]
+        public MediaItem? Media { get; set; }
 
         [HtmlAttributeName("bl-image-profiles")]
         public IEnumerable<ImageProfile> ImageProfiles { get; set; } = [];
@@ -16,7 +16,7 @@ namespace Core.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             base.Process(context, output);
-            if (blMedia.TryGetValue(out var mediaItem)) {
+            if (Media.TryGetValue(out var mediaItem)) {
                 output.Attributes.SetAttribute("src", mediaItem.MediaPermanentUrl);
                 output.Attributes.AddorReplaceEmptyAttribute("alt", mediaItem.MediaDescription.GetValueOrDefault(mediaItem.MediaTitle));
                 output.Attributes.Add("data-media-item", mediaItem);

@@ -15,9 +15,10 @@ using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Http;
 using Core.Installers;
 using Microsoft.AspNetCore.Builder;
-using MVC.NewFolder;
 using PartialWidgetPage;
 using XperienceCommunity.ImageProcessing;
+using MVC.Middleware;
+using Core.Middleware;
 
 namespace Core
 {
@@ -195,5 +196,18 @@ namespace Core
         {
             return app.UseMiddleware<PageBuilderModelStateClearer>();
         }
+
+        /// <summary>
+        /// Registers Core Baseline Middleware
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseCoreBaselineEnd(this IApplicationBuilder app)
+        {
+            return app.UseXperienceCommunityImageProcessing()
+                .UseMiddleware<BaseRedirectMiddleware>();
+        }
+
+
     }
 }

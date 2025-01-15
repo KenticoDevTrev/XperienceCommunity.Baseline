@@ -485,7 +485,7 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
         /// <returns></returns>
         private async Task<Result<ContentIdentityBaseDataDictionary>> GetContentIdentityBaseDataDictionary()
         {
-            var builder = _cacheDependencyBuilderFactory.Create(false).AddKey("contentitem|all");
+            var builder = _cacheDependencyBuilderFactory.Create(false).AddKeys(["contentitem|all", "webpageitem|all"]);
 
             if (!builder.DependenciesNotTouchedSince(TimeSpan.FromSeconds(30)))
             {
@@ -496,7 +496,7 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
             {
                 if (cs.Cached)
                 {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency($"contentitem|all");
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([$"contentitem|all", "webpageitem|all"]);
                 }
 
                 // To optimize, performing 3 queries in a single call, these are collecting only the essential information, no duplicates of data except the ContentItemID references
@@ -564,7 +564,7 @@ select WebPageItemContentItemID, WebPageItemID, WebPageItemGUID, WebPageItemName
             return _progressiveCache.Load(cs =>
             {
                 var builder = _cacheDependencyBuilderFactory.Create(false)
-                    .AddKey("contentitem|all");
+                    .AddKeys(["contentitem|all", "webpageitem|all"]);
 
                 if (cs.Cached)
                 {

@@ -281,6 +281,9 @@ Generic.BaseInheritedPage and Generic.RedirectOnlyInheritedPage",
             fieldPageInternalRedirectPage.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Internal URL");
             fieldPageInternalRedirectPage.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldPageInternalRedirectPage.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+            fieldPageInternalRedirectPage.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>PageRedirectionType</PropertyName><Value>Internal</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
+
+
 
             if (fieldExistingPageInternalRedirectPage != null) {
                 contentItemCommonDataForm.UpdateFormField(nameof(IBaseRedirect.PageInternalRedirectPage), fieldPageInternalRedirectPage);
@@ -299,13 +302,14 @@ Generic.BaseInheritedPage and Generic.RedirectOnlyInheritedPage",
             fieldPageExternalRedirectURL.Enabled = true;
             fieldPageExternalRedirectURL.Visible = true;
             fieldPageExternalRedirectURL.Guid = Guid.Parse("3adfa20c-b5a3-4c4a-838e-54192743e35e");
-            fieldPageExternalRedirectURL.SetComponentName("Kentico.Administration.Link");
-            fieldPageExternalRedirectURL.Settings["OpenInNewTab"] = "True";
+            fieldPageExternalRedirectURL.SetComponentName("Kentico.Administration.TextInput");
 
             fieldPageExternalRedirectURL.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "External URL");
             fieldPageExternalRedirectURL.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
             fieldPageExternalRedirectURL.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldPageExternalRedirectURL.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+            fieldPageExternalRedirectURL.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>PageRedirectionType</PropertyName><Value>External</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
+
 
             if (fieldExistingPageExternalRedirectURL != null) {
                 contentItemCommonDataForm.UpdateFormField(nameof(IBaseRedirect.PageExternalRedirectURL), fieldPageExternalRedirectURL);
@@ -330,6 +334,8 @@ Generic.BaseInheritedPage and Generic.RedirectOnlyInheritedPage",
             fieldPageFirstChildClassName.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
             fieldPageFirstChildClassName.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldPageFirstChildClassName.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+            fieldPageFirstChildClassName.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>PageRedirectionType</PropertyName><Value>FirstChild</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
+
 
             if (fieldExistingPageFirstChildClassName != null) {
                 contentItemCommonDataForm.UpdateFormField(nameof(IBaseRedirect.PageFirstChildClassName), fieldPageFirstChildClassName);
@@ -353,6 +359,7 @@ Generic.BaseInheritedPage and Generic.RedirectOnlyInheritedPage",
             fieldPageUsePermanentRedirects.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
             fieldPageUsePermanentRedirects.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldPageUsePermanentRedirects.Properties["kxp_schema_identifier"] = schemaGuid.ToString().ToLower();
+            fieldPageUsePermanentRedirects.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.NotEqualsString</Identifier><Properties><PropertyName>PageRedirectionType</PropertyName><Value>None</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
 
             if (fieldExistingPageUsePermanentRedirects != null) {
                 contentItemCommonDataForm.UpdateFormField(nameof(IBaseRedirect.PageUsePermanentRedirects), fieldPageUsePermanentRedirects);
