@@ -9,6 +9,9 @@ namespace Navigation.TagHelpers
 
     public class NavigationItemNavReferenceTagHelper : TagHelper
     {
+
+        public override int Order => -10;
+
         [HtmlAttributeName("bl-navigation-item")]
         public NavigationItem? NavigationItem { get; set; }
 

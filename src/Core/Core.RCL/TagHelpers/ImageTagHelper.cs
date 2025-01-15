@@ -1,9 +1,4 @@
-﻿using Core.Models;
-using Core.Repositories;
-using Core.Services;
-using CSharpFunctionalExtensions;
-using Kentico.Content.Web.Mvc.Routing;
-using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Core.TagHelpers
 {
@@ -12,7 +7,7 @@ namespace Core.TagHelpers
     {
         private readonly IMediaRepository _mediaRepository = mediaRepository;
 
-        public override int Order => -2;
+        public override int Order => -20;
         public MediaItem? blMedia { get; set; }
 
         [HtmlAttributeName("bl-image-profiles")]
@@ -49,7 +44,7 @@ namespace Core.TagHelpers
         [HtmlAttributeName("bl-image-profiles")]
         public IEnumerable<ImageProfile> ImageProfiles { get; set; } = [];
 
-        public override int Order => -1;
+        public override int Order => -10;
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             await base.ProcessAsync(context, output);
@@ -80,11 +75,9 @@ namespace Core.TagHelpers
 
     [HtmlTargetElement("*", Attributes = "bl-background-image-profiles")]
     public class BackgroundMediaTagHelper(IMediaRepository mediaRepository,
-        IPreferredLanguageRetriever preferredLanguageRetriever,
         IMediaTagHelperService mediaTagHelperService) : TagHelper
     {
         private readonly IMediaRepository _mediaRepository = mediaRepository;
-        private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IMediaTagHelperService _mediaTagHelperService = mediaTagHelperService;
 
         [HtmlAttributeName("bl-background-image-profiles")]
@@ -121,7 +114,7 @@ namespace Core.TagHelpers
 
             if (output.Attributes.TryGetAttribute("srcset", out var attribute) &&
                 (await _mediaRepository.GetMediaItemFromUrl(attribute.Value?.ToString() ?? string.Empty)).TryGetValue(out var mediaItem)) {
-                _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, mediaItem, "srcset", Array.Empty<ImageProfile>());
+                _mediaTagHelperService.HandleMediaItemProfilesAndMetaData(output, mediaItem, "srcset", []);
             }
         }
     }

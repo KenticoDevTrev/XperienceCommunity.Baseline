@@ -43,12 +43,14 @@ namespace MVC
             });
 
             // Baseline services
-            services.UseCoreBaseline(
-                // TODO: Add once nuget package updated
-                /*persistantStorageConfiguration: new TempDataCookiePersistantStorageConfiguration("TEMPDATA", (configurations) => {
+            services.AddCoreBaseline<ApplicationUser, User>(
+                persistantStorageConfiguration: new TempDataCookiePersistantStorageConfiguration("TEMPDATA", (configurations) => {
                     // Configure TempData Cookie
-                }*/
-                );
+                }),
+                imageTagHelperOptionsConfiguration: (options) => {
+                    // Image tag helper options
+                }
+            );
 
             // Relationships Extended
             services.AddSingleton<IRelationshipExtendedHelper, RelationshipsExtendedHelper>();

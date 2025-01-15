@@ -13,14 +13,11 @@ namespace Core.Repositories.Implementation
         IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IProgressiveCache progressiveCache,
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
-        ICacheRepositoryContext cacheRepositoryContext,
         IUrlResolver urlResolver,
         IIdentityService identityService,
         ILanguageRepository languageFallbackRepository,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext,
-        IContentQueryExecutor contentQueryExecutor,
-        ISiteRepository siteRepository,
         IMappedContentItemRepository mappedContentItemRepository
         ) : IPageContextRepository
     {
@@ -28,14 +25,11 @@ namespace Core.Repositories.Implementation
         private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
-        private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly IIdentityService _identityService = identityService;
         private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
-        private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
-        private readonly ISiteRepository _siteRepository = siteRepository;
         private readonly IMappedContentItemRepository _mappedContentItemRepository = mappedContentItemRepository;
 
         public async Task<Result<PageIdentity>> GetCurrentPageAsync() => _webPageDataContextRetriever.TryRetrieve(out var data) ? await GetPageInternal(data.WebPage.WebPageItemID, data.WebPage.LanguageName) : Result.Failure<PageIdentity>("There is no current webpage context");
@@ -122,7 +116,7 @@ namespace Core.Repositories.Implementation
                     );
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetPageIdentityByWebpageIdAndLanguage"));
         }
-        private string _baseQuery = @"
+        private readonly string _baseQuery = @"
 select 
 ContentItemLanguageMetadataDisplayName,
 MetaData_PageName,
@@ -181,7 +175,7 @@ where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
                 return Result.Failure<PageIdentity<T>>(error);
             }
 
-            if (!(await mappedContentItemRepository.GetContentItem(pageIdentity.ContentIdentity, pageIdentity.Culture)).TryGetValue(out var fullPageModel, out var modelError)) {
+            if (!(await _mappedContentItemRepository.GetContentItem(pageIdentity.ContentIdentity, pageIdentity.Culture)).TryGetValue(out var fullPageModel, out var modelError)) {
                 return Result.Failure<PageIdentity<T>>(modelError);
             }
 

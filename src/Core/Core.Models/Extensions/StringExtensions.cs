@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using System.Web;
 
 namespace System
 {
-    public static class StringExtensions
+    public static partial class StringExtensions
     {
         /// <summary>
         /// Tries to get the Guid value from `/getmedia/GUID/etc` or `/getattachment/GUID` Urls
@@ -83,6 +84,13 @@ namespace System
             var langItem = queryItems.Where(x => x.StartsWith("language", StringComparison.OrdinalIgnoreCase));
             return langItem.FirstOrMaybe().TryGetValue(out var langItemVal) && langItemVal.Contains('=') ? langItemVal.Split('=')[1].AsNullOrWhitespaceMaybe() : Maybe.None;
         }
+
+        /// <summary>
+        /// Removes HTML Tags from a string
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static string RemoveHtmlTags(this string html) => HtmlTagRegex().Replace(HttpUtility.HtmlDecode(html), string.Empty);
 
         /// <summary>
         /// Returns a Maybe.None if the string is null or whitespace
@@ -171,5 +179,8 @@ namespace System
             }
             return clean;
         }
+
+        [GeneratedRegex("<.+?>")]
+        private static partial Regex HtmlTagRegex();
     }
 }

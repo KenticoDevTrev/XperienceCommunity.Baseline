@@ -18,7 +18,6 @@ namespace Core.Repositories.Implementation
         IIdentityService identityService,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IContentItemMediaMetadataQueryEditor contentItemMediaMetadataQueryEditor,
-        ContentItemAssetOptions contentItemAssetOptions,
         MediaFileOptions mediaFileOptions,
         IContentQueryExecutor contentQueryExecutor,
         ICacheRepositoryContext cacheRepositoryContext,
@@ -39,7 +38,6 @@ namespace Core.Repositories.Implementation
         private readonly IIdentityService _identityService = identityService;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IContentItemMediaMetadataQueryEditor _contentItemMediaMetadataQueryEditor = contentItemMediaMetadataQueryEditor;
-        private readonly ContentItemAssetOptions _contentItemAssetOptions = contentItemAssetOptions;
         private readonly MediaFileOptions _mediaFileOptions = mediaFileOptions;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
