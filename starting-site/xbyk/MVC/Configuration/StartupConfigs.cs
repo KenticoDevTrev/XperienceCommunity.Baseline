@@ -277,12 +277,12 @@ namespace MVC.Configuration
                     // If Installing the Starting Site Media is true, these are the configurations
                     options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.Image", [
                         new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("ImageFile", Core.Enums.ContentItemAssetMediaType.Image, "ImageTitle", "ImageDescription")
-                    ], preCache: true));
+                    ], PreCache: true));
 
 
                     options.ContentItemConfigurations.Add(new ContentItemAssetOptions.ContentItemWithAssetsConfiguration("Generic.File", [
                         new ContentItemAssetOptions.AssetFieldIdentifierConfiguration("FileFile", Core.Enums.ContentItemAssetMediaType.File, "FileTitle", "FileDescription")
-                    ], preCache: true));
+                    ], PreCache: true));
 
                     /* Less used, you can uncomment out if you wish along with the AddStartingSiteElements options */
                     /*

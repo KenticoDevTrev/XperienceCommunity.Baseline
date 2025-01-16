@@ -7,17 +7,11 @@ using Core.Middleware;
 
 namespace MVC
 {
-    public class Startup
+    public class Startup(IWebHostEnvironment environment, IConfiguration configuration)
     {
-        public IWebHostEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; } = environment;
 
-        public IConfiguration Configuration { get; }
-
-        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
-        {
-            Environment = environment;
-            Configuration = configuration;
-        }
+        public IConfiguration Configuration { get; } = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940

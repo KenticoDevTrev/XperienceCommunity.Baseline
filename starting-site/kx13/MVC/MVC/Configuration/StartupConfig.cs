@@ -33,14 +33,14 @@ namespace MVC
         {
             // MVC Caching
             services.AddMVCCaching();
-            services.AddMVCCachingAutoDependencyInjectionByAttribute(new Assembly[]
-            {
+            services.AddMVCCachingAutoDependencyInjectionByAttribute(
+            [
                 typeof(StartupConfig).Assembly,
                 typeof(Site.Models.AssemblyInfo).Assembly,
                 typeof(Site.Library.KX13.AssemblyInfo).Assembly,
                 typeof(Site.Library.AssemblyInfo).Assembly,
                 typeof(Site.Components.AssemblyInfo).Assembly,
-            });
+            ]);
 
             // Baseline services
             services.AddCoreBaseline<ApplicationUser, User>(
@@ -87,7 +87,7 @@ namespace MVC
             {
                 // Can configure
             });
-            services.AddValidatorsFromAssemblies(new Assembly[] { typeof(Startup).Assembly });
+            services.AddValidatorsFromAssemblies([typeof(Startup).Assembly]);
 
             // Widget Filters
             services.AddWidgetFilter();

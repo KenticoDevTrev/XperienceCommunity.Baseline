@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL" Version="2.4.0" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>
