@@ -33,7 +33,6 @@ Below are some Xperience by Kentico only Repositories and services.  Most are us
 - [IContentItemReferenceService](../../src/Core/Core.Library.Xperience/Repositories/IContentItemReferenceService.cs): Can retrieve the original Content Item GUID array from a selector (instead of the parsed model).
 - [ICustomTaxonomyFieldParser](../../src/Core/Core.Library.Xperience/Repositories/ICustomTaxonomyFieldParser.cs): Takes the Taxonomy Field for the given data container and converts them to ObjectIdentity, used internally mainly.
 - [IMetaDataWebPageDataContainerConverter](../../src/Core/Core.Library.Xperience/Repositories/IMetaDataWebPageDataContainerConverter.cs): Used mainly internally to get the Page Metadata from an IWebPageContentQueryDataContainer, but may be useful for other applications such as listing pages and such.
--
 
 ## Other Extension Methods
 
