@@ -91,12 +91,6 @@ Below are some Xperience by Kentico only Repositories and services.  Most are us
   - `In_____Identity/In_____Identities`: Handles a single or array of Identity objects and sets the proper Where Conditions
   - `Path`: Adds the Path filter to the ContentTypeQueryParameters query.
 
-## Special Models
-
-These models are utility models.
-
-- [DTOWithPermissions](../../src/Core/Core.Library.Xperience/Models/DTOWithPermissions.cs): Wrapper 
-
 ## Enums
 
 [**CacheMinuteTypes**](../../src/Core/Core.Models/Enums/CacheMinuteTypes.cs): Provides some standard caching types, that you can call and use the `.ToTimeSpan()` or `.ToDouble()` when leveraging for your Cache Durations.  
