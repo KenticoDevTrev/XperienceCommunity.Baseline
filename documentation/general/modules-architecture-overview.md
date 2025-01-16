@@ -72,7 +72,7 @@ Along with the above, there will be Libraries which are Kentico Specific
 The Baseline also comes with a Starting Site that follows a similar structure.  Keep in mind that the amount of separation of concerns that mimics the Baseline structure is more important to Kentico Xperience 13 (so you can keep as much Kentico Agnostic for the upgrade) than necessarily for Xperience by Knentico.  However, it is still roughly easier to do test and such using Kentico Agnostic items (although Xperience's Model system is designed to be easy to fake and test).
 
 
-![image](images/KX13-XbyK-Structure.png)
+![image](../images/KX13-XbyK-Structure.png)
 
 *In the image above, The arrows show what they reference, not what references them.*
 
