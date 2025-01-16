@@ -202,7 +202,7 @@ While in the baseline, this is more tied in with the Starter Site, but the Basel
 
 For performance, Google wants you to cache files for a very, very long time, especially CSS and Javascript files, and use gzip when possible.
 
-[The front end dev system](../front-end-development.md) already handles bundling and gzipping, but you often need to enable this functionality.
+[The front end dev system](../general/front-end-development.md) already handles bundling and gzipping, but you often need to enable this functionality.
 
 the `IServiceCollection.UseGzipAndCacheControlFileHandling()` does two things:
 

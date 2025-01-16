@@ -16,7 +16,7 @@ You can use this by configuring the route:
 
 ## Customize Views
 
-You will want to customize the views, simply use the [standard customization point](../customization-points.md) and place your own views in these locations:
+You will want to customize the views, simply use the [standard customization point](../general/customization-points.md) and place your own views in these locations:
 
 - /Features/HttpErrors/Error404.cshtml
 - /Features/HttpErrors/AccessDenied.cshtml

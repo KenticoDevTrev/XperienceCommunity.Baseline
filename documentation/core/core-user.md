@@ -14,7 +14,7 @@ Kentico provides documentation on how to [add fields to your Member object](http
 
 The Baseline User Model contains a `Maybe<IUserMetadata> MetaData` property which is used as a catch all for any customizations you wish to do.  This is where you should store and retreive these custom fields.
 
-You do this in the service [IBaselineUserMapper.cs](../../src/Core/Core.Library.Xperience/Services/IBaselineUserMapper.cs) that has a default [implementation](../../src/Core/Core.Library.Xperience/Services/Implementation/BaselineUserMapper.cs), that you can [override](../customization-points.md).  In here you can use type-checking to retrieve and parse additional information to the `MetaData` property (and from the MetaData to the ApplicationUser for saving).  This is how you can add additional properties and fields for your purposes.
+You do this in the service [IBaselineUserMapper.cs](../../src/Core/Core.Library.Xperience/Services/IBaselineUserMapper.cs) that has a default [implementation](../../src/Core/Core.Library.Xperience/Services/Implementation/BaselineUserMapper.cs), that you can [override](../general/customization-points.md).  In here you can use type-checking to retrieve and parse additional information to the `MetaData` property (and from the MetaData to the ApplicationUser for saving).  This is how you can add additional properties and fields for your purposes.
 
 ### ApplicationUserBaseline
 

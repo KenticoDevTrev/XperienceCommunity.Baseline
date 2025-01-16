@@ -25,7 +25,7 @@ This functionality may eventually be configurable in Xperience by Kentico (in wh
 
 ## OptimizedPictureTagHelper
 
-If you have any image that is static (part of the template, not in Xperience by Kentico), the [FrontEndDev](../front-end-development.md) system has an optimization workflow that takes any images in the `/images/source` location, and creates optimized versions of them.
+If you have any image that is static (part of the template, not in Xperience by Kentico), the [FrontEndDev](../general/front-end-development.md) system has an optimization workflow that takes any images in the `/images/source` location, and creates optimized versions of them.
 
 To leverage, if you add the `bl-optimize` attribute to your image tag, it will check if the image URL starts with `/images/source` and if so, will automatically convert it to a `picture` tag with `sources` for the optimized versions, so browsers can select the more optimized element.
 

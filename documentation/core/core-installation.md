@@ -17,7 +17,7 @@ npm install XperienceCommunity.Baseline.Core.RCL.Xperience
 npm install XperienceCommunity.Baseline.Core.Admin.Xperience
 ```
 
-Please see [the detailed overview of all nuget packages and dependencies](../modules-architecture-overview.md) if you wish to install packages on other projects.
+Please see [the detailed overview of all nuget packages and dependencies](../general/modules-architecture-overview.md) if you wish to install packages on other projects.
 
 ## 2. CI/CD Addition
 

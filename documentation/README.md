@@ -11,12 +11,12 @@ Likewise, some features listed in this documentation are only in the Xperience b
 
 ## Overviews
 
-- [The Baseline Story](baseline-story.md) - It's origin and evolution
-- [Modules and Architecture Overview](modules-architecture-overview.md) 
-- [General Customization Points](customization-points.md)
-- [Design Patterns](design-patterns.md)
-- [Front End Development (CSS, JS, Images)](front-end-development.md)
-- [Caching Systems](caching-systems.md)
+- [The Baseline Story](general/baseline-story.md) - It's origin and evolution
+- [Modules and Architecture Overview](general/modules-architecture-overview.md) 
+- [General Customization Points](general/customization-points.md)
+- [Design Patterns](general/design-patterns.md)
+- [Front End Development (CSS, JS, Images)](general/front-end-development.md)
+- [Caching Systems](general/caching-systems.md)
 
 ## Core Module
 

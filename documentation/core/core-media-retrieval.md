@@ -42,7 +42,7 @@ The Media Metadata is filled through one of two interfaces:
 `IContentItemMediaMetadataQueryEditor` (Customizes the query to retrieve additional fields)
 `IContentItemMediaCustomizer` (Build custom `IMediaMetadata`for Content Item Assets)
 
-You can overwrite these using [normal Implementation Override](../customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
+You can overwrite these using [normal Implementation Override](../general/customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
 
 In order to get 
 
