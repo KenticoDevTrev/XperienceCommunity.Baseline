@@ -138,9 +138,9 @@ There is an `MediaTagHelperOptions` that you can set the MediaTagHelperOptions i
 
 For an image that is 400 pixels wide:
 
-1 = 100%, 400 pixels wide and image set to be 400 pixels wide.
-1.25 = 125%, 500 pixels wide rendered but image set to be 400 pixels wide.
-1.5 = 150%, 600 pixel wide rendered but image set to be 400 pixels wide.
+- 1 = 100%, 400 pixels wide and image set to be 400 pixels wide.
+- 1.25 = 125%, 500 pixels wide rendered but image set to be 400 pixels wide.
+- 1.5 = 150%, 600 pixel wide rendered but image set to be 400 pixels wide.
 
 There are other options you can set in the `MediaTagHelperOptions`, including disabling this functionality all together on the img tags, and also controlling what image extensions support dynamic resizing.
 
