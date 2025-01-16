@@ -30,9 +30,9 @@ The `Account` module hookup requires you to set the `TUser` and `TRole` types, a
 
 Some models have an optional property which is intended for you to store any customization models you wish.  
 
-The [PageIdentity](../src/Core/Core.Models/Models/PageIdentity.cs) has a Generic version which exposes a `T Data` property, so you can append any data you wish to the PageIdentity that you pass along (such as data from the Page's model itself).  
+The [PageIdentity](../../src/Core/Core.Models/Models/PageIdentity.cs) has a Generic version which exposes a `T Data` property, so you can append any data you wish to the PageIdentity that you pass along (such as data from the Page's model itself).  
 
-The [User](../src/Core/Core.Models/Models/User.cs) class has an `public Maybe<IUserMetadata> MetaData {get; init;} = Maybe.None;` which you can fill with any class that inherits the `IUserMetadata` (an empty interface).  This allows you to extend the model without creating your own.
+The [User](../../src/Core/Core.Models/Models/User.cs) class has an `public Maybe<IUserMetadata> MetaData {get; init;} = Maybe.None;` which you can fill with any class that inherits the `IUserMetadata` (an empty interface).  This allows you to extend the model without creating your own.
 
 ## View Overrides
 

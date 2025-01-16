@@ -18,11 +18,11 @@ Here are the Identity Types:
 To create an Identity, you often are doing one of two things:
 
 1. Converting a static value (int, Guid, string) to an Identity
-    - Use the [ToObjectIdentityHelper Extensions](../src/Core/Core.Models/Extensions/ToObjectIdentityHelper.cs) or [ToContentAndContentCultureIdentityHelper Extensions](../src/Core/Core.Models/Extensions/ToContentAndContentCultureIdentityHelper.cs)
+    - Use the [ToObjectIdentityHelper Extensions](../../src/Core/Core.Models/Extensions/ToObjectIdentityHelper.cs) or [ToContentAndContentCultureIdentityHelper Extensions](../../src/Core/Core.Models/Extensions/ToContentAndContentCultureIdentityHelper.cs)
 2. Converting an existing Identity of one type to another
     - Use the Extension Methods on the various Identity classes that allow you to convert from one to another.
 3. Converting an existing object to one type or another
-    - Use the Constructor Methods on the Identity fields.  You can have your property inherit from [IObjectIdentity](../src/Core/Core.Models/Interfaces/IObjectIdentity.cs) an implement the `ToObjectIdentity` method to help.
+    - Use the Constructor Methods on the Identity fields.  You can have your property inherit from [IObjectIdentity](../../src/Core/Core.Models/Interfaces/IObjectIdentity.cs) an implement the `ToObjectIdentity` method to help.
 
 ## IIdentityService
 
@@ -43,5 +43,5 @@ if (!(await contentItem.GetOrRetrieveContentGuid(_identityService)).TryGetValue(
 
 ## Comparison
 
-There is an [ObjectIdentityComparer](../src/Core/Core.Library/Comparers/ObjectIdentityComparer.cs) which can be used to compare two ObjectIdentities
+There is an [ObjectIdentityComparer](../../src/Core/Core.Library/Comparers/ObjectIdentityComparer.cs) which can be used to compare two ObjectIdentities
 

@@ -12,10 +12,10 @@ Or, if you find an Article, if the property `BannerUrl` is a `Maybe<string>`, it
 
 It also has various extension methods to help make coding a little easier:
 
-- [IEnumerableExtensions](../src/Core/Core.Models/Extensions/IEnumerableExtensions.cs)
+- [IEnumerableExtensions](../../src/Core/Core.Models/Extensions/IEnumerableExtensions.cs)
   - `FirstOrMaybe()`: is a shortcut for `if(MyArray.Any()) { var first = MyArray.First(); }`
   - `WithEmptyAsNone()`: is similar to FirstOrMaybe() but handles null arrays safetly.
-- [MaybeExtensions](../src/Core/Core.Models/Extensions/MaybeExtensions.cs)
+- [MaybeExtensions](../../src/Core/Core.Models/Extensions/MaybeExtensions.cs)
   - `AdMaybeStatic`: sometimes the normal AsMaybe() is blocked due to out parameters or linking, it will make a static copy of the value)
   - `AsNullableValue`: Converts `Maybe<T>` to a nullable value (useful in serialization)
   - `GetValueOrDefault`: Adds the `Maybe<T>.GetValueOrDefault` functionality to normal nullable values (so you don't need to parse to maybe first).
@@ -27,6 +27,6 @@ It also has various extension methods to help make coding a little easier:
   - `AsMaybeIfTrue`: Returns a `Maybe.None` if the condition is false that you provide it.
   - `GetValueOrMaybe`: Wrapper for `Dictionary.TryGetValue`, returning a `Maybe.None` if not found
   - `TryGetValue<T, TSpecificValType>`: Allows you to return a property from the given value if it's found, using a function.  Useful when the `Maybe<T>` is on a parent type, and you really want to get a property within, so you don't need to do sub-parsing.
-- [ResultExtensions](../src/Core/Core.Models/Extensions/ResultExtensions.cs)
+- [ResultExtensions](../../src/Core/Core.Models/Extensions/ResultExtensions.cs)
   - `AsMaybeIfSuccessful`: Converts a `Result<T>` to a `Maybe<T>` based on if it's successful
 

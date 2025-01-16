@@ -23,7 +23,7 @@ This system solves the problems of Cache Context by:
 
 ## Custom Vary By (Site and Culture)
 
-The two main areas you'll want to vary your caches by are the current Language (culture), and if you do multi-site, the current site.  The Baseline has the [CustomVaryByMiddleware](../src/Core/Core.RCL/Middleware/CustomVaryByMiddleware.cs) which adds two headers (x-culture and x-site) with the proper values.
+The two main areas you'll want to vary your caches by are the current Language (culture), and if you do multi-site, the current site.  The Baseline has the [CustomVaryByMiddleware](../../src/Core/Core.RCL/Middleware/CustomVaryByMiddleware.cs) which adds two headers (x-culture and x-site) with the proper values.
 
 The Culture is derived from the `System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0]` which should set itself properly in either Xperience by Kentico or Kentico Xperience 13.
 

@@ -8,7 +8,7 @@ The Baseline uses the [Features Folder](https://learn.microsoft.com/en-us/archiv
 
 As part of Feature Folders, some like the system to automatically divine where a view is based on the class name conventions, being in a feature folder, etc.  This can be done partially through the `services.AddMvc(o => o.Conventions.Add(new FeatureConvention()))`, and you can additionally configure it if you wish.
 
-Or, If you wish you can implement and leverage your own [IViewLocationExpander](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.razor.iviewlocationexpander?view=aspnetcore-8.0) and configure as you wish. (The Baseline has an optional [CustomLocationExpander](../src/Core/Core.RCL/Middleware/CustomLocationExpander.cs) that you can call on your `IServiceCollection.UseFeatureFoldersAndLocationExpansions` to do this).
+Or, If you wish you can implement and leverage your own [IViewLocationExpander](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.razor.iviewlocationexpander?view=aspnetcore-8.0) and configure as you wish. (The Baseline has an optional [CustomLocationExpander](../../src/Core/Core.RCL/Middleware/CustomLocationExpander.cs) that you can call on your `IServiceCollection.UseFeatureFoldersAndLocationExpansions` to do this).
 
 ***HOWEVER***, you can simply do what I do and put in the full path, and not have to worry about any of that.  ex:
 

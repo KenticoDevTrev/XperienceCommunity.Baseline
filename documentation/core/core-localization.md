@@ -6,6 +6,6 @@ Kentico Xperience 13 uses the [XperienceCommunity.Localizer](https://www.nuget.o
 
 This integrates with the normal `IStringLocalizer` and `IHtmlLocalizer` so you can use both `.resx` files as well as Key + Translations defined in the Kentico Admin.
 
-There is also extension methods for both the [IHtmlLocalizer](../src/Core/Core.Library.Xperience/Extensions/IHtmlLocalizerExtensions.cs) (`GetHtmlStringOrDefault`) and [IStringLocalizer](../src/Core/Core.Library.Xperience/Extensions/IStringLocalizerExtensions.cs) (`GetStringOrDefault`) which allow you to put a default value if the given localization key is neither found in the resx nor in Kentico.
+There is also extension methods for both the [IHtmlLocalizer](../../src/Core/Core.Library.Xperience/Extensions/IHtmlLocalizerExtensions.cs) (`GetHtmlStringOrDefault`) and [IStringLocalizer](../../src/Core/Core.Library.Xperience/Extensions/IStringLocalizerExtensions.cs) (`GetStringOrDefault`) which allow you to put a default value if the given localization key is neither found in the resx nor in Kentico.
 
 Language fallbacks are honored, and Kentico translation takes priority over resx translations.

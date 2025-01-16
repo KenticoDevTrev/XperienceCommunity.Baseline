@@ -318,7 +318,7 @@ namespace MVC.Configuration
                 })
             );
 
-            /// BASELINE CUSTOMIZATION - Starting Site - Add your own Page metadata Converter here
+            /// BASELINE CUSTOMIZATION - Core - Add your own Page metadata Converter here
             builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
         }
 
@@ -354,8 +354,6 @@ namespace MVC.Configuration
             // XperienceCommunity.DevTools.MVCCaching
             // builder.Services.AddMVCCaching() added in AddCoreBaseline()
             builder.Services.AddMVCCachingAutoDependencyInjectionByAttribute();
-
-
 
             // Optional - Add up IUrlHelper if you wish to use it
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -695,7 +693,7 @@ namespace MVC.Configuration
 
         public static void RegisterBaselineCoreMiddlewareEnd(WebApplication app)
         {
-            app.UseXperienceCommunityImageProcessing();
+            app.UseCoreBaselineEnd();
         }
     }
 }

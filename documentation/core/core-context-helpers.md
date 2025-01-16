@@ -32,3 +32,5 @@ The starter site uses the [XperienceCommunity.DevTools.PageBuilderTagHelpers](ht
   <div>widget placeholder!</div>
 </page-data-context>
 ```
+
+If you are not using the starter site, you can install and use these yourself.

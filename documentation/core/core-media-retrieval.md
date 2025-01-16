@@ -42,11 +42,11 @@ The Media Metadata is filled through one of two interfaces:
 `IContentItemMediaMetadataQueryEditor` (Customizes the query to retrieve additional fields)
 `IContentItemMediaCustomizer` (Build custom `IMediaMetadata`for Content Item Assets)
 
-You can overwrite these using [normal Implementation Override](customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
+You can overwrite these using [normal Implementation Override](../customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
 
 In order to get 
 
 ## IMediaRepository
 
-The `IMediaRepository` class provides easy helpers to get Content Item Assets and Media Files by their GUID identifier.  This is useful especially if you parse the Guid from a Media URL (see [StringExtensions.ParseGuidFrom____Url](../src/Core/Core.Models/Extensions/StringExtensions.cs)), you can get the MediaItem and it's metadata.
+The `IMediaRepository` class provides easy helpers to get Content Item Assets and Media Files by their GUID identifier.  This is useful especially if you parse the Guid from a Media URL (see [StringExtensions.ParseGuidFrom____Url](../../src/Core/Core.Models/Extensions/StringExtensions.cs)), you can get the MediaItem and it's metadata.
 
