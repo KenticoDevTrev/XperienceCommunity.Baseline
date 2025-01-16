@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace Core.TagHelpers
 {
     [HtmlTargetElement("a", TagStructure = TagStructure.NormalOrSelfClosing)]
-    public class LinkTagHelper(IStringLocalizer<SharedResources> stringLocalizer) : TagHelper
+    public partial class LinkTagHelper(IStringLocalizer<SharedResources> stringLocalizer) : TagHelper
     {
         private readonly IStringLocalizer<SharedResources> _stringLocalizer = stringLocalizer;
 
@@ -48,7 +48,7 @@ namespace Core.TagHelpers
                     // Telephone Links
                     else if (hrefVal.StartsWith("tel:", StringComparison.OrdinalIgnoreCase)) {
                         var dialText = _stringLocalizer.GetStringOrDefault("link.adaphone", "Dial Phone Number");
-                        if (Regex.IsMatch(linkTextHtml, ".*[0-9]{3}.*")) {
+                        if (TelephoneRegex().IsMatch(linkTextHtml)) {
                             linkTextNoHtml = $"{dialText} {linkTextNoHtml}";
                             contentPrefixHtml = $"<span class=\"sr-only\">{dialText}</span> ";
                         } else {
@@ -71,11 +71,13 @@ namespace Core.TagHelpers
                         }
                     } else {
                         // general links, anchor or not
+                        #pragma warning disable CA1866 // Use char overload - Doesn't work for # for some reason
                         if (hrefVal.StartsWith("#")) {
                             if (noLinkTextNorTitle) {
                                 linkTextNoHtml = $"{_stringLocalizer.GetStringOrDefault("link.adagenericanchor", "jump to section")} {hrefVal.Trim('#')}";
                             }
                         } else {
+                        #pragma warning restore CA1866 // Use char overload
                             if (noLinkTextNorTitle) {
                                 linkTextNoHtml = $"{_stringLocalizer.GetStringOrDefault("link.adagenericlink", "go to url")} {hrefVal}";
                             }
@@ -95,6 +97,9 @@ namespace Core.TagHelpers
             output.Attributes.AddorReplaceEmptyAttribute("role", ariaRole);
             output.Attributes.AddorReplaceEmptyAttribute("aria-label", linkTextNoHtml);
         }
+
+        [GeneratedRegex(".*[0-9]{3}.*")]
+        private static partial Regex TelephoneRegex();
     }
 
     [HtmlTargetElement("a", Attributes = "[bl-render-as-button]", TagStructure = TagStructure.NormalOrSelfClosing)]

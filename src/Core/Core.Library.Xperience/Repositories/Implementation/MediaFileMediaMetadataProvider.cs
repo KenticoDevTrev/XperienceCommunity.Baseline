@@ -27,7 +27,7 @@ namespace Core.Repositories.Implementation
                             )
                         );
                         var element = doc.XPathSelectElement("svg");
-                        if (doc != null && doc.Root != null && doc.Root.Attributes().Where(x => x.Name.LocalName.Equals("viewBox", StringComparison.OrdinalIgnoreCase)).FirstOrMaybe().TryGetValue(out var viewBox)) {
+                        if (doc != null && doc.Root != null && doc.Root.Attributes().Where(x => x.Name.LocalName.Equals("viewBox", StringComparison.OrdinalIgnoreCase)).TryGetFirst(out var viewBox)) {
                             var splitVals = viewBox.Value.Split(' ');
                             if (splitVals.Length == 4
                                 && int.TryParse(splitVals[0], out var widthStart)

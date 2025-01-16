@@ -40,3 +40,8 @@ if (!(await contentItem.GetOrRetrieveContentGuid(_identityService)).TryGetValue(
 }
 // I now have contentItemGuid value
 ```
+
+## Comparison
+
+There is an [ObjectIdentityComparer](../src/Core/Core.Library/Comparers/ObjectIdentityComparer.cs) which can be used to compare two ObjectIdentities
+

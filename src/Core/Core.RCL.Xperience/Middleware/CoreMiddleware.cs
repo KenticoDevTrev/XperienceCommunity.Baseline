@@ -205,7 +205,8 @@ namespace Core
         public static IApplicationBuilder UseCoreBaselineEnd(this IApplicationBuilder app)
         {
             return app.UseXperienceCommunityImageProcessing()
-                .UseMiddleware<BaseRedirectMiddleware>();
+                .UseMiddleware<BaseRedirectMiddleware>()
+                .UseCustomVaryByHeaders();
         }
 
 

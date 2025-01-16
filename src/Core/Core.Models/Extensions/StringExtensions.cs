@@ -82,7 +82,7 @@ namespace System
             }
             var queryItems = src.Split('?')[0].Split('&', StringSplitOptions.RemoveEmptyEntries);
             var langItem = queryItems.Where(x => x.StartsWith("language", StringComparison.OrdinalIgnoreCase));
-            return langItem.FirstOrMaybe().TryGetValue(out var langItemVal) && langItemVal.Contains('=') ? langItemVal.Split('=')[1].AsNullOrWhitespaceMaybe() : Maybe.None;
+            return langItem.TryGetFirst(out var langItemVal) && langItemVal.Contains('=') ? langItemVal.Split('=')[1].AsNullOrWhitespaceMaybe() : Maybe.None;
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace System
         /// <returns></returns>
         public static string ToAttributeId(this string text)
         {
-            var clean = Regex.Replace(text.Replace(" ", "-"), "[^a-zA-Z0-9-_]", "").ToLower();
+            var clean = CleanHtmlRegex().Replace(text.Replace(" ", "-"), "").ToLower();
             if (clean.Length > 0 && !char.IsLetter(clean[0]))
             {
                 return "id-" + clean;
@@ -182,5 +182,7 @@ namespace System
 
         [GeneratedRegex("<.+?>")]
         private static partial Regex HtmlTagRegex();
+        [GeneratedRegex("[^a-zA-Z0-9-_]")]
+        private static partial Regex CleanHtmlRegex();
     }
 }

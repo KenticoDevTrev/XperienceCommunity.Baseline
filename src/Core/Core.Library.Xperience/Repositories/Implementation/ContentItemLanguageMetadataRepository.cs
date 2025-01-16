@@ -3,20 +3,20 @@
 namespace Core.Repositories.Implementation
 {
     public class ContentItemLanguageMetadataRepository(ICacheRepositoryContext cacheRepositoryContext,
-        ILanguageRepository languageRepository,
         IProgressiveCache progressiveCache,
-        IInfoProvider<ContentItemLanguageMetadataInfo> contentItemLanguageMetadataInfoProvider) : IContentItemLanguageMetadataRepository
+        IInfoProvider<ContentItemLanguageMetadataInfo> contentItemLanguageMetadataInfoProvider,
+        ILanguageIdentifierRepository languageIdentifierRepository) : IContentItemLanguageMetadataRepository
     {
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
-        private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IInfoProvider<ContentItemLanguageMetadataInfo> _contentItemLanguageMetadataInfoProvider = contentItemLanguageMetadataInfoProvider;
+        private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
         public Task<Result<ContentItemLanguageMetadataSummary>> GetOptimizedContentItemLanguageMetadata(IContentQueryDataContainer contentItem, bool? webPagesOnly = null, bool? published = null) => GetOptimizedContentItemLanguageMetadataInternal(contentItem.ContentItemID, contentItem.ContentItemCommonDataContentLanguageID, webPagesOnly ?? false, published.GetValueOrDefault(!_cacheRepositoryContext.PreviewEnabled()));
 
         public Task<Result<ContentItemLanguageMetadataSummary>> GetOptimizedContentItemLanguageMetadata(IContentItemFieldsSource contentItem, bool? webPagesOnly = null, bool? published = null) => GetOptimizedContentItemLanguageMetadataInternal(contentItem.SystemFields.ContentItemID, contentItem.SystemFields.ContentItemCommonDataContentLanguageID, webPagesOnly ?? false, published.GetValueOrDefault(!_cacheRepositoryContext.PreviewEnabled()));
         
-        public Task<Result<ContentItemLanguageMetadataSummary>> GetOptimizedContentItemLanguageMetadata(int contentItemID, string languageCode, bool? webPagesOnly = null, bool? published = null) => GetOptimizedContentItemLanguageMetadataInternal(contentItemID, _languageRepository.LanguageNameToId(languageCode), webPagesOnly ?? false, published.GetValueOrDefault(!_cacheRepositoryContext.PreviewEnabled()));
+        public Task<Result<ContentItemLanguageMetadataSummary>> GetOptimizedContentItemLanguageMetadata(int contentItemID, string languageCode, bool? webPagesOnly = null, bool? published = null) => GetOptimizedContentItemLanguageMetadataInternal(contentItemID, _languageIdentifierRepository.LanguageNameToId(languageCode), webPagesOnly ?? false, published.GetValueOrDefault(!_cacheRepositoryContext.PreviewEnabled()));
         
         public Task<Result<ContentItemLanguageMetadataSummary>> GetOptimizedContentItemLanguageMetadata(int contentItemID, int languageId, bool? webPagesOnly = null, bool? published = null) => GetOptimizedContentItemLanguageMetadataInternal(contentItemID, languageId, webPagesOnly ?? false, published.GetValueOrDefault(!_cacheRepositoryContext.PreviewEnabled()));
 

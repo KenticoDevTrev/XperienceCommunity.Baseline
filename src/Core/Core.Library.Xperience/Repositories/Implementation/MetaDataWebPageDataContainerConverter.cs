@@ -8,7 +8,6 @@ namespace Core.Repositories.Implementation
 {
     public class MetaDataWebPageDataContainerConverter(IContentItemReferenceService contentItemReferenceService,
         IClassContentTypeAssetConfigurationRepository classContentTypeAssetConfigurationRepository,
-        IContentItemAssetUrlProvider contentItemAssetUrlProvider,
         IProgressiveCache progressiveCache,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
         ILanguageIdentifierRepository languageIdentifierRepository,
@@ -19,7 +18,6 @@ namespace Core.Repositories.Implementation
     {
         private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
         private readonly IClassContentTypeAssetConfigurationRepository _classContentTypeAssetConfigurationRepository = classContentTypeAssetConfigurationRepository;
-        private readonly IContentItemAssetUrlProvider _contentItemAssetUrlProvider = contentItemAssetUrlProvider;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
         private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
@@ -51,7 +49,7 @@ namespace Core.Repositories.Implementation
                     keywords = metaDataKeywords;
                     dataFound = true;
                 }
-                if (_contentItemReferenceService.GetContentItemReferences(webPageContentQueryData, nameof(IBaseMetadata.MetaData_OGImage)).FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
+                if (_contentItemReferenceService.GetContentItemReferences(webPageContentQueryData, nameof(IBaseMetadata.MetaData_OGImage)).TryGetFirst(out var metaDataSmall)) {
                     // Get class name based on the ContentItemGuid
                     if ((await _contentTypeRetriever.GetContentType(metaDataSmall.Identifier.ToContentIdentity())).TryGetValue(out var contentType)
                         && (await _classContentTypeAssetConfigurationRepository.GetClassNameToContentTypeAssetConfigurationDictionary()).TryGetValue(contentType.ToLowerInvariant(), out var configurations)) {
@@ -73,7 +71,7 @@ namespace Core.Repositories.Implementation
                     dataFound = true;
                 }
                 var translations = await _contentTranslationInformationRepository.GetWebpageTranslationSummaries(webPageContentQueryData.WebPageItemID, webPageContentQueryData.WebPageItemWebsiteChannelID);
-                if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageIdentifierRepository.LanguageIdToName(webPageContentQueryData.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).FirstOrMaybe().TryGetValue(out var properItem)) {
+                if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageIdentifierRepository.LanguageIdToName(webPageContentQueryData.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).TryGetFirst(out var properItem)) {
                     url = properItem.Url;
                 } else {
                     url = $"/{webPageContentQueryData.WebPageUrlPath}";

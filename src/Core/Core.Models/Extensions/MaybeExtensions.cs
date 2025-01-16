@@ -209,7 +209,7 @@
             }
             else
             {
-                value = Array.Empty<T>();
+                value = [];
                 return false;
             }
         }

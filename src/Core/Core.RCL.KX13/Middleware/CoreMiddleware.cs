@@ -6,7 +6,7 @@ using Kentico.Membership;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using MVC.NewFolder;
+using MVC.Middleware;
 using Logger = Core.Services.Implementation.Logger;
 
 namespace Core

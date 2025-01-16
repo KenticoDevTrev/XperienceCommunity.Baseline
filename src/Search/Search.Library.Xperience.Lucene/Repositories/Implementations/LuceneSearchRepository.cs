@@ -11,6 +11,7 @@ using Search.Library.Xperience.Lucene.Services;
 using Search.Library.Xperience.Lucene.Services.Implementations;
 using Search.Models;
 using XperienceCommunity.MemberRoles.Interfaces;
+using XperienceCommunity.MemberRoles.Models;
 using XperienceCommunity.MemberRoles.Services;
 
 namespace Search.Repositories.Implementations
@@ -38,8 +39,8 @@ namespace Search.Repositories.Implementations
         private async Task<SearchResponse> SearchInternalMultipleIndexes(string searchValue, IEnumerable<string> indexes, int page, int pageSize)
         {
             int MAX_RESULTS = 1000;
-            var combinedItems = new List<DTOWithPermissions<CombinedDocWithScoreAndIndex>>();
-            var indexDocIdKeyToDoc = new Dictionary<string, DTOWithPermissions<Document>>();
+            var combinedItems = new List<DTOWithMemberPermissionConfiguration<CombinedDocWithScoreAndIndex>>();
+            var indexDocIdKeyToDoc = new Dictionary<string, DTOWithMemberPermissionConfiguration<Document>>();
             int totalHits = 0;
             foreach (var indexName in indexes) {
                 var index = _luceneIndexManager.GetIndex(indexName);
@@ -51,7 +52,7 @@ namespace Search.Repositories.Implementations
                 combinedItems.AddRange( _luceneSearchService.UseSearcher(index, (searcher) => {
                     var results = searcher.Search(query, MAX_RESULTS);
                     totalHits += results.TotalHits;
-                    var items = new List<DTOWithPermissions<CombinedDocWithScoreAndIndex>>();
+                    var items = new List<DTOWithMemberPermissionConfiguration<CombinedDocWithScoreAndIndex>>();
                     foreach(var scoreDoc in results.ScoreDocs) {
                         items.Add(ToCombinedDocWithScoreAndIndexWithPermissions(new CombinedDocWithScoreAndIndex(searcher.Doc(scoreDoc.Doc), scoreDoc, indexName)));
                     }
@@ -111,14 +112,14 @@ namespace Search.Repositories.Implementations
 
         }
 
-        private static DTOWithPermissions<CombinedDocWithScoreAndIndex> ToCombinedDocWithScoreAndIndexWithPermissions(CombinedDocWithScoreAndIndex CombinedItem)
+        private static DTOWithMemberPermissionConfiguration<CombinedDocWithScoreAndIndex> ToCombinedDocWithScoreAndIndexWithPermissions(CombinedDocWithScoreAndIndex CombinedItem)
         {
             var Doc = CombinedItem.Doc;
-            return new DTOWithPermissions<CombinedDocWithScoreAndIndex>(
+            return new DTOWithMemberPermissionConfiguration<CombinedDocWithScoreAndIndex>(
                 Model: CombinedItem,
-                MemberPermissionOverride: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionOverride)), out bool overrideValue) ? overrideValue : false,
+                MemberPermissionOverride: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionOverride)), out bool overrideValue) && overrideValue,
                 ContentID: int.TryParse(Doc.Get(nameof(ContentItemFields.ContentItemID)), out var contentItemID) ? contentItemID : 0,
-                MemberPermissionIsSecure: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionIsSecure)), out bool secureValue) ? secureValue : false,
+                MemberPermissionIsSecure: bool.TryParse(Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionIsSecure)), out bool secureValue) && secureValue,
                 MemberPermissionRoleTags: (Doc.Get(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionRoleTags)) ?? "").Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
                 );
         }

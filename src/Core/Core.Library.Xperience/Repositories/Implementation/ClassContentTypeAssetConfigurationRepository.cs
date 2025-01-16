@@ -41,7 +41,7 @@ namespace Core.Repositories.Implementation
                 foreach(var type in typeToFieldToGuid.Keys) {
                     var assetFieldIdentifiers = new List<AssetFieldIdentifierWithType>();
                     var assetOptionConfig = _contentItemAssetOptions.ContentItemConfigurations.FirstOrMaybe(x => x.ClassName.Equals(type, StringComparison.OrdinalIgnoreCase));
-                    var fieldConfigDictionary = assetOptionConfig.TryGetValue(out var config) ? config.AssetFieldIdentifierConfigurations.ToDictionary(key => key.AssetFieldName.ToLowerInvariant(), value => value) : new Dictionary<string, ContentItemAssetOptions.AssetFieldIdentifierConfiguration>();
+                    var fieldConfigDictionary = assetOptionConfig.TryGetValue(out var config) ? config.AssetFieldIdentifierConfigurations.ToDictionary(key => key.AssetFieldName.ToLowerInvariant(), value => value) : [];
                     foreach(var fieldName in typeToFieldToGuid[type].Keys) {
                         if(fieldConfigDictionary.TryGetValue(fieldName.ToLowerInvariant(), out var assetFieldConfig)) {
                             assetFieldIdentifiers.Add(
@@ -65,7 +65,7 @@ namespace Core.Repositories.Implementation
                                );
                         }
                     }
-                    configuration.TryAdd(type.ToLowerInvariant(), new ContentTypeAssetConfigurations(assetFieldIdentifiers, assetOptionConfig.TryGetValue(out var configVal) && configVal.preCache));
+                    configuration.TryAdd(type.ToLowerInvariant(), new ContentTypeAssetConfigurations(assetFieldIdentifiers, assetOptionConfig.TryGetValue(out var configVal) && configVal.PreCache));
                 }
                 return configuration;
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetClassNameToFieldNameToAssetFieldIdentifierDictionary"));

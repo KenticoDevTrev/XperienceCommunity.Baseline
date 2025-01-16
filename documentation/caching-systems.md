@@ -20,3 +20,20 @@ This system solves the problems of Cache Context by:
 3. Has an easy way to convert your `ICacheDependencyBuilder` to the `CMSCacheDependency` required on the `CacheDependency` parameter
 4. Has a `DTOWithDependencies` class that allows you to return your results **with an array of dependencies** so you can pass any dependencies found within your `IProgressiveCache` outside, and add it to the `ICacheDependencyScope` through the `ICacheDependencyBuilder.AppendDTOWithDependencies` extension
 5. Allows for easy begin and end context of the dependency keys through `ICacheDependencyScope.Begin()` and `string[] ICacheDependencyScope.End()` to pass to your `<cache-dependency>` or `<cache-dependency-mvc>` tag helper within your `<cache>` tag.
+
+## Custom Vary By (Site and Culture)
+
+The two main areas you'll want to vary your caches by are the current Language (culture), and if you do multi-site, the current site.  The Baseline has the [CustomVaryByMiddleware](../src/Core/Core.RCL/Middleware/CustomVaryByMiddleware.cs) which adds two headers (x-culture and x-site) with the proper values.
+
+The Culture is derived from the `System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0]` which should set itself properly in either Xperience by Kentico or Kentico Xperience 13.
+
+The site is just from the normal Site Context.
+
+You can leverage these then by using the vary-by-headers using the CustomVaryByHeaders.SiteVaryBy(), CustomVaryByHeaders.CultureSiteVaryBy(), and CustomVaryByHeaders.CultureVaryBy()
+
+```html
+<cache vary-by-header=@($"{CustomVaryByHeaders._CULTURE_},MyCustomHeaderVaryBy")></cache>
+<cache vary-by-header=@CustomVaryByHeaders.CultureSiteVaryBy()></cache>
+```
+
+You can also use mine as a template to create your own.

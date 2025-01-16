@@ -16,12 +16,10 @@ namespace Core.Repositories.Implementation
         ICacheRepositoryContext cacheRepositoryContext,
         IProgressiveCache progressiveCache,
         MetadataOptions metadataOptions,
-        ILanguageRepository languageRepository,
         IContentTranslationInformationRepository contentTranslationInformationRepository,
         IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
-        IMediaRepository mediaRepository,
-        IContentItemReferenceService contentItemReferenceService,
-        IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter) : IMetaDataRepository
+        IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter,
+        ILanguageIdentifierRepository languageIdentifierRepository) : IMetaDataRepository
     {
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
@@ -30,12 +28,10 @@ namespace Core.Repositories.Implementation
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly MetadataOptions _metadataOptions = metadataOptions;
-        private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly IContentTranslationInformationRepository _contentTranslationInformationRepository = contentTranslationInformationRepository;
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
-        private readonly IMediaRepository _mediaRepository = mediaRepository;
-        private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
+        private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
         // TODO: Revamp this to use a Mapped result of IBaseMetaData using the Content Mapper, i made it more complicated not knowing
         // that you could return a mapped Interface and get it's containing data :( 
@@ -63,7 +59,7 @@ namespace Core.Repositories.Implementation
                 }, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
             }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", treeCultureIdentity.GetCacheKey(), _metadataOptions.MaxLinkedLevelsRetrievedForMetadata));
 
-            if (results.FirstOrMaybe().TryGetValue(out var webPageResult)) {
+            if (results.TryGetFirst(out var webPageResult)) {
                 return await GetMetaDataInternalAsync(webPageResult, thumbnail);
             }
             return Result.Failure<PageMetaData>("No webpage found by that tree culture identity");
@@ -101,7 +97,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
                 var idToTree = new Dictionary<int, TreeCultureIdentity>();
                 var guidToTree = new Dictionary<Guid, TreeCultureIdentity>();
                 foreach (var row in results.Tables[0].Rows.Cast<DataRow>()) {
-                    var identity = new TreeCultureIdentity(_languageRepository.LanguageIdToName((int)row["ContentItemLanguageMetadataContentLanguageID"])) {
+                    var identity = new TreeCultureIdentity(_languageIdentifierRepository.LanguageIdToName((int)row["ContentItemLanguageMetadataContentLanguageID"])) {
                         PageID = (int)row[nameof(WebPageFields.WebPageItemID)]
                     };
                     idToTree.TryAdd((int)row["ContentItemLanguageMetadataID"], identity);
@@ -144,7 +140,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             // Handle canonical url
             if (canonicalUrlValue.GetValueOrDefault(string.Empty).AsNullOrWhitespaceMaybe().HasNoValue) {
                 var translations = await _contentTranslationInformationRepository.GetWebpageTranslationSummaries(node.WebPageItemID, node.WebPageItemWebsiteChannelID);
-                if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageRepository.LanguageIdToName(node.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).FirstOrMaybe().TryGetValue(out var properItem)) {
+                if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageIdentifierRepository.LanguageIdToName(node.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).TryGetFirst(out var properItem)) {
                     canonicalUrlValue = properItem.Url;
                 } else {
                     canonicalUrlValue = $"/{node.WebPageUrlPath}";

@@ -25,8 +25,8 @@ namespace Core.Repositories.Implementation
         ILanguageRepository languageFallbackRepository,
         IPageContextRepository pageContextRepository,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
-        ILanguageRepository languageRepository,
-        IClassContentTypeAssetConfigurationRepository classContentTypeAssetConfigurationRepository) : IMediaRepository
+        IClassContentTypeAssetConfigurationRepository classContentTypeAssetConfigurationRepository,
+        ILanguageIdentifierRepository languageIdentifierRepository) : IMediaRepository
     {
 
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
@@ -45,14 +45,14 @@ namespace Core.Repositories.Implementation
         private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
-        private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly IClassContentTypeAssetConfigurationRepository _classContentTypeAssetConfigurationRepository = classContentTypeAssetConfigurationRepository;
+        private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
         #region "Content Items"
 
-        public async Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, Guid assetFieldGuid, string? language = null) => (await GetContentItemAssetsInternal([contentItem], Maybe.None, assetFieldGuid, language)).FirstOrMaybe().TryGetValue(out var firstResult) ? firstResult : Result.Failure<MediaItem>("Could not find asset given the information");
+        public async Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, Guid assetFieldGuid, string? language = null) => (await GetContentItemAssetsInternal([contentItem], Maybe.None, assetFieldGuid, language)).TryGetFirst(out var firstResult) ? firstResult : Result.Failure<MediaItem>("Could not find asset given the information");
 
-        public async Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, string assetFieldName, string? language = null) => (await GetContentItemAssetsInternal([contentItem], assetFieldName, Maybe.None, language)).FirstOrMaybe().TryGetValue(out var firstResult) ? firstResult : Result.Failure<MediaItem>("Could not find asset given the information");
+        public async Task<Result<MediaItem>> GetContentItemAsset(ContentIdentity contentItem, string assetFieldName, string? language = null) => (await GetContentItemAssetsInternal([contentItem], assetFieldName, Maybe.None, language)).TryGetFirst(out var firstResult) ? firstResult : Result.Failure<MediaItem>("Could not find asset given the information");
 
         public Task<IEnumerable<MediaItem>> GetContentItemAssets(IEnumerable<ContentIdentity> contentItems, string? language = null) => GetContentItemAssetsInternal(contentItems, Maybe.None, Maybe.None, language);
 
@@ -98,7 +98,7 @@ namespace Core.Repositories.Implementation
         public async Task<Result<MediaItem>> GetContentItemLanguageMetadataAsset(int? contentItemMetadataId, Guid assetFieldGuid)
         {
             if ((await GetContentIdentityAndLanguage(contentItemMetadataId)).TryGetValue(out var identityAndLanguage)) {
-                return (await GetContentItemAssetsInternal([identityAndLanguage.ContentIdentity], Maybe.None, assetFieldGuid, identityAndLanguage.Language)).FirstOrMaybe().TryGetValue(out var mediaItem) ? mediaItem : Result.Failure<MediaItem>("No media item found");
+                return (await GetContentItemAssetsInternal([identityAndLanguage.ContentIdentity], Maybe.None, assetFieldGuid, identityAndLanguage.Language)).TryGetFirst(out var mediaItem) ? mediaItem : Result.Failure<MediaItem>("No media item found");
             }
             return Result.Failure<MediaItem>("Content Item Metadata ID not provided and there is no current page context");
         }
@@ -106,7 +106,7 @@ namespace Core.Repositories.Implementation
         public async Task<Result<MediaItem>> GetContentItemLanguageMetadataAsset(int? contentItemMetadataId, string assetFieldName)
         {
             if ((await GetContentIdentityAndLanguage(contentItemMetadataId)).TryGetValue(out var identityAndLanguage)) {
-                return (await GetContentItemAssetsInternal([identityAndLanguage.ContentIdentity], assetFieldName, Maybe.None, identityAndLanguage.Language)).FirstOrMaybe().TryGetValue(out var mediaItem) ? mediaItem : Result.Failure<MediaItem>("No media item found");
+                return (await GetContentItemAssetsInternal([identityAndLanguage.ContentIdentity], assetFieldName, Maybe.None, identityAndLanguage.Language)).TryGetFirst(out var mediaItem) ? mediaItem : Result.Failure<MediaItem>("No media item found");
             }
             return Result.Failure<MediaItem>("Content Item Metadata ID not provided and there is no current page context");
         }
@@ -291,7 +291,7 @@ namespace Core.Repositories.Implementation
                         compiledDictionary.Add(contentItemDataContainer.ContentItemGUID, contentItemDictionary);
                     }
 
-                    var language = _languageRepository.LanguageIdToName(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
+                    var language = _languageIdentifierRepository.LanguageIdToName(contentItemDataContainer.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
 
                     foreach (var assetField in classAssetConfiguration.AssetFields) {
                         if (!contentItemDictionary.TryGetValue(assetField.FieldGuid, out Dictionary<string, MediaItem>? languageToMediaItemDictionary)) {
@@ -329,7 +329,7 @@ namespace Core.Repositories.Implementation
                 // ignore
             }
 
-            var language = _languageRepository.LanguageIdToName(fileItem.ContentItemCommonDataContentLanguageID);
+            var language = _languageIdentifierRepository.LanguageIdToName(fileItem.ContentItemCommonDataContentLanguageID);
 
             var permanentUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}?language={language}";
             var directUrl = $"/getcontentasset/{fileItem.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}?language={language}";
@@ -393,7 +393,7 @@ namespace Core.Repositories.Implementation
                         .WhereEquals(nameof(MediaFileInfo.FileGUID), fileGuid)
                         .GetEnumerableTypedResultAsync();
 
-                    if (mediaFile.FirstOrMaybe().TryGetValue(out var mediaFileVal)) {
+                    if (mediaFile.TryGetFirst(out var mediaFileVal)) {
                         var mediaItem = MediaFileInfoToMediaItem(mediaFileVal);
                         if ((await _mediaFileMediaMetadataProvider.GetMediaMetadata(mediaFileVal, mediaItem)).TryGetValue(out var metaData)) {
                             mediaItem = mediaItem with { MetaData = metaData.AsMaybe() };

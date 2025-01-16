@@ -7,7 +7,7 @@
         and https://www.nwtc.edu/academics/programs/fields-of-interest (The "Parent" is Academic Progrms")
         -->
 
-        @if (Model.NavItems.FirstOrMaybe().TryGetValue(out var navItem))
+        @if (Model.NavItems.TryGetFirst(out var navItem))
         {
             <h3>@navItem.LinkText</h3>
             <ul class="@Model.NavWrapperClass">

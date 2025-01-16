@@ -9,15 +9,15 @@
         /// <summary>
         /// Provides configurations of your content types and their Content Item Asset fields, used when generating Media items
         /// </summary>
-        public List<ContentItemWithAssetsConfiguration> ContentItemConfigurations { get; set; } = new List<ContentItemWithAssetsConfiguration>();
+        public List<ContentItemWithAssetsConfiguration> ContentItemConfigurations { get; set; } = [];
 
         /// <summary>
         /// Configuration for a specific Content Type, since it may contain multiple Content Asset Fields, has a list of them.
         /// </summary>
         /// <param name="ClassName">The Content Type CodeName</param>
         /// <param name="AssetFieldIdentifierConfigurations">The list of Asset Field Configurations</param>
-        /// <param name="preCache">If true, will generate and cache all the Media Items for this Class and use that instead of individual lookups.  Has logic to switch to individual lookup if the content items are being updated frequently.</param>
-        public record ContentItemWithAssetsConfiguration(string ClassName, List<AssetFieldIdentifierConfiguration> AssetFieldIdentifierConfigurations, bool preCache = false);
+        /// <param name="PreCache">If true, will generate and cache all the Media Items for this Class and use that instead of individual lookups.  Has logic to switch to individual lookup if the content items are being updated frequently.</param>
+        public record ContentItemWithAssetsConfiguration(string ClassName, List<AssetFieldIdentifierConfiguration> AssetFieldIdentifierConfigurations, bool PreCache = false);
 
         /// <summary>
         /// Used by editors to configure the asset identifiers.  Title field and Field Guid will be filled in if not provided.

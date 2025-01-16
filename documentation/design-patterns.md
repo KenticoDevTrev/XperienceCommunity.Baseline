@@ -6,9 +6,17 @@ Below is a list of Design Patterns used in the Baseline Project.
 
 The Baseline uses the [Features Folder](https://learn.microsoft.com/en-us/archive/msdn-magazine/2016/september/asp-net-core-feature-slices-for-asp-net-core-mvc) methodology when creating new features.  
 
-It doesn't, however, have systems in place to 'try to find' the right View location.  I simply put the full path of the view by default, which is always compatible no matter what users have set up for their Conventions.  If you wish you can implement and leverage your own [IViewLocationExpander](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.razor.iviewlocationexpander?view=aspnetcore-8.0) and configure as you wish.
+As part of Feature Folders, some like the system to automatically divine where a view is based on the class name conventions, being in a feature folder, etc.  This can be done partially through the `services.AddMvc(o => o.Conventions.Add(new FeatureConvention()))`, and you can additionally configure it if you wish.
 
-Keep in mind not everything is a Feature in the Baseline, I put general use Components under the typical `Components` folder.
+Or, If you wish you can implement and leverage your own [IViewLocationExpander](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.razor.iviewlocationexpander?view=aspnetcore-8.0) and configure as you wish. (The Baseline has an optional [CustomLocationExpander](../src/Core/Core.RCL/Middleware/CustomLocationExpander.cs) that you can call on your `IServiceCollection.UseFeatureFoldersAndLocationExpansions` to do this).
+
+***HOWEVER***, you can simply do what I do and put in the full path, and not have to worry about any of that.  ex:
+
+```csharp
+return View("/Features/Home/Home.cshtml");
+```
+
+This is what I would personally recommend.
 
 ## Page Template View Component (PTVC) and Widget View Component (WVC)
 

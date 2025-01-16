@@ -15,10 +15,6 @@ namespace Core.Repositories
         /// <returns>The best language fit, or failure if no available languages (or no good match found)</returns>
         Task<Result<string>> GetLanguagueToSelect(IEnumerable<string> availableLanguages, string requestedLanguage, bool firstIfNoMatch = false, bool includeDefaultAsMatch = true);
 
-        int LanguageNameToId(string languageName);
-
-        string LanguageIdToName(int languageId);
-
         /// <summary>
         /// Gets the system's default language (used as a fallback often times)
         /// </summary>

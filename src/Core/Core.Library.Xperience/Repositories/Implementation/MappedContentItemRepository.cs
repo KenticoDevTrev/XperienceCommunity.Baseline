@@ -93,7 +93,7 @@ namespace Core.Repositories.Implementation
 
                 var dataContainerResults = await _contentQueryExecutor.GetWebPageResult(getPageFull, (dataContainer) => dataContainer, new ContentQueryExecutionOptions() { ForPreview = _cacheRepositoryContext.PreviewEnabled(), IncludeSecuredItems = true });
 
-                if (!dataContainerResults.FirstOrMaybe().TryGetValue(out var firstItem)) {
+                if (!dataContainerResults.TryGetFirst(out var firstItem)) {
                     return Result.Failure<object>($"No Web Page Item Found!");
                 }
 

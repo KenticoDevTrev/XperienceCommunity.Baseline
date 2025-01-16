@@ -57,6 +57,8 @@ namespace CMS.ContentEngine
 
         public static ContentTypeQueryParameters InContentIdentity(this ContentTypeQueryParameters queryParams, ContentIdentity identity) => queryParams.InContentIdentities([identity]);
 
+        /* These fields are not visible for the where conditions...
+        
         public static ContentTypeQueryParameters InContentCultureIdentities(this ContentTypeQueryParameters queryParams, IEnumerable<ContentCultureIdentity> identities)
         {
             var ids = identities.Where(x => x.ContentCultureID.HasValue).Select(x => x.ContentCultureID.Value);
@@ -109,7 +111,7 @@ namespace CMS.ContentEngine
             return queryParams;
         }
         
-        public static ContentTypeQueryParameters InContentCultureIdentity(this ContentTypeQueryParameters queryParams, ContentCultureIdentity identity) => queryParams.InContentCultureIdentities([identity]);
+        */
 
         public static ContentTypeQueryParameters InTreeIdentities(this ContentTypeQueryParameters queryParams, IEnumerable<TreeIdentity> identities)
         {

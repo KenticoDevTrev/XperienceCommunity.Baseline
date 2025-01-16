@@ -73,7 +73,7 @@ namespace Core.Services.Implementation
                     queryParams.Add(new DataParameter("@ContentItemName", name));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var docRow))
+                if (item.TryGetFirst(out var docRow))
                 {
 
                     return new ContentIdentity()
@@ -255,7 +255,7 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
                     queryParams.Add(new DataParameter("@WebPageItemWebsiteChannelID", pathAndChannel.ChannelId.GetValueOrDefault(currentChannelID)));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var docRow))
+                if (item.TryGetFirst(out var docRow))
                 {
                     return new TreeIdentity()
                     {
@@ -367,7 +367,7 @@ inner join CMS_ContentLanguage on ContentLanguageID = ContentItemLanguageMetadat
                     queryParams.Add(new DataParameter("@CodeName", codeName));
                 }
                 var item = (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, queryParams, QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>();
-                if (item.FirstOrMaybe().TryGetValue(out var objRow))
+                if (item.TryGetFirst(out var objRow))
                 {
                     Maybe<int> idMaybe = Maybe.None;
                     Maybe<Guid> guidMaybe = Maybe.None;

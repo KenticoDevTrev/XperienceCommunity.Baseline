@@ -14,11 +14,9 @@
                 output = inValue;
                 return true;
             }
-#pragma warning disable CS8601 // Possible null reference assignment, ignoring because this specifically should not reference the output if this returns false
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             output = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-#pragma warning restore CS8601 // Possible null reference assignment.
             return false;
         }
 
@@ -30,7 +28,7 @@
             }
 
 #pragma warning disable CS8601 // Possible null reference assignment, ignoring because this specifically should not reference the output if this returns false
-            output = default(T);
+            output = default;
 #pragma warning restore CS8601 // Possible null reference assignment.
             return false;
         }

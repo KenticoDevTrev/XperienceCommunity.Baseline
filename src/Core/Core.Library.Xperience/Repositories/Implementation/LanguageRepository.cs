@@ -148,7 +148,7 @@ namespace Core.Repositories.Implementation
             if (GetWebsiteChannelById().TryGetValue(websiteChannelID.GetValueOrDefault(_websiteChannelContext.WebsiteChannelID), out var websiteChannel)) {
                 return new ObjectIdentity() {
                     Id = websiteChannel.WebsiteChannelPrimaryContentLanguageID,
-                    CodeName = LanguageIdToName(websiteChannel.WebsiteChannelPrimaryContentLanguageID)
+                    CodeName = _languageIdentifierRepository.LanguageIdToName(websiteChannel.WebsiteChannelPrimaryContentLanguageID)
                 };
             }
 
@@ -174,12 +174,8 @@ namespace Core.Repositories.Implementation
             if (defaultLanguageID.Id.Value.Equals(contenLanguageID)) {
                 return string.Empty;
             }
-            return $"/{LanguageIdToName(contenLanguageID)}";
+            return $"/{_languageIdentifierRepository.LanguageIdToName(contenLanguageID)}";
         }
-
-        public int LanguageNameToId(string languageName) => _languageIdentifierRepository.LanguageNameToId(languageName);
-
-        public string LanguageIdToName(int languageId) => _languageIdentifierRepository.LanguageIdToName(languageId);
 
         private record CultureMappingDictionaries(Dictionary<string, int> NameToId, Dictionary<int, string> IdToName, int DefaultLanguageId, Dictionary<int, int> SiteToDefaultLanguageID);
     }

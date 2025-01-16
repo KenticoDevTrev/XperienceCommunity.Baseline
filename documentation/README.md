@@ -17,12 +17,12 @@ Likewise, some features listed in this documentation are only in the Xperience b
 - [Design Patterns](design-patterns.md)
 - [Front End Development (CSS, JS, Images)](front-end-development.md)
 - [Caching Systems](caching-systems.md)
-
 ## Core Module
 
 - Developer Tools
   - [Maybe and Result Monads](core-maybe-result-monads.md)
   - [Identity Objects](core-identity-objects.md)
+  - [Context and Context Tag Helpers](core-context-helpers.md)
   - [Other Tools](core-other-tools.md)
 - Features
   - [Localization](core-localization.md)
@@ -34,3 +34,4 @@ Likewise, some features listed in this documentation are only in the Xperience b
   - [MetaData System](core-metadata.md)
   - [Link Accessibility](core-link-accessibility.md)
   - [Url Redirect](core-redirect.md)
+  - [Error Pages](core-error-pages.md)

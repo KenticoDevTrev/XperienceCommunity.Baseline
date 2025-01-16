@@ -43,7 +43,7 @@ namespace Core.Middleware
                     // redirect
                     switch (baseRedirect.PageRedirectionType.ToLowerInvariant()) {
                         case "internal":
-                            if (baseRedirect.PageInternalRedirectPage.FirstOrMaybe().TryGetValue(out var pageInternalRedirectWebpageGuid)
+                            if (baseRedirect.PageInternalRedirectPage.TryGetFirst(out var pageInternalRedirectWebpageGuid)
                                 && (await pageContextRepository.GetPageAsync(pageInternalRedirectWebpageGuid.WebPageGuid.ToTreeIdentity())).TryGetValue(out var foundPage)) {
                                 if (websiteChannelContext.WebsiteChannelID.Equals(foundPage.ChannelID)) {
                                     httpContext.Response.Redirect(urlResolver.ResolveUrl(foundPage.RelativeUrl), permanent: baseRedirect.PageUsePermanentRedirects);

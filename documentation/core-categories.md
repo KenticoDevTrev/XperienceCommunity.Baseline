@@ -35,3 +35,7 @@ Since categories are often used in sites, and they don't change often, the Basel
 Retrieving a page's category is handled by the [IContentCategoryRepository](../src/Core/Core.Models/Repositories/IContentCategoryRepository.cs) and is reponsible for getting all the Categories found on a given Page or Content Item.  It has helper methods to also take an array of Taxonomy Types if you wish to only return ones of a certain type.
 
 Remember though, this depends on your `ContentItemTaxonomyOptions` that you configure in the `AddCoreBaseline` extension method for Xperience by Kentico.
+
+## Comparison
+
+There is an [ICategoryItemEqualityComparer](../src/Core/Core.Library/Comparers/CategoryItemEqualityComparer.cs) that can be used to compare categories.

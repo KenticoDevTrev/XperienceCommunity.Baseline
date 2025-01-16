@@ -35,13 +35,16 @@ Any Content Type can have an array of Asset Field Identifiers, so labeling these
 Keep in mind, I also have logic that will still find your Content Item Assets *even if you don't set this* (through parsing the Content Type Structure in the database), the Title and Description though won't have values. 
 
 ## Add Custom Metadata
- The Media Metadata is filled through one of two interfaces:
- 
- `IMediaFileMetadatProvider` (For Media Files) 
- 
- `IContentItemMediaMetadataProvider` (for Content Assets)
+The Media Metadata is filled through one of two interfaces:
 
- You can overwrite these using [normal Implementation Override](customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
+`IMediaFileMediaMetadataProvider` (Build custom `IMediaMetadata` For Media Library Files) 
+
+`IContentItemMediaMetadataQueryEditor` (Customizes the query to retrieve additional fields)
+`IContentItemMediaCustomizer` (Build custom `IMediaMetadata`for Content Item Assets)
+
+You can overwrite these using [normal Implementation Override](customization-points.md#Implementation-Override), and with it you can grab additional metadata to attach to your Media Items.  The default only handles Images and adds the MediaMetadataImage to those images (including .svg via the viewbox)
+
+In order to get 
 
 ## IMediaRepository
 

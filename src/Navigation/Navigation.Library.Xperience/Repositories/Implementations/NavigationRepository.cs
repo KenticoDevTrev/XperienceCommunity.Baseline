@@ -134,7 +134,7 @@ namespace Navigation.Repositories.Implementations
 
                 if (navigationItem.NavPage.TryGetValue(out var navPage)) {
                     var dynamicItems = navPage.IsDynamic && webPageItemIDToDynamicChildren.TryGetValue(navPage.SystemFields.WebPageItemID, out var dynamicChildren) ? dynamicChildren : [];
-                    if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase) && navPage.NavigationWebPageItemGuid.FirstOrMaybe().TryGetValue(out var automaticPageWebPageGuid)) {
+                    if (navPage.NavigationType.Equals("automatic", StringComparison.OrdinalIgnoreCase) && navPage.NavigationWebPageItemGuid.TryGetFirst(out var automaticPageWebPageGuid)) {
                         if (filteredAutomaticItems.TryGetValue(automaticPageWebPageGuid.WebPageGuid, out var automaticItem)) {
                             try {
                                 linkText = automaticItem.GetValue<string>(nameof(IBaseMetadata.MetaData_PageName));
