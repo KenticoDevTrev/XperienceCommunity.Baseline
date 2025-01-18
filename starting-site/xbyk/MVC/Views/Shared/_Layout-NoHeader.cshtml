@@ -1,6 +1,6 @@
 ﻿@{
     Layout = null;
-    // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
+    // Used by the Navigation, so when editing a Mega Menu Navigation, it does NOT render the header thus causing an infinite loop.
 }
 <!DOCTYPE html>
 <html dir="ltr" lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0])">
@@ -49,6 +49,7 @@
         @{
             CacheScope.Begin();
         }
+        <!-- Great place to place an Accessability quick nav to go to parts of your site! -->
         <!--<vc:ada-quick-nav />-->
         <cache-dependency cache-keys="@CacheScope.End()" />
     </cache>

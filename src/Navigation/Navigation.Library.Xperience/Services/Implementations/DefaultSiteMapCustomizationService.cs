@@ -8,15 +8,14 @@ namespace Navigation.Services.Implementations
     {
         public Task<Result<IEnumerable<SitemapNode>>> CustomizeCasting(string contentTypeCodename, IEnumerable<IContentQueryDataContainer> items)
         {
+            // Implement your own logic if you want to cast content types a certain way, most cases the default behavior should suffice
             return Task.FromResult(Result.Failure<IEnumerable<SitemapNode>>("Not implemented, should customize if you want to customzie the casting"));
         }
 
-        public Task<Result<ContentItemQueryBuilder>> CustomizeQueryBuilder(string contentTypeCodename)
+        public Task<IEnumerable<SitemapNode>> GetAdditionalSitemapNodes()
         {
-            if(contentTypeCodename.Equals(Generic.Navigation.CONTENT_TYPE_NAME)) {
-                // TODO: Implement so it contains the fields needed for this.
-            }
-            return Task.FromResult(Result.Failure<ContentItemQueryBuilder>("Not implemented, should customize if you want to customize the casting"));
+            // Implement your own logic to add custom site map items to the normal `ISiteMapRepository.GetSiteMapUrlSetAsync
+            return Task.FromResult<IEnumerable<SitemapNode>>([]);
         }
     }
 }

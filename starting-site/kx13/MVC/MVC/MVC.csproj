@@ -37,6 +37,7 @@
     <PackageReference Include="XperienceCommunity.Baseline.Core.RCL.KX13" Version="2.4.1" />
     <PackageReference Include="XperienceCommunity.Baseline.Navigation.Models" Version="2.4.1" />
     <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL" Version="2.4.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL.KX13" Version="2.4.1" />
     <PackageReference Include="XperienceCommunity.Localizer" Version="13.5.5" />
     <PackageReference Include="XperienceCommunity.PageBuilderTagHelpers" Version="1.1.0" />
     <PackageReference Include="XperienceCommunity.PageNavigationRedirects" Version="1.1.0" />

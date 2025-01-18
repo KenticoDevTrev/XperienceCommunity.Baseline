@@ -16,7 +16,6 @@ namespace Navigation.Repositories.Implementations
             builder.PagePath("/", PathTypeEnum.Children);
 
             // You can implement your own custom data here. 
-            // In this example, we will pull from any pages with the "Navigation Item" feature.
             var nodes = await _pageRetriever.RetrieveMultipleAsync(
                query => query
                     .WhereEquals(nameof(TreeNode.DocumentShowInMenu), true)

@@ -1,6 +1,6 @@
 ﻿@{
     Layout = null;
-    // This Layout leverages the Baseline "Async Script" system which offloads all javascript till after page load, but requires special care when building out your javascript logic.
+    // Used by the Navigation, so when editing a Mega Menu Navigation, it does NOT render the header thus causing an infinite loop.
 }
 <!DOCTYPE html>
 <html dir="ltr" lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.Name.Split('-')[0])">
@@ -43,17 +43,31 @@
         <link href="/css/individual/edit-mode.css" rel="stylesheet" />
     </page-builder-mode>
 
+    <vc:breadcrumbs-json />
 </head>
 <body>
     <cache expires-after="CacheMinuteTypes.VeryLong.ToTimeSpan()">
         @{
             CacheScope.Begin();
         }
+        <!-- Great place to place an Accessability quick nav to go to parts of your site! -->
         <!--<vc:ada-quick-nav />-->
         <cache-dependency cache-keys="@CacheScope.End()" />
     </cache>
 
     <header data-ktc-search-exclude>
+        <cache expires-after="CacheMinuteTypes.VeryLong.ToTimeSpan()">
+            @{
+                CacheScope.Begin();
+            }
+
+            <!--<vc:main-navigation x-navigation-parent-path="/Navigation" x-css-class="main-nav" x-include-screen-reader-nav="true"/>-->
+            <cache-dependency cache-keys="@CacheScope.End()" />
+        </cache>
+        @*
+        // Only if needed context in the main nav, this is outside the cache so you can cache the entire nav and then just highlight the current page.
+        <bl:navigation-page-selector x-parent-class="main-nav"></bl:navigation-page-selector>
+        *@
     </header>
 
     @RenderSection("breadcrumb", false)

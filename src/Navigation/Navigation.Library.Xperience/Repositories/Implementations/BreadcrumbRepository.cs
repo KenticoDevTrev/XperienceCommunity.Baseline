@@ -103,8 +103,8 @@ namespace Navigation.Repositories.Implementations
                 .Object("NittinLocalization.LocalizationTranslationItem", "generic.default.breadcrumbtext")
                 .Object("NittinLocalization.LocalizationTranslationItem", "generic.default.breadcrumburl");
 
-            return new Breadcrumb(linkText: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumbtext", settings.DefaultBreadcrumbText),
-                linkUrl: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumburl", settings.DefaultBreadcrumbUrl));
+            return new Breadcrumb(linkText: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumbtext", _stringLocalizer.GetStringOrDefault(settings.DefaultBreadcrumbText, "Home")),
+                linkUrl: _stringLocalizer.GetStringOrDefault("generic.default.breadcrumburl", _stringLocalizer.GetStringOrDefault(settings.DefaultBreadcrumbUrl, "/")));
         }
 
         private async Task<Dictionary<int, Tuple<Breadcrumb, int>>> GetWebPageItemIDToBreadcrumbAndParent()

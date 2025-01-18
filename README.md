@@ -3,9 +3,9 @@
 
 Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico
 
-**[View Installation Instructions and Starting Site Setup for Xperience by Kentico](installationXbyK.md)**
+**[View Installation Instructions and Starting Site Setup for Xperience by Kentico](documentation/site/site-xbyk-setup.md)**
 
-**[View Installation Instructions and Starting Site Setup for KX13](installationKX13.md)**
+**[View Installation Instructions and Starting Site Setup for KX13](documentation/site/site-kx13-setup.md)**
 
 Special thanks to my previous employer [Heartland Business Systems](https://www.hbs.net) who supported me as I created this baseline, adding things we all learned on projects into this (and other repositories) and allowing me to give them away to the Kentico Community. If you need a kentico partner to implement a Baseline project, I would definitely get in touch with them.
 
@@ -13,7 +13,7 @@ Also thanks to my other previous employer [Movement Mortgage](https://www.moveme
 
 Lastly thanks to my wife for bearing with me as I stressed and had near-nervous breakdowns creating the Xperience by Kentico Implementation by my self-imposed Christmas Deadline (12/22/2024 at 3:00 am as i write this).
 
-## Please Star / Send a Line
+## Please Star / Send a Linked In Message
 
 If you use this repo, please send me a message or star the project, I put hundreds of hours into this project over the years, and sometimes hard to know if anyone actually uses it...
 

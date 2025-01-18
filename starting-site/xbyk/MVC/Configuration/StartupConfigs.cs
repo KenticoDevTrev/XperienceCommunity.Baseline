@@ -53,6 +53,8 @@ using Account.Features.Account.Registration;
 using Account.Features.Account.ResetPassword;
 using Navigation.Features.PartialNavigation;
 using XperienceCommunity.ImageProcessing;
+using Navigation.Services;
+using MVC.Services.Implementation;
 
 
 // BASELINE CUSTOMIZATION - Account - Add this to edit Channel Settings
@@ -599,6 +601,7 @@ namespace MVC.Configuration
 
             // Add my repo for dynamic nav
             builder.Services.AddScoped<IDynamicNavigationRepository, CustomDynamicNavigationRepository>();
+            builder.Services.AddScoped<ISiteMapCustomizationService, CustomSitemapCustomizationService>();
         }
 
         /// <summary>

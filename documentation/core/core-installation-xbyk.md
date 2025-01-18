@@ -1,4 +1,4 @@
-# Baseline Core Installation
+# Baseline Core Installation (Xperience by Kentico)
 
 These are the instructions for the Baseline Core Mode Installation.  The Starter Sites already have everything installed, so if you are using the Starting Site, you can largely skip this.
 
