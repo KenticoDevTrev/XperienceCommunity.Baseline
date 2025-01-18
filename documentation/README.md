@@ -59,3 +59,11 @@ Likewise, some features listed in this documentation are only in the Xperience b
   - [Current Page](navigation/navigation-current-page.md)
   - [Breadcrumbs and JSON+LT](navigation/navigation-breadcrumbs.md)
   - [Sitemap](navigation/navigation-sitemap.md)
+
+## Localization
+
+- [Installation (Xperience by Kentico)](localization/localization-installation-xbyk.md)
+- [Installation (Kentico Xperience 13)](localization/localization-installation-kx13.md)
+- Developer Tools
+  - [Other Tools](localization/localization-other-tools.md)
+

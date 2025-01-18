@@ -100,24 +100,20 @@ if (addAuthorizationFilters) {
     builder.Services.AddKenticoAuthorization();
 }
 
-if (addXperienceCommunityLocalization) {
-    builder.Services.AddXperienceCommunityLocalization();
-} else {
-    builder.Services.AddLocalization();
-}
+// Localizer along with Controller Views
+services.AddLocalization()
+        .AddXperienceLocalizer() // Call after AddLocalization
+        .AddControllersWithViews() // .AddControllersWithViewsAndKenticoAuthorization()
+        .AddViewLocalization()
+        .AddDataAnnotationsLocalization(options =>
+        {
+            options.DataAnnotationLocalizerProvider = (type, factory) =>
+            {
+                return factory.Create(typeof(SharedResources));
+            };
+        });
 
-var mvcBuilder = addAuthorizationFilters ?
-                    builder.Services.AddControllersWithViewsWithKenticoAuthorization()
-                    : builder.Services.AddControllersWithViews();
-
-mvcBuilder.AddViewLocalization()
-            .AddDataAnnotationsLocalization(options => {
-                options.DataAnnotationLocalizerProvider = (type, factory) => {
-                    return factory.Create(localizationResourceType);
-                };
-            });
-
-            // Page template filters
+// Page template filters
 services.AddPageTemplateFilters(Assembly.GetExecutingAssembly());
 
 

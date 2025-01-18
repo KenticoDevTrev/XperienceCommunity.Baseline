@@ -11,19 +11,7 @@ namespace Localization
             var configuration = localizationConfiguration ?? new LocalizationConfiguration("en-US");
             services
                 .AddScoped((serviceProvider) => configuration)
-                .AddScoped<ILocalizedCategoryCachedRepository, LocalizedCategoryCachedRepository>()
-                .AddLocalization()
-                .AddXperienceLocalizer()
-                .AddControllersWithViews()
-                .AddViewLocalization() // honestly couldn't get View Localization to ever work...
-                .AddDataAnnotationsLocalization(options =>
-                {
-                    options.DataAnnotationLocalizerProvider = (type, factory) =>
-                    {
-                        // This will use your ~/Resources/SharedResources.resx, with kentico fall back
-                        return factory.Create(typeof(SharedResources));
-                    };
-                });
+                .AddScoped<ILocalizedCategoryCachedRepository, LocalizedCategoryCachedRepository>();
 
             return services;
         }
