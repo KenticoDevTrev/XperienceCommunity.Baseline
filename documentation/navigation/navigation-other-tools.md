@@ -9,4 +9,32 @@ Below are a list of notable interfaces, models, and other systems.  Most of thes
   - **GetDefaultBreadcrumbAsync**: Gets the default breadcrumb (see [Breadcrumbs](navigation-breadcrumbs.md))
   - **BreadcrumbsToJsonLDAsync**: Converts an array of Breadcrumbs into the LD+Json model.
 - [INavigationRepository](../../src/Navigation/Navigation.Models/Repositories/INavigationRepository.cs)
-  - **GetNavItemsAsync**: 
+  - **GetNavItemsAsync**: Retrieves navigation based on `Navigation` Page type given the path.  If NavTypes are provided, filters via the `NavigationGroups` field (Xperience by Kentico) or `Tree Categories` in Kentico Xperience 13 (part of the Relationships Extended module)
+  - **GetSecondaryNavItemsAsync**: Retrieves secondary navigation items.  Note that the `orderBy` and `whereCondition` are no longer supported in Xperience by Kentico.  This is leveraged by the `SecondaryNavigationViewComponent`.
+  - **GetAncestorPathAsync**: Helper to get the Ancestor path given the properties.
+- [ISiteMapRepository](../../src/Navigation/Navigation.Models/Repositories/INavigationRepository.cs)
+  - **GetSiteMapUrlSetAsync**: Retrieves the default Sitemap Set, for logic see [the sitemap documentation](navigation-sitemap.md)
+
+
+## View Components
+
+See the various Features, all are listed there.
+
+## TagHelpers
+
+See [NavigationItem and Tag Helpers](navigation/navigation-navigation-item.md)  To use the tag helpers and view components, add these:
+
+Xperience by Kentico:
+
+```html
+@* BASELINE CUSTOMIZATION - Navigation *@
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.Xperience
+```
+
+Kentico Xperience 13:
+```html
+@* BASELINE CUSTOMIZATION - Navigation *@
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.KX13
+```

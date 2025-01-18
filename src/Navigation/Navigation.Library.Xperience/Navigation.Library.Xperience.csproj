@@ -28,8 +28,4 @@
     <ProjectReference Include="..\Navigation.XperienceModels.Xperience\Navigation.XperienceModels.Xperience.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>

@@ -28,6 +28,11 @@ There is also an optional place to put a `Alternative Text` if you wish (usually
 
 `Link CSS Class` adds any classes to the link's CSS classes.  You have control of the rendering so this is only for customization, i would not use this to make the links match your template.
 
+### Nav Types (Groupings)
+When retrieving navigation items, you can pass an array of Navigation Types (`TagName` / `CategoryName`).  These will look to either to the items in the `Navigation Groupings` field (Xperience by Kentico) or the `TreeCategories` (Kentico Xperience 13 via the [Relationships Extended Module](https://github.com/KenticoDevTrev/RelationshipsExtended)).
+
+This is useful if you have a separate Mobile Navigation and some items should only render in the mobile vs. desktop version, or can be used to tag navigation that should only show in some other context.  Be aware though that if you specify taxonomy, it will exclude any navigation with *no* taxonomy set, so often if you use this, you must update all your Navigation Items (and language variants in Xperience by Kentico)
+
 ### Dyanamic Navigation - Kentico Xperience 13
 
 There is an `Is Dynamic` which if checked, allows you to fill out a "Repeater" style form to dynamically select and render out these fields.  These will appear as children to the current navigation item.
@@ -35,6 +40,12 @@ There is an `Is Dynamic` which if checked, allows you to fill out a "Repeater" s
 ### Dynamic Navigation - Xperience by Kentico
 
 There is a `Is Dynamic` and `Dynamic Menu Identifier`, that when set will call the `IDynamicNavigationRepository` (which you should overwrite) with that menu identifier.  It's up to you to then check what the identifier is, and perform any logic you wish to retrieve and build an Array of `NavigationItem`s for the children.  An example would be `BlogArticles` as the Menu Identifier, and you retrieve recent blog articles and convert them to `NavigationItem`s
+
+### Dynamic Navigation and _Layout-NoHeader.cshtml
+
+Since most page renderings use the main _layout, and the layout usually contains the Navigation on it, when editing Navigation Items in the page builder, it's vital to use a layout that does NOT have the main navigation in it (otherwise it will try to render out the navigation item you're modifying).
+
+The default Navigation Page Template uses the `/Views/Shared/_Layout-NoHeader.cshtml` which you'll need to create or include if you use this feature.  The starting site contains this file already.  If you wish to change where this file location is, you can overwrite the [/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml](../../src/Navigation/Navigation.RCL.Xperience/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml) with your own copy.
 
 ## Placing the Main Navigation
 

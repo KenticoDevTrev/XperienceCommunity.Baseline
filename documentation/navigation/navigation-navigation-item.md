@@ -17,3 +17,20 @@ There's various Tag Helpers that help perform operations given a Navigation Item
 - [NavigationItemClassTagHelper](../../src/Navigation/Navigation.RCL/TagHelpers/NavigationItemTagHelpers.cs)
   - `bl-navigation-item=@MyNavItem bl-navitem-class`: given the NavigationItem, adds the navigation item's CSS Class (if present).  Available on `li`, `a` and `article` tags.
 - [NavigationPageSelectorTagHelper](../../src/Navigation/Navigation.RCL/TagHelpers/NavigationItemClassTagHelper.cs): Discussed on it's own [documentation page](navigation-current-page).
+
+To see Tag Helpers, please use the following:
+
+Xperience by Kentico:
+
+```html
+@* BASELINE CUSTOMIZATION - Navigation *@
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.Xperience
+```
+
+Kentico Xperience 13:
+```html
+@* BASELINE CUSTOMIZATION - Navigation *@
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
+@addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.KX13
+```

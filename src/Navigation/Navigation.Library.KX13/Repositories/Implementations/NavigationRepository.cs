@@ -48,7 +48,8 @@ namespace Navigation.Repositories.Implementations
         public async Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType = PathSelectionEnum.ChildrenOnly) => await GetSecondaryNavItemsAsync(startingPath, pathType, Maybe.None, Maybe.None, Maybe.None, Maybe.None, Maybe.None);
         public async Task<IEnumerable<NavigationItem>> GetSecondaryNavItemsAsync(string startingPath, PathSelectionEnum pathType, Maybe<IEnumerable<string>> pageTypes, Maybe<string> orderBy, Maybe<string> whereCondition, Maybe<int> maxLevel, Maybe<int> topNumber)
         {
-            var builder = _cacheDependencyBuilderFactory.Create();
+            var builder = _cacheDependencyBuilderFactory.Create()
+                .Navigation(true);
 
             var hierarchyNodes = new List<HierarchyTreeNode>();
             var nodeIDToHierarchyTreeNode = new Dictionary<int, HierarchyTreeNode>();
@@ -351,7 +352,8 @@ namespace Navigation.Repositories.Implementations
 
         private async Task<IEnumerable<NavigationPageType>> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
         {
-            var builder = _cacheDependencyBuilderFactory.Create();
+            var builder = _cacheDependencyBuilderFactory.Create()
+                .Navigation(true);
 
             if(navPath.TryGetValue(out var pathForBuilder))
             {
