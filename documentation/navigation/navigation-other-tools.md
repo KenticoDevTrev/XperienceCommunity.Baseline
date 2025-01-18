@@ -38,3 +38,8 @@ Kentico Xperience 13:
 @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL
 @addTagHelper *, XperienceCommunity.Baseline.Navigation.RCL.KX13
 ```
+
+## Cache Dependency Key Extension
+
+The `ICacheDependencyKeyBuilder` has an extension method `.Navigation` which contains some additional custom cache keys that the Navigation System uses, please use this extension when caching for navigation.
+

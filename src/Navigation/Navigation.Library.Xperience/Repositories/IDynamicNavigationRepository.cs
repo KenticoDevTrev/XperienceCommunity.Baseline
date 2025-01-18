@@ -4,6 +4,6 @@ namespace Navigation.Repositories
 {
     public interface IDynamicNavigationRepository
     {
-        Task<IEnumerable<NavigationItem>> GetDynamicNavication(string dynamicCodeName);
+        Task<IEnumerable<NavigationItem>> GetDynamicNavigation(string dynamicCodeName);
     }
 }

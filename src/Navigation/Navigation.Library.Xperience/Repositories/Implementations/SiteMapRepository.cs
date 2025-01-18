@@ -108,7 +108,7 @@ May wish to overwrite and implement a custom ISiteMapCustomizationService to par
 
                 // Add dynamic sub nav items if available
                 if (navItem.IsDynamic && !string.IsNullOrWhiteSpace(navItem.DynamicCodeName)) {
-                    var dynamicSubItems = await _dynamicNavigationRepository.GetDynamicNavication(navItem.DynamicCodeName);
+                    var dynamicSubItems = await _dynamicNavigationRepository.GetDynamicNavigation(navItem.DynamicCodeName);
                     navNodes.AddRange(dynamicSubItems.Where(x => x.LinkHref.HasValue && !x.LinkHref.Value.StartsWith("http", StringComparison.OrdinalIgnoreCase)).Select(x => new SitemapNode(x.LinkHref.Value)));
                 }
                 return navNodes;

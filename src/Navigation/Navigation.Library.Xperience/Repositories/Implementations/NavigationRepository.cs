@@ -231,6 +231,7 @@ namespace Navigation.Repositories.Implementations
                 _ => PathMatch.Children(startingPath, nestingLevel)
             };
             var builder = _cacheDependencyBuilderFactory.Create()
+                .Navigation(true)
                 .WebPagePath(startingPath, pageTypeEnum);
 
             return await _progressiveCache.LoadAsync(async cs => {
@@ -269,7 +270,8 @@ namespace Navigation.Repositories.Implementations
 
         private async Task<NavItemsAndJoinedDocs> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
         {
-            var builder = _cacheDependencyBuilderFactory.Create();
+            var builder = _cacheDependencyBuilderFactory.Create()
+                .Navigation(true);
 
             if (navPath.TryGetValue(out var pathForBuilder)) {
                 builder.WebPagePath(pathForBuilder.Trim('%'), PathTypeEnum.Section);
@@ -325,7 +327,7 @@ namespace Navigation.Repositories.Implementations
             var webPageItemIDToDynamicNavItems = new Dictionary<int, IEnumerable<NavigationItem>>();
             var dynamicNavs = results.Result.NavItems.Where(x => x.IsDynamic && !string.IsNullOrWhiteSpace(x.DynamicCodeName)).Select(x => x);
             foreach (var dynamicNav in dynamicNavs) {
-                var dynamicNavItems = await _dynamicNavigationRepository.GetDynamicNavication(dynamicNav.DynamicCodeName);
+                var dynamicNavItems = await _dynamicNavigationRepository.GetDynamicNavigation(dynamicNav.DynamicCodeName);
                 webPageItemIDToDynamicNavItems.Add(dynamicNav.SystemFields.WebPageItemID, dynamicNavItems);
             }
 
