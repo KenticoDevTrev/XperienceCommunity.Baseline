@@ -6,16 +6,35 @@ using CMS.FormEngine;
 using NavigationType = Generic.Navigation;
 namespace Account.Installers
 {
-    public class BaselineNavigationModuleInstaller(IEventLogService eventLogService)
+    public class BaselineNavigationModuleInstaller(IEventLogService eventLogService, IInfoProvider<TaxonomyInfo> taxonomyInfoProvider)
     {
         private readonly IEventLogService _eventLogService = eventLogService;
+        private readonly IInfoProvider<TaxonomyInfo> _taxonomyInfoProvider = taxonomyInfoProvider;
 
         public bool InstallationRan { get; set; } = false;
 
         public void Install()
         {
+
+            CreateNavigationTypesTaxonomy();
+
             CreateNavigationWebPage();
+
             InstallationRan = true;
+        }
+
+        private void CreateNavigationTypesTaxonomy()
+        {
+            var taxonomyInfo = _taxonomyInfoProvider.Get("NavigationGroups");
+            if (taxonomyInfo == null) {
+                taxonomyInfo = new TaxonomyInfo() {
+                    TaxonomyDescription = "Groups the Navigation Item belongs to (ex \"Mobile\" or \"Main\"), used when filtering the Main Navigation for different purposes.",
+                    TaxonomyName = "NavigationGroups",
+                    TaxonomyTitle = "Navigation Groups",
+                    TaxonomyGUID = Guid.Parse("A1357C75-1925-4F91-B2FD-B151906A38D0")
+                };
+                _taxonomyInfoProvider.Set(taxonomyInfo);
+            }
         }
 
         private void CreateNavigationWebPage()
@@ -310,6 +329,29 @@ namespace Account.Installers
                 contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkCSS), fieldLinkCSS);
             } else {
                 contentItemCommonDataForm.AddFormItem(fieldLinkCSS);
+            }
+
+            // Add or Update Groups Field
+            var existingFieldGroups = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationGroups));
+            var fieldGroups = existingFieldGroups ?? new FormFieldInfo();
+            fieldGroups.Name = nameof(NavigationType.NavigationGroups);
+            fieldGroups.AllowEmpty = true;
+            fieldGroups.Precision = 0;
+            fieldGroups.DataType = "taxonomy";
+            fieldGroups.Enabled = true;
+            fieldGroups.Visible = true;
+            fieldGroups.Guid = Guid.Parse("6ca6d829-5c16-47d4-bef4-6f073d6118d2");
+            fieldGroups.SetComponentName("Kentico.Administration.TagSelector");
+            fieldGroups.Settings.Add("TaxonomyGroup", "[\"a1357c75-1925-4f91-b2fd-b151906a38d0\"]");
+            fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Navigation Groups");
+            fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, @"Used in filtering with the INavigationRepository.GetNavItemsAsync(navTypes: [""TagNameHere""]). This way you can have nav items be included or excluded based on context, such as logged in or mobile menu vs. main");
+            fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
+            fieldGroups.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
+
+            if (existingFieldGroups != null) {
+                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationGroups), fieldGroups);
+            } else {
+                contentItemCommonDataForm.AddFormItem(fieldGroups);
             }
 
             // Add or Update IsDynamic Field

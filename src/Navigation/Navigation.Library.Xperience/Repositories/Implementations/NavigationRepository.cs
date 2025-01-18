@@ -33,7 +33,8 @@ namespace Navigation.Repositories.Implementations
                                       IMemberAuthorizationFilter memberAuthorizationFilter,
                                       IDynamicNavigationRepository dynamicNavigationRepository,
                                       IIdentityService identityService,
-                                      IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository) : INavigationRepository, ISecondaryNavigationService
+                                      IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
+                                      ICategoryCachedRepository categoryCachedRepository) : INavigationRepository, ISecondaryNavigationService
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
@@ -45,6 +46,7 @@ namespace Navigation.Repositories.Implementations
         private readonly IDynamicNavigationRepository _dynamicNavigationRepository = dynamicNavigationRepository;
         private readonly IIdentityService _identityService = identityService;
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
+        private readonly ICategoryCachedRepository _categoryCachedRepository = categoryCachedRepository;
 
         public Task<string> GetAncestorPathAsync(string path, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
@@ -272,9 +274,9 @@ namespace Navigation.Repositories.Implementations
             if (navPath.TryGetValue(out var pathForBuilder)) {
                 builder.WebPagePath(pathForBuilder.Trim('%'), PathTypeEnum.Section);
             }
-            if (navTypes.Any()) {
-                builder.ObjectType(ContentItemCategoryInfo.OBJECT_TYPE);
-            }
+
+            // Convert Navigation Tag Names to Guids
+            var navGroupings = _categoryCachedRepository.GetCategoryIdentifiertoCategoryCached(navTypes.Select(x => x.ToObjectIdentity())).Select(x => x.CategoryGuid);
 
             var results = await _progressiveCache.LoadAsync(async cs => {
                 var additionalDependencies = _cacheDependencyBuilderFactory.Create(false);
@@ -285,7 +287,7 @@ namespace Navigation.Repositories.Implementations
                             queryForPath => queryForPath.ForWebsite(_websiteChannelContext.WebsiteChannelName, PathMatch.Section(navPathVal), includeUrlPath: true),
                             queryWithoutPath => queryWithoutPath.ForWebsite(_websiteChannelContext.WebsiteChannelName, includeUrlPath: true)
                        )
-                       .If(navTypes.Any(), query => query.ContentItemCategoryCondition(_relationshipExtendedHelper, navTypes.Select(x => (object)x)))
+                       .If(navGroupings.Any(), query => query.Where(where => where.WhereContainsTags(nameof(NavigationPageType.NavigationGroups), navGroupings)))
                        .OrderByWebpageItemOrder()
                        )
                        .WithCultureContext(_cacheRepositoryContext);

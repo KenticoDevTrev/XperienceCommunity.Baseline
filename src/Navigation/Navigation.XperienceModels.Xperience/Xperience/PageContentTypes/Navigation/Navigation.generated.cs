@@ -89,10 +89,17 @@ namespace Generic
 		public string NavigationLinkCSS { get; set; }
 
 
-		/// <summary>
-		/// IsDynamic.
-		/// </summary>
-		public bool IsDynamic { get; set; }
+        /// <summary>
+        /// NavigationGroups.
+        /// </summary>
+        public IEnumerable<TagReference> NavigationGroups { get; set; }
+
+
+
+        /// <summary>
+        /// IsDynamic.
+        /// </summary>
+        public bool IsDynamic { get; set; }
 
 
 		/// <summary>
