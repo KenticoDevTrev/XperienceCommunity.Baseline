@@ -20,6 +20,13 @@ By setting the `NavigationType` to `Manual`, you are presented with a `Link Text
 
 By checking `Is Mega Menu`, you will be able to go to the Page Builder and via the widget, add in any widgets you want into it.  This will then be rendered when the navigation displays (by default, Mega Menu is usually only supported on the first level, but you can change things up if you wish)
 
+
+#### Mega Menu Navigation and _Layout-NoHeader.cshtml
+
+Since most page renderings use the main _layout, and the layout usually contains the Navigation on it, when editing Navigation Items in the page builder, it's vital to use a layout that does NOT have the main navigation in it (otherwise it will try to render out the navigation item you're modifying).
+
+The default Navigation Page Template uses the `/Views/Shared/_Layout-NoHeader.cshtml` which you'll need to create or include if you use this feature.  The starting site contains this file already.  If you wish to change where this file location is, you can overwrite the [/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml](../../src/Navigation/Navigation.RCL.Xperience/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml) with your own copy.
+
 ### Navigation Styling and Advanced Functionality
 
 There is also an optional place to put a `Alternative Text` if you wish (usually un-needed as the text within a link is considered accessible enough, but if you choose to use an icon only for the link text of a manual one, this is a good idea to set this).
@@ -40,12 +47,6 @@ There is an `Is Dynamic` which if checked, allows you to fill out a "Repeater" s
 ### Dynamic Navigation - Xperience by Kentico
 
 There is a `Is Dynamic` and `Dynamic Menu Identifier`, that when set will call the `IDynamicNavigationRepository` (which you should overwrite) with that menu identifier.  It's up to you to then check what the identifier is, and perform any logic you wish to retrieve and build an Array of `NavigationItem`s for the children.  An example would be `BlogArticles` as the Menu Identifier, and you retrieve recent blog articles and convert them to `NavigationItem`s
-
-### Dynamic Navigation and _Layout-NoHeader.cshtml
-
-Since most page renderings use the main _layout, and the layout usually contains the Navigation on it, when editing Navigation Items in the page builder, it's vital to use a layout that does NOT have the main navigation in it (otherwise it will try to render out the navigation item you're modifying).
-
-The default Navigation Page Template uses the `/Views/Shared/_Layout-NoHeader.cshtml` which you'll need to create or include if you use this feature.  The starting site contains this file already.  If you wish to change where this file location is, you can overwrite the [/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml](../../src/Navigation/Navigation.RCL.Xperience/Features/Navigation/PartialNavigation/NavigationPageTemplate.cshtml) with your own copy.
 
 ## Placing the Main Navigation
 

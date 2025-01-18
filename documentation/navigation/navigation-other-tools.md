@@ -15,6 +15,17 @@ Below are a list of notable interfaces, models, and other systems.  Most of thes
 - [ISiteMapRepository](../../src/Navigation/Navigation.Models/Repositories/INavigationRepository.cs)
   - **GetSiteMapUrlSetAsync**: Retrieves the default Sitemap Set, for logic see [the sitemap documentation](navigation-sitemap.md)
 
+Xperience by Kentico Only
+
+- [IDynamicNavigationRepository](../../src/Navigation/Navigation.Library.Xperience/Repositories/IDynamicNavigationRepository.cs)
+  - **GetDynamicNavigation**: If a Navigation Page type has the IsDynamic and the code name given, it is up to you to implement this repository and return the NavigationItems for the dynamicly requested sub nav.
+- [ISiteMapService](../../src/Navigation/Navigation.Library.Xperience/Services/ISiteMapService.cs)
+  - **ConvertToSitemapNode**: Converts the given IContentQueryDataContainers into SiteMapNodes
+- [ISiteMapCustomizationService](../../src/Navigation/Navigation.Library.Xperience/Services/ISiteMapService.cs)
+  - **CustomizeCasting**: Allows you to optionally control the SitemapNode generated from the given IContentQueryDataContainer items and the content type.  Called within the `ISiteMapService.ConvertToSitemapNode`
+  - **GetAdditionalSitemapNodes**: Allows you to add Additional SitemapNodes that are custom and not derivable from the `Navigation` page type and pages inheriting `BaseMetadata` Reusable Schema
+- [ISecondaryNavigationService](../../src/Navigation/Navigation.Library.Xperience/Services/ISecondaryNavigationService.cs)
+  - **FilterAndConvertIWebPageContentQueryDataContainerItems**: Uses the [Membership Roles](https://github.com/KenticoDevTrev/MembershipRoles_Temp) system to filter out any items that the current user does not have access to.  This is used within the normal `INavigationRepository` but you can leverage it yourself if you wish.
 
 ## View Components
 
