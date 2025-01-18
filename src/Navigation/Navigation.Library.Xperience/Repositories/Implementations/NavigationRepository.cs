@@ -316,7 +316,7 @@ namespace Navigation.Repositories.Implementations
 
                 return new DTOWithDependencies<NavItemsAndJoinedDocs>(new NavItemsAndJoinedDocs(navItems, additionalItemDictionary, []), additionalDependencies.GetKeys().ToList());
 
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), navPath.GetValueOrDefault(string.Empty), string.Join(",", navTypes.GetValueOrDefault([]))));
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), navPath.GetValueOrDefault(string.Empty), string.Join(",", navGroupings.GetValueOrDefault([]))));
 
             // Add any dependencies found during retrieval.
             builder.AddKeys(results.AdditionalDependencies);
