@@ -10,7 +10,7 @@
   <ItemGroup>
 	  <PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="13.0.131" />
 	  <PackageReference Include="RelationshipsExtended.MVC.Standard" Version="13.0.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.Library.KX13" Version="2.4.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Library.KX13" Version="2.4.5" />
   </ItemGroup>
 
   <ItemGroup>

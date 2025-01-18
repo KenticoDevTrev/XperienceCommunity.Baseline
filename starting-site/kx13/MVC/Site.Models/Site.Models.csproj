@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.Baseline.Core.Models" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Models" Version="2.4.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Models" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Models" Version="2.4.5" />
   </ItemGroup>
 
   <ItemGroup>

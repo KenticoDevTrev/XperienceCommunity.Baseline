@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="XperienceCommunity.Baseline.Core.Library" Version="2.4.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Library" Version="2.4.5" />
   </ItemGroup>
 
   <ItemGroup>

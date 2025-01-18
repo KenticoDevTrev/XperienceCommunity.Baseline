@@ -45,6 +45,8 @@ Likewise, some features listed in this documentation are only in the Xperience b
   - [Link Accessibility](core/core-link-accessibility.md)
   - [Url Redirect](core/core-redirect.md)
   - [Error Pages](core/core-error-pages.md)
+  - [FUTURE - Html String Media and Link Accessability](core/core-media-link-accessibility-string.md)
+  - [FUTURE - Cookie Permissions](core/core-cookie-permissions.md)
 
 ## Navigation Module
 

@@ -19,13 +19,13 @@
 
   <ItemGroup>
     <PackageReference Include="Kentico.Xperience.Admin" Version="30.0.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Account.Admin.Xperience" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.Admin.Xperience" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Localization.Admin.Xperience" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Admin.Xperience" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene" Version="2.4.4" />
-    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.Admin.Xperience" Version="2.4.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.Admin.Xperience" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.Admin.Xperience" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.Admin.Xperience" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.Admin.Xperience" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Admin.Xperience.Lucene" Version="2.4.5" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.Admin.Xperience" Version="2.4.5" />
   </ItemGroup>
 
   <ItemGroup>
