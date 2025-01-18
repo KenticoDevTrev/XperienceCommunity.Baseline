@@ -123,9 +123,9 @@ namespace Navigation.Repositories.Implementations
                 }
                 var itemBuilder = new ContentItemQueryBuilder().ForContentTypes(query => {
                     query.ForWebsite(channelName, PathMatch.Section("/"), includeUrlPath: true);
-                    //if (validClassNames.Any()) {
-                    //    query.OfContentType(validClassNames);
-                    //}
+                    if (validClassNames.Length != 0) {
+                        query.OfContentType(validClassNames);
+                    }
                 })
                 .WithCultureContext(_cacheRepositoryContext);
 

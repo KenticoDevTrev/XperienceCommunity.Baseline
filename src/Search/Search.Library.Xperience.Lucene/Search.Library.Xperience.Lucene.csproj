@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Search.Library.Xperience\Search.Library.Xperience.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

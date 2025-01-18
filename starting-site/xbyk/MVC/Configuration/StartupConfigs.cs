@@ -197,7 +197,10 @@ namespace MVC.Configuration
 
                         // BASELINE CUSTOMIZATION - TabbedPages - If using TabbedPages, MUST add it here
                         Generic.TabParent.CONTENT_TYPE_NAME,
-                        Generic.Tab.CONTENT_TYPE_NAME
+                        Generic.Tab.CONTENT_TYPE_NAME,
+
+                        // BASELINE CUSTOMIZATION - Search - If using Search with it's Page, MUST add it here
+                        Generic.Search.CONTENT_TYPE_NAME,
 
                     ],
                     // Specifies a default section for the page builder feature

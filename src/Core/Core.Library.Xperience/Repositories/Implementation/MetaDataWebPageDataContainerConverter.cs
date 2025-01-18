@@ -35,7 +35,8 @@ namespace Core.Repositories.Implementation
             string? ogImage = null;
             string? url = null;
             var dataFound = false;
-
+            // TODO: just try to do a type cast if it's an actual right object, didn't realize these do map
+            // ex: if(webPageContentQueryData is IBaseMetadata baseMetadata)
             try {
                 if (webPageContentQueryData.GetValue<string>(nameof(IBaseMetadata.MetaData_Title)).AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataTitle)) {
                     title = metaDataTitle;

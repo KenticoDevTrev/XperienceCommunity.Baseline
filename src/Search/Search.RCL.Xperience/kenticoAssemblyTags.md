@@ -6,5 +6,6 @@ Below are the various assembly tags that you will want to include in your projec
     "Generic.Search_Default",
     "Search",
     typeof(SearchPageTemplateProperties),
-    "~/Features/Search/SearchPageTemplate.cshtml")]
+    "~/Features/Search/SearchPageTemplate.cshtml",
+    ContentTypeNames = [Search.CONTENT_TYPE_NAME])]
 ```

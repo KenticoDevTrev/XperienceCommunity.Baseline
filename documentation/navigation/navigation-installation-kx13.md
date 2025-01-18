@@ -28,3 +28,14 @@ Optionally, you can also call `UseSitemap` which adds the sitemap interface hook
 
 Lastly, if you wish to use the Navigation's built in [SitemapController](../../src/Navigation/Navigation.RCL/Features/Sitemap/SiteMapController.cs), you can use the `IEndpointRouteBuilder.UseSitemapRoute` extension (with optional sitemap patterns).
 
+## 4. Page Template
+
+For Navigation Items, in order to get the Mega Menu functionality, you also need to register the page template and the Page type
+
+``` csharp
+[assembly: RegisterPageTemplate(
+    "Generic.Navigation_Default",
+    "Navigation",
+    typeof(NavigationPageTemplateProperties),
+    "/Features/PartialNavigation/NavigationPageTemplate.cshtml")]
+```

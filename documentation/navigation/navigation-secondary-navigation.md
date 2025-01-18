@@ -1,6 +1,6 @@
 # Secondary Navigation
 
-Unlike main navigations, secondary navigations are almost always contextual, based on the web pages at and around the current page.
+Unlike main navigations, secondary navigations are almost always contextual, based on the web pages at and around the current page. 
 
 The Navigation module contains the [SecondaryNavigationViewComponent](../../src/Navigation/Navigation.RCL/Components/Navigation/SecondaryNavigation/SecondaryNavigationViewComponent.cs) which takes a `SecondaryNavigationProperties` and renders out the secondary navigation based on those properties.  Let's break them down.
 
@@ -35,6 +35,9 @@ You do this largely through the [customization point](../general/customization-p
 - [/Components/Navigation/SecondaryNavigation/SecondaryNavigation.cshtml](../../src/Navigation/Navigation.RCL/Components/Navigation/SecondaryNavigation/SecondaryNavigation.cshtml): The wrapper around your navigation and where the screen reader / Navigation Page Selector are optionally rendered.
 - [/Components/Navigation/SecondaryNavigation/SecondaryNavigationItem.cshtml](../../src/Navigation/Navigation.RCL/Components/Navigation/SecondaryNavigation/SecondaryNavigation.cshtml): The First Level Navigation
 - [/Components/Navigation/SecondaryNavigation/SecondaryNavigationDropdownItem.cshtml](../../src/Navigation/Navigation.RCL/Components/Navigation/SecondaryNavigation/SecondaryNavigation.cshtml): All levels below the first level, handles rendering items and their nested children.
+
+## Allowed Page Types for Breadcrumbs / Secondary Navigation
+ What pages are allowed in the Secondary Navigation are configured in a Web Channel Settings (Admin -> Channel Managemenet -> (Select your channel) -> Navigation Channel Settings -> Navigation Page Types).  This is used for Breadcrumbs and Secondary Navigation Selection (unless the Secondary Navigation specifies the page types).
 
 ## Customizing Everything
 

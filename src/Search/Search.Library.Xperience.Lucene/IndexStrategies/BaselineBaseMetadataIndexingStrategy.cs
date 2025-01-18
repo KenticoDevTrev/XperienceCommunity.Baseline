@@ -48,7 +48,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
             // IIndexEventItemModel could be a reusable content item or a web page item, so we use
             // pattern matching to get access to the web page item specific type and fields
             if (item is IndexEventWebPageItemModel indexedPage) {
-                // Get basic navigation data from IBaseMetada and IBaseRedirect
+                // Get basic navigation data from IBaseMetada or IXperienceCommunityMemberPermissionConfiguration
                 var result = await GetBaseMetadataCached(indexedPage.ItemID, indexedPage.WebsiteChannelName, indexedPage.LanguageName);
                 if (result == null) {
                     return null;
@@ -132,6 +132,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
                         config
                             .OfReusableSchema([IBaseMetadata.REUSABLE_FIELD_SCHEMA_NAME, IXperienceCommunityMemberPermissionConfiguration.REUSABLE_FIELD_SCHEMA_NAME])
                             .ForWebsite(channelName, includeUrlPath: true)
+                            .WithLinkedItems(2) // for metadata images
                     )
                     .InLanguage(languageName);
 

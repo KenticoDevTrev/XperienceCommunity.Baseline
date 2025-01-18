@@ -21,6 +21,8 @@ using Navigation.Services;
 using Generic;
 using Core.Repositories;
 using XperienceCommunity.MemberRoles.Services;
+using XperienceCommunity.ChannelSettings.Repositories;
+using System.Linq;
 
 namespace Navigation.Repositories.Implementations
 {
@@ -34,7 +36,8 @@ namespace Navigation.Repositories.Implementations
                                       IDynamicNavigationRepository dynamicNavigationRepository,
                                       IIdentityService identityService,
                                       IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
-                                      ICategoryCachedRepository categoryCachedRepository) : INavigationRepository, ISecondaryNavigationService
+                                      ICategoryCachedRepository categoryCachedRepository,
+                                      IChannelCustomSettingsRepository channelCustomSettingsRepository) : INavigationRepository, ISecondaryNavigationService
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
@@ -47,6 +50,7 @@ namespace Navigation.Repositories.Implementations
         private readonly IIdentityService _identityService = identityService;
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
         private readonly ICategoryCachedRepository _categoryCachedRepository = categoryCachedRepository;
+        private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
 
         public Task<string> GetAncestorPathAsync(string path, int levels, bool levelIsRelative = true, int minAbsoluteLevel = 2)
         {
@@ -234,20 +238,23 @@ namespace Navigation.Repositories.Implementations
                 .Navigation(true)
                 .WebPagePath(startingPath, pageTypeEnum);
 
+            // Default to site settings if available
+            var pageTypesToSelect = pageTypes != null && pageTypes.Any() ? pageTypes.ToArray() : (await _channelCustomSettingsRepository.GetSettingsModel<NavigationChannelSettings>()).NavigationPageTypes.SplitAndRemoveEntries();
+
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
 
                 var contentTypeIds = new List<int>();
-                if (pageTypes != null && pageTypes.Any()) {
+                if (pageTypesToSelect != null && pageTypesToSelect.Any()) {
                     contentTypeIds = (await DataClassInfoProvider.GetClasses()
-                    .WhereIn(nameof(DataClassInfo.ClassName), pageTypes.ToArray())
+                    .WhereIn(nameof(DataClassInfo.ClassName), pageTypesToSelect.ToArray())
                     .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
                     .Columns(nameof(DataClassInfo.ClassID))
                     .GetEnumerableTypedResultAsync())
                     .Select(x => x.ClassID).ToList();
-                }
+                } 
 
                 // Include content type fields if there is an order or where condition as it may be part of it.
                 var navQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
@@ -265,7 +272,7 @@ namespace Navigation.Repositories.Implementations
                         })
                     .WithCultureContext(_cacheRepositoryContext);
                 return await _contentQueryExecutor.GetWebPageResult(navQueryBuilder, x => x, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
-            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetSecondaryNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), startingPath, pathType.ToString(), _websiteChannelContext.WebsiteChannelName, string.Join(",", pageTypes.GetValueOrDefault([])), nestingLevel, topN));
+            }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetSecondaryNavigationItemsAsync", _cacheRepositoryContext.GetCacheKey(), startingPath, pathType.ToString(), _websiteChannelContext.WebsiteChannelName, string.Join(",", pageTypesToSelect.GetValueOrDefault([])), nestingLevel, topN));
         }
 
         private async Task<NavItemsAndJoinedDocs> GetNavigationItemsAsync(Maybe<string> navPath, IEnumerable<string> navTypes)
