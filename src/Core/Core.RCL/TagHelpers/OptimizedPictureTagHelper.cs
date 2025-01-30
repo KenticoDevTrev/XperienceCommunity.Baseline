@@ -8,7 +8,7 @@ namespace Core.TagHelpers
     public class OptimizedPictureTagHelper : TagHelper
     {
         private readonly string[] _optimizedImageExtensions = ["jpg", "jpeg", "png"];
-        private readonly string[] _webpImageExtensions = ["jpg", "jpeg"];
+        private readonly string[] _webpImageExtensions = ["jpg", "jpeg", "png"];
 
         [HtmlAttributeName("bl-optimize")]
         public bool UseThisThing { get; set; } = true;
@@ -36,8 +36,8 @@ namespace Core.TagHelpers
                             output.PreElement.AppendHtml("<picture>");
 
                             var altString = output.Attributes.ContainsName("alt") ? $"alt=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["alt"].Value.ToString() ?? "")}\"" : "";
-                            var heightString = output.Attributes.ContainsName("height") ? $"height=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["width"].Value.ToString() ?? "")}\"" : "";
-                            var widthString = output.Attributes.ContainsName("width") ? $"width=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["height"].Value.ToString() ?? "")}\"" : "";
+                            var heightString = output.Attributes.ContainsName("height") ? $"height=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["height"].Value.ToString() ?? "")}\"" : "";
+                            var widthString = output.Attributes.ContainsName("width") ? $"width=\"{HttpUtility.HtmlAttributeEncode(output.Attributes["width"].Value.ToString() ?? "")}\"" : "";
 
                             // use WebP
                             if (hasWebp)

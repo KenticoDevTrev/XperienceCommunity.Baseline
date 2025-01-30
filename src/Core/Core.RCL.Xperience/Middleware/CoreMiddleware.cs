@@ -52,7 +52,8 @@ namespace Core
             Action<MetadataOptions>? metaDataOptionsConfiguration = null,
             Action<ImageProcessingOptions>? imageProcessingOptionsConfiguration = null,
             Action<MediaTagHelperOptions>? imageTagHelperOptionsConfiguration = null,
-            IPersistantStorageConfiguration? persistantStorageConfiguration = null
+            IPersistantStorageConfiguration? persistantStorageConfiguration = null,
+            bool addAjaxPWPJs = false
             ) where TUser : ApplicationUser, new()
         {
             // Configuration Points
@@ -89,7 +90,7 @@ namespace Core
             services.AddChannelCustomSettings();
 
             // Used by Tabs and Navigation modules
-            services.AddPartialWidgetPage();
+            services.AddPartialWidgetPage(addAjaxPWPJs);
 
             // XperienceCommunity.ImageProcessing
             var imageProcessingOptions = new ImageProcessingOptions() { ProcessContentItemAssets = true, ProcessMediaLibrary = true };
