@@ -50,7 +50,8 @@ namespace Microsoft.AspNetCore.Builder
                 .AddScoped<IRoleService, RoleService<TUser, TRole>>()
                 .AddScoped<ISignInManagerService, SignInManagerService<TUser>>()
                 .AddScoped<IUserManagerService, UserManagerService<TUser>>()
-                .AddScoped<IUserService, UserService<TUser>>();
+                .AddScoped<IUserService, UserService<TUser>>()
+                .AddScoped<IUserRoleRepository, UserRoleRepository>();
 
             // Baseline Configuration of External Authentication
             var defaultObj = new AuthenticationConfigurations() {

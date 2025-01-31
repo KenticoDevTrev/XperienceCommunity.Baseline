@@ -18,8 +18,39 @@
         }
     }
 
+    public record ObjectIdentityFilled : ICacheKey
+    {
+        public ObjectIdentityFilled(int id, Guid guid, string codeName)
+        {
+            Id = id;
+            Guid = guid;
+            CodeName = codeName;
+        }
+        public int Id { get; init; }
+        public Guid Guid { get; init; }
+        public string CodeName { get; init; }
+
+        public string GetCacheKey()
+        {
+            return $"{Id.GetValueOrDefault(0)}{CodeName.GetValueOrDefault(string.Empty)}{Guid.GetValueOrDefault(System.Guid.Empty)}";
+
+        }
+
+        public override int GetHashCode()
+        {
+            return GetCacheKey().GetHashCode();
+        }
+    }
+
     public static class ObjectIdentityExtensionMethods
     {
+        public static ObjectIdentity ToObjectIdentity(this ObjectIdentityFilled identity) => new() {
+                Id = identity.Id,
+                Guid = identity.Guid,
+                CodeName = identity.CodeName
+            };
+        
+
         /// <summary>
         /// Returns the requested identity value (if not present, will retrieve it)
         /// </summary>
