@@ -31,7 +31,7 @@ namespace Admin.Installer
 
         private async Task CheckAndCreateWebChannel()
         {
-            if ((await _channelInfoProvider.Get().GetEnumerableTypedResultAsync()).Any()) {
+            if (!(await _channelInfoProvider.Get().GetEnumerableTypedResultAsync()).Any()) {
                 var webChannel = new ChannelInfo() {
                     ChannelDisplayName = "Web",
                     ChannelName = "Web",
