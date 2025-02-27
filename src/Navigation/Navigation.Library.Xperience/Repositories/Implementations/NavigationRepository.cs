@@ -31,7 +31,6 @@ namespace Navigation.Repositories.Implementations
                                       IProgressiveCache progressiveCache,
                                       ICacheRepositoryContext cacheRepositoryContext,
                                       IWebsiteChannelContext websiteChannelContext,
-                                      IRelationshipExtendedHelper relationshipExtendedHelper,
                                       IMemberAuthorizationFilter memberAuthorizationFilter,
                                       IDynamicNavigationRepository dynamicNavigationRepository,
                                       IIdentityService identityService,
@@ -44,7 +43,6 @@ namespace Navigation.Repositories.Implementations
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
-        private readonly IRelationshipExtendedHelper _relationshipExtendedHelper = relationshipExtendedHelper;
         private readonly IMemberAuthorizationFilter _memberAuthorizationFilter = memberAuthorizationFilter;
         private readonly IDynamicNavigationRepository _dynamicNavigationRepository = dynamicNavigationRepository;
         private readonly IIdentityService _identityService = identityService;

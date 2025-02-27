@@ -17,22 +17,18 @@ using XperienceCommunity.MemberRoles;
 namespace Search.Library.Xperience.Lucene.IndexStrategies
 {
     public class BaselineBaseMetadataIndexingStrategy(
-        IWebPageQueryResultMapper webPageMapper,
         IContentQueryExecutor queryExecutor,
         IProgressiveCache progressiveCache,
         IWebPageQueryResultMapper webPageQueryResultMapper,
-        IContentItemReferenceService contentItemReferenceService,
         IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter,
         BaselineSearchLuceneWebCrawlerService baselineSearchLuceneWebCrawlerService,
         BaselineSearchLuceneWebScraperSanitizer baselineSearchLuceneWebScraperSanitizer,
         IInfoProvider<TagInfo> tagInfoProvider
         ) : DefaultLuceneIndexingStrategy
     {
-        private readonly IWebPageQueryResultMapper _webPageMapper = webPageMapper;
         private readonly IContentQueryExecutor _queryExecutor = queryExecutor;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IWebPageQueryResultMapper _webPageQueryResultMapper = webPageQueryResultMapper;
-        private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
         private readonly BaselineSearchLuceneWebCrawlerService _baselineSearchLuceneWebCrawlerService = baselineSearchLuceneWebCrawlerService;
         private readonly BaselineSearchLuceneWebScraperSanitizer _baselineSearchLuceneWebScraperSanitizer = baselineSearchLuceneWebScraperSanitizer;

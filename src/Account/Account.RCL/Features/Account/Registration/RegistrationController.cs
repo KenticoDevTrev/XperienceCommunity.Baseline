@@ -86,7 +86,7 @@ namespace Account.Features.Account.Registration
         [Route("Account/ResendRegistration")]
         public async Task<ActionResult> ResendRegistration(ResendConfirmationViewModel model)
         {
-            var registrationUrl = await _accountSettingsRepository.GetAccountRegistrationUrlAsync(GetUrl());
+            // var registrationUrl = await _accountSettingsRepository.GetAccountRegistrationUrlAsync(GetUrl());
             // verify token
             var userResult = await _userRepository.GetUserAsync(model.UserName);
             if(userResult.IsFailure) {

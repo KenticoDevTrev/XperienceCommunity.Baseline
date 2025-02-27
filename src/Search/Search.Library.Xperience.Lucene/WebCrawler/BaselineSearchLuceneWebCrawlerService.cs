@@ -6,9 +6,9 @@ namespace Search.WebCrawler
 {
     public class BaselineSearchLuceneWebCrawlerService
     {
-        private readonly HttpClient httpClient;
-        private readonly IEventLogService log;
-        private readonly IWebPageUrlRetriever webPageUrlRetriever;
+        private readonly HttpClient _httpClient;
+        private readonly IEventLogService _log;
+        private readonly IWebPageUrlRetriever _webPageUrlRetriever;
 
         public BaselineSearchLuceneWebCrawlerService(
             HttpClient httpClient,
@@ -18,23 +18,23 @@ namespace Search.WebCrawler
         {
             string baseUrl = appSettingsService["WebCrawlerBaseUrl"];
 
-            this.httpClient = httpClient;
-            this.httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "SearchCrawler");
-            this.httpClient.BaseAddress = new Uri(baseUrl);
+            _httpClient = httpClient;
+            _httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "SearchCrawler");
+            _httpClient.BaseAddress = new Uri(baseUrl);
 
-            this.log = log;
-            this.webPageUrlRetriever = webPageUrlRetriever;
+            _log = log;
+            _webPageUrlRetriever = webPageUrlRetriever;
         }
 
         public async Task<string> CrawlWebPage(IWebPageFieldsSource page)
         {
             try {
-                var url = await webPageUrlRetriever.Retrieve(page);
+                var url = await _webPageUrlRetriever.Retrieve(page);
                 string path = url.RelativePath.TrimStart('~').TrimStart('/');
 
                 return await CrawlPage(path);
             } catch (Exception ex) {
-                log.LogException(
+                _log.LogException(
                     nameof(BaselineSearchLuceneWebCrawlerService),
                     nameof(CrawlWebPage),
                     ex,
@@ -46,10 +46,10 @@ namespace Search.WebCrawler
         public async Task<string> CrawlPage(string url)
         {
             try {
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 return await response.Content.ReadAsStringAsync();
             } catch (Exception ex) {
-                log.LogException(
+                _log.LogException(
                     nameof(BaselineSearchLuceneWebCrawlerService),
                     nameof(CrawlPage),
                     ex,
