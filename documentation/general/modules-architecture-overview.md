@@ -115,7 +115,7 @@ The Baseline also comes with a Starting Site that follows a similar structure.  
   - References
     - Core.Admin.Xperience
     - ____.Admin.Xperience
-    - XperienceModels
+    - XperienceModels (KX13 or XbyK) OR Site.Library.Xperience (XbyK only - If you wish to have more shared libraries)
 - **MVC**
   - The main project, since `IServiceCollection` and Middleware hookups are here
   - The site version of the` ____.RCL.[KX13|Xperience]` libraries
