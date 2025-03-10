@@ -3,6 +3,7 @@ using CMS.ContentEngine.Internal;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.FormEngine;
+using System.Collections;
 using NavigationType = Generic.Navigation;
 namespace Account.Installers
 {
@@ -112,7 +113,7 @@ namespace Account.Installers
 
 
             // Add or Update Title Field
-            var existingFieldTitle = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationType));
+            var existingFieldTitle = formInfo.GetFormField(nameof(NavigationType.NavigationType));
             var fieldTitle = existingFieldTitle ?? new FormFieldInfo();
             fieldTitle.Name = nameof(NavigationType.NavigationType);
             fieldTitle.AllowEmpty = false;
@@ -123,9 +124,9 @@ namespace Account.Installers
             fieldTitle.Visible = true;
             fieldTitle.Guid = Guid.Parse("3d1d9d6b-1d41-467a-8660-a1269f33e1cd");
             fieldTitle.SetComponentName("Kentico.Administration.DropDownSelector");
-            fieldTitle.Settings.Add("Options", "automatic;Automatic\nmanual;Manual");
-            fieldTitle.Settings.Add("OptionsValueSeparator", ";");
-            fieldTitle.Settings.Add("Placeholder", "automatic");
+            fieldTitle.Settings.AddOrReplace("Options", "automatic;Automatic\nmanual;Manual");
+            fieldTitle.Settings.AddOrReplace("OptionsValueSeparator", ";");
+            fieldTitle.Settings.AddOrReplace("Placeholder", "automatic");
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Navigation Type");
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.DefaultValue, "automatic");
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Whether or not the Navigation Item should automatically build itself off of the selected page, or if you want to manually enter in the information.");
@@ -134,13 +135,13 @@ namespace Account.Installers
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldTitle != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationType), fieldTitle);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationType), fieldTitle);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTitle);
+                formInfo.AddFormItem(fieldTitle);
             }
 
             // Add or Update Description Field
-            var existingFieldDescription = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationWebPageItemGuid));
+            var existingFieldDescription = formInfo.GetFormField(nameof(NavigationType.NavigationWebPageItemGuid));
             var fieldDescription = existingFieldDescription ?? new FormFieldInfo();
             fieldDescription.Name = nameof(NavigationType.NavigationWebPageItemGuid);
             fieldDescription.AllowEmpty = true;
@@ -150,21 +151,21 @@ namespace Account.Installers
             fieldDescription.Visible = true;
             fieldDescription.Guid = Guid.Parse("abd80753-a218-4382-b245-30d1adb8064e");
             fieldDescription.SetComponentName("Kentico.Administration.WebPageSelector");
-            fieldTitle.Settings.Add("MaximumPages", "1");
-            fieldTitle.Settings.Add("Sortable", "False");
+            fieldTitle.Settings.AddOrReplace("MaximumPages", "1");
+            fieldTitle.Settings.AddOrReplace("Sortable", "False");
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Page");
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Can select a page, the navigation will be based on this page's WebPageItemName and Url");
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldDescription != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationWebPageItemGuid), fieldDescription);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationWebPageItemGuid), fieldDescription);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDescription);
+                formInfo.AddFormItem(fieldDescription);
             }
 
             // Add or Update LinkText Field
-            var existingFieldLinkText = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkText));
+            var existingFieldLinkText = formInfo.GetFormField(nameof(NavigationType.NavigationLinkText));
             var fieldLinkText = existingFieldLinkText ?? new FormFieldInfo();
             fieldLinkText.Name = nameof(NavigationType.NavigationLinkText);
             fieldLinkText.AllowEmpty = true;
@@ -174,9 +175,9 @@ namespace Account.Installers
             fieldLinkText.Visible = true;
             fieldLinkText.Guid = Guid.Parse("b7e9ec6e-bab6-48b6-a069-3f51819adea1");
             fieldLinkText.SetComponentName("Kentico.Administration.TextArea");
-            fieldLinkText.Settings.Add("CopyButtonVisible", "False");
-            fieldLinkText.Settings.Add("MaxRowsNumber", "5");
-            fieldLinkText.Settings.Add("MinRowsNumber", "1");
+            fieldLinkText.Settings.AddOrReplace("CopyButtonVisible", "False");
+            fieldLinkText.Settings.AddOrReplace("MaxRowsNumber", "5");
+            fieldLinkText.Settings.AddOrReplace("MinRowsNumber", "1");
             fieldLinkText.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Link Text");
             fieldLinkText.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Can be HTML (icons and stuff), but be sure to make it valid HTML if you do.");
             fieldLinkText.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
@@ -184,13 +185,13 @@ namespace Account.Installers
             fieldLinkText.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>NavigationType</PropertyName><Value>manual</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
 
             if (existingFieldLinkText != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkText), fieldLinkText);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkText), fieldLinkText);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkText);
+                formInfo.AddFormItem(fieldLinkText);
             }
 
             // Add or Update LinkUrl Field
-            var existingFieldLinkUrl = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkUrl));
+            var existingFieldLinkUrl = formInfo.GetFormField(nameof(NavigationType.NavigationLinkUrl));
             var fieldLinkUrl = existingFieldLinkUrl ?? new FormFieldInfo();
             fieldLinkUrl.Name = nameof(NavigationType.NavigationLinkUrl);
             fieldLinkUrl.AllowEmpty = true;
@@ -208,13 +209,13 @@ namespace Account.Installers
             fieldLinkUrl.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>NavigationType</PropertyName><Value>manual</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
 
             if (existingFieldLinkUrl != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkUrl), fieldLinkUrl);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkUrl), fieldLinkUrl);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkUrl);
+                formInfo.AddFormItem(fieldLinkUrl);
             }
 
             // Add or Update LinkTarget Field
-            var existingFieldLinkTarget = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkTarget));
+            var existingFieldLinkTarget = formInfo.GetFormField(nameof(NavigationType.NavigationLinkTarget));
             var fieldLinkTarget = existingFieldLinkTarget ?? new FormFieldInfo();
             fieldLinkTarget.Name = nameof(NavigationType.NavigationLinkTarget);
             fieldLinkTarget.AllowEmpty = false;
@@ -225,9 +226,9 @@ namespace Account.Installers
             fieldLinkTarget.Visible = true;
             fieldLinkTarget.Guid = Guid.Parse("b446d1a8-c5e6-4812-84db-bd6b133c7a3e");
             fieldLinkTarget.SetComponentName("Kentico.Administration.DropDownSelector");
-            fieldLinkTarget.Settings.Add("Options", "_self;Open in this window\n_blank;Open in a new window");
-            fieldLinkTarget.Settings.Add("OptionsValueSeparator", ";");
-            fieldLinkTarget.Settings.Add("Placeholder", "_self");
+            fieldLinkTarget.Settings.AddOrReplace("Options", "_self;Open in this window\n_blank;Open in a new window");
+            fieldLinkTarget.Settings.AddOrReplace("OptionsValueSeparator", ";");
+            fieldLinkTarget.Settings.AddOrReplace("Placeholder", "_self");
             fieldLinkTarget.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Link Target");
             fieldLinkTarget.SetPropertyValue(FormFieldPropertyEnum.DefaultValue, "_self");
             fieldLinkTarget.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
@@ -235,13 +236,13 @@ namespace Account.Installers
             fieldLinkTarget.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsEqualToString</Identifier><Properties><PropertyName>NavigationType</PropertyName><Value>manual</Value><CaseSensitive>true</CaseSensitive></Properties></VisibilityConditionConfiguration>";
 
             if (existingFieldLinkTarget != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkTarget), fieldLinkTarget);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkTarget), fieldLinkTarget);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkTarget);
+                formInfo.AddFormItem(fieldLinkTarget);
             }
 
             // Add or Update IsMegaMenu Field
-            var existingFieldIsMegaMenu = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationIsMegaMenu));
+            var existingFieldIsMegaMenu = formInfo.GetFormField(nameof(NavigationType.NavigationIsMegaMenu));
             var fieldIsMegaMenu = existingFieldIsMegaMenu ?? new FormFieldInfo();
             fieldIsMegaMenu.Name = nameof(NavigationType.NavigationIsMegaMenu);
             fieldIsMegaMenu.AllowEmpty = false;
@@ -257,13 +258,13 @@ namespace Account.Installers
             fieldIsMegaMenu.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldIsMegaMenu != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationIsMegaMenu), fieldIsMegaMenu);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationIsMegaMenu), fieldIsMegaMenu);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldIsMegaMenu);
+                formInfo.AddFormItem(fieldIsMegaMenu);
             }
 
             // Add or Update LinkAlt Field
-            var existingFieldLinkAlt = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkAlt));
+            var existingFieldLinkAlt = formInfo.GetFormField(nameof(NavigationType.NavigationLinkAlt));
             var fieldLinkAlt = existingFieldLinkAlt ?? new FormFieldInfo();
             fieldLinkAlt.Name = nameof(NavigationType.NavigationLinkAlt);
             fieldLinkAlt.AllowEmpty = true;
@@ -280,13 +281,13 @@ namespace Account.Installers
             fieldLinkAlt.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldLinkAlt != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkAlt), fieldLinkAlt);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkAlt), fieldLinkAlt);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkAlt);
+                formInfo.AddFormItem(fieldLinkAlt);
             }
 
             // Add or Update LinkOnClick Field
-            var existingFieldLinkOnClick = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkOnClick));
+            var existingFieldLinkOnClick = formInfo.GetFormField(nameof(NavigationType.NavigationLinkOnClick));
             var fieldLinkOnClick = existingFieldLinkOnClick ?? new FormFieldInfo();
             fieldLinkOnClick.Name = nameof(NavigationType.NavigationLinkOnClick);
             fieldLinkOnClick.AllowEmpty = true;
@@ -296,20 +297,20 @@ namespace Account.Installers
             fieldLinkOnClick.Visible = true;
             fieldLinkOnClick.Guid = Guid.Parse("f575cf48-b76b-4c43-9238-34740a436da5");
             fieldLinkOnClick.SetComponentName("Kentico.Administration.CodeEditor");
-            fieldLinkOnClick.Settings.Add("Language", "javascript");
+            fieldLinkOnClick.Settings.AddOrReplace("Language", "javascript");
             fieldLinkOnClick.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "On Click (Javascript)");
             fieldLinkOnClick.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, "Optional On click for the link.");
             fieldLinkOnClick.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldLinkOnClick.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldLinkOnClick != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkOnClick), fieldLinkOnClick);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkOnClick), fieldLinkOnClick);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkOnClick);
+                formInfo.AddFormItem(fieldLinkOnClick);
             }
 
             // Add or Update LinkCSS Field
-            var existingFieldLinkCSS = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationLinkCSS));
+            var existingFieldLinkCSS = formInfo.GetFormField(nameof(NavigationType.NavigationLinkCSS));
             var fieldLinkCSS = existingFieldLinkCSS ?? new FormFieldInfo();
             fieldLinkCSS.Name = nameof(NavigationType.NavigationLinkCSS);
             fieldLinkCSS.AllowEmpty = true;
@@ -326,13 +327,13 @@ namespace Account.Installers
             fieldLinkCSS.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldLinkCSS != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationLinkCSS), fieldLinkCSS);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationLinkCSS), fieldLinkCSS);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldLinkCSS);
+                formInfo.AddFormItem(fieldLinkCSS);
             }
 
             // Add or Update Groups Field
-            var existingFieldGroups = contentItemCommonDataForm.GetFormField(nameof(NavigationType.NavigationGroups));
+            var existingFieldGroups = formInfo.GetFormField(nameof(NavigationType.NavigationGroups));
             var fieldGroups = existingFieldGroups ?? new FormFieldInfo();
             fieldGroups.Name = nameof(NavigationType.NavigationGroups);
             fieldGroups.AllowEmpty = true;
@@ -342,20 +343,20 @@ namespace Account.Installers
             fieldGroups.Visible = true;
             fieldGroups.Guid = Guid.Parse("6ca6d829-5c16-47d4-bef4-6f073d6118d2");
             fieldGroups.SetComponentName("Kentico.Administration.TagSelector");
-            fieldGroups.Settings.Add("TaxonomyGroup", "[\"a1357c75-1925-4f91-b2fd-b151906a38d0\"]");
+            fieldGroups.Settings.AddOrReplace("TaxonomyGroup", "[\"a1357c75-1925-4f91-b2fd-b151906a38d0\"]");
             fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Navigation Groups");
             fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldDescription, @"Used in filtering with the INavigationRepository.GetNavItemsAsync(navTypes: [""TagNameHere""]). This way you can have nav items be included or excluded based on context, such as logged in or mobile menu vs. main");
             fieldGroups.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldGroups.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldGroups != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.NavigationGroups), fieldGroups);
+                formInfo.UpdateFormField(nameof(NavigationType.NavigationGroups), fieldGroups);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldGroups);
+                formInfo.AddFormItem(fieldGroups);
             }
 
             // Add or Update IsDynamic Field
-            var existingFieldIsDynamic = contentItemCommonDataForm.GetFormField(nameof(NavigationType.IsDynamic));
+            var existingFieldIsDynamic = formInfo.GetFormField(nameof(NavigationType.IsDynamic));
             var fieldIsDynamic = existingFieldIsDynamic ?? new FormFieldInfo();
             fieldIsDynamic.Name = nameof(NavigationType.IsDynamic);
             fieldIsDynamic.AllowEmpty = false;
@@ -371,13 +372,13 @@ namespace Account.Installers
             fieldIsDynamic.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldIsDynamic != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.IsDynamic), fieldIsDynamic);
+                formInfo.UpdateFormField(nameof(NavigationType.IsDynamic), fieldIsDynamic);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldIsDynamic);
+                formInfo.AddFormItem(fieldIsDynamic);
             }
 
             // Add or Update DynamicCodeName Field
-            var existingFieldDynamicCodeName = contentItemCommonDataForm.GetFormField(nameof(NavigationType.DynamicCodeName));
+            var existingFieldDynamicCodeName = formInfo.GetFormField(nameof(NavigationType.DynamicCodeName));
             var fieldDynamicCodeName = existingFieldDynamicCodeName ?? new FormFieldInfo();
             fieldDynamicCodeName.Name = nameof(NavigationType.DynamicCodeName);
             fieldDynamicCodeName.AllowEmpty = true;
@@ -395,9 +396,9 @@ namespace Account.Installers
             fieldDynamicCodeName.VisibilityConditionConfigurationXmlData = "<VisibilityConditionConfiguration><Identifier>Kentico.Administration.IsTrueVisibilityCondition</Identifier><Properties><PropertyName>IsDynamic</PropertyName></Properties></VisibilityConditionConfiguration>";
 
             if (existingFieldDynamicCodeName != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(NavigationType.DynamicCodeName), fieldDynamicCodeName);
+                formInfo.UpdateFormField(nameof(NavigationType.DynamicCodeName), fieldDynamicCodeName);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDynamicCodeName);
+                formInfo.AddFormItem(fieldDynamicCodeName);
             }
 
             // Add the schema
