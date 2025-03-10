@@ -7,6 +7,7 @@ using Generic;
 using Image = Generic.Image;
 using File = Generic.File;
 using Microsoft.CodeAnalysis;
+using System.Collections;
 
 namespace Admin.Installer
 {
@@ -153,7 +154,7 @@ namespace Admin.Installer
 
 
             // Add or Update Title Field
-            var existingFieldTitle = contentItemCommonDataForm.GetFormField(nameof(Image.ImageTitle));
+            var existingFieldTitle = formInfo.GetFormField(nameof(Image.ImageTitle));
             var fieldTitle = existingFieldTitle ?? new FormFieldInfo();
             fieldTitle.Name = nameof(Image.ImageTitle);
             fieldTitle.AllowEmpty = false;
@@ -169,13 +170,13 @@ namespace Admin.Installer
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldTitle != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Image.ImageTitle), fieldTitle);
+                formInfo.UpdateFormField(nameof(Image.ImageTitle), fieldTitle);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTitle);
+                formInfo.AddFormItem(fieldTitle);
             }
 
             // Add or Update Description Field
-            var existingFieldDescription = contentItemCommonDataForm.GetFormField(nameof(Image.ImageDescription));
+            var existingFieldDescription = formInfo.GetFormField(nameof(Image.ImageDescription));
             var fieldDescription = existingFieldDescription ?? new FormFieldInfo();
             fieldDescription.Name = nameof(Image.ImageDescription);
             fieldDescription.AllowEmpty = true;
@@ -191,13 +192,13 @@ namespace Admin.Installer
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldDescription != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Image.ImageDescription), fieldDescription);
+                formInfo.UpdateFormField(nameof(Image.ImageDescription), fieldDescription);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDescription);
+                formInfo.AddFormItem(fieldDescription);
             }
 
             // Add or Update File Field
-            var existingFieldFile = contentItemCommonDataForm.GetFormField(nameof(Image.ImageFile));
+            var existingFieldFile = formInfo.GetFormField(nameof(Image.ImageFile));
             var fieldFile = existingFieldFile ?? new FormFieldInfo();
             fieldFile.Name = nameof(Image.ImageFile);
             fieldFile.AllowEmpty = true;
@@ -210,13 +211,13 @@ namespace Admin.Installer
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "File");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldFile.Settings.Add("AllowedExtensions", _startingSiteInstallationOptions.ImageFormatsSupported);
+            fieldFile.Settings.AddOrReplace("AllowedExtensions", _startingSiteInstallationOptions.ImageFormatsSupported);
             fieldFile.ValidationRuleConfigurationsXmlData = @"<validationrulesdata><ValidationRuleConfiguration><ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier><RuleValues><ErrorMessage>Must add a file</ErrorMessage></RuleValues></ValidationRuleConfiguration></validationrulesdata>";
 
             if (existingFieldFile != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Image.ImageFile), fieldFile);
+                formInfo.UpdateFormField(nameof(Image.ImageFile), fieldFile);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldFile);
+                formInfo.AddFormItem(fieldFile);
             }
 
             // Add the schema
@@ -303,7 +304,7 @@ namespace Admin.Installer
 
 
             // Add or Update Title Field
-            var existingFieldTitle = contentItemCommonDataForm.GetFormField(nameof(File.FileTitle));
+            var existingFieldTitle = formInfo.GetFormField(nameof(File.FileTitle));
             var fieldTitle = existingFieldTitle ?? new FormFieldInfo();
             fieldTitle.Name = nameof(File.FileTitle);
             fieldTitle.AllowEmpty = false;
@@ -319,13 +320,13 @@ namespace Admin.Installer
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldTitle != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(File.FileTitle), fieldTitle);
+                formInfo.UpdateFormField(nameof(File.FileTitle), fieldTitle);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTitle);
+                formInfo.AddFormItem(fieldTitle);
             }
 
             // Add or Update Description Field
-            var existingFieldDescription = contentItemCommonDataForm.GetFormField(nameof(File.FileDescription));
+            var existingFieldDescription = formInfo.GetFormField(nameof(File.FileDescription));
             var fieldDescription = existingFieldDescription ?? new FormFieldInfo();
             fieldDescription.Name = nameof(File.FileDescription);
             fieldDescription.AllowEmpty = true;
@@ -340,13 +341,13 @@ namespace Admin.Installer
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldDescription != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(File.FileDescription), fieldDescription);
+                formInfo.UpdateFormField(nameof(File.FileDescription), fieldDescription);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDescription);
+                formInfo.AddFormItem(fieldDescription);
             }
 
             // Add or Update File Field
-            var existingFieldFile = contentItemCommonDataForm.GetFormField(nameof(File.FileFile));
+            var existingFieldFile = formInfo.GetFormField(nameof(File.FileFile));
             var fieldFile = existingFieldFile ?? new FormFieldInfo();
             fieldFile.Name = nameof(File.FileFile);
             fieldFile.AllowEmpty = true;
@@ -359,13 +360,13 @@ namespace Admin.Installer
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "File");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldFile.Settings.Add("AllowedExtensions", _startingSiteInstallationOptions.NonMediaFileFormatsSupported);
+            fieldFile.Settings.AddOrReplace("AllowedExtensions", _startingSiteInstallationOptions.NonMediaFileFormatsSupported);
             fieldFile.ValidationRuleConfigurationsXmlData = @"<validationrulesdata><ValidationRuleConfiguration><ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier><RuleValues><ErrorMessage>Must add a file</ErrorMessage></RuleValues></ValidationRuleConfiguration></validationrulesdata>";
 
             if (existingFieldFile != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(File.FileFile), fieldFile);
+                formInfo.UpdateFormField(nameof(File.FileFile), fieldFile);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldFile);
+                formInfo.AddFormItem(fieldFile);
             }
 
             classFile.ClassFormDefinition = formInfo.GetXmlDefinition();
@@ -443,7 +444,7 @@ namespace Admin.Installer
 
 
             // Add or Update Title Field
-            var existingFieldTitle = contentItemCommonDataForm.GetFormField(nameof(Audio.AudioTitle));
+            var existingFieldTitle = formInfo.GetFormField(nameof(Audio.AudioTitle));
             var fieldTitle = existingFieldTitle ?? new FormFieldInfo();
             fieldTitle.Name = nameof(Audio.AudioTitle);
             fieldTitle.AllowEmpty = false;
@@ -459,13 +460,13 @@ namespace Admin.Installer
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldTitle != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Audio.AudioTitle), fieldTitle);
+                formInfo.UpdateFormField(nameof(Audio.AudioTitle), fieldTitle);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTitle);
+                formInfo.AddFormItem(fieldTitle);
             }
 
             // Add or Update Description Field
-            var existingFieldDescription = contentItemCommonDataForm.GetFormField(nameof(Audio.AudioDescription));
+            var existingFieldDescription = formInfo.GetFormField(nameof(Audio.AudioDescription));
             var fieldDescription = existingFieldDescription ?? new FormFieldInfo();
             fieldDescription.Name = nameof(Audio.AudioDescription);
             fieldDescription.AllowEmpty = true;
@@ -480,13 +481,13 @@ namespace Admin.Installer
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldDescription != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Audio.AudioDescription), fieldDescription);
+                formInfo.UpdateFormField(nameof(Audio.AudioDescription), fieldDescription);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDescription);
+                formInfo.AddFormItem(fieldDescription);
             }
 
             // Add or Update File Field
-            var existingFieldFile = contentItemCommonDataForm.GetFormField(nameof(Audio.AudioFile));
+            var existingFieldFile = formInfo.GetFormField(nameof(Audio.AudioFile));
             var fieldFile = existingFieldFile ?? new FormFieldInfo();
             fieldFile.Name = nameof(Audio.AudioFile);
             fieldFile.AllowEmpty = true;
@@ -499,17 +500,17 @@ namespace Admin.Installer
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "File");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldFile.Settings.Add("AllowedExtensions", _startingSiteInstallationOptions.AudioFormatsSupported);
+            fieldFile.Settings.AddOrReplace("AllowedExtensions", _startingSiteInstallationOptions.AudioFormatsSupported);
             fieldFile.ValidationRuleConfigurationsXmlData = @"<validationrulesdata><ValidationRuleConfiguration><ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier><RuleValues><ErrorMessage>Must add a file</ErrorMessage></RuleValues></ValidationRuleConfiguration></validationrulesdata>";
 
             if (existingFieldFile != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Audio.AudioFile), fieldFile);
+                formInfo.UpdateFormField(nameof(Audio.AudioFile), fieldFile);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldFile);
+                formInfo.AddFormItem(fieldFile);
             }
 
             // Add or Update Transcript Field
-            var existingFieldTranscript = contentItemCommonDataForm.GetFormField(nameof(Audio.AudioTranscript));
+            var existingFieldTranscript = formInfo.GetFormField(nameof(Audio.AudioTranscript));
             var fieldTranscript = existingFieldTranscript ?? new FormFieldInfo();
             fieldTranscript.Name = nameof(Audio.AudioTranscript);
             fieldTranscript.AllowEmpty = true;
@@ -522,13 +523,13 @@ namespace Admin.Installer
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Transcript");
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldTranscript.Settings.Add("MaxRowsNumber", 5);
-            fieldTranscript.Settings.Add("MinRowsNumber", 3);
+            fieldTranscript.Settings.AddOrReplace("MaxRowsNumber", 5);
+            fieldTranscript.Settings.AddOrReplace("MinRowsNumber", 3);
 
             if (existingFieldTranscript != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Audio.AudioTranscript), fieldTranscript);
+                formInfo.UpdateFormField(nameof(Audio.AudioTranscript), fieldTranscript);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTranscript);
+                formInfo.AddFormItem(fieldTranscript);
             }
 
             classAudio.ClassFormDefinition = formInfo.GetXmlDefinition();
@@ -606,7 +607,7 @@ namespace Admin.Installer
 
 
             // Add or Update Title Field
-            var existingFieldTitle = contentItemCommonDataForm.GetFormField(nameof(Video.VideoTitle));
+            var existingFieldTitle = formInfo.GetFormField(nameof(Video.VideoTitle));
             var fieldTitle = existingFieldTitle ?? new FormFieldInfo();
             fieldTitle.Name = nameof(Video.VideoTitle);
             fieldTitle.AllowEmpty = false;
@@ -622,13 +623,13 @@ namespace Admin.Installer
             fieldTitle.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldTitle != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Video.VideoTitle), fieldTitle);
+                formInfo.UpdateFormField(nameof(Video.VideoTitle), fieldTitle);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTitle);
+                formInfo.AddFormItem(fieldTitle);
             }
 
             // Add or Update Description Field
-            var existingFieldDescription = contentItemCommonDataForm.GetFormField(nameof(Video.VideoDescription));
+            var existingFieldDescription = formInfo.GetFormField(nameof(Video.VideoDescription));
             var fieldDescription = existingFieldDescription ?? new FormFieldInfo();
             fieldDescription.Name = nameof(Video.VideoDescription);
             fieldDescription.AllowEmpty = true;
@@ -643,13 +644,13 @@ namespace Admin.Installer
             fieldDescription.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
 
             if (existingFieldDescription != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Video.VideoDescription), fieldDescription);
+                formInfo.UpdateFormField(nameof(Video.VideoDescription), fieldDescription);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldDescription);
+                formInfo.AddFormItem(fieldDescription);
             }
 
             // Add or Update File Field
-            var existingFieldFile = contentItemCommonDataForm.GetFormField(nameof(Video.VideoFile));
+            var existingFieldFile = formInfo.GetFormField(nameof(Video.VideoFile));
             var fieldFile = existingFieldFile ?? new FormFieldInfo();
             fieldFile.Name = nameof(Video.VideoFile);
             fieldFile.AllowEmpty = true;
@@ -662,17 +663,17 @@ namespace Admin.Installer
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "File");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldFile.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldFile.Settings.Add("AllowedExtensions", _startingSiteInstallationOptions.VideoFormatsSupported);
+            fieldFile.Settings.AddOrReplace("AllowedExtensions", _startingSiteInstallationOptions.VideoFormatsSupported);
             fieldFile.ValidationRuleConfigurationsXmlData = @"<validationrulesdata><ValidationRuleConfiguration><ValidationRuleIdentifier>Kentico.Administration.RequiredValue</ValidationRuleIdentifier><RuleValues><ErrorMessage>Must add a file</ErrorMessage></RuleValues></ValidationRuleConfiguration></validationrulesdata>";
 
             if (existingFieldFile != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Video.VideoFile), fieldFile);
+                formInfo.UpdateFormField(nameof(Video.VideoFile), fieldFile);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldFile);
+                formInfo.AddFormItem(fieldFile);
             }
 
             // Add or Update Transcript Field
-            var existingFieldTranscript = contentItemCommonDataForm.GetFormField(nameof(Video.VideoTranscript));
+            var existingFieldTranscript = formInfo.GetFormField(nameof(Video.VideoTranscript));
             var fieldTranscript = existingFieldTranscript ?? new FormFieldInfo();
             fieldTranscript.Name = nameof(Video.VideoTranscript);
             fieldTranscript.AllowEmpty = true;
@@ -685,13 +686,13 @@ namespace Admin.Installer
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.FieldCaption, "Transcript");
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.FieldDescriptionAsHtml, "False");
             fieldTranscript.SetPropertyValue(FormFieldPropertyEnum.ExplanationTextAsHtml, "False");
-            fieldTranscript.Settings.Add("MaxRowsNumber", 5);
-            fieldTranscript.Settings.Add("MinRowsNumber", 3);
+            fieldTranscript.Settings.AddOrReplace("MaxRowsNumber", 5);
+            fieldTranscript.Settings.AddOrReplace("MinRowsNumber", 3);
 
             if (existingFieldTranscript != null) {
-                contentItemCommonDataForm.UpdateFormField(nameof(Video.VideoTranscript), fieldTranscript);
+                formInfo.UpdateFormField(nameof(Video.VideoTranscript), fieldTranscript);
             } else {
-                contentItemCommonDataForm.AddFormItem(fieldTranscript);
+                formInfo.AddFormItem(fieldTranscript);
             }
 
             classVideo.ClassFormDefinition = formInfo.GetXmlDefinition();
