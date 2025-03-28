@@ -35,7 +35,17 @@ Documentation is my next goal, I'll be focusing on the Xperience by Kentico at t
 
 **See more about the design principle in my talk ['Patterns for an easy-to-migrate and easy-to-maintain website'](https://www.kentico.com/presentation/patterns-for-an-easy-to-migrate-and-easy-to-mainta)**
 
-## Current Version: 2.3 (December 22, 2024)
+## Current Version: 2.X
+
+As each refresh is launched, the baseline is being updated to the latest Xperience Refresh.  Below is a table of the Baseline version to the Refresh
+
+Baseline => Xperience
+v2.6 => 30.3.0
+v2.5 => 30.2.0
+v2.4 => 30.1.0
+v2.3 => 30.0.0
+
+## Version: 2.3 (December 22, 2024)
 
 Version 2.3 is built on .net 8.0 and supports both Kentico Xperience 13.0.131+ as well as Xperience by Kentico 30.0.0.  All modules except Ecommerce have been implemented.
 
