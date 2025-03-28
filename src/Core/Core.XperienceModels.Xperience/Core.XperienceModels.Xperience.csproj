@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.2.0" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.3.0" />
     <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.2" />
   </ItemGroup>
 
