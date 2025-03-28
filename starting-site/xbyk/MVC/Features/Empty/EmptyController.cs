@@ -4,6 +4,7 @@
     {
         public IActionResult Index()
         {
+            
             return View("/Features/Empty/Empty.cshtml");
         }
     }

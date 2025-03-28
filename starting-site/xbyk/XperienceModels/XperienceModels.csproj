@@ -26,13 +26,13 @@
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.2.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.Xperience" Version="2.5.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.Xperience" Version="2.5.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Localization.XperienceModels.Xperience" Version="2.5.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.XperienceModels.Xperience" Version="2.5.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.XperienceModels.Xperience" Version="2.5.1" />
-    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.XperienceModels.Xperience" Version="2.5.1" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.3.0" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.XperienceModels.Xperience" Version="2.6.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.XperienceModels.Xperience" Version="2.6.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.XperienceModels.Xperience" Version="2.6.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.XperienceModels.Xperience" Version="2.6.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.XperienceModels.Xperience" Version="2.6.1" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.XperienceModels.Xperience" Version="2.6.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Site.UniversalModels\Site.UniversalModels.csproj" />
