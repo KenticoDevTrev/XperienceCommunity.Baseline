@@ -28,9 +28,18 @@
         /// <summary>
         /// Retrieves the Metadata given the page identified
         /// </summary>
-        /// <param name="treeCultureIdentity"></param>
-        /// <param name="thumbnail"></param>
+        /// <param name="treeCultureIdentity">The Web Page Identity</param>
+        /// <param name="thumbnail">Optioanl Thumbnail Override</param>
         /// <returns></returns>
         Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null);
+
+        /// <summary>
+        /// Retrieves the Metadata given the content item (for non page items)
+        /// </summary>
+        /// <param name="contentCultureIdentity">The Content Item (non web page)</param>
+        /// <param name="canonicalUrl">The URL (since this is NOT a web page)</param>
+        /// <param name="thumbnail">Optioanl Thumbnail Override</param>
+        /// <returns></returns>
+        Task<Result<PageMetaData>> GetMetaDataForReusableContentAsync(ContentCultureIdentity contentCultureIdentity, string? canonicalUrl, string? thumbnail = null);
     }
 }

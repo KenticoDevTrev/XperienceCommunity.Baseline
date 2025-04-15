@@ -1,5 +1,4 @@
 ﻿using CMS.Websites;
-using Core.Services.Implementations;
 using Generic;
 using Kentico.Content.Web.Mvc;
 using System.Data;
@@ -33,9 +32,6 @@ namespace Core.Repositories.Implementation
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
         private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
 
-        // TODO: Revamp this to use a Mapped result of IBaseMetaData using the Content Mapper, i made it more complicated not knowing
-        // that you could return a mapped Interface and get it's containing data :( 
-
         public async Task<Result<PageMetaData>> GetMetaDataAsync(TreeCultureIdentity treeCultureIdentity, string? thumbnail = null)
         {
             if (!(await treeCultureIdentity.GetOrRetrievePageID(_identityService)).TryGetValue(out var pageId)) {
@@ -61,6 +57,36 @@ namespace Core.Repositories.Implementation
 
             if (results.TryGetFirst(out var webPageResult)) {
                 return await GetMetaDataInternalAsync(webPageResult, thumbnail);
+            }
+            return Result.Failure<PageMetaData>("No webpage found by that tree culture identity");
+        }
+
+        public async Task<Result<PageMetaData>> GetMetaDataForReusableContentAsync(ContentCultureIdentity contentCultureIdentity, string? canonicalUrl, string? thumbnail = null)
+        {
+            if (!(await contentCultureIdentity.GetOrRetrieveContentCultureLookup(_identityService)).TryGetValue(out var contentLookup)) {
+                return Result.Failure<PageMetaData>("No content item found by that Content Identity");
+            }
+
+            var builder = _cacheDependencyBuilderFactory.Create()
+                .ContentItem(contentLookup.ContentId);
+
+            var results = await _progressiveCache.LoadAsync(async cs => {
+                if (cs.Cached) {
+                    cs.CacheDependency = builder.GetCMSCacheDependency();
+                }
+                var queryBuilder = new ContentItemQueryBuilder()
+
+                // Get web page items from this content culture ID
+                .ForContentTypes(subQuery => subQuery.OfReusableSchema(IBaseMetadata.REUSABLE_FIELD_SCHEMA_NAME).WithLinkedItems(_metadataOptions.MaxLinkedLevelsRetrievedForMetadata))
+                .InLanguage(contentLookup.Culture.GetValueOrDefault("en"), useLanguageFallbacks: true);
+
+                return await _contentQueryExecutor.GetResult(queryBuilder, (dataContainer) => {
+                    return dataContainer;
+                }, new ContentQueryExecutionOptions().WithPreviewModeContext(_cacheRepositoryContext));
+            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "GetMetaDataAsync", contentCultureIdentity.GetCacheKey(), _metadataOptions.MaxLinkedLevelsRetrievedForMetadata));
+
+            if (results.TryGetFirst(out var contentItemResult)) {
+                return await GetMetaDataContentItemInternalAsync(contentItemResult, canonicalUrl, thumbnail);
             }
             return Result.Failure<PageMetaData>("No webpage found by that tree culture identity");
         }
@@ -172,7 +198,52 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             return basePageMetadata;
         }
 
-        
+        private async Task<PageMetaData> GetMetaDataContentItemInternalAsync(IContentQueryDataContainer node, string? canonicalUrl, string? thumbnail = null)
+        {
+            Maybe<string> keywords = Maybe.None;
+            Maybe<string> description = Maybe.None;
+            Maybe<string> title = Maybe.None;
+            Maybe<bool> noIndex = Maybe.None;
+            Maybe<string> canonicalUrlValue = Maybe.None;
+            Maybe<string> ogImage = thumbnail.AsNullOrWhitespaceMaybe();
+
+            // Generate Base PageMetaData
+            if ((await _metaDataWebPageDataContainerConverter.GetDefaultMetadataLogic(node, canonicalUrl)).TryGetValue(out var metaDataFromBase)) {
+                if (metaDataFromBase.Thumbnail.TryGetValue(out var foundThumbnail)) {
+                    ogImage = foundThumbnail;
+                }
+                keywords = metaDataFromBase.Keywords;
+                description = metaDataFromBase.Description;
+                title = metaDataFromBase.Title;
+                noIndex = metaDataFromBase.NoIndex;
+                canonicalUrlValue = metaDataFromBase.CanonicalUrl;
+            }
+
+            // Use fallback of display name
+            if (title.GetValueOrDefault("").AsNullOrWhitespaceMaybe().HasNoValue) {
+                if ((await _contentItemLanguageMetadataRepository.GetOptimizedContentItemLanguageMetadata(node, true, true)).TryGetValue(out var langMetadata)) {
+                    title = langMetadata.ContentItemLanguageMetadataDisplayName;
+                } else {
+                    title = node.ContentItemName;
+                }
+            }
+
+            var basePageMetadata = new PageMetaData() {
+                Title = title,
+                Keywords = keywords,
+                Description = description,
+                Thumbnail = ogImage.TryGetValue(out var thumbUrl) ? _urlResolver.GetAbsoluteUrl(thumbUrl) : Maybe.None,
+                NoIndex = noIndex,
+                CanonicalUrl = canonicalUrlValue.TryGetValue(out var url) ? _urlResolver.GetAbsoluteUrl(url) : Maybe.None
+            };
+
+            // Allow customizations
+            if ((await _webPageToPageMetadataConverter.MapAndGetPageMetadataReusableContent(node, basePageMetadata, canonicalUrl)).TryGetValue(out var metaData)) {
+                return metaData;
+            };
+            return basePageMetadata;
+        }
+
 
         private record ContentCultureLookup(Dictionary<int, TreeCultureIdentity> ContentCultureIdToIdentity, Dictionary<Guid, TreeCultureIdentity> ContentCultureGuidToIdentity);
 

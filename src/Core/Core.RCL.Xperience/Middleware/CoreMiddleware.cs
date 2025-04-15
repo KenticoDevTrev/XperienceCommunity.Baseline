@@ -128,7 +128,10 @@ namespace Core
                 .AddScoped<IContentItemMediaCustomizer, ContentItemMediaCustomizer>()
                 .AddScoped<IContentItemMediaMetadataQueryEditor, ContentItemMediaMetadataQueryEditor>()
                 .AddScoped<ICustomTaxonomyFieldParser, CustomTaxonomyFieldParser>()
-                .AddScoped<IWebPageToPageMetadataConverter, DefaultWebPageToPageMetadataConverter>()
+                .AddScoped<IContentItemToPageMetadataConverter, DefaultContentItemToPageMetadataConverter>()
+#pragma warning disable CS0618 // Type or member is obsolete - keeping for fallback purposes
+                .AddScoped<IWebPageToPageMetadataConverter, DefaultContentItemToPageMetadataConverter>()
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 // Main item retrieval that depends on baseline apis and user customizations
                 .AddScoped<IUserRepository, UserRepository<TUser>>()

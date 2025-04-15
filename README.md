@@ -40,7 +40,7 @@ Documentation is my next goal, I'll be focusing on the Xperience by Kentico at t
 As each refresh is launched, the baseline is being updated to the latest Xperience Refresh.  Below is a table of the Baseline version to the Refresh
 
 Baseline => Xperience
-v2.6 => 30.3.0
+v2.6.1 => 30.3.0
 v2.5 => 30.2.0
 v2.4 => 30.1.0
 v2.3 => 30.0.0
