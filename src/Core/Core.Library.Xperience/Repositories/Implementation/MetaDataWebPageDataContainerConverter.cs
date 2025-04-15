@@ -8,7 +8,6 @@ namespace Core.Repositories.Implementation
     public class MetaDataWebPageDataContainerConverter(IContentItemReferenceService contentItemReferenceService,
         IClassContentTypeAssetConfigurationRepository classContentTypeAssetConfigurationRepository,
         IProgressiveCache progressiveCache,
-        IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
         ILanguageIdentifierRepository languageIdentifierRepository,
         IContentTranslationInformationRepository contentTranslationInformationRepository,
         IContentTypeRetriever contentTypeRetriever,
@@ -18,7 +17,6 @@ namespace Core.Repositories.Implementation
         private readonly IContentItemReferenceService _contentItemReferenceService = contentItemReferenceService;
         private readonly IClassContentTypeAssetConfigurationRepository _classContentTypeAssetConfigurationRepository = classContentTypeAssetConfigurationRepository;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
         private readonly ILanguageIdentifierRepository _languageIdentifierRepository = languageIdentifierRepository;
         private readonly IContentTranslationInformationRepository _contentTranslationInformationRepository = contentTranslationInformationRepository;
         private readonly IContentTypeRetriever _contentTypeRetriever = contentTypeRetriever;

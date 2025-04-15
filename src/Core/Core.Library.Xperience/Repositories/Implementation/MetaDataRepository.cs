@@ -9,7 +9,7 @@ namespace Core.Repositories.Implementation
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
         IUrlResolver _urlResolver,
         IPageContextRepository pageContextRepository,
-        IWebPageToPageMetadataConverter webPageToPageMetadataConverter,
+        IContentItemToPageMetadataConverter contentItemToPageMetadataConverter,
         IIdentityService identityService,
         IContentQueryExecutor contentQueryExecutor,
         ICacheRepositoryContext cacheRepositoryContext,
@@ -21,7 +21,7 @@ namespace Core.Repositories.Implementation
         ILanguageIdentifierRepository languageIdentifierRepository) : IMetaDataRepository
     {
         private readonly IPageContextRepository _pageContextRepository = pageContextRepository;
-        private readonly IWebPageToPageMetadataConverter _webPageToPageMetadataConverter = webPageToPageMetadataConverter;
+        private readonly IContentItemToPageMetadataConverter _contentItemToPageMetadataConverter = contentItemToPageMetadataConverter;
         private readonly IIdentityService _identityService = identityService;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
@@ -192,7 +192,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             };
 
             // Allow customizations
-            if ((await _webPageToPageMetadataConverter.MapAndGetPageMetadata(node, basePageMetadata)).TryGetValue(out var metaData)) {
+            if ((await _contentItemToPageMetadataConverter.MapAndGetPageMetadata(node, basePageMetadata)).TryGetValue(out var metaData)) {
                 return metaData;
             };
             return basePageMetadata;
@@ -238,7 +238,7 @@ inner join CMS_WebPageItem on WebPageItemContentItemID = ContentItemID";
             };
 
             // Allow customizations
-            if ((await _webPageToPageMetadataConverter.MapAndGetPageMetadataReusableContent(node, basePageMetadata, canonicalUrl)).TryGetValue(out var metaData)) {
+            if ((await _contentItemToPageMetadataConverter.MapAndGetPageMetadataReusableContent(node, basePageMetadata, canonicalUrl)).TryGetValue(out var metaData)) {
                 return metaData;
             };
             return basePageMetadata;
