@@ -119,6 +119,7 @@ namespace Core
                 .AddTransient<IMetaDataWebPageDataContainerConverter, MetaDataWebPageDataContainerConverter>()
                 .AddScoped<IPageContextRepository, PageContextRepository>()
                 .AddScoped<IMappedContentItemRepository, MappedContentItemRepository>()
+                .AddScoped<IMappedContentItemLinkedItemDepthRetriever, MappedContentItemLinkedItemDepthRetriever>()
                 .AddScoped<IMetaDataRepository, MetaDataRepository>();
 
             // User Customization Points, register your own versions afterwards if you wish
@@ -132,6 +133,7 @@ namespace Core
 #pragma warning disable CS0618 // Type or member is obsolete - keeping for fallback purposes
                 .AddScoped<IWebPageToPageMetadataConverter, DefaultContentItemToPageMetadataConverter>()
 #pragma warning restore CS0618 // Type or member is obsolete
+                
 
                 // Main item retrieval that depends on baseline apis and user customizations
                 .AddScoped<IUserRepository, UserRepository<TUser>>()

@@ -10,7 +10,8 @@ namespace Core.Repositories.Implementation
         ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
         IContentQueryExecutor contentQueryExecutor,
         ISiteRepository siteRepository,
-        ICacheRepositoryContext cacheRepositoryContext) : IMappedContentItemRepository
+        ICacheRepositoryContext cacheRepositoryContext,
+        IMappedContentItemLinkedItemDepthRetriever mappedContentItemLinkedItemDepthRetriever) : IMappedContentItemRepository
     {
         private readonly IIdentityService _identityService = identityService;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
@@ -19,6 +20,7 @@ namespace Core.Repositories.Implementation
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ISiteRepository _siteRepository = siteRepository;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
+        private readonly IMappedContentItemLinkedItemDepthRetriever _mappedContentItemLinkedItemDepthRetriever = mappedContentItemLinkedItemDepthRetriever;
 
         public async Task<Result<object>> GetContentItem(ContentIdentity identity, string? language = null)
         {
@@ -66,6 +68,7 @@ namespace Core.Repositories.Implementation
             var className = lookupInfoVal.ClassName;
             var isWebsite = lookupInfoVal.IsWebPage;
             var websiteName = websiteChannelID.TryGetValue(out var webChannelID) ? _siteRepository.ChannelNameById(webChannelID) : string.Empty;
+            var linkedItemDepth = _mappedContentItemLinkedItemDepthRetriever.GetLinkedItemDepth(className);
 
             // Actual logic now to get and map item
             return await _progressiveCache.LoadAsync(async cs => {
@@ -86,7 +89,7 @@ namespace Core.Repositories.Implementation
                         .If(isWebsite, webQuery => webQuery.ForWebsite(websiteName, includeUrlPath: true))
                         .If(contentItemId.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemID), contentItemId.GetValueOrDefault(0))))
                         .If(contentItemGuid.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemGUID), contentItemGuid.GetValueOrDefault(Guid.Empty))))
-                        .WithLinkedItems(100, x => x.IncludeWebPageData(true))                        
+                        .WithLinkedItems(linkedItemDepth, x => x.IncludeWebPageData(true))                        
                         .TopN(1)
                 )
                 .InLanguage(lang);
@@ -99,7 +102,7 @@ namespace Core.Repositories.Implementation
 
                 var result = typedMapper.Invoke(typeMapper, [firstItem]);
                 return result != null ? result : Result.Failure<object>("Mapped object was null.");
-            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "ContentItemRepository_GetContentItem", contentItemId.GetValueOrDefault(0), contentItemGuid.GetValueOrDefault(Guid.Empty), _cacheRepositoryContext.GetCacheKey()));
+            }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "ContentItemRepository_GetContentItem", contentItemId.GetValueOrDefault(0), contentItemGuid.GetValueOrDefault(Guid.Empty), linkedItemDepth, _cacheRepositoryContext.GetCacheKey()));
         }
 
         public async Task<Result<T>> GetContentItem<T>(ContentIdentity identity, string? language = null)

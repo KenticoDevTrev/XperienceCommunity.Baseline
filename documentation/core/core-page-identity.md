@@ -18,7 +18,7 @@ The PageIdentity also has a Generic typed version, which revelas a Data property
 
 You can leverage this to include additional data with your PageIdentity (such as your actual Content Type model, Reusable Schema data, or a DTO of it).
 
-If you retrieve a PageIdentity of one type, and wish to convert it to a PageIdentity of a different type, there is the [IPageIdentityFactory.Convert](../../src/Core/Core.Models/Services/IPageIdentityFactory.cs) which allows you to convert the Data from one type to another easily.
+If you retrieve a PageIdentity of one type, and wish to convert it to a PageIdentity of a different type, there is the [IPageIdentityFactory.Convert](../../src/Core/Core.Models/Services/IPageIdentityFactory.cs) which allows you to convert the Data from one type to another easily, or even easier, the `PageIdentity.ToTypedPageIdentity` methods which do the same thing.
 
 
 ## IPageContextRepository
@@ -33,7 +33,7 @@ Here's a breakdown of the methods and their uses.
 
 **GetCurrentPageAsync T** / **GetPageAsync T**: Typed version of GetCurrentPageAsync() and GetPageAsync, can pass your Content Type or Reusable Schema type as the parameter, and if the current page is that type (or inherits from that reusable schema), it will return the PageIdentity WITH the T Data property of the type you requested (Result.Failure if couldn't find or parse);
 
-This uses the `IMappedContentItemRepository`
+This uses the `IMappedContentItemRepository`.  Since the depth of the Linked Items may need to be controlled, there is also an `IMappedContentItemLinkedItemDepthRetriever` that you can implement adjust the Linked Items given the Class Name (Default 100).
 
 ### Leveraging the Typed GetPageAsync/GetCurrentPageAsync
 The IPageContextRepository.GetCurrentPageAsync<T> or GetPageAsync<T> are very useful both for your initial Page Templates (to get the model without needing additional parsing each time), but also for "Current Page" related View Components.  For example, if you have an `IBanners` Reusable Schema that links to `Banner` Content Types.  Some pages have banners, some do not.
