@@ -1,6 +1,8 @@
-﻿using CMS.Core;
+﻿using CMS.ContentEngine;
+using CMS.Core;
 using CMS.Websites;
 using Kentico.Content.Web.Mvc.Routing;
+using MVCCaching;
 
 namespace Core.Repositories.Implementation
 {
@@ -11,7 +13,8 @@ namespace Core.Repositories.Implementation
         IContentQueryExecutor contentQueryExecutor,
         ISiteRepository siteRepository,
         ICacheRepositoryContext cacheRepositoryContext,
-        IMappedContentItemLinkedItemDepthRetriever mappedContentItemLinkedItemDepthRetriever) : IMappedContentItemRepository
+        IMappedContentItemLinkedItemDepthRetriever mappedContentItemLinkedItemDepthRetriever,
+        ILinkedItemsDependencyAsyncRetriever linkedItemsDependencyAsyncRetriever) : IMappedContentItemRepository
     {
         private readonly IIdentityService _identityService = identityService;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
@@ -21,6 +24,7 @@ namespace Core.Repositories.Implementation
         private readonly ISiteRepository _siteRepository = siteRepository;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IMappedContentItemLinkedItemDepthRetriever _mappedContentItemLinkedItemDepthRetriever = mappedContentItemLinkedItemDepthRetriever;
+        private readonly ILinkedItemsDependencyAsyncRetriever _linkedItemsDependencyAsyncRetriever = linkedItemsDependencyAsyncRetriever;
 
         public async Task<Result<object>> GetContentItem(ContentIdentity identity, string? language = null)
         {
@@ -71,18 +75,18 @@ namespace Core.Repositories.Implementation
             var linkedItemDepth = _mappedContentItemLinkedItemDepthRetriever.GetLinkedItemDepth(className);
 
             // Actual logic now to get and map item
-            return await _progressiveCache.LoadAsync(async cs => {
+            var resultWithDependencies = await _progressiveCache.LoadAsync(async cs => {
 
                 if (cs.Cached) {
                     cs.CacheDependency = builder.GetCMSCacheDependency();
                 }
 
                 if (_contentQueryExecutor is not IContentQueryModelTypeMapper typeMapper) {
-                    return Result.Failure<object>($"The IContentQueryExecutor is not of type IContentQueryModelTypeMapper, so can't map dynamically");
+                    return new DTOWithDependencies<Result<object>>(Result.Failure<object>($"The IContentQueryExecutor is not of type IContentQueryModelTypeMapper, so can't map dynamically"), additionalDependencies: []);
                 }
                 var typedMapper = typeMapper.GetType().GetMethod("Map")?.MakeGenericMethod(contentType) ?? null;
                 if (typedMapper == null) {
-                    return Result.Failure<object>($"The IContentQueryModelTypeMapper for some reason no longer has the Map<T> Method, can't proceed");
+                    return new DTOWithDependencies<Result<object>>(Result.Failure<object>($"The IContentQueryModelTypeMapper for some reason no longer has the Map<T> Method, can't proceed"), additionalDependencies: []);
                 }
 
                 var getPageFull =  new ContentItemQueryBuilder().ForContentType(className, query => query
@@ -97,12 +101,18 @@ namespace Core.Repositories.Implementation
                 var dataContainerResults = await _contentQueryExecutor.GetWebPageResult(getPageFull, (dataContainer) => dataContainer, new ContentQueryExecutionOptions() { ForPreview = _cacheRepositoryContext.PreviewEnabled(), IncludeSecuredItems = true });
 
                 if (!dataContainerResults.TryGetFirst(out var firstItem)) {
-                    return Result.Failure<object>($"No Web Page Item Found!");
+                    return new DTOWithDependencies<Result<object>>(Result.Failure<object>($"No Web Page Item Found!"), additionalDependencies: []);
                 }
+                var linkedDependencies = await _linkedItemsDependencyAsyncRetriever.Get(firstItem.ContentItemID, linkedItemDepth);
 
                 var result = typedMapper.Invoke(typeMapper, [firstItem]);
-                return result != null ? result : Result.Failure<object>("Mapped object was null.");
+                return new DTOWithDependencies<Result<object>>(result != null ? result : Result.Failure<object>("Mapped object was null."), linkedDependencies.ToList());
             }, new CacheSettings(CacheMinuteTypes.Medium.ToDouble(), "ContentItemRepository_GetContentItem", contentItemId.GetValueOrDefault(0), contentItemGuid.GetValueOrDefault(Guid.Empty), linkedItemDepth, _cacheRepositoryContext.GetCacheKey()));
+
+            // Add keys
+            builder.AddKeys(resultWithDependencies.AdditionalDependencies);
+
+            return resultWithDependencies.Result;
         }
 
         public async Task<Result<T>> GetContentItem<T>(ContentIdentity identity, string? language = null)

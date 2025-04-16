@@ -5,6 +5,7 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
+using MVCCaching.Obsolete;
 using System.Data;
 
 namespace Core.Repositories.Implementation
@@ -65,6 +66,9 @@ namespace Core.Repositories.Implementation
                 if (lookupDictionary.TryGetValue(webPageItemID, out var langToIdentity)
                     &&
                     (await _languageFallbackRepository.GetLanguagueToSelect(langToIdentity.Keys, lang, true)).TryGetValue(out var langToUse)) {
+
+                    // Add individual to cache dependency key
+                    _cacheDependencyBuilderFactory.Create().WebPageOnLanguage(webPageItemID, lang);
 
                     // Absolute URL must be done outside of caching
                     var item = langToIdentity[langToUse];
