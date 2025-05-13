@@ -98,6 +98,82 @@ namespace Core.Repositories.Implementation
 
         }
 
+        public Task<Result<PageMetaData>> GetDefaultMetadataLogic(IWebPageFieldsSource webPageFieldSource) => GetDefaultMetadataLogic(webPageFieldSource, null);
+
+        public Task<Result<PageMetaData>> GetDefaultMetadataLogic(IContentItemFieldsSource nonWebpageContentItemFieldSource, string? canonicalUrl) => GetDefaultMetadataLogicInternal(nonWebpageContentItemFieldSource, canonicalUrl);
+
+        private async Task<Result<PageMetaData>> GetDefaultMetadataLogicInternal(IContentItemFieldsSource queryDataContainer, string? canonicalUrl)
+        {
+            string? keywords = null;
+            string? description = null;
+            string? title = null;
+            bool? noIndex = null;
+            string? ogImage = null;
+            string? url = null;
+            var dataFound = false;
+
+            try {
+                if (queryDataContainer is IBaseMetadataCore baseMetadata) {
+                    if (baseMetadata.MetaData_Title.AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataTitle)) {
+                        title = metaDataTitle;
+                        dataFound = true;
+                    }
+                    if (baseMetadata.MetaData_Description.AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataDescription)) {
+                        description = metaDataDescription;
+                        dataFound = true;
+                    }
+                    if (baseMetadata.MetaData_Keywords.AsNullOrWhitespaceMaybe().TryGetValue(out var metaDataKeywords)) {
+                        keywords = metaDataKeywords;
+                        dataFound = true;
+                    }
+                    if (baseMetadata.MetaData_OGImage.FirstOrMaybe().TryGetValue(out var metaDataSmall)) {
+                        // Get class name based on the ContentItemGuid
+                        if ((await _contentTypeRetriever.GetContentType(metaDataSmall.SystemFields.ContentItemID.ToContentIdentity())).TryGetValue(out var contentType)
+                            && (await _classContentTypeAssetConfigurationRepository.GetClassNameToContentTypeAssetConfigurationDictionary()).TryGetValue(contentType.ToLowerInvariant(), out var configurations)) {
+                            // Grab the first Image media field found as the OG image
+                            if (configurations.AssetFields
+                                .Where(x => x.MediaType == ContentItemAssetMediaType.Image || x.MediaType == ContentItemAssetMediaType.Unknown)
+                                .OrderByDescending(x => x.MediaType == ContentItemAssetMediaType.Image)
+                                .FirstOrMaybe()
+                                .TryGetValue(out var assetField)) {
+                                var language = _languageIdentifierRepository.LanguageIdToName(queryDataContainer.SystemFields.ContentItemCommonDataContentLanguageID);
+                                if ((await GetImageMetadataField(metaDataSmall.SystemFields.ContentItemGUID, contentType, assetField.AssetFieldName, language)).TryGetValue(out var metaData)) {
+                                    ogImage = $"/getcontentasset/{metaDataSmall.SystemFields.ContentItemGUID}/{assetField.FieldGuid}/{metaData.Name}{metaData.Extension}?language={language}";
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (baseMetadata.MetaData_NoIndex) {
+                        noIndex = baseMetadata.MetaData_NoIndex;
+                        dataFound = true;
+                    }
+
+                    if (queryDataContainer is IWebPageContentQueryDataContainer webPageContentQueryDataContainer) {
+                        var translations = await _contentTranslationInformationRepository.GetWebpageTranslationSummaries(webPageContentQueryDataContainer.WebPageItemID, webPageContentQueryDataContainer.WebPageItemWebsiteChannelID);
+                        if (translations.OrderByDescending(x => x.LanguageName.Equals(_languageIdentifierRepository.LanguageIdToName(webPageContentQueryDataContainer.ContentItemCommonDataContentLanguageID), StringComparison.OrdinalIgnoreCase)).TryGetFirst(out var properItem)) {
+                            url = properItem.Url;
+                        } else {
+                            url = $"/{webPageContentQueryDataContainer.WebPageUrlPath}";
+                        }
+                    } else {
+                        url = canonicalUrl.AsNullOrWhitespaceMaybe().TryGetValue(out var cannonUrl) ? cannonUrl : null;
+                    }
+                }
+            } catch (Exception) {
+
+            }
+            return Result.SuccessIf(dataFound, new PageMetaData() {
+                Title = title.AsNullOrWhitespaceMaybe(),
+                Description = description.AsNullOrWhitespaceMaybe(),
+                Keywords = keywords.AsNullOrWhitespaceMaybe(),
+                NoIndex = noIndex.AsMaybe(),
+                Thumbnail = ogImage.AsNullOrWhitespaceMaybe(),
+                CanonicalUrl = url.AsNullOrWhitespaceMaybe()
+            }, "Does not have any MetaData values");
+
+        }
+
 
         private async Task<Result<ContentItemAssetMetadata>> GetImageMetadataField(Guid assetContentItemGuid, string className, string fieldName, string language)
         {

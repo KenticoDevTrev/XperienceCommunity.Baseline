@@ -12,7 +12,17 @@ namespace Core.Repositories.Implementation
             return Task.FromResult(Result.Failure<PageMetaData>("If you want to customize, must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type"));
         }
 
+        public Task<Result<PageMetaData>> MapAndGetPageMetadata(IWebPageFieldsSource webPageFieldSource, PageMetaData baseMetaData)
+        {
+            return Task.FromResult(Result.Failure<PageMetaData>("If you want to customize, must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type"));
+        }
+
         public Task<Result<PageMetaData>> MapAndGetPageMetadataReusableContent(IContentQueryDataContainer contentQueryDataContainer, PageMetaData baseMetaData, string? canonicalUrl)
+        {
+            return Task.FromResult(Result.Failure<PageMetaData>("If you want to customize, must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type"));
+        }
+
+        public Task<Result<PageMetaData>> MapAndGetPageMetadataReusableContent(IContentItemFieldsSource contentItemFieldSource, PageMetaData baseMetaData, string? canonicalUrl)
         {
             return Task.FromResult(Result.Failure<PageMetaData>("If you want to customize, must implement and inject your own. Use IContentQueryResultMapper.Map to cast the contentQueryDataContainer to your type"));
         }
