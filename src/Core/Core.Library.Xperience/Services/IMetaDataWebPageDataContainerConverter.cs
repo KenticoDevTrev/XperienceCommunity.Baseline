@@ -12,5 +12,7 @@ namespace Core.Services
         /// <param name="canonicalUrl"></param>
         /// <returns></returns>
         Task<Result<PageMetaData>> GetDefaultMetadataLogic(IContentQueryDataContainer nonWebpageContentQueryDataContainer, string? canonicalUrl);
+        Task<Result<PageMetaData>> GetDefaultMetadataLogic(IWebPageFieldsSource webPageFieldSource);
+        Task<Result<PageMetaData>> GetDefaultMetadataLogic(IContentItemFieldsSource nonWebpageContentItemFieldSource, string? canonicalUrl);
     }
 }
