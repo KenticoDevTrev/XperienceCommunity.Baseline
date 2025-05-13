@@ -324,7 +324,7 @@ namespace MVC.Configuration
             );
 
             /// BASELINE CUSTOMIZATION - Core - Add your own Page metadata Converter here
-            builder.Services.AddScoped<IWebPageToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
+            builder.Services.AddScoped<IContentItemToPageMetadataConverter, CustomWebPageToPageMetadataConverter>();
         }
 
 
