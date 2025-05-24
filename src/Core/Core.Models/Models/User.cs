@@ -86,6 +86,7 @@
         public Maybe<string> FirstName { get; init; } = Maybe.None;
         public Maybe<string> MiddleName { get; init; } = Maybe.None;
         public Maybe<string> LastName { get; init; } = Maybe.None;
+        public string SecurityStamp { get; init; } = string.Empty;
         public bool Enabled { get; init; }
         public bool IsExternal { get; init; }
         public bool IsPublic { get; init; }

@@ -16,6 +16,7 @@ namespace Core.Services.Implementations
                 FirstName = userInfo.FirstName.GetValueOrDefault(string.Empty),
                 LastName = userInfo.LastName.GetValueOrDefault(string.Empty)
             };
+
             if(userInfo.UserID.TryGetValue(out var id)) { 
                 appUser.Id = id;
             }

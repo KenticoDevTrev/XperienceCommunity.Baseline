@@ -21,7 +21,7 @@
                 }
             }
         };
-    @* Loading javascript, should be {src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool} *@
+    @* Loading javascript, should be {src: string, header?: boolean, crossorigin?: string, appendAtEnd?: bool, type?: string} *@
     window.LoadScript = function (scriptObj) {
         window.scriptsToLoad = window.scriptsToLoad || [];
         window.scriptsToLoad.push(scriptObj);

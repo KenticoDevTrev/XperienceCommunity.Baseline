@@ -12,6 +12,7 @@ namespace Core.Services.Implementations
                 Enabled = user.Enabled,
                 Email = user.Email,
                 IsExternal = user.IsExternal,
+                SecurityStamp = user.SecurityStamp
             };
             if (user.UserID.TryGetValue(out var userId)) {
                 appUser.Id = userId;
@@ -50,6 +51,7 @@ namespace Core.Services.Implementations
                 Enabled = applicationUser.Enabled,
                 IsExternal = applicationUser.IsExternal,
                 IsPublic = (applicationUser.UserName ?? "public").Equals("public", StringComparison.OrdinalIgnoreCase),
+                SecurityStamp = applicationUser.SecurityStamp ?? string.Empty
             };
 
             // Put your own custom user type here

@@ -25,7 +25,9 @@
                                 var scrpt = document.createElement("script");
                                 scrpt.async = false;
                                 scrpt.src = options.src;
-
+                                if (options.type) {
+                                    scrpt.type = options.type;
+                                }
                                 scrpt.crossOrigin = options.crossorigin;
                                 if (options.head) {
                                     document.head.appendChild(scrpt);
@@ -45,7 +47,9 @@
                                 var scrpt = document.createElement("script");
                                 scrpt.async = false;
                                 scrpt.src = options.src;
-
+                                if (options.type) {
+                                    scrpt.type = options.type;
+                                }
                                 scrpt.crossOrigin = options.crossorigin;
                                 if (options.head) {
                                     document.head.appendChild(scrpt);
