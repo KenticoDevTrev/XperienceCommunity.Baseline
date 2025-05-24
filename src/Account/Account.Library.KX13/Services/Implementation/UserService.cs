@@ -45,7 +45,17 @@ namespace Account.Services.Implementation
             return await _userManager.ConfirmEmailAsync(appUser, token);
         }
 
-        public async Task SendPasswordResetEmailAsync(User user, string confirmationLink)
+        public async Task<string> GetPasswordResetTokenAsync(User user)
+        {
+            var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
+            if (appUser == null) {
+                _eventLogService.LogEvent(EventTypeEnum.Error, "UserService.cs", "SendPasswordResetEmailError", eventDescription: $"Could not send password reset for user with ID {user.UserID} was not found in Kentico.");
+                return string.Empty;
+            }
+            return await _userManager.GeneratePasswordResetTokenAsync(appUser);
+        }
+
+        public async Task SendPasswordResetEmailAsync(User user, string confirmationLink, string? resetToken = null)
         {
             var appUser = await _userManager.FindByIdAsync(user.UserID.ToString());
             if (appUser == null)
@@ -53,7 +63,7 @@ namespace Account.Services.Implementation
                 _eventLogService.LogEvent(EventTypeEnum.Error, "UserService.cs", "SendPasswordResetEmailError", eventDescription: $"Could not send password reset for user with ID {user.UserID} was not found in Kentico.");
                 return;
             }
-            string token = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+            string token = resetToken ?? await _userManager.GeneratePasswordResetTokenAsync(appUser);
 
             // Creates and sends the confirmation email to the user's address
             await _emailService.SendEmailAsync(user.Email, "Password Reset Request",

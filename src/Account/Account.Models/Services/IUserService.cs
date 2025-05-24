@@ -41,12 +41,20 @@ namespace Account.Services
         Task<IdentityResult> ConfirmRegistrationConfirmationTokenAsync(User user, string token);
 
         /// <summary>
+        /// Generates the Password Reset Token, not needed if you use the SendPasswordEmailAsync, but is if you want to write your own email sender
+        /// </summary>
+        /// <param name="user">The User object</param>
+        /// <returns>The Email token that should be passed to the password reset link</returns>
+        Task<string> GetPasswordResetTokenAsync(User user);
+
+        /// <summary>
         /// Sends a password reset email for the given user
         /// </summary>
         /// <param name="user">The User object</param>
         /// <param name="confirmationLink">The base URL for the Email Confirmation string, the user GUID and Hash are appended to this</param>
+        /// <param name="resetToken">The reset token generated from ConfirmRegistrationConfirmationTokenAsync, optional, if not passed will use this method to generate.</param>
         /// <returns></returns>
-        Task SendPasswordResetEmailAsync(User user, string confirmationLink);
+        Task SendPasswordResetEmailAsync(User user, string confirmationLink, string? resetToken = null);
 
         /// <summary>
         /// Validates and resets the password for the given user and token
