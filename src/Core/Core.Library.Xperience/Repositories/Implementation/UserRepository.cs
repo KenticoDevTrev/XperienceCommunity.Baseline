@@ -68,7 +68,6 @@ namespace Core.Repositories.Implementation
         {
             var result = await _progressiveCache.LoadAsync(async cs => {
                 var userquery = _memberInfoProvider.Get()
-                                    .Columns(nameof(MemberInfo.MemberName))
                                     .TopN(1);
 
                 var internalBuilder = _cacheDependencyBuilderFactory.Create(false);
@@ -88,11 +87,13 @@ namespace Core.Repositories.Implementation
                 var user = (await userquery.GetEnumerableTypedResultAsync()).FirstOrMaybe();
 
                 if (user.TryGetValue(out var userMember)) {
-                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userMember.MemberName);
+                    internalBuilder.Object(MemberInfo.OBJECT_TYPE, userMember.MemberID);
 
                     // In case in converting MemberInfo to the object type, there are other dependencies added to scope
                     _cacheDependenciesScope.Begin();
-                    var applicationUser = await _userManager.FindByNameAsync(userMember.MemberName);
+                    var applicationUser = new TUser();
+                    applicationUser.MapFromMemberInfo(userMember);
+                    //var applicationUser = await _userManager.FindByNameAsync(userMember.MemberName);
                     internalBuilder.AddKeys(_cacheDependenciesScope.End());
 
                     if (cs.Cached) {
