@@ -4,6 +4,9 @@ using Account.Services.Implementation;
 using Kentico.Membership;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +43,11 @@ namespace Account
             string AUTHENTICATION_COOKIE_NAME = "identity.authentication",
             string defaultLoginUrl = "/Account/LogIn",
             string defaultLogOutUrl = "/Account/LogOut",
-            string defaultAccessDeniedPath = "/Error/403")
+            string defaultAccessDeniedPath = "/Error/403",
+            Action<GoogleOptions>? googleOathOptions = null,
+            Action<FacebookOptions>? facebookOathOptions = null,
+            Action<TwitterOptions>? twitterOathOptions = null,
+            Action<MicrosoftAccountOptions>? microsoftOathOptions = null)
             where TUser : ApplicationUser, new()
             where TRole : ApplicationRole, new()
         {
@@ -80,6 +87,8 @@ namespace Account
                     opt.ClientSecret = googleAuth["ClientSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
+                    opt.CallbackPath = googleAuth["CallbackPath"] ?? "/signin-google";
+                    googleOathOptions?.Invoke(opt);
                 });
             }
             var facebookAuth = configuration.GetSection("Authentication:Facebook");
@@ -90,6 +99,8 @@ namespace Account
                     opt.AppSecret = facebookAuth["AppSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
+                    opt.CallbackPath = facebookAuth["CallbackPath"] ?? "/signin-facebook";
+                    facebookOathOptions?.Invoke(opt);
                 });
             }
             var twitterAuth = configuration.GetSection("Authentication:Twitter");
@@ -100,6 +111,7 @@ namespace Account
                     opt.RetrieveUserDetails = true;
                     opt.EventsType = typeof(SiteSettingsTwitterOauthAuthenticationEvents);
                     opt.CallbackPath = twitterAuth["CallbackPath"] ?? "/signin-twitter";
+                    twitterOathOptions?.Invoke(opt);
                 });
             }
             var microsoftAuth = configuration.GetSection("Authentication:Microsoft");
@@ -111,6 +123,7 @@ namespace Account
                     opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                     opt.CallbackPath = microsoftAuth["CallbackPath"] ?? "/signin-microsoft";
+                    microsoftOathOptions?.Invoke(opt);
                 });
             }
 
