@@ -19,11 +19,13 @@ Configuration is relatively easy, it's all done through the `appsettings.json`, 
   "Authentication": {
     "Google": {
       "ClientId": "000000000000-123456789abcdefghijklmnopqrstuvw.apps.googleusercontent.com",
-      "ClientSecret": "SOMETH-_Ng0123456789ABcDeFgHiJk_LM0"
+      "ClientSecret": "SOMETH-_Ng0123456789ABcDeFgHiJk_LM0",
+      "CallbackPath": "/signin-google"
     },
     "Facebook": {
       "AppId": "0000000000000000",
-      "AppSecret": "123456789abcdefghijklmnopqrstuvw"
+      "AppSecret": "123456789abcdefghijklmnopqrstuvw",
+      "CallbackPath": "/signin-facebook"
     },
     "Twitter": {
       "APIKey": "Something0123456789Here00",
@@ -38,6 +40,8 @@ Configuration is relatively easy, it's all done through the `appsettings.json`, 
   }
 }
 ```
+
+You also have the ability to modify the `_____Options` for the various OAuth providers through the `Services.AddBaselineAccountAuthentication(... googleOauthOptions, facebookOauthOptions, twitterOathOptions, microsoftOauthOptions) Actions.
 
 ## Retrieving configuration and executing them
 
