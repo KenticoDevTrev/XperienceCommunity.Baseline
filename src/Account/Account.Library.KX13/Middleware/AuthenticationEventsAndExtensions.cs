@@ -44,10 +44,10 @@ namespace Account
             string defaultLoginUrl = "/Account/LogIn",
             string defaultLogOutUrl = "/Account/LogOut",
             string defaultAccessDeniedPath = "/Error/403",
-            Action<GoogleOptions>? googleOathOptions = null,
-            Action<FacebookOptions>? facebookOathOptions = null,
-            Action<TwitterOptions>? twitterOathOptions = null,
-            Action<MicrosoftAccountOptions>? microsoftOathOptions = null)
+            Action<GoogleOptions>? googleOauthOptions = null,
+            Action<FacebookOptions>? facebookOauthOptions = null,
+            Action<TwitterOptions>? twitterOauthOptions = null,
+            Action<MicrosoftAccountOptions>? microsoftOauthOptions = null)
             where TUser : ApplicationUser, new()
             where TRole : ApplicationRole, new()
         {
@@ -88,7 +88,7 @@ namespace Account
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                     opt.CallbackPath = googleAuth["CallbackPath"] ?? "/signin-google";
-                    googleOathOptions?.Invoke(opt);
+                    googleOauthOptions?.Invoke(opt);
                 });
             }
             var facebookAuth = configuration.GetSection("Authentication:Facebook");
@@ -100,7 +100,7 @@ namespace Account
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
                     opt.CallbackPath = facebookAuth["CallbackPath"] ?? "/signin-facebook";
-                    facebookOathOptions?.Invoke(opt);
+                    facebookOauthOptions?.Invoke(opt);
                 });
             }
             var twitterAuth = configuration.GetSection("Authentication:Twitter");
@@ -111,7 +111,7 @@ namespace Account
                     opt.RetrieveUserDetails = true;
                     opt.EventsType = typeof(SiteSettingsTwitterOauthAuthenticationEvents);
                     opt.CallbackPath = twitterAuth["CallbackPath"] ?? "/signin-twitter";
-                    twitterOathOptions?.Invoke(opt);
+                    twitterOauthOptions?.Invoke(opt);
                 });
             }
             var microsoftAuth = configuration.GetSection("Authentication:Microsoft");
@@ -123,7 +123,7 @@ namespace Account
                     opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                     opt.CallbackPath = microsoftAuth["CallbackPath"] ?? "/signin-microsoft";
-                    microsoftOathOptions?.Invoke(opt);
+                    microsoftOauthOptions?.Invoke(opt);
                 });
             }
 
