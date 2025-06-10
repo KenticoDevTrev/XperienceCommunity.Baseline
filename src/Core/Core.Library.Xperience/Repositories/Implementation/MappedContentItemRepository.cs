@@ -94,7 +94,6 @@ namespace Core.Repositories.Implementation
                         .If(contentItemId.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemID), contentItemId.GetValueOrDefault(0))))
                         .If(contentItemGuid.HasValue, queryWhere => queryWhere.Where(where => where.WhereEquals(nameof(ContentItemFields.ContentItemGUID), contentItemGuid.GetValueOrDefault(Guid.Empty))))
                         .WithLinkedItems(linkedItemDepth, x => x.IncludeWebPageData(true))                        
-                        .TopN(1)
                 )
                 .InLanguage(lang);
 
