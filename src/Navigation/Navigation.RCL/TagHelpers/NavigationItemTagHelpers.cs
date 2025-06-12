@@ -6,6 +6,7 @@ namespace Navigation.TagHelpers
 {
     [HtmlTargetElement("li", Attributes = "[bl-navitem-references]")]
     [HtmlTargetElement("a", Attributes = "[bl-navitem-references]")]
+    [HtmlTargetElement("div", Attributes = "[bl-navitem-references]")]
 
     public class NavigationItemNavReferenceTagHelper : TagHelper
     {
@@ -38,6 +39,7 @@ namespace Navigation.TagHelpers
     [HtmlTargetElement("li", Attributes = "[bl-navitem-class]")]
     [HtmlTargetElement("article", Attributes = "[bl-navitem-class]")]
     [HtmlTargetElement("a", Attributes = "[bl-navitem-class]")]
+    [HtmlTargetElement("div", Attributes = "[bl-navitem-class]")]
     public class NavigationItemClassTagHelper : TagHelper
     {
         [HtmlAttributeName("bl-navigation-item")]
