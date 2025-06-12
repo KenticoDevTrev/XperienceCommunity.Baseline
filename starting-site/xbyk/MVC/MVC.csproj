@@ -6,16 +6,16 @@
     <None Remove="appsettings.json.backup" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="kentico.xperience.azurestorage" Version="30.4.0" />
-    <PackageReference Include="kentico.xperience.imageprocessing" Version="30.4.0" />
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.4.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL.Xperience" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL.Xperience" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL.Xperience" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL.Xperience" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.Library.Xperience.Lucene" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL.Xperience" Version="2.7.0" />
-    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL.Xperience" Version="2.7.0" />
+    <PackageReference Include="kentico.xperience.azurestorage" Version="30.5.4" />
+    <PackageReference Include="kentico.xperience.imageprocessing" Version="30.5.4" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.5.4" />
+    <PackageReference Include="XperienceCommunity.Baseline.Account.RCL.Xperience" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.Core.RCL.Xperience" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.Localization.RCL.Xperience" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.Navigation.RCL.Xperience" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.Library.Xperience.Lucene" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.Search.RCL.Xperience" Version="2.8.2" />
+    <PackageReference Include="XperienceCommunity.Baseline.TabbedPages.RCL.Xperience" Version="2.8.2" />
     <PackageReference Include="XperienceCommunity.DevTools.PageBuilderTagHelpers" Version="1.0.3" />
   </ItemGroup>
   <ItemGroup>
