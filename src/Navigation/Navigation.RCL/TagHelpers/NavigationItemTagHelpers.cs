@@ -56,7 +56,9 @@ namespace Navigation.TagHelpers
             }
             if (NavigationItem.LinkCSSClass.TryGetValueNonEmpty(out var linkCSSClassVal))
             {
-                output.AddClass(linkCSSClassVal.ToLowerInvariant(), HtmlEncoder.Default);
+                foreach (var cssClass in linkCSSClassVal.SplitAndRemoveEntries(" ")) {
+                    output.AddClass(cssClass, HtmlEncoder.Default);
+                }
             }
         }
     }
