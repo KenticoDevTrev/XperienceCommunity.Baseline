@@ -1,6 +1,6 @@
 ﻿@using Navigation.Components.Navigation.ScreenReaderNavigation
 @model ScreenReaderNavigationViewModel
-<nav class="visually-hidden ada-main-navigation" role="navigation" aria-label="Screen Reader Navigation">
+<nav class="ada-main-navigation visually-hidden-focusable" role="navigation" aria-label="Screen Reader Navigation">
     <ul id="@Model.Id" name="@Model.Id">
         @foreach (var navItem in Model.NavigationItems)
         {
@@ -50,7 +50,7 @@
                 case 'ArrowUp':
                     let parentLink = parentUl.previousElementSibling;
                     if (parentLink) {
-                        $(parentLink).focus();
+                        parentLink.focus();
                     }
                     break;
                 case 'ArrowRight':
@@ -69,6 +69,15 @@
                 case ' ':
                 case 'Space':
                     link.click();
+                    // focus if it's an anchor tag
+                    var href = elem.getAttribute('href');
+                    if (href.length > 0 && href[0] == '#') {
+                        var name = href.substring(1);
+                        var firstNavItem = document.querySelectorAll(`${href}, [name='${name}']`);
+                        if (firstNavItem.length > 0) {
+                            firstNavItem[0].focus();
+                        }
+                    }
                     break;
             }
         });

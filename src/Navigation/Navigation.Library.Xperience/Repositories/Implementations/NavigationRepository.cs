@@ -160,6 +160,8 @@ namespace Navigation.Repositories.Implementations
                                 LinkPageID = automaticItem.WebPageItemID,
                                 LinkPageGuid = automaticItem.WebPageItemGUID,
                                 LinkPagePath = automaticItem.WebPageItemTreePath,
+                                LinkCSSClass = navPage.NavigationLinkCSS,
+                                LinkAlt = navPage.NavigationLinkAlt,
                                 Children = children.Union(dynamicItems)
                             });
                         } else {
