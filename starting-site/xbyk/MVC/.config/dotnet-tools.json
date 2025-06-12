@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "kentico.xperience.dbmanager": {
-      "version": "30.4.0",
+      "version": "30.5.4",
       "commands": [
         "kentico-xperience-dbmanager"
       ]
