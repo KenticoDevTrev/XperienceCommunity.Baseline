@@ -7,6 +7,9 @@ using Kentico.Membership;
 using Kentico.Web.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +43,11 @@ namespace Microsoft.AspNetCore.Builder
             string AUTHENTICATION_COOKIE_NAME = "identity.authentication",
             string defaultLoginUrl = "/Account/LogIn",
             string defaultLogOutUrl = "/Account/LogOut",
-            string defaultAccessDeniedPath = "/Error/403") 
+            string defaultAccessDeniedPath = "/Error/403",
+             Action<GoogleOptions>? googleOauthOptions = null,
+            Action<FacebookOptions>? facebookOauthOptions = null,
+            Action<TwitterOptions>? twitterOauthOptions = null,
+            Action<MicrosoftAccountOptions>? microsoftOauthOptions = null) 
             where TUser : ApplicationUser, new() 
             where TRole : TagApplicationUserRole, new() 
         {
@@ -88,6 +95,7 @@ namespace Microsoft.AspNetCore.Builder
                     opt.ClientSecret = googleAuth["ClientSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
+                    googleOauthOptions?.Invoke(opt);
                 });
             }
             var facebookAuth = builder.Configuration.GetSection("Authentication:Facebook");
@@ -97,6 +105,8 @@ namespace Microsoft.AspNetCore.Builder
                     opt.AppSecret = facebookAuth["AppSecret"] ?? string.Empty;
                     opt.SignInScheme = IdentityConstants.ExternalScheme;
                     opt.EventsType = typeof(SiteSettingsFacebookOauthAuthenticationEvents);
+                    facebookOauthOptions?.Invoke(opt);
+
                 });
             }
             var twitterAuth = builder.Configuration.GetSection("Authentication:Twitter");
@@ -107,6 +117,7 @@ namespace Microsoft.AspNetCore.Builder
                     opt.RetrieveUserDetails = true;
                     opt.EventsType = typeof(SiteSettingsTwitterOauthAuthenticationEvents);
                     opt.CallbackPath = twitterAuth["CallbackPath"] ?? "/signin-twitter";
+                    twitterOauthOptions?.Invoke(opt);
                 });
             }
             var microsoftAuth = builder.Configuration.GetSection("Authentication:Microsoft");
@@ -116,6 +127,7 @@ namespace Microsoft.AspNetCore.Builder
                     opt.ClientSecret = microsoftAuth["ClientSecret"] ?? string.Empty;
                     opt.EventsType = typeof(SiteSettingsOauthAuthenticationEvents);
                     opt.CallbackPath = microsoftAuth["CallbackPath"] ?? "/signin-microsoft";
+                    microsoftOauthOptions?.Invoke(opt);
                 });
             }
 
