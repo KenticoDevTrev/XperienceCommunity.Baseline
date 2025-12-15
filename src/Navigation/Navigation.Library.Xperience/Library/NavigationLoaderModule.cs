@@ -43,7 +43,7 @@ namespace Navigation.Library
         {
             try
             {
-                var query = $@"SELECT NavigationWebPageItemGuid FROM [Baseline_v2_XbyK].[dbo].[Generic_Navigation]
+                var query = $@"SELECT NavigationWebPageItemGuid FROM [dbo].[Generic_Navigation]
   inner join CMS_WebPageItem on WebPageItemGUID = NavigationWebPageItemGuid
   where WebPageItemContentItemID = {e.ID}";
                 
