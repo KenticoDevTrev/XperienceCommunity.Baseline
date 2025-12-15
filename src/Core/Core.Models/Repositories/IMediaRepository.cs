@@ -116,6 +116,7 @@
         /// </summary>
         /// <param name="fileGuid"></param>
         /// <returns></returns>
+        [Obsolete("Media Items are being replaced by Content Item Assets in Xperience by Kentico.  Please use GetContentItemAssets(mediaFileGuid.Select(x => x.ToObjectIdentity())). Please see https://docs.kentico.com/guides/architecture/media-libraries-migration-guidance to migrate.")]
         Task<Result<MediaItem>> GetMediaItemAsync(Guid fileGuid);
 
         /// <summary>
@@ -123,6 +124,7 @@
         /// </summary>
         /// <param name="libraryName"></param>
         /// <returns></returns>
+        [Obsolete("Media Items are being replaced by Content Item Assets in Xperience by Kentico.  Please see https://docs.kentico.com/guides/architecture/media-libraries-migration-guidance to migrate.")]
         Task<IEnumerable<MediaItem>> GetMediaItemsByLibraryAsync(string libraryName);
 
         /// <summary>
@@ -131,12 +133,14 @@
         /// <param name="path">The path within the media library folder</param>
         /// <param name="libraryName">Optional Library name</param>
         /// <returns></returns>
+        [Obsolete("Media Items are being replaced by Content Item Assets in Xperience by Kentico.  Please see https://docs.kentico.com/guides/architecture/media-libraries-migration-guidance to migrate.")]
         Task<IEnumerable<MediaItem>> GetMediaItemsByPathAsync(string path, string? libraryName = null);
 
         /// <summary>
         /// Gets the sitename of the media or attachment by Guid so it can be appended, used primarily in the middleware to update getattachment
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Media Items are being replaced by Content Item Assets in Xperience by Kentico. Please see https://docs.kentico.com/guides/architecture/media-libraries-migration-guidance to migrate.")]
         Task<Result<string>> GetMediaAttachmentSiteNameAsync(Guid mediaOrAttachmentGuid);
 
         /// <summary>

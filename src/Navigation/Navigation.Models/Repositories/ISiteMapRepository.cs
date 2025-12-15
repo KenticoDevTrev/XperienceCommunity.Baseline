@@ -11,7 +11,7 @@
 
 Instead use your own logic to retrieve the IEnumerable<IContentQueryDataContainer> of your items and then use the ISiteMapService.ConvertToSitemapNode to convert.
 
-May wish to overwrite and implement a custom ISiteMapCustomizationService to parsing individual page types (using the IWebPageQueryResultMapper or IContentItemQueryResultMapper) to map to your own data")]
+May wish to overwrite and implement a custom ISiteMapCustomizationService to parsing individual page types (using the IContentQueryModelTypeMapper or IContentItemQueryResultMapper) to map to your own data")]
         Task<IEnumerable<SitemapNode>> GetSiteMapUrlSetAsync(SiteMapOptions options);
 
         /// <summary>

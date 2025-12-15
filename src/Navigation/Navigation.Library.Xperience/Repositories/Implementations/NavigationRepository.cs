@@ -259,7 +259,6 @@ namespace Navigation.Repositories.Implementations
                 // Include content type fields if there is an order or where condition as it may be part of it.
                 var navQueryBuilder = new ContentItemQueryBuilder().ForContentTypes(query => query
                             .ForWebsite(_websiteChannelContext.WebsiteChannelName, pathMatch, true)
-                        //.WithWebPageData(includeUrlPath: true)
                         )
                         .Parameters(query => {
                             query.Where(where =>

@@ -2,6 +2,7 @@
 
 namespace Core.Services.Implementation
 {
+    [Obsolete("Kentico now implements the system ILogger which you can start using, or the IEventLogService.")]
     public class Logger(IEventLogService eventLogService) : ILogger
     {
         private readonly IEventLogService _eventLogService = eventLogService;

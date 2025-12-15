@@ -4,7 +4,9 @@ using CMS.Core;
 namespace Core.Services.Implementation
 {
     [AutoDependencyInjection]
+#pragma warning disable CS0618 // Type or member is obsolete - Needed for KX13 though
     public class Logger(ISiteService _siteRepo, IEventLogService _logService) : ILogger
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         public void LogException(Exception ex, string Source, string EventCode, string Description = "")
         {

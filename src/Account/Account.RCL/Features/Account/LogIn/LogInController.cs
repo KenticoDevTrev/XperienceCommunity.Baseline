@@ -11,7 +11,9 @@ namespace Account.Features.Account.LogIn
         IUserRepository _userRepository,
         IAccountSettingsRepository _accountSettingsRepository,
         IUserService _userService,
+#pragma warning disable CS0618 // Type or member is obsolete
         ILogger _logger,
+#pragma warning restore CS0618 // Type or member is obsolete
         IRoleService _roleService,
         ISiteRepository _siteRepository,
         IModelStateService _modelStateService,

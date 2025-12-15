@@ -97,9 +97,13 @@ namespace Core
             imageProcessingOptionsConfiguration?.Invoke(imageProcessingOptions);
             services.AddSingleton(imageProcessingOptions);
 
+
             services
                 // Largely Only dependent upon Kentico's APIs
+#pragma warning disable CS0618 // Type or member is obsolete
                 .AddScoped<ILogger, Logger>()
+#pragma warning restore CS0618 // Type or member is obsolete
+
                 .AddScoped<ISiteRepository, SiteRepository>()
                 .AddScoped<ILanguageRepository, LanguageRepository>()
                 .AddScoped<IUrlResolver, UrlResolver>()
@@ -125,7 +129,10 @@ namespace Core
             // User Customization Points, register your own versions afterwards if you wish
             services
                 .AddScoped<IBaselineUserMapper<TUser>, BaselineUserMapper<TUser>>()
+#pragma warning disable CS0618 // Type or member is obsolete - keeping for fallback purposes
                 .AddScoped<IMediaFileMediaMetadataProvider, MediaFileMediaMetadataProvider>()
+#pragma warning restore CS0618 // Type or member is obsolete
+
                 .AddScoped<IContentItemMediaCustomizer, ContentItemMediaCustomizer>()
                 .AddScoped<IContentItemMediaMetadataQueryEditor, ContentItemMediaMetadataQueryEditor>()
                 .AddScoped<ICustomTaxonomyFieldParser, CustomTaxonomyFieldParser>()

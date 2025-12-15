@@ -4,6 +4,7 @@ using System.Xml.XPath;
 
 namespace Core.Repositories.Implementation
 {
+    [Obsolete("Media Items are being replaced by Content Item Assets in Xperience by Kentico.")]
     public class MediaFileMediaMetadataProvider(IProgressiveCache progressiveCache, IUrlResolver urlResolver, IHttpClientFactory HttpClientFactory) : IMediaFileMediaMetadataProvider
     {
         private static readonly string[] _imageExtensions = ["png", "gif", "bmp", "jpg", "jpeg", "webp"];
