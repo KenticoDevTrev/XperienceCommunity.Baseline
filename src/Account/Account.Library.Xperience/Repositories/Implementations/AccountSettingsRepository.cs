@@ -16,12 +16,12 @@ namespace Account.Repositories.Implementations
     /// <param name="cacheDependencyBuilderFactory"></param>
     /// <param name="passwordPolicySettings"></param>
     public class AccountSettingsRepository(IUrlResolver urlResolver,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IChannelCustomSettingsRepository channelCustomSettingsRepository,
         IOptions<IdentityOptions> identityOptions) : IAccountSettingsRepository
     {
         private readonly IUrlResolver _urlResolver = urlResolver;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
         private readonly IOptions<IdentityOptions> _identityOptions = identityOptions;
 

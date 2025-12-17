@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.6.3" />
-    <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.3.2" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="31.0.0" />
+    <PackageReference Include="XperienceCommunity.MemberRoles" Version="2.6.0" />
   </ItemGroup>
 
 </Project>

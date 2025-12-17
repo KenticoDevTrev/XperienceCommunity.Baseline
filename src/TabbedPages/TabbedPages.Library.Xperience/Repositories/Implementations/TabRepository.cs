@@ -15,7 +15,7 @@ using XperienceCommunity.MemberRoles.Services;
 namespace TabbedPages.Repositories.Implementations
 {
     public class TabRepository(IIdentityService identityService,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IProgressiveCache progressiveCache,
         ICacheRepositoryContext cacheRepositoryContext,
         IContentQueryExecutor contentQueryExecutor,
@@ -24,7 +24,7 @@ namespace TabbedPages.Repositories.Implementations
         IWebsiteChannelContext websiteChannelContext) : ITabRepository
     {
         private readonly IIdentityService _identityService = identityService;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;

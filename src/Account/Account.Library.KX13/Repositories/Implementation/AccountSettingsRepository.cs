@@ -1,6 +1,6 @@
 ﻿using CMS.DataEngine;
 
-namespace Account.Repositories.Implementation
+namespace Account.KX13.Repositories.Implementation
 {
     public class AccountSettingsRepository(
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,

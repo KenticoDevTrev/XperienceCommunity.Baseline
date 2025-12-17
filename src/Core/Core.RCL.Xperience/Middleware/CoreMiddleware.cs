@@ -19,8 +19,11 @@ using PartialWidgetPage;
 using XperienceCommunity.ImageProcessing;
 using MVC.Middleware;
 using Core.Middleware;
+using XperienceCommunity.ImageProcessing.Options;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace Core
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 {
     public static class CoreMiddleware
     {

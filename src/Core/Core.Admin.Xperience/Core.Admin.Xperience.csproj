@@ -19,10 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" Version="30.6.3" />
-    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.2.0" />
-    <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="2.3.2" />
-    <PackageReference Include="XperienceCommunity.RelationshipsExtended.Admin" Version="1.0.1" />
+    <PackageReference Include="Kentico.Xperience.Admin" Version="31.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings.Admin" Version="1.3.0" />
+    <PackageReference Include="XperienceCommunity.MemberRoles.Admin" Version="2.6.0" />
+    <PackageReference Include="XperienceCommunity.RelationshipsExtended.Admin" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

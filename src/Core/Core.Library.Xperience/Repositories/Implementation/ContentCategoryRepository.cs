@@ -14,7 +14,7 @@ namespace Core.Repositories.Implementation
         ContentItemTaxonomyOptions contentItemTaxonomyOptions,
         IProgressiveCache progressiveCache,
         IIdentityService identityService,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         ICacheDependenciesScope cacheDependenciesScope,
         IContentQueryExecutor contentQueryExecutor,
         ICacheRepositoryContext cacheRepositoryContext,
@@ -32,7 +32,7 @@ namespace Core.Repositories.Implementation
         private readonly ContentItemTaxonomyOptions _contentItemTaxonomyOptions = contentItemTaxonomyOptions;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IIdentityService _identityService = identityService;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
@@ -242,7 +242,7 @@ namespace Core.Repositories.Implementation
                 foreach (var dataItem in contentItemIdToField[contentId]) {
                     var lang = _languageIdentifierRepository.LanguageIdToName(dataItem.ContentItemCommonDataContentLanguageID).ToLowerInvariant();
                     if (!langToTagIds.ContainsKey(lang)) {
-                        langToTagIds.Add(lang, (await GetTagsFromCategoryFields(dataItem, configuration, lookupDictionaries)).ToList());
+                        langToTagIds.Add(lang, [.. (await GetTagsFromCategoryFields(dataItem, configuration, lookupDictionaries))]);
                     }
                 }
             }

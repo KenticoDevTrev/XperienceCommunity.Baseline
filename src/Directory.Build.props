@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<NetCoreTargetVersion>net8.0</NetCoreTargetVersion>
 		<KXVersion>13.0.130</KXVersion>
-		<XByKVersion>30.0.0</XByKVersion>
+		<XByKVersion>31.0.0</XByKVersion>
 		<SourceLinkVersion>8.0.0</SourceLinkVersion>
 	</PropertyGroup>
 	<PropertyGroup>

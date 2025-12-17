@@ -1,2 +1,1 @@
-﻿// Kentico's new ICacheDependencyBuilderFactor is currently incompatible with Cache Scope, waiting on Kentico to add hooks to allow replacing.
-global using ICacheDependencyBuilderFactory = MVCCaching.ICacheDependencyBuilderFactory;
+﻿

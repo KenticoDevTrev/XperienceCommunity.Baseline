@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Lucene.Admin" Version="12.4.0" />
+    <!-- TODO: Needs to be updated to latest Xperience package when possible -->
+    <PackageReference Include="Kentico.Xperience.Lucene.Admin" Version="13.0.2" />
   </ItemGroup>
 
   <ItemGroup>

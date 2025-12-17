@@ -27,7 +27,7 @@ using System.Linq;
 namespace Navigation.Repositories.Implementations
 {
     public class NavigationRepository(IContentQueryExecutor contentQueryExecutor,
-                                      ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+                                      ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
                                       IProgressiveCache progressiveCache,
                                       ICacheRepositoryContext cacheRepositoryContext,
                                       IWebsiteChannelContext websiteChannelContext,
@@ -39,7 +39,7 @@ namespace Navigation.Repositories.Implementations
                                       IChannelCustomSettingsRepository channelCustomSettingsRepository) : INavigationRepository, ISecondaryNavigationService
     {
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
@@ -239,7 +239,7 @@ namespace Navigation.Repositories.Implementations
                 .WebPagePath(startingPath, pageTypeEnum);
 
             // Default to site settings if available
-            var pageTypesToSelect = pageTypes != null && pageTypes.Any() ? pageTypes.ToArray() : (await _channelCustomSettingsRepository.GetSettingsModel<NavigationChannelSettings>()).NavigationPageTypes.SplitAndRemoveEntries();
+            var pageTypesToSelect = pageTypes != null && pageTypes.Any() ? [.. pageTypes] : (await _channelCustomSettingsRepository.GetSettingsModel<NavigationChannelSettings>()).NavigationPageTypes.SplitAndRemoveEntries();
 
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
@@ -248,12 +248,12 @@ namespace Navigation.Repositories.Implementations
 
                 var contentTypeIds = new List<int>();
                 if (pageTypesToSelect != null && pageTypesToSelect.Any()) {
-                    contentTypeIds = (await DataClassInfoProvider.GetClasses()
+                    contentTypeIds = [.. (await DataClassInfoProvider.GetClasses()
                     .WhereIn(nameof(DataClassInfo.ClassName), pageTypesToSelect.ToArray())
                     .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
                     .Columns(nameof(DataClassInfo.ClassID))
                     .GetEnumerableTypedResultAsync())
-                    .Select(x => x.ClassID).ToList();
+                    .Select(x => x.ClassID)];
                 } 
 
                 // Include content type fields if there is an order or where condition as it may be part of it.

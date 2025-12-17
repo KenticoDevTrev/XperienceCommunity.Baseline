@@ -9,7 +9,7 @@ namespace Core.Repositories.Implementation
     public class MappedContentItemRepository(IIdentityService identityService,
         IPreferredLanguageRetriever preferredLanguageRetriever,
         IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IContentQueryExecutor contentQueryExecutor,
         ISiteRepository siteRepository,
         ICacheRepositoryContext cacheRepositoryContext,
@@ -19,7 +19,7 @@ namespace Core.Repositories.Implementation
         private readonly IIdentityService _identityService = identityService;
         private readonly IPreferredLanguageRetriever _preferredLanguageRetriever = preferredLanguageRetriever;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IContentQueryExecutor _contentQueryExecutor = contentQueryExecutor;
         private readonly ISiteRepository _siteRepository = siteRepository;
         private readonly ICacheRepositoryContext _cacheRepositoryContext = cacheRepositoryContext;

@@ -20,9 +20,10 @@
   </ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Kentico.Xperience.WebApp" Version="30.6.3" />
-	  <PackageReference Include="XperienceCommunity.ImageProcessing" Version="1.1.1" />
-	  <PackageReference Include="XperienceCommunity.PartialWidgetPage" Version="30.0.3" />
+	  <PackageReference Include="Kentico.Xperience.WebApp" Version="31.0.0" />
+    <!-- TODO: Maybe update if they get to a 31.0.0-->
+	  <PackageReference Include="XperienceCommunity.ImageProcessing" Version="2.0.1" />
+	  <PackageReference Include="XperienceCommunity.PartialWidgetPage" Version="31.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

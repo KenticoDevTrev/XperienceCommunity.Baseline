@@ -5,7 +5,6 @@ using CMS.Websites.Routing;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.PageBuilder.Web.Mvc;
-using MVCCaching.Obsolete;
 using System.Data;
 
 namespace Core.Repositories.Implementation
@@ -13,7 +12,7 @@ namespace Core.Repositories.Implementation
     public class PageContextRepository(IWebPageDataContextRetriever webPageDataContextRetriever,
         IPageBuilderDataContextRetriever pageBuilderDataContextRetriever,
         IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IUrlResolver urlResolver,
         IIdentityService identityService,
         ILanguageRepository languageFallbackRepository,
@@ -25,7 +24,7 @@ namespace Core.Repositories.Implementation
         private readonly IWebPageDataContextRetriever _webPageDataContextRetriever = webPageDataContextRetriever;
         private readonly IPageBuilderDataContextRetriever _pageBuilderDataContextRetriever = pageBuilderDataContextRetriever;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly IIdentityService _identityService = identityService;
         private readonly ILanguageRepository _languageFallbackRepository = languageFallbackRepository;

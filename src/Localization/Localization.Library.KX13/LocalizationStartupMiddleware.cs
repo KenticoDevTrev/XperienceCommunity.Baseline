@@ -1,4 +1,4 @@
-﻿using Localization.Repositories.Implementations;
+﻿using Localization.KX13.Repositories.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using XperienceCommunity.Localizer;
 

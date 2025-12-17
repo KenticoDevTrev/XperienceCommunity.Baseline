@@ -4,13 +4,13 @@
             ICacheRepositoryContext cacheRepositoryContext,
             IInfoProvider<TagInfo> tagInfoProvider,
             IProgressiveCache progressiveCache,
-            ICacheDependencyBuilderFactory cacheDependencyBuilderFactory
+            ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory
          ) : ICategoryCachedRepository
     {
         public ICacheRepositoryContext CacheRepositoryContext { get; } = cacheRepositoryContext;
         public IInfoProvider<TagInfo> TagInfoProvider { get; } = tagInfoProvider;
         public IProgressiveCache ProgressiveCache { get; } = progressiveCache;
-        public ICacheDependencyBuilderFactory CacheDependencyBuilderFactory { get; } = cacheDependencyBuilderFactory;
+        public ICacheDependencyScopedBuilderFactory CacheDependencyBuilderFactory { get; } = cacheDependencyBuilderFactory;
 
         public IEnumerable<ObjectIdentity> CategoryNamesToCategoryIdentity(IEnumerable<string> categoryNames)
         {

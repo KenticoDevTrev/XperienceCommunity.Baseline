@@ -1,5 +1,5 @@
-﻿using Localization.Library.Xperience.Repositories.Implementations;
-using Localization.Repositories;
+﻿using Localization.Repositories;
+using Localization.Repositories.Implementations;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

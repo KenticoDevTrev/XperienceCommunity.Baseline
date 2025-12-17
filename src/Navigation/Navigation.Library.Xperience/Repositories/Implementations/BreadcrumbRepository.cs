@@ -18,7 +18,7 @@ using XperienceCommunity.ChannelSettings.Repositories;
 namespace Navigation.Repositories.Implementations
 {
     public class BreadcrumbRepository(IUrlResolver urlResolver,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IStringLocalizer<SharedResources> stringLocalizer,
         IIdentityService identityService,
         IChannelCustomSettingsRepository channelCustomSettingsRepository,
@@ -30,7 +30,7 @@ namespace Navigation.Repositories.Implementations
         ) : IBreadcrumbRepository
     {
         private readonly IUrlResolver _urlResolver = urlResolver;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IStringLocalizer<SharedResources> _stringLocalizer = stringLocalizer;
         private readonly IIdentityService _identityService = identityService;
         private readonly IChannelCustomSettingsRepository _channelCustomSettingsRepository = channelCustomSettingsRepository;
@@ -114,7 +114,7 @@ namespace Navigation.Repositories.Implementations
             builder.AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<NavigationChannelSettings>())
                 .AddKey($"webpageitems|all");
 
-            string[] validClassNames = (settings.NavigationPageTypes ?? "").ToLower().Split(";|,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+            string[] validClassNames = [.. (settings.NavigationPageTypes ?? "").ToLower().Split(";|,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim())];
             var channelName = _websiteChannelContext.WebsiteChannelName;
             // Cache dependency should not extend to the CacheDependenciesStore as only the matching breadcrumbs should apply.
             return await _progressiveCache.LoadAsync(async cs => {

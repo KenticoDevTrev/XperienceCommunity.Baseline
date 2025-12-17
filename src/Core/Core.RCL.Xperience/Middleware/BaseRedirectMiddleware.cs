@@ -32,7 +32,7 @@ namespace Core.Middleware
                                       IContentQueryExecutor contentQueryExecutor,
                                       ICacheRepositoryContext cacheRepositoryContext,
                                       IProgressiveCache progressiveCache,
-                                      ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+                                      ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
                                       IEventLogService eventLogService)
         {
             try {

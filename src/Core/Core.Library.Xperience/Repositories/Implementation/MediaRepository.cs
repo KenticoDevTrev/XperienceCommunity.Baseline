@@ -1,18 +1,19 @@
-﻿using CMS.ContentEngine.Internal;
-using CMS.MediaLibrary;
+﻿using CMS.MediaLibrary;
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using System.Data;
 using System.Text.Json;
 using System.Web;
-using System.Xml;
 
 namespace Core.Repositories.Implementation
 {
     public class MediaRepository(IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
+#pragma warning disable CS0618 // Type or member is obsolete
         IInfoProvider<MediaFileInfo> mediaFileInfoProvider,
         IMediaFileUrlRetriever mediaFileUrlRetriever,
+#pragma warning restore CS0618 // Type or member is obsolete
+
         IMediaFileMediaMetadataProvider mediaFileMediaMetadataProvider,
         IContentItemMediaCustomizer contentItemMediaCustomizer,
         IIdentityService identityService,
@@ -30,9 +31,11 @@ namespace Core.Repositories.Implementation
     {
 
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+#pragma warning disable CS0618 // Type or member is obsolete
         private readonly IInfoProvider<MediaFileInfo> _mediaFileInfoProvider = mediaFileInfoProvider;
         private readonly IMediaFileUrlRetriever _mediaFileUrlRetriever = mediaFileUrlRetriever;
+#pragma warning restore CS0618 // Type or member is obsolete
         private readonly IMediaFileMediaMetadataProvider _mediaFileMediaMetadataProvider = mediaFileMediaMetadataProvider;
         private readonly IContentItemMediaCustomizer _contentItemMediaCustomizer = contentItemMediaCustomizer;
         private readonly IIdentityService _identityService = identityService;
@@ -365,7 +368,7 @@ namespace Core.Repositories.Implementation
         #endregion
 
         #region "Media_File Items"
-
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         public async Task<Result<MediaItem>> GetMediaItemAsync(Guid fileGuid)
         {
             // use cached if possible, much faster, but does have some drawbacks like the DirectUrl is excluded for performance
@@ -405,6 +408,7 @@ namespace Core.Repositories.Implementation
             }
         }
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         public async Task<IEnumerable<MediaItem>> GetMediaItemsByLibraryAsync(string libraryName)
         {
             var builder = _cacheDependencyBuilderFactory.Create()
@@ -433,6 +437,7 @@ namespace Core.Repositories.Implementation
             }, new CacheSettings(15, "GetMediaItemsByLibraryAsync", libraryName));
         }
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         public async Task<IEnumerable<MediaItem>> GetMediaItemsByPathAsync(string path, string? libraryName = null)
         {
             var builder = _cacheDependencyBuilderFactory.Create();
@@ -468,6 +473,7 @@ namespace Core.Repositories.Implementation
 
         #region "Media_File Item Helpers"
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         private async Task<Dictionary<Guid, MediaFileInfo>> GetMediaFileGuidToMediaFile()
         {
             var builder = _cacheDependencyBuilderFactory.Create(false)
@@ -502,6 +508,7 @@ namespace Core.Repositories.Implementation
 
         #region "Obsolete Methods"
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         public Task<Result<string>> GetMediaAttachmentSiteNameAsync(Guid mediaOrAttachmentGuid)
         {
             throw new NotSupportedException("There is no longer a Media File Channel or Attachment Channel, neither require the sitename parameter to operate, you can remove usage of this.");
@@ -525,10 +532,12 @@ namespace Core.Repositories.Implementation
 
         public async Task<Result<MediaItem>> GetMediaItemFromUrl(string url)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             if (url.IsMediaUrl() && url.ParseGuidFromMediaUrl().TryGetValue(out var mediaMediaGuid)
                 && (await GetMediaItemAsync(mediaMediaGuid)).TryGetValue(out var mediaMediaItem)) {
                 return mediaMediaItem;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
             if (url.IsContentAssetUrl() && url.ParseGuidFromAssetUrl().TryGetValue(out var mediaContentAssetGuid)
                 && (await GetContentItemAsset(mediaContentAssetGuid.ContentItemGuid.ToContentIdentity(), mediaContentAssetGuid.FieldGuid, url.GetContentAssetUrlLanguage().AsNullableValue())).TryGetValue(out var contentMediaItem)) {
                 return contentMediaItem;
@@ -540,6 +549,7 @@ namespace Core.Repositories.Implementation
 
         #region "Media Helpers"
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         private static MediaItem MediaFileInfoToMediaItemCached(MediaFileInfo mediaFile)
         {
             return new MediaItem(
@@ -554,6 +564,7 @@ namespace Core.Repositories.Implementation
             };
         }
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         private MediaItem MediaFileInfoToMediaItem(MediaFileInfo mediaFile)
         {
             // using own logic since media file url retriever is not optimized

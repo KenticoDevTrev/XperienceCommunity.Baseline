@@ -5,7 +5,7 @@ using System.Data;
 namespace Core.Services.Implementation
 {
     public class IdentityService(IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider,
         IContentLanguageRetriever contentLanguageRetriever,
         IWebsiteChannelContext websiteChannelContext,
@@ -14,7 +14,7 @@ namespace Core.Services.Implementation
         IContentTypeRetriever contentTypeRetriever) : IIdentityService
     {
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
         private readonly IContentLanguageRetriever _contentLanguageRetriever = contentLanguageRetriever;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;

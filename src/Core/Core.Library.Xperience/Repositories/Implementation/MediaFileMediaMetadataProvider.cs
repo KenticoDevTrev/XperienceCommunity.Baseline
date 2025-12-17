@@ -11,6 +11,7 @@ namespace Core.Repositories.Implementation
         public IProgressiveCache ProgressiveCache { get; } = progressiveCache;
         public IUrlResolver UrlResolver { get; } = urlResolver;
 
+        [Obsolete("Media Library is now Obsolete in Xperience by Kentico.  Migrate to Content Items")]
         public async Task<Result<IMediaMetadata>> GetMediaMetadata(MediaFileInfo mediaFileInfo, MediaItem mediaItem)
         {
             var extension = mediaFileInfo.FileExtension.Trim('.').ToLower();

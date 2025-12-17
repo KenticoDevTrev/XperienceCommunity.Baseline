@@ -15,7 +15,7 @@ namespace Navigation.Repositories.Implementations
     public class SiteMapRepository(IUrlResolver urlResolver,
         IContentItemLanguageMetadataRepository contentItemLanguageMetadataRepository,
         ISiteMapCustomizationService siteMapCustomizationService,
-        IWebPageQueryResultMapper webPageQueryResultMapper,
+        IContentQueryModelTypeMapper contentQueryModelTypeMapper,
         IDynamicNavigationRepository dynamicNavigationRepository,
         ILanguageRepository languageRepository,
         IWebsiteChannelContext websiteChannelContext,
@@ -27,7 +27,7 @@ namespace Navigation.Repositories.Implementations
         private readonly IUrlResolver _urlResolver = urlResolver;
         private readonly IContentItemLanguageMetadataRepository _contentItemLanguageMetadataRepository = contentItemLanguageMetadataRepository;
         private readonly ISiteMapCustomizationService _siteMapCustomizationService = siteMapCustomizationService;
-        private readonly IWebPageQueryResultMapper _webPageQueryResultMapper = webPageQueryResultMapper;
+        private readonly IContentQueryModelTypeMapper _contentQueryModelTypeMapper = contentQueryModelTypeMapper;
         private readonly IDynamicNavigationRepository _dynamicNavigationRepository = dynamicNavigationRepository;
         private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
@@ -98,7 +98,7 @@ May wish to overwrite and implement a custom ISiteMapCustomizationService to par
         private async Task<IEnumerable<SitemapNode>> WebPageContentItemToSitemapNode(IWebPageContentQueryDataContainer data, bool showPagesNotTranslatedInSitemapUrlSet)
         {
             if (data.ContentTypeName.Equals(Generic.Navigation.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase)) {
-                var navItem = _webPageQueryResultMapper.Map<Generic.Navigation>(data);
+                var navItem = _contentQueryModelTypeMapper.Map<Generic.Navigation>(data);
                 var navNodes = new List<SitemapNode>();
 
                 // Don't do automatic (should be caught by other page types) and don't do external links

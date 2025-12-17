@@ -10,17 +10,17 @@ using Localization.Repositories;
 using MVCCaching;
 using System.Text.Json;
 
-namespace Localization.Library.Xperience.Repositories.Implementations
+namespace Localization.Repositories.Implementations
 {
     public class LocalizedCategoryCachedRepository(IInfoProvider<TagInfo> tagInfoProvider,
         IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilder,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilder,
         ILanguageRepository languageRepository,
         IInfoProvider<ContentLanguageInfo> contentLanguageInfoProvider) : ILocalizedCategoryCachedRepository
     {
         private readonly IInfoProvider<TagInfo> _tagInfoProvider = tagInfoProvider;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilder = cacheDependencyBuilder;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilder = cacheDependencyBuilder;
         private readonly ILanguageRepository _languageRepository = languageRepository;
         private readonly IInfoProvider<ContentLanguageInfo> _contentLanguageInfoProvider = contentLanguageInfoProvider;
 

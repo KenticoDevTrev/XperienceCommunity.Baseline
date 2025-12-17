@@ -14,8 +14,8 @@
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
 		<PackageReference Include="MVCCaching.Base.Core" Version="4.5.0" />
-		<PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.2.0" />
-		<PackageReference Include="XperienceCommunity.MemberRoles.Core" Version="2.3.2" />
+		<PackageReference Include="XperienceCommunity.ChannelSettings.Core" Version="1.3.0" />
+		<PackageReference Include="XperienceCommunity.MemberRoles.Core" Version="2.6.0" />
 	</ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using CMS.Localization;
 using CMS.Taxonomy;
 using System.Data;
 
-namespace Localization.Repositories.Implementations
+namespace Localization.KX13.Repositories.Implementations
 {
     public class LocalizedCategoryCachedRepository(
         ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,

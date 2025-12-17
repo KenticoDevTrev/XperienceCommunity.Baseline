@@ -15,13 +15,13 @@ namespace Core.Repositories.Implementation
     /// <param name="websiteChannelInfoProvider"></param>
     public class SiteRepository(IWebsiteChannelContext websiteChannelContext,
         IProgressiveCache progressiveCache,
-        ICacheDependencyBuilderFactory cacheDependencyBuilderFactory,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
         IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider,
         IInfoProvider<ChannelInfo> channelInfoProvider) : ISiteRepository
     {
         private readonly IWebsiteChannelContext _websiteChannelContext = websiteChannelContext;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
         private readonly IInfoProvider<WebsiteChannelInfo> _websiteChannelInfoProvider = websiteChannelInfoProvider;
         private readonly IInfoProvider<ChannelInfo> _channelInfoProvider = channelInfoProvider;
 

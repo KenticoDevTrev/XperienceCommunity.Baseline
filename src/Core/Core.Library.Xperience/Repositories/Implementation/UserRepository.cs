@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Core.Repositories.Implementation
 {
     public class UserRepository<TUser>(IHttpContextAccessor httpContextAccessor,
-        ICacheDependencyBuilderFactory _cacheDependencyBuilderFactory,
-        IProgressiveCache _progressiveCache,
+        ICacheDependencyScopedBuilderFactory cacheDependencyBuilderFactory,
+        IProgressiveCache progressiveCache,
         IInfoProvider<MemberInfo> memberInfoProvider,
         ICacheDependenciesScope cacheDependenciesScope,
         IBaselineUserMapper<TUser> baselineUserMapper,
@@ -15,6 +15,8 @@ namespace Core.Repositories.Implementation
     {
         private const string _userName = "Public";
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly ICacheDependencyScopedBuilderFactory _cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+        private readonly IProgressiveCache _progressiveCache = progressiveCache;
         private readonly IInfoProvider<MemberInfo> _memberInfoProvider = memberInfoProvider;
         private readonly ICacheDependenciesScope _cacheDependenciesScope = cacheDependenciesScope;
         private readonly IBaselineUserMapper<TUser> _baselineUserMapper = baselineUserMapper;

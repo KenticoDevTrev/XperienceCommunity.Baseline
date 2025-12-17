@@ -19,13 +19,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="30.6.3" />
-    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.10" />
-    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.0.3" />
+    <PackageReference Include="Kentico.Xperience.WebApp" Version="31.0.0" />
+    <PackageReference Include="XperienceCommunity.ChannelSettings" Version="1.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.22" />
+    <PackageReference Include="XperienceCommunity.DevTools.Authorization.MemberRoles" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
