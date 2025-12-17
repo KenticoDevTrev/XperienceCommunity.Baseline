@@ -3,6 +3,8 @@
 
 Core Systems, Tools, and Structure to ensure a superior Kentico Website that's easy to migrate, for Kentico Xperience 13 and eventually Xperience by Kentico
 
+**NOTE** If you are not developing in Kentico Xperience 13, I would honestly recommend you do NOT use the Baseline v2, or if you use it only pull in the necessary pieces.  See the Goal and History section below for more.
+
 **[View Installation Instructions and Starting Site Setup for Xperience by Kentico](documentation/site/site-xbyk-setup.md)**
 
 **[View Installation Instructions and Starting Site Setup for KX13](documentation/site/site-kx13-setup.md)**
@@ -29,17 +31,24 @@ Later it morphed into a structure that would make it easy for Kentico Xperience 
 
 Finally, I was able to implement it in Xperience by Kentico (v2.3.0), which now provides a great turn-key solution for people looking to use Xperience by Kentico.
 
+Xperience by Kentico was still missing many key features at the time which the Baseline saught to fill in, however now the platform is robust and many of these work-arounds are no longer needed, thus the Baseline v2 is not a good choice for starting out with a new Xperience by Kentico Project, wait for v3 (mid 2026) or simply look and grab what functionality / logic you want from this baseline for your own usage until then.
+
+### Final Baseline v2 - Future v3
+
+Version 2.10 is the final version of the Baseline that features "Dual Support" for Kentico Xperience 13 and Xperience by Kentico.  In 2026, we plan on creating a brand new Baseline that will be Xperience Only, and will focus on leveraging all the new Xperience Features without all the complex Project Structure / Hacks / "Kentico Agnostic" projects since people will no longer are developing on Kentico Xperience 13 (or at least shouldn't be).  Version 3 will also be built in .net 10.
+
 ### Documentation
 
 Documentation is my next goal, I'll be focusing on the Xperience by Kentico at this point as you should be building on that platform vs. KX13.
 
 **See more about the design principle in my talk ['Patterns for an easy-to-migrate and easy-to-maintain website'](https://www.kentico.com/presentation/patterns-for-an-easy-to-migrate-and-easy-to-mainta)**
 
-## Current Version: 2.X
+## Current Version: 2.x
 
 As each refresh is launched, the baseline is being updated to the latest Xperience Refresh.  Below is a table of the Baseline version to the Refresh
 
 Baseline => Xperience
+- v2.10 => 31.0.0
 - v2.9 => 30.6.3
 - v2.8 => 30.5.4
 - v2.7 => 30.4.0
@@ -47,6 +56,10 @@ Baseline => Xperience
 - v2.5 => 30.2.0
 - v2.4 => 30.1.0
 - v2.3 => 30.0.0
+
+## Version: 2.10 (December 17, 2025)
+
+Xperience released it's version 31.0.0 Refresh (with .net 10 support) as well as the final refresh for Kentico Xperience 13.0.197 with .net 10 support.  This will be the final version of the Baseline v2 (except bug fixes)
 
 ## Version: 2.9 (September 9, 2025)
 
