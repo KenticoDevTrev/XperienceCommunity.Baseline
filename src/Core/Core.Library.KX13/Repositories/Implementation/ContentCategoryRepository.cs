@@ -132,7 +132,7 @@ namespace Core.KX13.Repositories.Implementation
 
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(siteNames.Select(x => $"node|{x}|/|childnodes").ToArray());
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([.. siteNames.Select(x => $"node|{x}|/|childnodes")]);
                 }
 
                 var query = $"SELECT {nameof(TreeNode.DocumentID)} ,{nameof(TreeNode.DocumentCulture)} ,{nameof(TreeNode.DocumentNodeID)}  FROM CMS_Document order by {nameof(TreeNode.DocumentNodeID)}";
@@ -174,7 +174,7 @@ namespace Core.KX13.Repositories.Implementation
 
             return await _progressiveCache.LoadAsync(async cs => {
                 if (cs.Cached) {
-                    cs.CacheDependency = CacheHelper.GetCacheDependency(siteNames.Select(x => $"node|{x}|/|childnodes").ToArray());
+                    cs.CacheDependency = CacheHelper.GetCacheDependency([.. siteNames.Select(x => $"node|{x}|/|childnodes")]);
                 }
 
                 var query = $"SELECT {nameof(TreeNode.DocumentID)} ,{nameof(TreeNode.DocumentNodeID)}  FROM CMS_Document order by {nameof(TreeNode.DocumentID)}";

@@ -15,6 +15,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="MVCCaching.Base.Core.Components" Version="8.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Core.Library\Core.Library.csproj" />
 		<ProjectReference Include="..\Core.Models\Core.Models.csproj" />
 	</ItemGroup>

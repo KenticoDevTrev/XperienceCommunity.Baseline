@@ -9,8 +9,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="13.0.130" />
-		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.16.5" />
+		<PackageReference Include="Kentico.Xperience.AspNetCore.WebApp" Version="13.0.198" />
+		<PackageReference Include="XperienceCommunity.MVCCaching" Version="13.197.0" />
 		<PackageReference Include="RelationshipsExtended.Base" Version="13.0.10" />
 		<PackageReference Include="XperienceCommunity.PageBuilderTagHelpers" Version="1.1.0" />
 		<PackageReference Include="XperienceCommunity.PageBuilderUtilities" Version="1.1.0" />
