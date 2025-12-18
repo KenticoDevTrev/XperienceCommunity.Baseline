@@ -19,7 +19,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
     public class BaselineBaseMetadataIndexingStrategy(
         IContentQueryExecutor queryExecutor,
         IProgressiveCache progressiveCache,
-        IWebPageQueryResultMapper webPageQueryResultMapper,
+        IContentQueryModelTypeMapper contentQueryModelTypeMapper,
         IMetaDataWebPageDataContainerConverter metaDataWebPageDataContainerConverter,
         BaselineSearchLuceneWebCrawlerService baselineSearchLuceneWebCrawlerService,
         BaselineSearchLuceneWebScraperSanitizer baselineSearchLuceneWebScraperSanitizer,
@@ -28,7 +28,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
     {
         private readonly IContentQueryExecutor _queryExecutor = queryExecutor;
         private readonly IProgressiveCache _progressiveCache = progressiveCache;
-        private readonly IWebPageQueryResultMapper _webPageQueryResultMapper = webPageQueryResultMapper;
+        private readonly IContentQueryModelTypeMapper _contentQueryModelTypeMapper = contentQueryModelTypeMapper;
         private readonly IMetaDataWebPageDataContainerConverter _metaDataWebPageDataContainerConverter = metaDataWebPageDataContainerConverter;
         private readonly BaselineSearchLuceneWebCrawlerService _baselineSearchLuceneWebCrawlerService = baselineSearchLuceneWebCrawlerService;
         private readonly BaselineSearchLuceneWebScraperSanitizer _baselineSearchLuceneWebScraperSanitizer = baselineSearchLuceneWebScraperSanitizer;
@@ -57,7 +57,7 @@ namespace Search.Library.Xperience.Lucene.IndexStrategies
                 // Add Authorization filtering fields so can filter results.
                 document.AddStoredField(nameof(ContentItemFields.ContentItemID), result.ContentItemID);
                 try { 
-                    var permissionObject = _webPageQueryResultMapper.Map<XperienceCommunityMemberPermissionConfigurationConfigurationForMapping>(result);
+                    var permissionObject = _contentQueryModelTypeMapper.Map<XperienceCommunityMemberPermissionConfigurationConfigurationForMapping>(result);
                     document.AddStoredField(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionOverride), permissionObject.MemberPermissionOverride.ToString());
                     document.AddStoredField(nameof(IXperienceCommunityMemberPermissionConfiguration.MemberPermissionIsSecure), permissionObject.MemberPermissionIsSecure.ToString());
                     if(permissionObject.MemberPermissionOverride && permissionObject.MemberPermissionRoleTags.Any()) {
