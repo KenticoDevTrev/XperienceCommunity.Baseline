@@ -6,7 +6,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.198" />
+    <PackageReference Include="Kentico.Xperience.Libraries" Version="13.0.198" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 	</ItemGroup>
 
 </Project>
