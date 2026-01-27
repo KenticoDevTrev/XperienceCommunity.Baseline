@@ -15,7 +15,7 @@ namespace Core.TagHelpers
         {
             var linkTextHtml = (await output.GetChildContentAsync()).GetContent();
             var linkTextNoHtml = linkTextHtml.RemoveHtmlTags();
-
+            
             var contentPostfixHtml = "";
             var contentPrefixHtml = "";
             var ariaRole = "link";
@@ -92,10 +92,13 @@ namespace Core.TagHelpers
             if (linkTextHasValue && !string.IsNullOrWhiteSpace(contentPostfixHtml)) {
                 output.PostContent.AppendHtml(contentPostfixHtml);
             }
-
-            output.Attributes.AddorReplaceEmptyAttribute("title", linkTextNoHtml);
+            if(noLinkTextNorTitle)
+            {
+                output.Attributes.AddorReplaceEmptyAttribute("title", linkTextNoHtml);    
+                output.Attributes.AddorReplaceEmptyAttribute("aria-label", linkTextNoHtml);
+            }
+            
             output.Attributes.AddorReplaceEmptyAttribute("role", ariaRole);
-            output.Attributes.AddorReplaceEmptyAttribute("aria-label", linkTextNoHtml);
         }
 
         [GeneratedRegex(".*[0-9]{3}.*")]
