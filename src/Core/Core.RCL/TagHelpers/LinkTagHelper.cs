@@ -15,7 +15,8 @@ namespace Core.TagHelpers
         {
             var linkTextHtml = (await output.GetChildContentAsync()).GetContent();
             var linkTextNoHtml = linkTextHtml.RemoveHtmlTags();
-            
+            var originalLinkTextNoHtml = linkTextNoHtml;
+
             var contentPostfixHtml = "";
             var contentPrefixHtml = "";
             var ariaRole = "link";
@@ -92,12 +93,17 @@ namespace Core.TagHelpers
             if (linkTextHasValue && !string.IsNullOrWhiteSpace(contentPostfixHtml)) {
                 output.PostContent.AppendHtml(contentPostfixHtml);
             }
-            if(noLinkTextNorTitle)
-            {
-                output.Attributes.AddorReplaceEmptyAttribute("title", linkTextNoHtml);    
-                output.Attributes.AddorReplaceEmptyAttribute("aria-label", linkTextNoHtml);
+
+            var titleValue = title.GetValueOrDefault(linkTextNoHtml).Trim();
+            if (titleValue.Equals(originalLinkTextNoHtml.Trim(), StringComparison.OrdinalIgnoreCase)) {
+                // remove title if same as original link text - redundant attribute
+                output.Attributes.RemoveAll("title");
+                output.Attributes.RemoveAll("aria-label");
+            } else {
+                output.Attributes.AddorReplaceEmptyAttribute("title", titleValue);
+                output.Attributes.AddorReplaceEmptyAttribute("aria-label", titleValue);
             }
-            
+
             output.Attributes.AddorReplaceEmptyAttribute("role", ariaRole);
         }
 
