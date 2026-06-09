@@ -118,7 +118,7 @@ namespace Core.Repositories.Implementation
                         .ToDictionary(
                             g => g.Key,
                             g => DataRowToPageIdentity(g.First())
-                        );
+                        ));
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetPageIdentityByWebpageIdAndLanguage"));
         }
         private readonly string _baseQuery = @"
