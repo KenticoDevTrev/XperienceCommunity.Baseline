@@ -113,10 +113,12 @@ namespace Core.Repositories.Implementation
                 return (await XperienceCommunityConnectionHelper.ExecuteQueryAsync(query, [], QueryTypeEnum.SQLQuery)).Tables[0].Rows.Cast<DataRow>()
                 .GroupBy(x => (int)x["WebPageItemID"])
                 .ToDictionary(key => key.Key, value =>
-                    value.ToDictionary(key => ((string)key["ContentLanguageName"]).ToLowerInvariant(),
-                        value => DataRowToPageIdentity(value)
-                        )
-                    );
+                    value
+                        .GroupBy(x => ((string)x["ContentLanguageName"]).ToLowerInvariant())
+                        .ToDictionary(
+                            g => g.Key,
+                            g => DataRowToPageIdentity(g.First())
+                        );
             }, new CacheSettings(CacheMinuteTypes.VeryLong.ToDouble(), "GetPageIdentityByWebpageIdAndLanguage"));
         }
         private readonly string _baseQuery = @"
