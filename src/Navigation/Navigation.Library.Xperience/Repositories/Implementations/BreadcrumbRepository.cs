@@ -112,7 +112,7 @@ namespace Navigation.Repositories.Implementations
             var settings = await _channelCustomSettingsRepository.GetSettingsModel<NavigationChannelSettings>();
             var builder = _cacheDependencyBuilderFactory.Create();
             builder.AddKeys(_channelCustomSettingsRepository.GetSettingModelDependencyKeys<NavigationChannelSettings>())
-                .AddKey($"webpageitems|all");
+                .AddKey($"webpageitem|all");
 
             string[] validClassNames = [.. (settings.NavigationPageTypes ?? "").ToLower().Split(";|,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim())];
             var channelName = _websiteChannelContext.WebsiteChannelName;
