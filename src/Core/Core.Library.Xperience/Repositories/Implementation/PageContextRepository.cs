@@ -146,7 +146,7 @@ inner join CMS_WebsiteChannel on WebsiteChannelID = WebPageItemWebsiteChannelID
 inner join CMS_Class on ClassID = ContentItemContentTypeID
 inner join CMS_WebPageUrlPath on WebPageUrlPathWebPageItemID = WebPageItemID and WebPageUrlPathContentLanguageID = ContentLanguageID
 inner join CMS_ContentItemCommonData on ContentItemCommonDataContentItemID = ContentItemID and ContentItemCommonDataContentLanguageID = ContentItemLanguageMetadataContentLanguageID
-where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1
+where ContentItemCommonDataIsLatest = 1 and WebPageUrlPathIsLatest = 1 and WebPageUrlPathIsCanonical = 1
 ";
 
         private PageIdentity DataRowToPageIdentity(DataRow value) => new(
