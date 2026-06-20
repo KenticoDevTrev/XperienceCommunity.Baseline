@@ -48,6 +48,7 @@ Documentation is my next goal, I'll be focusing on the Xperience by Kentico at t
 As each refresh is launched, the baseline is being updated to the latest Xperience Refresh.  Below is a table of the Baseline version to the Refresh
 
 Baseline => Xperience
+- v2.11 => 31.1.2
 - v2.10 => 31.0.0
 - v2.9 => 30.6.3
 - v2.8 => 30.5.4
@@ -57,9 +58,14 @@ Baseline => Xperience
 - v2.4 => 30.1.0
 - v2.3 => 30.0.0
 
+
+## Version: 2.11 (June 20, 2026)
+
+Small update to the Baseline to go to Xperience refresh 31.1.2.  Adding so a key missing functionality (visibility conditions on forms) can be included in this support. This will be the final version of the Baseline v2 (except bug fixes), too much of the API and core functionality around Roles and such are changing beyond this.  I will be creating a slimmer, Xperience by Kentico only version over the next year, although feel free to pick apart this project for your own needs.  It MAY function fine with higher versions, i just haven't tested...
+
 ## Version: 2.10 (December 17, 2025)
 
-Xperience released it's version 31.0.0 Refresh (with .net 10 support) as well as the final refresh for Kentico Xperience 13.0.197 with .net 10 support.  This will be the final version of the Baseline v2 (except bug fixes)
+Xperience released it's version 31.0.0 Refresh (with .net 10 support) as well as the final refresh for Kentico Xperience 13.0.197 with .net 10 support.  
 
 ## Version: 2.9 (September 9, 2025)
 
