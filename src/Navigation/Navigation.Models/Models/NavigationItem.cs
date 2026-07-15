@@ -19,6 +19,7 @@
         public Maybe<int> LinkPageID { get; set; }
         public Maybe<int> LinkContentCultureID { get; set; }
         public bool IsMegaMenu { get; set; } = false;
+        public Maybe<object> LinkAdditionalData { get; init; }
 
         /// <summary>
         /// Call this on the top level navigation items to set the levels
@@ -49,7 +50,8 @@
                 LinkContentCultureGuid = LinkContentCultureGuid,
                 LinkPageID = LinkPageID,
                 LinkContentCultureID = LinkContentCultureID,
-                IsMegaMenu = IsMegaMenu
+                IsMegaMenu = IsMegaMenu,
+                LinkAdditionalData = LinkAdditionalData
             };
         }
     }
@@ -78,6 +80,11 @@
         public Maybe<int> LinkPageID { get; init; }
         public Maybe<int> LinkContentCultureID { get; init; }
         public bool IsMegaMenu { get; init; } = false;
+        
+        /// <summary>
+        /// This can be any object, will need to do type checking to determine which it is.
+        /// </summary>
+        public Maybe<object> LinkAdditionalData { get; init; }
 
 
 
